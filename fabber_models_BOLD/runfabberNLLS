@@ -1,0 +1,4 @@
+#!/bin/bash
+
+./fabber --method=vb --noise=white --allow-bad-voxels --output=../Fabber_Results/ --data1=../Fabber_Results/brain_1.nii.gz --model=BOLD2c --mask=../Fabber_Results/brain_mask.nii.gz --tau1=-0.016 --tau2=-0.008 --tau3=0.0 --tau4=0.008 --tau5=0.016 --tau6=0.024 --tau7=0.032 --tau8=0.040 --tau9=0.048 --tau10=0.056 --tau11=0.064
+
