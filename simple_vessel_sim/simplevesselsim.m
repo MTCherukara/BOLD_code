@@ -19,12 +19,12 @@ function [storedProtonPhase, p] = simplevesselsim(p)
 	
 	t(1) = now;
 	
-	% set up random number generator
-	if ~isfield(p,'seed')
-		fid = fopen('/dev/urandom');
-		p.seed = fread(fid, 1, 'uint32');
-	end
-	rng(p.seed); % use a random seed to avoid problems when running on a cluster
+	% set up random number generator - not necessary when running locally
+% 	if ~isfield(p,'seed')
+% 		fid = fopen('/dev/urandom');
+% 		p.seed = fread(fid, 1, 'uint32');
+% 	end
+% 	rng(p.seed); % use a random seed to avoid problems when running on a cluster
 	
 	% define parameters for simulation
 	p.HD = 10; % factor for higher density sampling near vessels
@@ -90,10 +90,13 @@ function [vesselOrigins, vesselNormals, R, deltaChi, protonPosit, numVessels, ve
     % withinSphere=find(sqrt(sum(vesselOrigins.^2,2))<=p.universeSize); % LEAVE OUT
     % vesselOrigins=vesselOrigins(withinSphere,:); % LEAVE OUT
     
-    % distribute some vessel origins within sphere and some on surface (50-50)
+    % generate some (normalized) random directions (lines from the centre
+    % of the universe to the edge), then pick a random point along each
+    % line and use that as the origin for each vessel (half of the vessels
+    % will begin at the edge of the universe, rather than at the end).
     randomNormals = randn(M,3);
     randomNormals = randomNormals./repmat(sqrt(sum(randomNormals.^2,2)),1,3);
-    r = repmat(p.universeSize.*rand(M,1).^(1/3),1,3);
+    r = repmat(p.universeSize.*rand(M,1).^(1/3),1,3); % this can be efficiencied, 
     % r = repmat(p.universeSize,M,3); % LEAVE OUT
     r(2:2:end,:) = repmat(p.universeSize,M/2,3); %half of vessel origins on the surface
     vesselOrigins = r.*randomNormals;
@@ -103,6 +106,7 @@ function [vesselOrigins, vesselNormals, R, deltaChi, protonPosit, numVessels, ve
     % vesselNormals=vesselNormals./repmat(sqrt(sum(vesselNormals.^2,2)),1,3); % LEAVE OUT
     % vesselNormals=repmat([0 0 1],length(withinSphere),1); % LEAVE OUT
 
+    % generate random (normalized) directions for each vessel
     vesselNormals = randn(M,3);
     vesselNormals = vesselNormals./repmat(sqrt(sum(vesselNormals.^2,2)),1,3);
     
