@@ -23,7 +23,7 @@ function [sig_ase, tau_ase] = plotresults(p,storedPhase,varargin)
 	Yscale = (1-r.Y)./(1-p.Y(end));
 	
 	%generate an ASE weighted signal
-	TEind = find(round(t.*1000)==round(r.TE*1000),1,'first');
+	TEind = find(round(t)==round(r.TE),1,'first');
 	
 	for k = 1:TEind+1
 		ASEPhase(k,:) = sum(storedPhase(1:k-1,:),1)-sum(storedPhase(k:TEind,:),1);
@@ -42,7 +42,7 @@ function [sig_ase, tau_ase] = plotresults(p,storedPhase,varargin)
 	if length(protonIndex)<5000
 		sig_aseEV = NaN;
 	else
-		sig_aseEV = abs(sum(exp(-i.*ASEPhase(:,protonIndex).*Yscale),2)./length(protonIndex));
+		sig_aseEV = abs(sum(exp(-1i.*ASEPhase(:,protonIndex).*Yscale),2)./length(protonIndex));
 	end
 	
 	sig_aseIV = intravascularsim(p,r.TE,r.Y);
@@ -65,15 +65,18 @@ function [sig_ase, tau_ase] = plotresults(p,storedPhase,varargin)
 	
 	%plot signal curves
 	if r.display
-		figure(100);
+		figure;
 		hold on;
 		plot(tau_gesse.*1000,sig_gesse,'o-');
+        xlabel('Time (ms)')
+        ylabel('Signal');
 		box on;
-	
-		figure(101);
-		hold on;
-		plot(tau_ase.*1000,sig_ase,'o-');
-		box on;
+        
+        % for now we'll hide the ASE results and just look at GESSE
+% 		figure(101);
+% 		hold on;
+% 		plot(tau_ase.*1000,sig_ase,'o-');
+% 		box on;
 	end
 
 return;
