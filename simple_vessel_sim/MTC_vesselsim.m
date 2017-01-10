@@ -143,7 +143,7 @@ function [vesselOrigins, vesselNormals, R, deltaChi, protonPosit, numVessels, ve
     % blood coming in from arterioles) and 0.6 (deoxygenated blood going
     % out from capillary bed into venules)
 %     vOxygen   = 0.6 + 0.35*rand(cutOff,1); % U(0.60,0.95)
-    vOxygen   = p.Y + 0.1*randn(cutOff,1); % N(0.775,0.10) - set such that the p.Y parameter is the mean
+    vOxygen   = p.Y + 0.1*randn(cutOff,1); % N(Y,0.10) - set such that the p.Y parameter is the mean
     deltaChi  = p.deltaChi0*p.Hct.*(1-vOxygen);
     
     protonPosit = [0 0 0];

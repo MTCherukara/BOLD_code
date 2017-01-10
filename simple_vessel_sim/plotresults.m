@@ -32,14 +32,14 @@ function [sig_ase, tau_ase] = plotresults(p,storedPhase,varargin)
 	
 	switch(r.permeable)
 		case true
-			protonIndex = (1:5000);
+			protonIndex = (1000);
 		case false
-			protonIndex = find(p.numStepsInVessel==0,5000,'first');
+			protonIndex = find(p.numStepsInVessel==0,1000,'first');
 		otherwise
-			protonIndex = find(p.numStepsInVessel==0,5000,'first');
+			protonIndex = find(p.numStepsInVessel==0,1000,'first');
 	end
 	
-	if length(protonIndex)<5000
+	if length(protonIndex)<1000
 		sig_aseEV = NaN;
 	else
 		sig_aseEV = abs(sum(exp(-1i.*ASEPhase(:,protonIndex).*Yscale),2)./length(protonIndex));
@@ -65,7 +65,7 @@ function [sig_ase, tau_ase] = plotresults(p,storedPhase,varargin)
 	
 	%plot signal curves
 	if r.display
-		figure;
+		figure(22)
 		hold on;
 		plot(tau_gesse.*1000,sig_gesse,'o-');
         xlabel('Time (ms)')
@@ -73,10 +73,10 @@ function [sig_ase, tau_ase] = plotresults(p,storedPhase,varargin)
 		box on;
         
         % for now we'll hide the ASE results and just look at GESSE
-% 		figure(101);
-% 		hold on;
-% 		plot(tau_ase.*1000,sig_ase,'o-');
-% 		box on;
+		figure(33);
+		hold on;
+		plot(tau_ase.*1000,sig_ase,'o-');
+		box on;
 	end
 
 return;
