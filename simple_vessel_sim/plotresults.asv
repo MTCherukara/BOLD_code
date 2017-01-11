@@ -33,7 +33,7 @@ function [sig_ase, tau_ase] = plotresults(p,storedPhase,varargin)
 	
 	switch(r.permeable) % this will be FALSE
 		case true
-			protonIndex = 1:1000;
+			protonIndex = (1000);
 		case false
             % protonIndex = [952 points]
 			protonIndex = find(p.numStepsInVessel==0,1000,'first');
@@ -43,7 +43,7 @@ function [sig_ase, tau_ase] = plotresults(p,storedPhase,varargin)
 	
     % don't generate an ASE signal at all if the proton didn't spend a
     % suitable amount of time outside the vessel
-	if length(protonIndex)<1000 
+	if length(protonIndex)<500 
 		sig_aseEV = NaN;
     else
         sigexp = exp(-1i.*ASEPhase(:,protonIndex).*Yscale);

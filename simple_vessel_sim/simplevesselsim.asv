@@ -265,7 +265,19 @@ function [totalField, numStepsInVessel, numCloseApproaches, stepInLargeVessel] =
 		stepInLargeVessel = max(R(find(sum(mask,2)>0)))>4e-6;
 	else
 		stepInLargeVessel=0;
-    end
+	end
+
+	% keyboard; % LEAVE OUT
+	
+	% fields=p.B0.*2.*pi.*p.deltaChi.*(p.R./r).^2.*cos(2.*phi).*sin(repmat(theta,1,1,p.numSteps)).^2; % LEAVE OUT
+	% fields_intra=p.B0.*2.*pi./3.*p.deltaChi.*(3.*cos(repmat(theta,1,1,p.numSteps)).^2-1); % LEAVE OUT
+	% fields(r<p.R)=0; %really should be calculating field inside vessel % LEAVE OUT
+	% fields=fields % LEAVE OUT
+
+    % totalField= p.B0 + sum(fields,1); % LEAVE OUT
+    % totalField=squeeze(totalField);   % LEAVE OUT
+    
+    % keyboard; % LEAVE OUT
 return;
 
 
