@@ -204,6 +204,7 @@ function [totalField, numStepsInVessel, numCloseApproaches, stepInLargeVessel] =
 	fields = fields_extra.*(~mask)+fields_intra.*mask;
 	
 	% CONSIDER CLEARING NO LONGER NEEDED VARIABLES HERE
+    clear fields_extra fields_intra nb nc np relPosits phi protonPosits
 		
 	% START HD
 	% find vessels within R^2/r^2<0.04 of the proton

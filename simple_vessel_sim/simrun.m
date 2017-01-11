@@ -5,7 +5,7 @@ p.vesselDensity=0.05;   % set vessel density (is this the same as p.vesselFracti
 
 p.R = 2.5e-6;   % radius, in m
 p.D = 0;        % diffusion, in m^2/s
-Y = 0.7;        % oxygenation fraction (1-OEF)
+Y = 0.6;        % oxygenation fraction (1-OEF)
 
 for j = 1:length(Y)
     
@@ -14,7 +14,7 @@ for j = 1:length(Y)
     
     disp(['Running Y = ',num2str(p.Y)])
     
-	for k = 1:10  % loop through 10 iterations
+	for k = 1%:10  % loop through 10 iterations
 		[storedPhase(:,:,k),p] = simplevesselsim(p); 
 %         [storedPhase_N(:,:,k),p] = MTC_vesselsim(p); 
 		fprintf('.');          
