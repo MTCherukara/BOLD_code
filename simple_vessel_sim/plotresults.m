@@ -26,7 +26,7 @@ function [sig_ase, tau_ase] = plotresults(p,storedPhase,varargin)
 	TEind = find(round(t)==round(r.TE),1,'first'); % = 1, does nothing
 	
 	for k = 1:TEind+1 % loops through 2, why?
-        % ASEPhase = [2,1000], first row -X, second row +X
+        %%% ASEPhase = [2,1000], first row -X, second row +X
 		ASEPhase(k,:) = sum(storedPhase(1:k-1,:),1)-sum(storedPhase(k:TEind,:),1);
 	end
 	tau_ase = (r.TE:-p.deltaTE*2:-r.TE)'; % [31 points]
@@ -35,7 +35,7 @@ function [sig_ase, tau_ase] = plotresults(p,storedPhase,varargin)
 		case true
 			protonIndex = 1:1000;
 		case false
-            % protonIndex = [952 points]
+            %%% protonIndex = [952 points]
 			protonIndex = find(p.numStepsInVessel==0,1000,'first');
 		otherwise
 			protonIndex = find(p.numStepsInVessel==0,1000,'first');
@@ -61,27 +61,27 @@ function [sig_ase, tau_ase] = plotresults(p,storedPhase,varargin)
 	end
 	
 	%generate a GESSE weighted signal
-% 	TE2ind = find(round(t.*1000)==round(r.TE*500),1,'first');
-% 	mask   = repmat([ones(TE2ind,1); -ones(size(storedPhase,1)-TE2ind,1)],1,p.N);
-% 	GESSEPhase = cumsum(storedPhase.*mask,1);
-% 	tau_gesse  = t-r.TE;
-% 	sig_gesse  = abs(sum(exp(-1i.*GESSEPhase.*Yscale),2)./p.N);
+	TE2ind = find(round(t.*1000)==round(r.TE*500),1,'first');
+	mask   = repmat([ones(TE2ind,1); -ones(size(storedPhase,1)-TE2ind,1)],1,p.N);
+	GESSEPhase = cumsum(storedPhase.*mask,1);
+	tau_gesse  = t-r.TE;
+	sig_gesse  = abs(sum(exp(-1i.*GESSEPhase.*Yscale),2)./p.N);
 	
 	%plot signal curves
 	if r.display
         % GESSE
-% 		figure(22)
-% 		hold on;
-% 		plot(tau_gesse.*1000,sig_gesse,'o-');
-%         xlabel('Time (ms)')
-%         ylabel('Signal');
-% 		box on;
+		figure(22)
+		hold on;
+		plot(tau_gesse.*1000,sig_gesse,'o-');
+        xlabel('Time (ms)')
+        ylabel('Signal');
+		box on;
         
         % ASE
-		figure(33);
-		hold on;
-		plot(tau_ase.*1000,sig_ase,'o-');
-		box on;
+% 		figure(33);
+% 		hold on;
+% 		plot(tau_ase.*1000,sig_ase,'o-');
+% 		box on;
 	end
 
 return;
