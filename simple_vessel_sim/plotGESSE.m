@@ -13,7 +13,7 @@ function [sig_gesse, tau_gesse] = plotGESSE(p,storedPhase)
 	sig_gesse  = abs(sum(exp(-1i.*GESSEPhase),2)./p.N);
 	
     %plot signal curves
-    figure(22); hold on;
+    figure(23); hold on;
     plot(tau_gesse.*1000,sig_gesse,'o-');
     xlabel('Time (ms)')
     ylabel('Signal');

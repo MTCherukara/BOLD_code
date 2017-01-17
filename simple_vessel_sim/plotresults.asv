@@ -25,7 +25,7 @@ function [sig_ase, tau_ase] = plotresults(p,storedPhase,varargin)
 	%generate an ASE weighted signal
 	TEind = find(round(1000*t)==round(1000*r.TE),1,'first');
 	
-	for k = 1:TEind+1 % should produce the same number of rows as tau_ase (31)
+	for k = 1:TEind+1 % should produce the same n
         %%% ASEPhase = [2,1000], first row -X, second row +X
 		ASEPhase(k,:) = sum(storedPhase(1:k-1,:),1)-sum(storedPhase(k:TEind,:),1);
 	end
@@ -42,14 +42,13 @@ function [sig_ase, tau_ase] = plotresults(p,storedPhase,varargin)
     end
 	
     % don't generate an ASE signal at all if the proton didn't spend a
-    % suitable amount of time outside the vessel - maybe we just get rid of
-    % this statement, and use the whole length regardless (for now)
-% 	if length(protonIndex)<500 
-% 		sig_aseEV = NaN;
-%     else
+    % suitable amount of time outside the vessel
+	if length(protonIndex)<1000 
+		sig_aseEV = NaN;
+    else
         sigexp = exp(-1i.*ASEPhase(:,protonIndex).*Yscale);
-		sig_aseEV = abs(sum(sigexp,2)./length(protonIndex));
-%     end
+		sig_aseEV = abs(sum(sigexp,1)./length(protonIndex));
+    end
 	
 	switch(r.includeIV)
 		case true

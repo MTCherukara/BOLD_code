@@ -61,28 +61,12 @@ function [sig_ase, tau_ase] = plotresults(p,storedPhase,varargin)
 			sig_ase = sig_aseEV.*exp(-r.TE./r.T2EV);
 	end
 	
-	%generate a GESSE weighted signal
-% 	TE2ind = find(round(t.*1000)==round(r.TE*500),1,'first');
-% 	mask   = repmat([ones(TE2ind,1); -ones(size(storedPhase,1)-TE2ind,1)],1,p.N);
-% 	GESSEPhase = cumsum(storedPhase.*mask,1);
-% 	tau_gesse  = t-r.TE;
-% 	sig_gesse  = abs(sum(exp(-1i.*GESSEPhase.*Yscale),2)./p.N);
-	
-	%plot signal curves
-	if r.display
-        % GESSE
-% 		figure(22)
-% 		hold on;
-% 		plot(tau_gesse.*1000,sig_gesse,'o-');
-%         xlabel('Time (ms)')
-%         ylabel('Signal');
-% 		box on;
-
-        % ASE
-		figure(33);
-		hold on;
-		plot(tau_ase.*1000,sig_ase,'o-');
-		box on;
-	end
+    % ASE
+    figure(32);
+    hold on;
+    plot(tau_ase.*1000,sig_ase,'o-');
+    xlabel('Time (ms)')
+    ylabel('Signal');
+    box on;
 
 return;

@@ -6,7 +6,7 @@ p.vesselDensity=0.05;   % set vessel density (is this the same as p.vesselFracti
 p.R = 2.5e-6;   % radius, in m
 p.D = 0;        % diffusion, in m^2/s
 p.Y = 0.6;      % oxygenation fraction (1-OEF) 
-X = 0.06;        % TE values
+X = 0.04:0.02:0.1;        % TE values
 
 for j = 1:length(X)
     
@@ -30,9 +30,8 @@ for j = 1:length(X)
 	disp(['TE=',num2str(1000*p.TE),'ms completed']);
 %     [sGESSE(:,j),tGESSE] = plotGESSE(p,storedPhase); % include T2 of 80 ms (grey matter)
 %     ylim([0.7,1]);
-%     [sASE(:,j),  tASE]   = plotASE(p,storedPhase);
-    plotASE(p,storedPhase);
-    clear storedPhase
+    [sASE(:,j),  tASE]   = plotASE(p,storedPhase);
+    
 %     hold on
 %     plotresults(p,storedPhase_N);
 %     title(['GESSE Sequence, D = ',num2str(1e9*p.D)])
