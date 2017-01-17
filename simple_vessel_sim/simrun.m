@@ -4,7 +4,7 @@ p=gentemplate;          % create basic set of parameters
 p.vesselDensity=0.05;   % set vessel density (is this the same as p.vesselFraction ?)
 
 p.R = 2.5e-6;   % radius, in m
-p.D = 0;        % diffusion, in m^2/s
+p.D = 0.1e-9;        % diffusion, in m^2/s
 p.Y = 0.6;      % oxygenation fraction (1-OEF) 
 X = 0.06;        % TE values
 
@@ -32,7 +32,7 @@ for j = 1:length(X)
 %     ylim([0.7,1]);
 %     [sASE(:,j),  tASE]   = plotASE(p,storedPhase);
     plotASE(p,storedPhase);
-    clear storedPhase
+    
 %     hold on
 %     plotresults(p,storedPhase_N);
 %     title(['GESSE Sequence, D = ',num2str(1e9*p.D)])
