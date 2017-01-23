@@ -44,12 +44,12 @@ function [sig_ase, tau_ase] = plotresults(p,storedPhase,varargin)
     % don't generate an ASE signal at all if the proton didn't spend a
     % suitable amount of time outside the vessel - maybe we just get rid of
     % this statement, and use the whole length regardless (for now)
-	if length(protonIndex)<1000 
-		sig_aseEV = NaN;
-    else
+% 	if length(protonIndex)<1000 
+% 		sig_aseEV = NaN;
+%     else
         sigexp = exp(-1i.*ASEPhase(:,protonIndex).*Yscale);
 		sig_aseEV = abs(sum(sigexp,2)./length(protonIndex));
-    end
+%     end
 	
 	switch(r.includeIV)
 		case true

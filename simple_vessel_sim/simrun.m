@@ -4,16 +4,16 @@ p=gentemplate;          % create basic set of parameters
 p.vesselDensity=0.05;   % set vessel density (is this the same as p.vesselFraction ?)
 
 p.R = 2.5e-6;   % radius, in m
-p.D = 0.1e-9;        % diffusion, in m^2/s
+p.D = 0;        % diffusion, in m^2/s
 p.Y = 0.6;      % oxygenation fraction (1-OEF) 
-X = 0.06;        % TE values
+X = [0.5,0.7,0.9];        % TE values
 
 for j = 1:length(X)
     
-    p.TE = X(j);
+    p.Y = X(j);
     p.deltaChi = p.deltaChi0.*p.Hct.*(1-p.Y); % calculate susceptibility difference
     
-    disp(['Running TE = ',num2str(p.TE)])
+    disp(['Running X = ',num2str(X(j))])
     
 	for k = 1%:10  % loop through 10 iterations
 		[storedPhase(:,:,k),p] = simplevesselsim(p); 
