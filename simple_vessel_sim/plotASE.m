@@ -1,4 +1,4 @@
-function [sig_ase, tau_ase] = plotresults(p,storedPhase,varargin) 
+function [sig_ase, tau_ase] = plotASE(p,storedPhase,varargin) 
 
 	q = inputParser;
 	addParameter(q,'TE',p.TE,@isnumeric); %target echo time
@@ -62,11 +62,13 @@ function [sig_ase, tau_ase] = plotresults(p,storedPhase,varargin)
 	end
 	
     % ASE
-    figure(32);
-    hold on;
-    plot(tau_ase.*1000,sig_ase,'o-');
-    xlabel('Time (ms)')
-    ylabel('Signal');
-    box on;
-
+    if r.display
+        figure(32);
+        hold on;
+        plot(tau_ase.*1000,sig_ase,'o-');
+        xlabel('Time (ms)')
+        ylabel('Signal');
+        box on;
+    end
+    
 return;

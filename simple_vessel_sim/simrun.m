@@ -1,44 +1,51 @@
 clear variables;
 
 p=gentemplate;          % create basic set of parameters
-p.vesselDensity=0.05;   % set vessel density (is this the same as p.vesselFraction ?)
 p.N = 1000;
-
-p.R = 2.5e-6;   % radius, in m
+ 
+p.R = 1e-6;     % radius, in m
 p.D = 0;        % diffusion, in m^2/s
 p.Y = 0.6;      % oxygenation fraction (1-OEF) 
+p.vesselFraction = 0.05;    % DBV
 
 X = [1e-6,1e-5,1e-4];
 
+% pre-allocate phase storage arrays
+ph_steps = round((p.TE*2)/p.dt)./round(p.deltaTE./p.dt);
+Phase_u = zeros(ph_steps,p.N,length(X));
+Phase_n = zeros(ph_steps,p.N,length(X));
+
 for j = 1:length(X)
     
-    p.R = X(j);
+    p.Y = X(j);
     p.deltaChi = p.deltaChi0.*p.Hct.*(1-p.Y); % calculate susceptibility difference
     
     disp(['Running X = ',num2str(X(j))])
     
-	for k = 1%:10  % loop through 10 iterations
-		[storedPhase(:,:,k),p] = simplevesselsim(p); 
-%         [storedPhase(:,:,k),p] = MTC_vesselsim(p); 
-		fprintf('.');          
-    end
+    [Phase_u(:,:,j),p] = simplevesselsim(p);
+    [sASE_u, tASE]  = plotASE(p,Phase_u(:,:,j),'display',false);
     
-    % average out over iterations
-%     storedPhase = mean(storedPhase_1,3);
+    [Phase_n(:,:,j),p] = MTC_vesselsim(p);
+    [sASE_n, ~]     = plotASE(p,Phase_n(:,:,j),'display',false);
     
-    % save out results of phases
-% 	save(['storedPhaseVD05pc_diff2_Y_',num2str(100*p.Y),'.mat'],'storedPhase','p');
-% 	clear storedPhase;
-	disp(['TE=',num2str(1000*p.TE),'ms completed']);
+    disp(['  X = ',num2str(X(j)),' completed']);   
+    
+    % calculate normalized difference between the two signals
+    sdiff(:,j) = (sASE_u - sASE_n)./sASE_u;
+    
 %     [sGESSE(:,j),tGESSE] = plotGESSE(p,storedPhase); % include T2 of 80 ms (grey matter)
-    [sASE(:,j),  tASE]   = plotASE(p,storedPhase);
-	ylim([0.65,1]);
-    set(gca,'FontSize',12);
-    
-%     hold on
-%     plotresults(p,storedPhase_N);
-%     title(['GESSE Sequence, D = ',num2str(1e9*p.D)])
-%     legend(['Fixed Value Y = ',num2str(Y)],['Distribution Y = N(',num2str(Y),',1)'],'Location','SouthWest')
-%     title(['D = ',num2str(1e9*p.D),'\mum^2/ms, Y = N(',num2str(p.Y),',0.1)']);
+%     [sASE(:,j),  tASE]   = plotASE(p,storedPhase);
+%     plotASE(p,storedPhase);
+%     axis([-60, 60, 0.65,1]);
+%     set(gca,'FontSize',12);
     
 end
+
+% display difference
+figure(16);
+plot(tASE*1000,sdiff,'o-'); hold on;
+plot([-60,60],[0,0],'k:');
+axis([-60, 60, -0.03, 0.03]);
+xlabel('Spin Echo offset \tau (ms)');
+ylabel('Normalized Difference');
+set(gca,'FontSize',12);
