@@ -2,15 +2,17 @@ clear variables;
 
 p=gentemplate;          % create basic set of parameters
 p.vesselDensity=0.05;   % set vessel density (is this the same as p.vesselFraction ?)
+p.N = 1000;
 
 p.R = 2.5e-6;   % radius, in m
 p.D = 0;        % diffusion, in m^2/s
 p.Y = 0.6;      % oxygenation fraction (1-OEF) 
-X = [0.5,0.7,0.9];        % TE values
+
+X = [1e-6,1e-5,1e-4];
 
 for j = 1:length(X)
     
-    p.Y = X(j);
+    p.R = X(j);
     p.deltaChi = p.deltaChi0.*p.Hct.*(1-p.Y); % calculate susceptibility difference
     
     disp(['Running X = ',num2str(X(j))])
@@ -29,9 +31,9 @@ for j = 1:length(X)
 % 	clear storedPhase;
 	disp(['TE=',num2str(1000*p.TE),'ms completed']);
 %     [sGESSE(:,j),tGESSE] = plotGESSE(p,storedPhase); % include T2 of 80 ms (grey matter)
-%     ylim([0.7,1]);
-%     [sASE(:,j),  tASE]   = plotASE(p,storedPhase);
-    plotASE(p,storedPhase);
+    [sASE(:,j),  tASE]   = plotASE(p,storedPhase);
+	ylim([0.65,1]);
+    set(gca,'FontSize',12);
     
 %     hold on
 %     plotresults(p,storedPhase_N);

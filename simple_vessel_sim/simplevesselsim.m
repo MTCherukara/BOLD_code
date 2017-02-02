@@ -15,9 +15,7 @@ function [storedProtonPhase, p] = simplevesselsim(p)
 		storedProtonPhase = [];
 		p = [];
 		return;
-	end
-	
-	t(1) = now;
+    end
 	
 	% set up random number generator - not necessary when running locally
 % 	if ~isfield(p,'seed')
@@ -56,14 +54,10 @@ function [storedProtonPhase, p] = simplevesselsim(p)
 	p.numCloseApproaches    = numCloseApproaches;
 	p.stepInLargeVessel     = stepInLargeVessel;
 	
-	%p.timeProfiling=tp; % LEAVE OUT
-	
     % timing stuff
 	t(2) = now;
 	p.totalSimDuration = diff(t).*24*60*60;
-
-	%keyboard; % LEAVE OUT
-
+    
 return;
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -75,11 +69,6 @@ function [vesselOrigins, vesselNormals, R, deltaChi, protonPosit, numVessels, ve
     volUniverse = (4/3)*pi*p.universeSize^3;  % p.universeSize = p.universeScale*min(p.R);
     M = 100000; %max number of vessels
     
-    % % uniform random distribution of vessel seed points in sphere
-    % vesselOrigins=(rand(M,3)-0.5).*2.*p.universeSize; % LEAVE OUT
-    % withinSphere=find(sqrt(sum(vesselOrigins.^2,2))<=p.universeSize); % LEAVE OUT
-    % vesselOrigins=vesselOrigins(withinSphere,:); % LEAVE OUT
-    
     % generate some (normalized) random directions (lines from the centre
     % of the universe to the edge), then pick a random point along each
     % line and use that as the origin for each vessel (half of the vessels
@@ -87,14 +76,9 @@ function [vesselOrigins, vesselNormals, R, deltaChi, protonPosit, numVessels, ve
     randomNormals = randn(M,3);
     randomNormals = randomNormals./repmat(sqrt(sum(randomNormals.^2,2)),1,3);
     r = repmat(p.universeSize.*rand(M,1).^(1/3),1,3); % this can be efficiencied, 
-    % r = repmat(p.universeSize,M,3); % LEAVE OUT
+    
     r(2:2:end,:) = repmat(p.universeSize,M/2,3); %half of vessel origins on the surface
     vesselOrigins = r.*randomNormals;
-    
-    % % uniform random distribution of random normals (orientations)
-    % vesselNormals=randn(length(withinSphere),3); % LEAVE OUT
-    % vesselNormals=vesselNormals./repmat(sqrt(sum(vesselNormals.^2,2)),1,3); % LEAVE OUT
-    % vesselNormals=repmat([0 0 1],length(withinSphere),1); % LEAVE OUT
 
     % generate random (normalized) directions for each vessel
     vesselNormals = randn(M,3);
@@ -137,11 +121,6 @@ function [vesselOrigins, vesselNormals, R, deltaChi, protonPosit, numVessels, ve
     
     protonPosit = [0 0 0];
     
-    %figure; % LEAVE OUT
-    %plot3([p1(1:cutOff,1); p2(1:cutOff,1)],[p1(1:cutOff,2); p2(1:cutOff,2)],[p1(1:cutOff,3); p2(1:cutOff,3)],'-')
-    
-    %keyboard; % LEAVE OUT
-    
 return;
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -149,14 +128,9 @@ return;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 function [protonPosits] = randomWalk(p,protonPosit)
 
-    % % in main:
-    % % p.stdDev = sqrt(2*p.D*p.dt/p.HD);
-    % % p.HD = 10;
-    
 	protonPosits        = p.stdDev.*randn(p.numSteps*p.HD,3);   
 	protonPosits(1,:)   = protonPosit;
 	protonPosits        = cumsum(protonPosits);
-	% protonPosits = protonPosits(1:p.HD:end,:); % LEAVE OUT
 	
 return;
 
@@ -268,7 +242,3 @@ function [totalField, numStepsInVessel, numCloseApproaches, stepInLargeVessel] =
 		stepInLargeVessel=0;
     end
 return;
-
-
-
-
