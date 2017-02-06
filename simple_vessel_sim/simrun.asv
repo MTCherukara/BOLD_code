@@ -8,7 +8,7 @@ p.D = 1e-9;        % diffusion, in m^2/s
 p.Y = 0.7;      % oxygenation fraction (1-OEF) 
 p.vesselFraction = 0.05;    % DBV
 
-X = 0.7*ones(1,3);
+X = 0.7*ones(1,10);
 
 % pre-allocate phase storage arrays
 ph_steps = round((p.TE*2)/p.dt)./round(p.deltaTE./p.dt);
@@ -25,10 +25,10 @@ for j = 1:length(X)
     disp(['Running j = ',num2str(j)]);
     
     [Phase_u(:,:,j),p] = simplevesselsim(p);
-    [sASE_u(:,j), tASE]  = plotASE(p,Phase_u(:,:,j),'display',false);
+    [sASE_u(:,j), tASE]  = plotASE(p,Phase_u(:,:,j),'display',true);
     
-    [Phase_n(:,:,j),p] = MTC_vesselsim(p);
-    [sASE_n(:,j), ~]     = plotASE(p,Phase_n(:,:,j),'display',false);
+%     [Phase_n(:,:,j),p] = MTC_vesselsim(p);
+%     [sASE_n(:,j), ~]     = plotASE(p,Phase_n(:,:,j),'display',true);
     
     disp(['  j = ',num2str(j),' completed']);   
     
