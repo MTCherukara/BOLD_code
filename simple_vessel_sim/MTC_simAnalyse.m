@@ -65,7 +65,7 @@ if includeT2
     errorbar(1000*tASE,meanu,stdu,'-','LineWidth',1.5); hold on;
     errorbar(1000*tASE+1,meann,stdn,'--','LineWidth',1.5); % add an offset, so we can see them better
     axis([-62 62 0.95 1.05])
-    legend(['Y = ',num2str(p.Y)],'0.6\leqY\leq0.8','Location','North');
+    legend(['Y = ',num2str(p.Y)],'Y = N(0.7,0.1)','Location','North');
     ylabel('Signal Normalised to Uniform Distribution');
     xlabel('Spin Echo offset \tau (ms)');
     set(gca,'FontSize',12);

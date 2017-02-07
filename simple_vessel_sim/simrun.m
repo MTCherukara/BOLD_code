@@ -3,9 +3,9 @@ clear variables;
 p=gentemplate;          % create basic set of parameters
 p.N = 1000;
  
-p.R = 1e-4;     % radius, in m
+p.R = 1e-5;     % radius, in m
 p.D = 1e-9;        % diffusion, in m^2/s
-p.Y = 0.7;      % oxygenation fraction (1-OEF) 
+p.Y = 0.6;      % oxygenation fraction (1-OEF) 
 p.vesselFraction = 0.05;    % DBV
 
 X = 0.7*ones(1,10);
