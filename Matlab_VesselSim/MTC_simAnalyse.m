@@ -5,31 +5,39 @@
 % MT Cherukara
 % Created 7 February 2017
 
-% clear;
+clear;
+close all;
 
 % optional arguments
-includeT2 = 1;
+includeT2 = 1;  % include T2 elements
+NormMean  = 1;  % normalise plots
 
+%% Load data
 [dataname,datadir] = uigetfile('*.mat','Select Vessel Simulation Dataset...');
 load(strcat(datadir,dataname));
 
-
-%% compare normalized differences with errorbars, without T2
-meanu = mean(sASE_u,2); % calculate the mean
+%% Calculate without T2
+% calculate the mean and standard deviation of both
+meanu = mean(sASE_u,2);
 meann = mean(sASE_n,2);
-meann = meann./meanu;   % normalise it - normal-dist first
-meanu = meanu./meanu;   
-
-stdu = std(sASE_u,[],2);    % calculate standard deviation
+stdu = std(sASE_u,[],2);
 stdn = std(sASE_n,[],2);
-stdu = stdu./meanu;         % normalise it
-stdn = stdn./meanu;
+
+% normalise
+if NormMean
+    meann = meann./meanu;   % means - normal-dist first
+    meanu = meanu./meanu;   
+    stdu = stdu./meanu;     % standard deviations
+    stdn = stdn./meanu;
+end
+
+% variables for plotting things
+xls = 1000*p.TE + 2;
 
 %% plot data without T2 effects
 figure(11)
 errorbar(1000*tASE,meanu,stdu,'-','LineWidth',1.5); hold on;
 errorbar(1000*tASE+1,meann,stdn,'--','LineWidth',1.5); % add an offset, so we can see them better
-axis([-62 62 0.95 1.05])
 legend(['Y = ',num2str(p.Y)],'Y = N(0.7,0.1)','Location','North');
 ylabel('Signal Normalised to Uniform Distribution');
 xlabel('Spin Echo offset \tau (ms)');
@@ -38,33 +46,43 @@ title(['Y = ',num2str(p.Y),...
      ', R = ',num2str(p.R*1e6),'\mum',...
      ', D = ',num2str(p.D),'m^2/s',...
      ', T_2 = 0']);
+ if NormMean
+     axis([-xls, xls, 0.95, 1.05]);
+ else
+     axis([-xls, xls, 0, 1]);
+ end
 
 
-%% Optional steps
+%% Calculate the same stuff, but with T2
 if includeT2
+    
+    sASE_u  = zeros(round(500*p.TE)+1,length(X));
+    sASE_n  = zeros(round(500*p.TE)+1,length(X));
     
     % calculate again
     for j = 1:10
-        [sASE_u(:,j), tASE]  = plotASE(p,Phase_u(:,:,j),'display',false,'T2EV',0.11);
+        [sASE_u(:,j), ~   ]  = plotASE(p,Phase_u(:,:,j),'display',false,'T2EV',0.11);
         [sASE_n(:,j), tASE]  = plotASE(p,Phase_n(:,:,j),'display',false,'T2EV',0.11);
     end
     
-    % normalise and scale
-    meanu = mean(sASE_u,2); % calculate the mean
+    % calculate the mean and standard deviation of both
+    meanu = mean(sASE_u,2); 
     meann = mean(sASE_n,2);
-    meann = meann./meanu;   % normalise it - normal-dist first
-    meanu = meanu./meanu;   
-
-    stdu = std(sASE_u,[],2);    % calculate standard deviation
+    stdu = std(sASE_u,[],2); 
     stdn = std(sASE_n,[],2);
-    stdu = stdu./meanu;         % normalise it
-    stdn = stdn./meanu;
+
+    % normalise and scale
+    if NormMean
+        meann = meann./meanu;   % means - normal-dist first
+        meanu = meanu./meanu;   
+        stdu = stdu./meanu;     % standard deviations
+        stdn = stdn./meanu;
+    end
     
     % plot
     figure(12)
     errorbar(1000*tASE,meanu,stdu,'-','LineWidth',1.5); hold on;
     errorbar(1000*tASE+1,meann,stdn,'--','LineWidth',1.5); % add an offset, so we can see them better
-    axis([-62 62 0.95 1.05])
     legend(['Y = ',num2str(p.Y)],'Y = N(0.7,0.1)','Location','North');
     ylabel('Signal Normalised to Uniform Distribution');
     xlabel('Spin Echo offset \tau (ms)');
@@ -73,5 +91,11 @@ if includeT2
          ', R = ',num2str(p.R*1e6),'\mum',...
          ', D = ',num2str(p.D),'m^2/s',...
          ', T_2 = 110ms']);
+     % set axis
+     if NormMean
+         axis([-xls, xls, 0.95, 1.05]);
+     else
+         axis([-xls, xls, 0, 1]);
+     end
      
 end
