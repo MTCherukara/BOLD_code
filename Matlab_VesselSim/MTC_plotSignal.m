@@ -53,11 +53,12 @@ function [sig, tau] = MTC_plotSignal(p,storedPhase,varargin)
     
     % plot results
     if r.display
-        figure;
+        figure(11);
         hold on;
-        plot(tau.*1000,sig,'o-');
+        plot(tau.*1000,sig,'o-','LineWidth',2);
         xlabel('Time (ms)')
         ylabel('Signal');
+        set(gca,'FontSize',14);
         box on;
     end
     

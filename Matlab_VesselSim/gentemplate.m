@@ -14,5 +14,6 @@ function p=gentemplate
     p.vesselFraction = 0.05;
     p.deltaTE = 2e-3; 
     p.deltaChi0 = 0.264e-6;
+    p.solidWalls = 0;
 
 return;

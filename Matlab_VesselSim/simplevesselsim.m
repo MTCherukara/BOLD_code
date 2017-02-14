@@ -33,16 +33,20 @@ function [storedProtonPhase, p] = simplevesselsim(p)
 	
 	for k=1:p.N         % p.N = 10000, loop through points
 	
-		%set up universe
+		% set up universe
 		[vesselOrigins, vesselNormals, R, deltaChi, protonPosit, numVessels(k), vesselVolFrac(k)] = setupUniverse(p);
         
-		%generate random walk path
-		[protonPosits] = randomWalk(p,protonPosit);
+% 		% generate random walk path
+        if p.solidWalls
+            [protonPosits] = walkingReflection(p,protonPosit,vesselOrigins,vesselNormals);
+        else
+            [protonPosits] = randomWalk(p,protonPosit);
+        end
 	
-		%calculate field at each point
+		% calculate field at each point
 		[fieldAtProtonPosit, numStepsInVessel(k), numCloseApproaches(k), stepInLargeVessel(k)] = calculateField(p, protonPosits, vesselOrigins, vesselNormals, R, deltaChi, numVessels(k));
 	
-		%calculate phase at each point
+		% calculate phase at each point
 		storedProtonPhase(:,k) = sum(reshape(fieldAtProtonPosit,p.ptsPerdt,p.numSteps/p.ptsPerdt).*p.gamma.*p.dt,1)';
 
 	end
@@ -132,6 +136,41 @@ function [protonPosits] = randomWalk(p,protonPosit)
 	protonPosits(1,:)   = protonPosit;
 	protonPosits        = cumsum(protonPosits);
 	
+return;
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%     walkingReflection               %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+function [cumulPosits] = walkingReflection(p,protonPosit,vesselOrigins,vesselNormals)
+
+    basicPosits         = p.stdDev.*randn(p.numSteps.*p.HD,3);
+    cumulPosits         = basicPosits;
+    cumulPosits(1,:)    = protonPosit;
+    cumulPosits         = cumsum(cumulPosits);
+    
+    % define positive and negative versions of basicPosits, for reflecting
+    invPosits(:,:,1) = basicPosits;
+    invPosits(:,:,2) = -basicPosits;
+    
+    % counter
+    invert = 2;
+    
+    Q1 = vesselOrigins + vesselNormals.*0.5;
+    Q2 = vesselOrigins - vesselNormals.*0.5;
+    QD = Q2-Q1;
+    
+    for ii = 2:(p.HD*p.numSteps)
+        pos = cumulPosits(ii,:);
+        
+        QDPQ = abs(cross(QD,pos-Q1));
+        
+        if min(max(QDPQ,[],2)) < p.R(1)
+            % relflection algorithm (working)
+            cumulPosits(ii:end,:) = cumulPosits(ii-1,:) + cumsum(invPosits(ii:end,:,invert));
+            invert = mod(invert,2) + 1; % switch this between 1 and 2 each time
+        end
+    end
+
 return;
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
