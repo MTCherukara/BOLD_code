@@ -43,10 +43,15 @@ if INFER(6) == 1
     i = i+1;
 end
 if INFER(7) == 1
-    PARAMS.S0 = VALUES(i);
+    PARAMS.S0   = VALUES(i);
     i = i+1;
 end
 if INFER(8) == 1
     PARAMS.R2e  = VALUES(i);
     i = i+1;
 end
+if INFER(9) == 1
+    PARAMS.sig  = VALUES(i);
+    i = i+1;
+end
+

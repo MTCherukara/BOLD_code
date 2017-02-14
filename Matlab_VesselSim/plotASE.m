@@ -15,8 +15,8 @@ function [sig_ase, tau_ase] = plotASE(p,storedPhase,varargin)
 	%error checking
 	if or(mod(round(r.TE*1000),(round(p.deltaTE*2000)))>0,p.TE<=0)
 		disp(['TE must be in the range ' num2str(p.deltaTE*2000) 'ms to ' num2str(t(end)*1000) 'ms in steps of ' num2str(p.deltaTE*2000) 'ms!']);
-		ase=[];
-		return;
+		sig_ase = [];
+		return; 
 	end
 	
 	%scale for different Y values
@@ -31,15 +31,16 @@ function [sig_ase, tau_ase] = plotASE(p,storedPhase,varargin)
 	end
 	tau_ase = (r.TE:-p.deltaTE*2:-r.TE)'; % [31 points]
 	
-	switch(r.permeable) % this will be FALSE
-		case true
-			protonIndex = 1:1000;
-		case false
-            %%% protonIndex = [952 points]
-			protonIndex = find(p.numStepsInVessel==0,1000,'first');
-		otherwise
-			protonIndex = find(p.numStepsInVessel==0,1000,'first');
-    end
+    % don't care about permeability for now
+% 	switch(r.permeable) % this will be FALSE
+% 		case true
+% 			protonIndex = 1:1000;
+% 		case false
+%             %%% protonIndex = [952 points]
+% 			protonIndex = find(p.numStepsInVessel==0,1000,'first');
+% 		otherwise
+% 			protonIndex = find(p.numStepsInVessel==0,1000,'first');
+%     end
 	
     % don't generate an ASE signal at all if the proton didn't spend a
     % suitable amount of time outside the vessel - maybe we just get rid of
@@ -48,18 +49,22 @@ function [sig_ase, tau_ase] = plotASE(p,storedPhase,varargin)
 % 		sig_aseEV = NaN;
 %     else
         sigexp = exp(-1i.*ASEPhase(:,protonIndex).*Yscale);
-		sig_aseEV = abs(sum(sigexp,2)./length(protonIndex));
+		sig_aseEV = abs(sum(sigexp,2)./p.N);
 %     end
 	
-	switch(r.includeIV)
-		case true
-            sig_aseIV = intravascularsim(p,r.TE,r.Y); % put this in here to save a bit of time
-			sig_ase = (1-p.vesselFraction).*sig_aseEV.*exp(-r.TE./r.T2EV)+p.vesselFraction.*sig_aseIV;
-		case false
-			sig_ase = sig_aseEV.*exp(-r.TE./r.T2EV);
-		otherwise
-			sig_ase = sig_aseEV.*exp(-r.TE./r.T2EV);
-	end
+    % don't include IV signal at all
+% 	switch(r.includeIV)
+% 		case true
+%             sig_aseIV = intravascularsim(p,r.TE,r.Y); % put this in here to save a bit of time
+% 			sig_ase = (1-p.vesselFraction).*sig_aseEV.*exp(-r.TE./r.T2EV)+p.vesselFraction.*sig_aseIV;
+% 		case false
+% 			sig_ase = sig_aseEV.*exp(-r.TE./r.T2EV);
+% 		otherwise
+% 			sig_ase = sig_aseEV.*exp(-r.TE./r.T2EV);
+% 	end
+
+    % T2 effects
+    sig_ase = sig_aseEV.*exp(-r.TE./r.T2EV);
 	
     % ASE
     if r.display

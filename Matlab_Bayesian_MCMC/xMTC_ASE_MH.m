@@ -17,19 +17,19 @@
 clear; close all;
 
 % Load Data (data from 20-May-2016 uses besselj integral and isn't normalized)
-load('Simulated_Data/ASE_signal_data_27-May-2016_1.mat'); % various sigma = 0.02
+load('ASE_Data_006.mat'); % various sigma = 0.02
 DATA = S_sample;
 
 
 %% Decide Which Parameters to Infer On
 % if changing these, make sure to change PARAM_UPDATE!
-infer_on = [ 1   ,  1    ,    0    , 0    ,   0    ,   0   ,  0    ,   0   ];
-var_name = {'OEF','\zeta','\lambda','Hct','\Deltaf','R2(t)','S(0)' ,'R_2^e'};
-value =    [ 0.5 ,  0.03 ,    0.1  , 0.4 ,    5    ,  24   ,  1    ,   4   ]; % true values
-inits =    [ 0.3 ,  0.1  ,    0.1  , 0.5 ,    7    ,   5   ,  0.5  ,   5   ]; % initial values
-limit =    [ 0   ,  0    ,    0    , 0.0 ,    0    ,   1   ,  0    ,   0   ; ...
-             1   ,  1    ,    0.5  , 1   ,   10    ,  30   ,  10   ,  20   ];
-dis_t =    [ 1   ,  1    ,    1    , 1   ,    1    ,   1   ,  1    ,   1   ];
+infer_on = [ 1   ,  1    ,    0    , 0    ,   0    ,   0   ,  0    ,   0   ,   0    ];
+var_name = {'OEF','\zeta','\lambda','Hct','\Deltaf','R2(t)','S(0)' ,'R_2^e','\sigma'};
+value =    [ 0.4 ,  0.03 ,    0.1  , 0.4 ,    5    ,   6   ,  1    ,   4   ,   0.2  ]; % true values
+inits =    [ 0.3 ,  0.1  ,    0.1  , 0.5 ,    7    ,   5   ,  0.5  ,   5   ,   0.1  ]; % initial values
+limit =    [ 0   ,  0    ,    0    , 0.0 ,    0    ,   1   ,  0    ,   0   ,   0     ; ...
+             1   ,  0.2  ,    0.5  , 1   ,   10    ,  30   ,  10   ,  20   ,   1    ];
+dis_t =    [ 1   ,  1    ,    1    , 1   ,    1    ,   1   ,  1    ,   1   ,   1    ];
 % type of distribution to fit, 1 = normal, 2 = gamma     
 %       only use 1 (normal) for now
 
@@ -52,7 +52,7 @@ end
 %% function
 % algorithm parameters
 n_burn = 5000;  % number of jumps in the 'burn-in' phase
-n_jump = 5000;  % number of jumps after the 'burn-in'
+n_jump = 10000;  % number of jumps after the 'burn-in'
 n_samp = 10;    % rate of sampling (1 every N_SAMP jumps)
 n_updt = 10;    % rate of updating scale parameter (once every N_UPDT jumps)
 qs = 0.60;      % q_sig scaling parameter = ideal acceptance rate
@@ -265,12 +265,12 @@ for ff = 1:n_p
     ylabel('Posterior Density');
     xlabel(VNAME{ff});
     legend([p_true,p_mean,p_sd],'True value','Mean value','Mean \pm SD');
-    set(gca,'FontSize',20);
+    set(gca,'FontSize',12);
     
     if fits(ff)
-        title([VNAME{ff},' Inferred Correctly'],'FontSize',18);
+        title([VNAME{ff},' Inferred Correctly'],'FontSize',14);
     else
-        title([VNAME{ff},' Not Inferred Correctly'],'FontSize',18);
+        title([VNAME{ff},' Not Inferred Correctly'],'FontSize',14);
     end
 end
 

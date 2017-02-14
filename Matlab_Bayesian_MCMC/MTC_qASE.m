@@ -23,7 +23,7 @@ save_plot = 0;
 
 %% Model Parameters
 % noise
-sigma = 0.02;
+params.sig  = 0.02;         % -         - noise standard deviation
 % constants 
 params.B0   = 3.0;          % T         - static magnetic field
 params.dChi = 2.64e-7;      % parts     - susceptibility difference
@@ -91,9 +91,9 @@ S_bld = w_bld.*MTC_ASE_blood(tau,params);
 S_total = params.S0.*(S_tis + S_bld);
 
 % Add noise that is proportional to the maximum
-% Noise = max(S_total).*sigma.*randn(1,np);
+% Noise = max(S_total).*params.sig.*randn(1,np);
 T_sample = tau;
-S_sample = S_total + max(S_total).*sigma.*randn(1,np);
+S_sample = S_total + max(S_total).*params.sig.*randn(1,np);
 
 [~,int0] = find(tau>0,1);
 

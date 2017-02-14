@@ -25,10 +25,10 @@ PARAMS.R2b  = 14.9*PARAMS.Hct + 14.7 + (302.1*PARAMS.Hct + 41.8)*PARAMS.OEF^2;
 PARAMS.R2bs = 16.4*PARAMS.Hct + 4.5  + (165.2*PARAMS.Hct + 55.7)*PARAMS.OEF^2;
 
 % magnetisation of blood
-PARAMS.mb   = MTC_BOLD_M(PARAMS.T1b,1./PARAMS.R2b,PARAMS.TR,PARAMS.TE,PARAMS.alph);
+% PARAMS.mb   = MTC_BOLD_M(PARAMS.T1b,1./PARAMS.R2b,PARAMS.TR,PARAMS.TE,PARAMS.alph);
 
 % fraction of signal expressed by blood
-PARAMS.lamb = PARAMS.mb.*PARAMS.nb.*(1-PARAMS.lam0).*PARAMS.zeta;
+% PARAMS.lamb = PARAMS.mb.*PARAMS.nb.*(1-PARAMS.lam0).*PARAMS.zeta;
 
 %  characteristic frequency
 PARAMS.dw   = (4/3)*pi*PARAMS.gam*PARAMS.dChi*PARAMS.Hct*PARAMS.OEF*PARAMS.B0;
@@ -45,4 +45,7 @@ S_bld = w_bld.*MTC_ASE_blood(T,PARAMS);
 
 % add it all together:
 S = PARAMS.S0.*(S_tis + S_csf + S_bld);
+
+% add noise
+S = S + max(S).*PARAMS.sig.*randn(1,length(T));
 % S = (1 - PARAMS.lam0 - PARAMS.zeta).*S_tis + PARAMS.lam0.*S_csf .* PARAMS.zeta.*S_bld;
