@@ -61,8 +61,8 @@ if includeT2
     
     % calculate again
     for j = 1:10
-        [sASE_u(:,j), ~   ]  = plotASE(p,Phase_u(:,:,j),'display',false,'T2EV',0.11);
-        [sASE_n(:,j), tASE]  = plotASE(p,Phase_n(:,:,j),'display',false,'T2EV',0.11);
+        [sASE_u(:,j), ~   ]  = MTC_plotSignal(p,Phase_u(:,:,j),'sequence','ASE','display',false,'T2EV',0.11);
+        [sASE_n(:,j), tASE]  = MTC_plotSignal(p,Phase_n(:,:,j),'sequence','ASE','display',false,'T2EV',0.11);
     end
     
     % calculate the mean and standard deviation of both

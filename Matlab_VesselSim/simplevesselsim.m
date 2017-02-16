@@ -148,6 +148,8 @@ function [cumulPosits] = walkingReflection(p,protonPosit,vesselOrigins,vesselNor
     cumulPosits(1,:)    = protonPosit;
     cumulPosits         = cumsum(cumulPosits);
     
+    nv = size(vesselOrigins,1);
+    
     % define positive and negative versions of basicPosits, for reflecting
     invPosits(:,:,1) = basicPosits;
     invPosits(:,:,2) = -basicPosits;
@@ -160,13 +162,14 @@ function [cumulPosits] = walkingReflection(p,protonPosit,vesselOrigins,vesselNor
     QD = Q2-Q1;
     
     for ii = 2:(p.HD*p.numSteps)
-        pos = cumulPosits(ii,:);
+        pos = repmat(cumulPosits(ii,:),nv,1);
         
         QDPQ = abs(cross(QD,pos-Q1));
         
         if min(max(QDPQ,[],2)) < p.R(1)
             % relflection algorithm (working)
-            cumulPosits(ii:end,:) = cumulPosits(ii-1,:) + cumsum(invPosits(ii:end,:,invert));
+            previous = repmat(cumulPosits(ii-1,:),(p.HD*p.numSteps-ii)+1,1);
+            cumulPosits(ii:end,:) = previous + cumsum(invPosits(ii:end,:,invert));
             invert = mod(invert,2) + 1; % switch this between 1 and 2 each time
         end
     end
