@@ -35,22 +35,22 @@ end
 xls = 1000*p.TE + 2;
 
 %% plot data without T2 effects
-figure(11)
-errorbar(1000*tASE,meanu,stdu,'-','LineWidth',1.5); hold on;
-errorbar(1000*tASE+1,meann,stdn,'--','LineWidth',1.5); % add an offset, so we can see them better
-legend(['Y = ',num2str(p.Y)],'Y = N(0.7,0.1)','Location','North');
-ylabel('Signal Normalised to Uniform Distribution');
-xlabel('Spin Echo offset \tau (ms)');
-set(gca,'FontSize',12);
-title(['Y = ',num2str(p.Y),...
-     ', R = ',num2str(p.R*1e6),'\mum',...
-     ', D = ',num2str(p.D),'m^2/s',...
-     ', T_2 = 0']);
- if NormMean
-     axis([-xls, xls, 0.95, 1.05]);
- else
-     axis([-xls, xls, 0, 1]);
- end
+% figure(11)
+% errorbar(1000*tASE,meanu,stdu,':','LineWidth',1.5); hold on;
+% errorbar(1000*tASE+1,meann,stdn,'-','LineWidth',1.5); % add an offset, so we can see them better
+% legend('Permeable Walls','Solid Walls','Location','South');
+% ylabel('Signal Normalised to Uniform Distribution');
+% xlabel('Spin Echo offset \tau (ms)');
+% set(gca,'FontSize',16);
+% title(['DBV = ',num2str(p.vesselFraction),...
+%      ', R = ',num2str(p.R*1e6),'\mum',...
+%      ', D = ',num2str(p.D),'m^2/s',...
+%      ', T_2 = 0']);
+%  if NormMean
+%      axis([-xls, xls, 0.95, 1.05]);
+%  else
+%      axis([-xls, xls, 0.5, 1]);
+%  end
 
 
 %% Calculate the same stuff, but with T2
@@ -81,13 +81,13 @@ if includeT2
     
     % plot
     figure(12)
-    errorbar(1000*tASE,meanu,stdu,'-','LineWidth',1.5); hold on;
-    errorbar(1000*tASE+1,meann,stdn,'--','LineWidth',1.5); % add an offset, so we can see them better
-    legend(['Y = ',num2str(p.Y)],'Y = N(0.7,0.1)','Location','North');
+    errorbar(1000*tASE,meanu,stdu,':','LineWidth',1.5); hold on;
+    errorbar(1000*tASE+1,meann,stdn,'-','LineWidth',1.5); % add an offset, so we can see them better
+    legend('Permeable Walls','Solid Walls','Location','South');
     ylabel('Signal Normalised to Uniform Distribution');
     xlabel('Spin Echo offset \tau (ms)');
-    set(gca,'FontSize',12);
-    title(['Y = ',num2str(p.Y),...
+    set(gca,'FontSize',16);
+    title(['DBV = ',num2str(p.vesselFraction),...
          ', R = ',num2str(p.R*1e6),'\mum',...
          ', D = ',num2str(p.D),'m^2/s',...
          ', T_2 = 110ms']);
@@ -95,7 +95,7 @@ if includeT2
      if NormMean
          axis([-xls, xls, 0.95, 1.05]);
      else
-         axis([-xls, xls, 0, 1]);
+         axis([-xls, xls, 0.3, 0.8]);
      end
      
 end

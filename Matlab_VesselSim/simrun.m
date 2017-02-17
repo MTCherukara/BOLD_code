@@ -3,10 +3,10 @@ clear variables;
 p=gentemplate;          % create basic set of parameters
 p.N = 1000;
  
-p.R = 1e-4;     % radius, in m
-p.D = 1e-8;        % diffusion, in m^2/s
+p.R = 1e-5;     % radius, in m
+p.D = 1e-9;        % diffusion, in m^2/s
 % p.Y = 0.6;      % oxygenation fraction (1-OEF) 
-p.vesselFraction = 0.05;    % DBV
+p.vesselFraction = 0.1;    % DBV
 
 X = 0.7*ones(1,10);
 
@@ -42,6 +42,6 @@ if p.D == 0
 else
     diffterm = '_Diffusion_';
 end
-dataname = ['storedPhase\VesselSim_data_',date,'_Walls'];
+dataname = ['storedPhase/VesselSim_data_',date,'_Walls'];
 D = dir([dataname,'*']);
 save(strcat(dataname,num2str(length(D)+1),'.mat'),'Phase_n','Phase_u','sASE_n','sASE_u','tASE','X','p');
