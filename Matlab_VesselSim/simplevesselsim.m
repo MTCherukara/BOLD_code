@@ -30,26 +30,67 @@ function [storedProtonPhase, p] = simplevesselsim(p)
 	p.universeSize = p.universeScale*min(p.R);
 	p.numSteps = round((p.TE*2)/p.dt);
 	p.ptsPerdt = round(p.deltaTE./p.dt); %pts per deltaTE
+    
+    ci = 0; % count the number of protons that began inside a vessel
+            % this number should the vesselFraction (5%)
 	
 	for k=1:p.N         % p.N = 10000, loop through points
 	
 		% set up universe
 		[vesselOrigins, vesselNormals, R, deltaChi, protonPosit, numVessels(k), vesselVolFrac(k)] = setupUniverse(p);
         
-% 		% generate random walk path
-        if p.solidWalls
-            [protonPosits] = walkingReflection(p,protonPosit,vesselOrigins,vesselNormals);
+        % as soon as the universe is set up, we want to determine whether
+        % the proton is inside or outside a vessel:
+        vQ1 = vesselOrigins + vesselNormals.*0.5;
+        vQ2 = vesselOrigins - vesselNormals.*0.5;
+        
+        
+        if locateProton(protonPosit,R(1),vQ1,vQ2)
+%             disp('Inside');
+            od = p.D; % store out the old value of diffusion
+            
+            p.D = 0;    % ignore diffusion within blood vessels
+            protonPosits = randomWalk(p,protonPosit);   % for now, just do the old thing
+            ci = ci + 1;
+            
+            p.D = od; % restore diffusion to its rightful place
+            
+        elseif (p.D > 0) && p.solidWalls
+%             disp('Outside');
+
+            % if there is diffusion, and the walls are solid, run the
+            % walkingReflection version:
+            protonPosits = walkingReflection(p,protonPosit,vQ1,vQ2);
+            
         else
-            [protonPosits] = randomWalk(p,protonPosit);
+            % otherwise, continue as before
+            protonPosits = randomWalk(p,protonPosit);
         end
+        
+        
+        % we should change the way the calculateField function actually
+        % works, to remove a bunch of redundancies from it that would be
+        % accounted for by the above IF statements, and to introduce the
+        % intravascular version. 
+        
+        
+% % 		% generate random walk path
+%         if p.solidWalls
+%             [protonPosits] = walkingReflection(p,protonPosit,vesselOrigins,vesselNormals);
+%         else
+%             [protonPosits] = randomWalk(p,protonPosit);
+%         end
 	
 		% calculate field at each point
 		[fieldAtProtonPosit, numStepsInVessel(k), numCloseApproaches(k), stepInLargeVessel(k)] = calculateField(p, protonPosits, vesselOrigins, vesselNormals, R, deltaChi, numVessels(k));
 	
 		% calculate phase at each point
 		storedProtonPhase(:,k) = sum(reshape(fieldAtProtonPosit,p.ptsPerdt,p.numSteps/p.ptsPerdt).*p.gamma.*p.dt,1)';
-
-	end
+        
+    end
+    
+    disp([num2str(ci),' out of ',num2str(p.N),' protons originated inside a vessel']);
+    disp(['This is ',num2str(100.*ci./p.N),'% and it should be ',num2str(100*p.vesselFraction),'%']);
 	
 	%record useful values
 	p.numVessels            = numVessels;
@@ -141,14 +182,12 @@ return;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%     walkingReflection               %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-function [cumulPosits] = walkingReflection(p,protonPosit,vesselOrigins,vesselNormals)
+function [cumulPosits] = walkingReflection(p,protonPosit,Q1,Q2)
 
     basicPosits         = p.stdDev.*randn(p.numSteps.*p.HD,3);
     cumulPosits         = basicPosits;
     cumulPosits(1,:)    = protonPosit;
     cumulPosits         = cumsum(cumulPosits);
-    
-    nv = size(vesselOrigins,1);
     
     % define positive and negative versions of basicPosits, for reflecting
     invPosits(:,:,1) = basicPosits;
@@ -157,19 +196,20 @@ function [cumulPosits] = walkingReflection(p,protonPosit,vesselOrigins,vesselNor
     % counter
     invert = 2;
     
-    Q1 = vesselOrigins + vesselNormals.*0.5;
-    Q2 = vesselOrigins - vesselNormals.*0.5;
-    QD = Q2-Q1;
+    % don't need these lines, because Q1 and Q2 are defined outside here
+%     Q1 = vesselOrigins + vesselNormals.*0.5;
+%     Q2 = vesselOrigins - vesselNormals.*0.5;
+%     QD = Q2-Q1;
     
     for ii = 2:(p.HD*p.numSteps)
-        pos = repmat(cumulPosits(ii,:),nv,1);
+        pos = cumulPosits(ii,:);
         
-        QDPQ = abs(cross(QD,pos-Q1));
+        % this line is done within locateProton
+%         QDPQ = abs(cross(QD,pos-Q1));
         
-        if min(max(QDPQ,[],2)) < p.R(1)
+        if locateProton(pos,p.R(1),Q1,Q2)
             % relflection algorithm (working)
-            previous = repmat(cumulPosits(ii-1,:),(p.HD*p.numSteps-ii)+1,1);
-            cumulPosits(ii:end,:) = previous + cumsum(invPosits(ii:end,:,invert));
+            cumulPosits(ii:end,:) = cumulPosits(ii-1,:) + cumsum(invPosits(ii:end,:,invert));
             invert = mod(invert,2) + 1; % switch this between 1 and 2 each time
         end
     end
