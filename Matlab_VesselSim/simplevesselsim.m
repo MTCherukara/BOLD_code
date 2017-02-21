@@ -149,7 +149,7 @@ function [vesselOrigins, vesselNormals, R, deltaChi, protonPosit, numVessels, ve
         % does deltaChi need to be redone every time? It shouldn't change
     	deltaChi(cutOff+1:M,:) = repmat(p.deltaChi0*p.Hct(k).*(1-p.Y(k)),length(cutOff+1:M),1);
         
-    	volSum = (cumsum(l.*pi.*R.^2));
+    	volSum = 1.5*(cumsum(l.*pi.*R.^2));
 		cutOff = find(volSum<(volUniverse.*sum(p.vesselFraction(1:k))),1,'last');
     end
     
