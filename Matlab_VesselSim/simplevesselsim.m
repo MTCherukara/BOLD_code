@@ -1,5 +1,51 @@
+% simplevesselsim.m usage:
+%
+%       [storedProtonPhase, p] = simplevesselsim(p)
+%
+% Created by NP Blockley, March 2016
+%
+% Modifed by MT Cherukara, December 2016 and onwards
+%
+%
+%       Copyright (C) University of Oxford, 2016-2017
+% 
+%
+% This function is the main  part of the vessel simulator. It's called by
+% simrun.m once for each set of parameters, and will return the parameter
+% structure p, and a matrix of stored phase. It works in 3 parts,
+% represented by separate functions within this file, linked together by
+% the main simplevesselsim function:
+%
+% 1. setupUniverse
+%       This fills a space with cylinders of radius R and susceptibility
+%       deltaChi, centred on positions vesselOrigins, and pointed in
+%       direction vesselNormals. Space is filled randomly until the %
+%       occupied by vessels (vesselVolFrac) is equal to the user-specified
+%       p.vesselFraction. The number of vessels is also returned.
+%
+% 2. randomWalk
+%       This generates a list of coordinates, corresponding to the position
+%       of the proton as it diffuses randomly.
+%
+% 3. calculateField
+%       This calculates the magnetic field experience by the proton every
+%       specified number of steps (samples with higher resolution in an
+%       area close to a vessel). Returns totalField (which is transformed
+%       into a phase by the main function) and some counters.
+%
+% CHANGELOG:
+%
+% 2017-02-23 (MTC). A bunch of changes, including adding an alternative to
+%       randomWalk called walkingReflection, which checks every step
+%       whether the proton has wandered into a vessel (using locateProton
+%       function), and changes the direction of the random walk if it does,
+%       thus modelling the vessel walls as impermeable. This takes ~4 times
+%       longer, and is selected by p.solidWalls being set to 1. 
+
+
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%     simplevesselsim                 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%     (main) simplevesselsim          %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 function [storedProtonPhase, p] = simplevesselsim(p)
 	
@@ -116,7 +162,8 @@ function [storedProtonPhase, p] = simplevesselsim(p)
         % intravascular version. 
 	
 		% calculate field at each point
-		[fieldAtProtonPosit, numStepsInVessel(k), numCloseApproaches(k), stepInLargeVessel(k)] = calculateField(p, protonPosits, vesselOrigins, vesselNormals, R, deltaChi, numVessels(k));
+		[fieldAtProtonPosit, numStepsInVessel(k), numCloseApproaches(k), stepInLargeVessel(k)] ...
+            = calculateField(p, protonPosits, vesselOrigins, vesselNormals, R, deltaChi, numVessels(k));
 	
 		% calculate phase at each point
 		storedProtonPhase(:,k) = sum(reshape(fieldAtProtonPosit,p.ptsPerdt,p.numSteps/p.ptsPerdt).*p.gamma.*p.dt,1)';
@@ -268,7 +315,8 @@ return;
 %%%     calculateField                  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %calculate magnetic field at proton location
-function [totalField, numStepsInVessel, numCloseApproaches, stepInLargeVessel] = calculateField(p, protonPosits, vesselOrigins, vesselNormals, R, deltaChi, numVessels)
+function [totalField, numStepsInVessel, numCloseApproaches, stepInLargeVessel] ...
+    = calculateField(p, protonPosits, vesselOrigins, vesselNormals, R, deltaChi, numVessels)
 	
 	% store original values for later use
 	protonPositsHD  = protonPosits;
@@ -342,7 +390,8 @@ function [totalField, numStepsInVessel, numCloseApproaches, stepInLargeVessel] =
 		phiHD = permute(acos(dot(npHD,ncHD,2)),[1 3 2]);
 		
 		% calculate fields when proton is outside or inside a vessel
-		fields_extraHD = p.B0.*2.*pi.*repmat(deltaChiHD,1,p.numSteps*p.HD).*(repmat(RHD,1,p.numSteps*p.HD)./rHD).^2.*cos(2.*phiHD).*sin(repmat(thetaHD,1,p.numSteps*p.HD)).^2;
+		fields_extraHD = p.B0.*2.*pi.*repmat(deltaChiHD,1,p.numSteps*p.HD).*(repmat(RHD,1,p.numSteps*p.HD)./rHD).^2 ...
+                             .*cos(2.*phiHD).*sin(repmat(thetaHD,1,p.numSteps*p.HD)).^2;
 		fields_intraHD = p.B0.*2.*pi./3.*repmat(deltaChiHD,1,p.numSteps*p.HD).*(3.*cos(repmat(thetaHD,1,p.numSteps*p.HD)).^2-1);
 		
 		% combine fields based on whether proton is inside/outside the vessel
