@@ -1,7 +1,7 @@
-function inside = locateProton(posit,radius,Q1,Q2)
+function inside = locateProton(posit,radii,Q1,Q2)
     % Usage: 
     %
-    %       inside = locateProton(posit,radius,Q1,Q2)
+    %       inside = locateProton(posit,radii,Q1,Q2)
     %
     % Determine quickly whether a proton at POSIT is inside a blood vessel
     % of known RADIUS, with the distribution of blood vessels defined by Q1
@@ -18,12 +18,17 @@ function inside = locateProton(posit,radius,Q1,Q2)
     % locateProton returns 1 if the proton is within a vessel, and 0 if it
     % is not. 
     %
+    % 22 Feb - modify to accept a range of different vessel radii (MTC)
+    %
     % MT Cherukara
     % 16 February 2017
  
-    QDPQ = abs(cross(Q2-Q1,posit-Q1));
+    posits = repmat(posit,size(Q1,1),1); % added this so it works on MATLAB 2015
+    QDPQ = abs(cross(Q2-Q1,posits-Q1));
+    
+    [mind,mini] = min(max(QDPQ,[],2));
         
-    if min(max(QDPQ,[],2)) < radius
+    if mind < radii(mini)
         inside = 1;
     else
         inside = 0;

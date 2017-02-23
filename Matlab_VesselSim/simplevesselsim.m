@@ -8,15 +8,38 @@ function [storedProtonPhase, p] = simplevesselsim(p)
 		storedProtonPhase = [];
 		p = [];
 		return;
-	end
-	
-	% make sure that each p.R has a corresponding p.vesselFraction, p.Hct, p.Y
-	if (length(p.R)*length(p.vesselFraction)*length(p.Hct)*length(p.Y)) ~= length(p.R)^4
-		storedProtonPhase = [];
+    end
+    
+    % make sure that p.R, p.vesselFraction, p.Hct, and p.Y have the same
+    % number of elements.
+    nradii = length(p.R);
+    if length(p.vesselFraction) ~= nradii
+        disp('You need to specify the same number of radii and fractions!');
+        storedProtonPhase = [];
 		p = [];
 		return;
     end
-	
+    
+    % if only 1 value of Y is specified, apply it to all vessel radii
+    if length(p.Y) == 1
+        p.Y = repmat(p.Y,nradii,1);
+    elseif length(p.Y) ~= nradii
+        disp('p.Y and p.R must be the same length!')
+        storedProtonPhase = [];
+		p = [];
+		return;
+    end
+    
+    % do the same as above, but for Hct
+    if length(p.Hct) == 1
+        p.Hct = repmat(p.Hct,nradii,1);
+    elseif length(p.Hct) ~= nradii
+        disp('p.Hct and p.R must be the same length!')
+        storedProtonPhase = [];
+		p = [];
+		return;
+    end
+    
 	% set up random number generator - not necessary when running locally
 % 	if ~isfield(p,'seed')
 % 		fid = fopen('/dev/urandom');
@@ -44,42 +67,53 @@ function [storedProtonPhase, p] = simplevesselsim(p)
         vQ1 = vesselOrigins + vesselNormals.*0.5;
         vQ2 = vesselOrigins - vesselNormals.*0.5;
         
+        % if a proton is initialized to be inside a vessel, either, leave
+        % it inside , and calculate as normal, but without any diffusion,
+        % or move it upwards in steps of R until it is outside the vessel,
+        % then start it going as normal:
         
-        if locateProton(protonPosit,R(1),vQ1,vQ2)
-%             disp('Inside');
-            od = p.D; % store out the old value of diffusion
-            
-            p.D = 0;    % ignore diffusion within blood vessels
-            protonPosits = randomWalk(p,protonPosit);   % for now, just do the old thing
-            ci = ci + 1;
-            
-            p.D = od; % restore diffusion to its rightful place
-            
-        elseif (p.D > 0) && p.solidWalls
-%             disp('Outside');
+        % Option A
+% %         if locateProton(protonPosit,R(1),vQ1,vQ2)
+% % %             disp('Inside');
+% %             od = p.D; % store out the old value of diffusion
+% %             
+% %             p.D = 0;    % ignore diffusion within blood vessels
+% %             protonPosits = randomWalk(p,protonPosit);   % for now, just do the old thing
+% %             ci = ci + 1;
+% %             
+% %             p.D = od; % restore diffusion to its rightful place
+% %             
+% %         elseif (p.D > 0) && p.solidWalls
+% % %             disp('Outside');
+% % 
+% %             % if there is diffusion, and the walls are solid, run the
+% %             % walkingReflection version:
+% %             protonPosits = walkingReflection(p,protonPosit,vQ1,vQ2,R);
+% %             
+% %         else
+% %             % otherwise, continue as before
+% %             protonPosits = randomWalk(p,protonPosit);
+% %         end
 
-            % if there is diffusion, and the walls are solid, run the
-            % walkingReflection version:
-            protonPosits = walkingReflection(p,protonPosit,vQ1,vQ2);
-            
-        else
-            % otherwise, continue as before
-            protonPosits = randomWalk(p,protonPosit);
+        % Option B
+        
+        % move proton upwards until it is outside the vessel
+        while locateProton(protonPosit,R,vQ1,vQ2)
+            protonPosit = protonPosit + [0,0,R(1)];
+            ci = ci + 1;
         end
         
+        % start going as normal
+        if (p.D > 0) && p.solidWalls
+            protonPosits = walkingReflection(p,protonPosit,vQ1,vQ2,R);
+        else
+            protonPosits = randomWalk(p,protonPosit);
+        end
         
         % we should change the way the calculateField function actually
         % works, to remove a bunch of redundancies from it that would be
         % accounted for by the above IF statements, and to introduce the
         % intravascular version. 
-        
-        
-% % 		% generate random walk path
-%         if p.solidWalls
-%             [protonPosits] = walkingReflection(p,protonPosit,vesselOrigins,vesselNormals);
-%         else
-%             [protonPosits] = randomWalk(p,protonPosit);
-%         end
 	
 		% calculate field at each point
 		[fieldAtProtonPosit, numStepsInVessel(k), numCloseApproaches(k), stepInLargeVessel(k)] = calculateField(p, protonPosits, vesselOrigins, vesselNormals, R, deltaChi, numVessels(k));
@@ -99,9 +133,9 @@ function [storedProtonPhase, p] = simplevesselsim(p)
 	p.numCloseApproaches    = numCloseApproaches;
 	p.stepInLargeVessel     = stepInLargeVessel;
 	
-    % timing stuff
-	t(2) = now;
-	p.totalSimDuration = diff(t).*24*60*60;
+%     % timing stuff
+% 	t(2) = now;
+% 	p.totalSimDuration = diff(t).*24*60*60;
     
 return;
 
@@ -142,15 +176,29 @@ function [vesselOrigins, vesselNormals, R, deltaChi, protonPosit, numVessels, ve
     p2 = vesselOrigins+repmat(u2,1,3).*vesselNormals;
     l  = sqrt(sum((p2-p1).^2,2));
         
-    %find vessel number cutoff for desired volume fractions
+    % find vessel number cutoff for desired volume fractions
     cutOff = 0;
-    for k = 1:length(p.R)
-    	R(cutOff+1:M,:)        = repmat(p.R(k),length(cutOff+1:M),1);
-        % does deltaChi need to be redone every time? It shouldn't change
-    	deltaChi(cutOff+1:M,:) = repmat(p.deltaChi0*p.Hct(k).*(1-p.Y(k)),length(cutOff+1:M),1);
+    
+    % loop through values within p.R
+    for ii = 1:length(p.R)
         
-    	volSum = 1.5*(cumsum(l.*pi.*R.^2));
-		cutOff = find(volSum<(volUniverse.*sum(p.vesselFraction(1:k))),1,'last');
+        % assign all (remaining) vessels to have the same radius and
+        % susceptibility, given that there could be different values for Y
+        % and Hct in each of these cases
+        R(cutOff+1:M,:)        = repmat(p.R(ii),length(cutOff+1:M),1);
+        deltaChi(cutOff+1:M,:) = repmat(p.deltaChi0*p.Hct(ii).*(1-p.Y(ii)),length(cutOff+1:M),1);
+        
+        % calculate total cumulative volume of all vessels (this does not
+        % take into account the fact that vessels can be overlapping, but
+        % that's probably fine) (also, there's a fudge factor of 1.5 to
+        % ensure that at the middle of the universe the vessel fraction is
+        % about right)
+        volSum = 1.5*(cumsum(l.*pi.*R.^2));
+        
+        % find the vessel at which we reach the desired volume, and
+        % remember that point, checking the chosen vesselFraction
+        cutOff = find(volSum<(volUniverse.*sum(p.vesselFraction(1:ii))),1,'last');
+        
     end
     
     if cutOff==M
@@ -182,7 +230,7 @@ return;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%     walkingReflection               %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-function [cumulPosits] = walkingReflection(p,protonPosit,Q1,Q2)
+function [cumulPosits] = walkingReflection(p,protonPosit,Q1,Q2,R)
 
     basicPosits         = p.stdDev.*randn(p.numSteps.*p.HD,3);
     cumulPosits         = basicPosits;
@@ -207,7 +255,7 @@ function [cumulPosits] = walkingReflection(p,protonPosit,Q1,Q2)
         % this line is done within locateProton
 %         QDPQ = abs(cross(QD,pos-Q1));
         
-        if locateProton(pos,p.R(1),Q1,Q2)
+        if locateProton(pos,R,Q1,Q2)
             % relflection algorithm (working)
             cumulPosits(ii:end,:) = cumulPosits(ii-1,:) + cumsum(invPosits(ii:end,:,invert));
             invert = mod(invert,2) + 1; % switch this between 1 and 2 each time
