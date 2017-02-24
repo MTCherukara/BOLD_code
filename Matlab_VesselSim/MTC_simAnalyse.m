@@ -17,14 +17,14 @@
 % 
 % Created by MT Cherukara, February 2017
 %
-% CHANGELOG:
-%
-% 2017-02-23 (MTC). Added GUI.
+% THIS IS AN OLD VERSION - simAnalyse.m has replaced this, as of Feb 2017
 
+
+close all; clear;
 
 % optional arguments
 includeT2 = 1;  % include T2 elements
-NormMean  = 1;  % normalise plots
+NormMean  = 0;  % normalise plots
 
 %% Load data
 [dataname,datadir] = uigetfile('*.mat','Select Vessel Simulation Dataset...');

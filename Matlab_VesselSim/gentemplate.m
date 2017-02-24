@@ -12,7 +12,7 @@ function p=gentemplate
     p.gamma = 2*pi*42.58e6;
     p.universeScale = 45; %results in ~100 vessels
     p.vesselFraction = 0.05;
-    p.deltaTE = 2e-3; 
+    p.deltaTE = 2e-3;   % s     - step size (2ms) 
     p.deltaChi0 = 0.264e-6;
     p.solidWalls = 0;
 

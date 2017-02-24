@@ -30,15 +30,16 @@ function simAnalyse
     
     % h - structure containing all ui element handles
     % r - structure containing all random parameter information
-    global r
+    r.open = 1; % initialize the structure, because we refer to it later
     
     % create figure
-    fig = figure('Name','simAnalyse','OuterPosition',[200, 200, 800, 600]);
+    fig = figure(99);
+    set(fig,'Name','simAnalyse','OuterPosition',[200, 200, 800, 600]);
     
     
     % display some basic text
     h.tx00 = uicontrol('Style','Text',...
-                       'Position',[250,480,300,20],...
+                       'Position',[250,480,300,30],...
                        'String','Analysis for Vessel Simulator Data',...
                        'FontSize',18);
                  
@@ -61,39 +62,96 @@ function simAnalyse
                        'FontSize',14,...
                        'Callback',{@pickData,h});
                    
+    % spin echo parameters
+    h.tx12 = uicontrol('Style','Text',...
+                       'Position',[120,360,40,25],...
+                       'String','TE:',...
+                       'FontSize',14,...
+                       'HorizontalAlignment','Right');
+                   
+    h.inTE = uicontrol('Style','Edit',...
+                       'Position',[160,360,40,25],...
+                       'String','60',...
+                       'FontSize',14,...
+                       'HorizontalAlignment','Right');
+         
+    h.tx13 = uicontrol('Style','Text',...
+                       'Position',[200,360,40,25],...
+                       'String','ms',...
+                       'Fontsize',14,...
+                       'HorizontalAlignment','Left');
+               
+    h.tx14 = uicontrol('Style','Text',...
+                       'Position',[120,270,40,25],...
+                       'String','tau:',...
+                       'FontSize',14,...
+                       'HorizontalAlignment','Right');
+                   
+    h.inDT = uicontrol('Style','Edit',...
+                       'Position',[160,270,40,25],...
+                       'String','4',...
+                       'FontSize',14,...
+                       'HorizontalAlignment','Right',...
+                       'Enable','off');
+         
+    h.tx15 = uicontrol('Style','Text',...
+                       'Position',[200,270,40,25],...
+                       'String','ms',...
+                       'Fontsize',14,...
+                       'HorizontalAlignment','Left'); 
+                   
     % decide which sequences to plot using checkboxes
     h.tx10 = uicontrol('Style','Text',...
-                       'Position',[20,390,150,25],...
+                       'Position',[20,390,100,25],...
                        'String','Sequences:',...
                        'FontSize',14,...
                        'HorizontalAlignment','Left');
     
+    h.ch10 = uicontrol('Style','Checkbox',...
+                       'Position',[30,360,100,25],...
+                       'String','FID',...
+                       'FontSize',14);
+                   
     h.ch11 = uicontrol('Style','Checkbox',...
-                       'Position',[30,360,150,25],...
-                       'String','GE',...
+                       'Position',[30,330,100,25],...
+                       'String','GRE',...
                        'FontSize',14);
     
     h.ch12 = uicontrol('Style','Checkbox',...
-                       'Position',[30,330,150,25],...
+                       'Position',[30,300,100,25],...
                        'String','GESSE',...
-                       'FontSize',14);
+                       'FontSize',14,...
+                       'Callback',{@switchGESSE,h});
                    
     h.ch13 = uicontrol('Style','Checkbox',...
-                       'Position',[30,300,150,25],...
+                       'Position',[30,270,100,25],...
                        'String','ASE',...
-                       'FontSize',14);
+                       'FontSize',14,...
+                       'Callback',{@switchASE,h});
                    
     % other parameters
     h.tx20 = uicontrol('Style','Text',...
-                       'Position',[200,390,150,25],...
+                       'Position',[400,390,150,25],...
                        'String','Analysis options:',...
                        'FontSize',14,...
                        'HorizontalAlignment','Left');
+                   
+    h.chAG = uicontrol('Style','Checkbox',...
+                       'Position',[400,360,250,25],...
+                       'String','Aggregate repeated runs',...
+                       'FontSize',14,...
+                       'Value',1);
     
-    h.ch21 = uicontrol('Style','Checkbox',...
-                       'Position',[200,360,150,25],...
+    h.chT2 = uicontrol('Style','Checkbox',...
+                       'Position',[400,330,250,25],...
                        'String','Include T2 effects',...
                        'FontSize',14);
+                   
+    h.chIV = uicontrol('Style','Checkbox',...
+                       'Position',[400,300,250,25],...
+                       'String','Include Intravascular signal',...
+                       'FontSize',14);
+        
                    
                    
     % run analysis
@@ -121,16 +179,39 @@ function runAnalysis(src,event,h)
     disp(['Loading data from: ',filename]);
     load(filename);
     
+    % we want to plot graphs
+    r.display = 1;
+    r.save = 0; % leave this out for now
+    
+    % once we've loaded the data, we want to see how many stored-phase type
+    % variables we have (either 1 or 2) 
+    
+    twoMats = 0; % the default will be to analyse only 1 set of values at a time
+    
+    pnames = who('*phase*','*Phase*'); % this will list all the variables with the word 'phase' in their name
+    
+    sp1 = eval(pnames{1}); % take the first 'phase' variable
+    
+    if length(pnames) > 1
+        twoMats = 1; % we'll use this later to repeat the analysis process
+        sp2 = eval(pnames{2}); % if there are more than 3, tough...
+    end
+    
     % default values for the parameters in r (this avoids having to use
     % else statements, and makes sure we don't screw up)
-    r.plotGE        = 0;
+    r.plotFID       = 0;
+    r.plotGRE       = 0;
     r.plotGESSE     = 0;
     r.plotASE       = 0;
     r.incT2         = 0;
+    r.incIV         = 0; % we'll worry about this later
     
     % then, get the values from the various check-boxes in the gui
+    if get(h.ch10,'Value') == get(h.ch10,'Max')
+        r.plotFID = 1;
+    end
     if get(h.ch11,'Value') == get(h.ch11,'Max')
-        r.plotGE = 1;
+        r.plotGRE = 1;
     end
     if get(h.ch12,'Value') == get(h.ch12,'Max')
         r.plotGESSE = 1;
@@ -139,13 +220,40 @@ function runAnalysis(src,event,h)
         r.plotASE = 1;
     end
     
-    if get(h.ch21,'Value') == get(h.ch21,'Max')
+    % pull values from the form-fillable boxes and stick them in the p
+    % structure
+    p.TE = str2double(get(h.inTE,'String'));
+    p.deltaTE = str2double(get(h.inDT,'String'));
+    
+    % check whether the user has specified aggregating repeated runs, for
+    % now, aggregate regardless of what was selected, because analysis is
+    % only set up for 2D phase matrices
+    if get(h.chAG,'Value') == get(h.chAG,'Max')
+        sp1 = aggregate(sp1);
+        if twoMats
+            sp2 = aggregate(sp2);
+        end
+    else
+        disp('You must aggregate repeated runs...');
+        sp1 = aggregate(sp1);
+        if twoMats
+            sp2 = aggregate(sp2);
+        end
+    end
+    
+    % check the other optional input checkboxes
+    if get(h.chT2,'Value') == get(h.chT2,'Max')
         disp('Including T2 effects');
+        r.incT2 = 1;
+        p.T2EV = 0.11; % set T2 to be 110 ms (for grey matter at 3T)
+    end
+    
+	if get(h.chIV,'Value') == get(h.chIV,'Max')
+        disp('Intravascular signal is currently not working...');
     end
     
     % now, run the analysis:
-    
-    
+    plotSignal(sp1,p,r);
     
 return;
 
@@ -153,9 +261,47 @@ return;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%     GUI called functions            %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-function pickData(src,event,handles)
+function pickData(~,~,handles)
     % Let the user choose a data file to analyse
     [dataname,datadir] = uigetfile('*.mat','Select Vessel Simulation Dataset...');
     set(handles.inpt,'String',strcat(datadir,dataname));
 return;
 
+function switchGESSE(src,~,handles)
+    % turn on the field for entering DT if GESSE is ticked - this will
+    % screw up a little bit if you turn GESSE on, then turn ASE on, then
+    % turn one of them off again, but it's too much hassle to fix.
+    if get(src,'Value') == get(src,'Max')
+        set(handles.inDT,'Enable','on');
+    else
+        set(handles.inDT,'Enable','off');
+    end
+return;
+
+function switchASE(src,~,handles)
+    % turn on the field for entering delta tau if ASE is ticked
+    if get(src,'Value') == get(src,'Max')
+        set(handles.inDT,'Enable','on');
+    else
+        set(handles.inDT,'Enable','off');
+    end
+return;
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%     other useful functions          %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+function matrix2D = aggregate(matrix3D)
+    % converts a 3D matrix M-by-N-by-P into a 2D matrix M-by-(N*P), for
+    % sorting out those data sets where we performed separate runs, which
+    % were useful for plotting standard deviation and stuff, but aren't
+    % what we want to do generally.
+    
+    sz = size(matrix3D);
+    
+    % check that the input matrix is actually 3D, otherwise return it
+    if length(sz) ~= 3
+        matrix2D = matrix3D;
+    else
+        matrix2D = reshape(matrix3D,sz(1),(sz(2)*sz(3)));
+    end
+return;
