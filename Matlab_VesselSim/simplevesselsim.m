@@ -291,12 +291,15 @@ function [cumulPosits] = walkingReflection(p,protonPosit,Q1,Q2,R)
     % counter
     invert = 2;
     
+    % length
+    lng = p.HD*p.numSteps;
+    
     % don't need these lines, because Q1 and Q2 are defined outside here
 %     Q1 = vesselOrigins + vesselNormals.*0.5;
 %     Q2 = vesselOrigins - vesselNormals.*0.5;
 %     QD = Q2-Q1;
     
-    for ii = 2:(p.HD*p.numSteps)
+    for ii = 2:lng
         pos = cumulPosits(ii,:);
         
         % this line is done within locateProton
@@ -304,7 +307,7 @@ function [cumulPosits] = walkingReflection(p,protonPosit,Q1,Q2,R)
         
         if locateProton(pos,R,Q1,Q2)
             % relflection algorithm (working)
-            cumulPosits(ii:end,:) = cumulPosits(ii-1,:) + cumsum(invPosits(ii:end,:,invert));
+            cumulPosits(ii:end,:) = repmat(cumulPosits(ii-1,:),(lng-ii+1),1) + cumsum(invPosits(ii:end,:,invert));
             invert = mod(invert,2) + 1; % switch this between 1 and 2 each time
         end
     end
