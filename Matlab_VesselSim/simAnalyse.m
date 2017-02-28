@@ -102,7 +102,7 @@ function simAnalyse
            
     % Edit field - Tau - default 2 ms
     h.inDT = uicontrol('Style','Edit',...
-                       'Position',[160,300,40,25],...
+                       'Position',[160,300,100,25],...
                        'String','2',...
                        'FontSize',14,...
                        'HorizontalAlignment','Right',...
@@ -110,7 +110,7 @@ function simAnalyse
          
     % Text - 'ms'
     h.tx15 = uicontrol('Style','Text',...
-                       'Position',[200,300,40,25],...
+                       'Position',[260,300,40,25],...
                        'String','ms',...
                        'Fontsize',14,...
                        'HorizontalAlignment','Left'); 
@@ -281,7 +281,7 @@ return;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%     runAnalysis                     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-function runAnalysis(src,event,h)
+function runAnalysis(~,~,h)
     % this runs the actual analysis of our data
     
     % first, read the users input, and load that dataset:
@@ -302,11 +302,20 @@ function runAnalysis(src,event,h)
     r.incIV         = get(h.chIV,'Value'); % we'll worry about this later
     
     % then pull values from the form-fillable boxes:
-    p.tau  = 0.001*str2double(get(h.inDT,'String'));
     p.T2EV = 0.001*str2double(get(h.inT2,'String'));
     
-    r.TE   = 0.001*str2num(get(h.inTE,'String')); %#ok<ST2NM>
+    r.tau  = 0.001*str2num(get(h.inDT,'String')); %#ok<*ST2NM>
+    r.TE   = 0.001*str2num(get(h.inTE,'String'));
         
+    % check the value of tau supplied, if it's a single value, use it, if
+    % it's a range, be careful
+    if length(r.tau) == 1
+        p.tau = r.tau;
+        r.defineTau = 0;
+    else
+        r.defineTau = 1;
+    end
+    
     % not that we've loaded the data, we want to see how many stored-phase
     % type variables we have (either 1 or 2) 
     

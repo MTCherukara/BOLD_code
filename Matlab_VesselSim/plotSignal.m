@@ -18,7 +18,7 @@ function [t,sig] = plotSignal(storedPhase,p,r)
         if seqs(sq) == 1 % only do those sequences that we asked for
 
             % choose the right sequence and evaluate it
-            [t,ph] = eval(strcat('phase',snames{sq},'(storedPhase,ts,p)'));
+            [t,ph] = eval(strcat('phase',snames{sq},'(storedPhase,ts,p,r)'));
 
             % calculate extravascular signal
             sigEV = abs(sum(exp(-1i.*ph),2)./p.N);
@@ -26,9 +26,9 @@ function [t,sig] = plotSignal(storedPhase,p,r)
             % account for t2 decay
             if r.incT2
                 
-                if sq == 1 % do this for FID
-                    sigEV = sigEV.*exp(-t./(p.T2EV*1000)); 
-                else % do this for other sequences that have fixed TE
+                if sq == 1 || sq == 2 % do this for GRE and GESSE
+                    sigEV = sigEV.*exp(-t./p.T2EV);
+                else % do this for other sequences (e.g. ASE)
                     sigEV = sigEV.*exp(-p.TE./p.T2EV);
                 end
             end
@@ -79,7 +79,7 @@ return;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%     Phase calculating functions         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-function [tt,Phase] = phaseGRE(storedPhase,tarray,p)
+function [tt,Phase] = phaseGRE(storedPhase,tarray,~,~)
     % calculate the phase from an FID sequence (by summing it up)
     
     Phase = cumsum(storedPhase,1);
@@ -87,7 +87,7 @@ function [tt,Phase] = phaseGRE(storedPhase,tarray,p)
     
 return;
 
-function [tt,Phase] = phaseGESSE(storedPhase,tarray,p)
+function [tt,Phase] = phaseGESSE(storedPhase,tarray,p,~)
     % calculate the phase from a GESSE sequence
     
     ss = size(storedPhase);
@@ -104,7 +104,7 @@ function [tt,Phase] = phaseGESSE(storedPhase,tarray,p)
 
 return;
 
-function [tt,Phase] = phaseASE(storedPhase,tarray,p)
+function [tt,Phase] = phaseASE(storedPhase,tarray,p,r)
     % calculate the phase from an ASE sequence
     
     Tind = find(round(tarray.*1000) == round(p.TE.*1000),1,'first');
@@ -114,11 +114,15 @@ function [tt,Phase] = phaseASE(storedPhase,tarray,p)
     end
     
     % these are the point we want, given the tau value chosen by the user
-    tt = (p.TE/2:-p.tau:-p.TE/2)';
-    tt = tt(2:end-1);
+    if r.defineTau == 1
+        tt = r.tau';
+    else
+        tt = (-p.TE/2:p.tau:p.TE/2)';
+        tt = tt(2:end-1);
+    end
     
     % these are all the time-points that are available
-    t0 = (p.TE/2:-p.deltaTE:-p.TE/2)';
+    t0 = (-p.TE/2:p.deltaTE:p.TE/2)';
     t0 = t0(2:end-1);
     
     % find the indices of points in t0 that are also in tt
