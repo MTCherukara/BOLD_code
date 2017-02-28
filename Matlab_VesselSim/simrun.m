@@ -38,7 +38,7 @@ p=gentemplate;          % create basic set of parameters
 p.N = 10000;
  
 p.R = 2e-5;     % radius, in m
-p.D = 1e-9;     % diffusion, in m^2/s
+p.D = 0;     % diffusion, in m^2/s
 p.Y = 0.6;      % oxygenation fraction (1-OEF) 
 p.vesselFraction = 0.05;    % DBV
 
@@ -63,11 +63,11 @@ for j = 1:length(X)
 %     [sASE_u(:,j), tASE]  = MTC_plotSignal(p,Phase_u(:,:,j),'sequence','ASE','display',false);
     toc;
     
-    tic;
-    p.solidWalls = 1;
-    [Phase_n(:,:,j),p] = simplevesselsim(p);
-%     [sASE_n(:,j), tASE]  = MTC_plotSignal(p,Phase_n(:,:,j),'sequence','ASE','display',false);
-    toc;
+%     tic;
+%     p.solidWalls = 1;
+%     [Phase_n(:,:,j),p] = simplevesselsim(p);
+% %     [sASE_n(:,j), tASE]  = MTC_plotSignal(p,Phase_n(:,:,j),'sequence','ASE','display',false);
+%     toc;
     
     disp(['  j = ',num2str(j),' completed']);   
     
@@ -80,7 +80,7 @@ if save_data
     else
         diffterm = '_Diffusion_';
     end
-    dataname = ['storedPhase/VesselSim_data_',date,'_Walls_'];
+    dataname = ['storedPhase/VesselSim_data_',date,diffterm];
     D = dir([dataname,'*']);
     
     % check whether we've created two sets of storedPhase, and save all

@@ -6,12 +6,12 @@ function [t,sig] = plotSignal(storedPhase,p,r)
     % Created by MT Cherukara, February 2017
     
     % define time range
-    ts = (p.deltaTE/2:p.deltaTE/2:p.TE*2)';
+    ts = (p.deltaTE:p.deltaTE:(p.numSteps*p.deltaTE/p.ptsPerdt))';
     
     % use r struct to decide which sequences we want to plot, then loop
     % through them all:
     seqs   = [r.plotFID, r.plotGESSE, r.plotASE];
-    snames = {'GRE'    ; 'GES'      ; 'ASE'};
+    snames = {'GRE'    ; 'GESSE'    ; 'ASE'};
     
     for sq = 1:length(seqs)
         
@@ -57,6 +57,7 @@ function [t,sig] = plotSignal(storedPhase,p,r)
                 plot(1000*t,sig,'o-','LineWidth',2);
                 xlabel('Time (ms)');
                 ylabel([snames{sq},' Signal']);
+                title(r.ftit);
                 set(gca,'FontSize',14);
                 box on;
             end
@@ -86,7 +87,7 @@ function [tt,Phase] = phaseGRE(storedPhase,tarray,p)
     
 return;
 
-function [tt,Phase] = phaseGES(storedPhase,tarray,p)
+function [tt,Phase] = phaseGESSE(storedPhase,tarray,p)
     % calculate the phase from a GESSE sequence
     
     ss = size(storedPhase);
@@ -95,7 +96,11 @@ function [tt,Phase] = phaseGES(storedPhase,tarray,p)
     mask = repmat([ones(Tind,1); -ones(ss(1)-Tind,1)],1,ss(2));
     Phase = cumsum(storedPhase.*mask,1);
     
-    tt = tarray-p.TE;
+    % this line screws up our calculation of the intravascular signal, and
+    % isn't really necessary, we can just have the time dimension of the
+    % plot start at 0, rather than have TE be at t=0.
+%     tt = tarray-p.TE;
+    tt = tarray;
 
 return;
 
@@ -104,26 +109,40 @@ function [tt,Phase] = phaseASE(storedPhase,tarray,p)
     
     Tind = find(round(tarray.*1000) == round(p.TE.*1000),1,'first');
     
-    for k = 1:Tind+1
-        Phase(k,:) = sum(storedPhase(1:k-1,:),1)-sum(storedPhase(k:Tind,:),1);
+    for k = 1:Tind-1
+        Phase(k,:) = sum(storedPhase(1:k,:),1)-sum(storedPhase(k+1:Tind,:),1);
     end
-    tt = (p.TE:-p.deltaTE:-p.TE)';
+    
+    % these are the point we want, given the tau value chosen by the user
+    tt = (p.TE/2:-p.tau:-p.TE/2)';
+    tt = tt(2:end-1);
+    
+    % these are all the time-points that are available
+    t0 = (p.TE/2:-p.deltaTE:-p.TE/2)';
+    t0 = t0(2:end-1);
+    
+    % find the indices of points in t0 that are also in tt
+    [~,~,it] = intersect(tt,t0);
+    
+    % select the right elements in Phase
+    Phase = Phase(it,:);
+    
 return;
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%     Intravascular phase functions         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-function signal = ivsigFID(tarray,R2,R2s,p)
+function signal = ivsigGRE(tarray,R2,R2s,p)
     signal = exp(-tarray.*R2s); % simple T2* decay
 return;
 
-function signal = ivsigGES(tarray,R2,R2s,p)
+function signal = ivsigGESSE(tarray,R2,R2s,p)
     % based on Simon et al., 2016
     S1 = exp(-R2s.*tarray);
     S2 = exp(-R2.*(2.*tarray-p.TE) - R2s.*(p.TE-tarray));
     S3 = exp(-R2.*p.TE - R2s.*(tarray-p.TE));
     
-    signal = S1.*(t<(p.TE/2)) + S2.*((t>=(p.TE/2)).*(t<p.TE)) + S3.*(t>=p.TE);
+    signal = S1.*(tarray<(p.TE/2)) + S2.*((tarray>=(p.TE/2)).*(tarray<p.TE)) + S3.*(tarray>=p.TE);
 return;
 
 function signal = ivsigASE(tarray,R2,R2s,p)
