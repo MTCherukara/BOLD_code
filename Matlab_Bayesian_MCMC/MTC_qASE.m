@@ -60,12 +60,6 @@ params.Hct  = 0.40;         % no units  - fractional hematocrit
 params.R2bs = 14.9*params.Hct + 14.7 + (302.1*params.Hct + 41.8)*params.OEF^2;
 params.R2b  = 16.4*params.Hct + 4.5  + (165.2*params.Hct + 55.7)*params.OEF^2;
 
-% magnetisation of blood
-params.mb   = MTC_BOLD_M(params.T1b,1./params.R2b,params.TR,params.TE,params.alph);
-
-% fraction of signal expressed by blood
-params.lamb = params.mb.*params.nb.*(1-params.lam0).*params.zeta;
-
 % calculate characteristic frequency
 params.dw   = (4/3)*pi*params.gam*params.dChi*params.Hct*params.OEF*params.B0;
 

@@ -1,4 +1,4 @@
-function p=gentemplate
+2function p=gentemplate
 
     p.R     = 20e-6;    % m     - Vessel radius
     p.D     = 1e-9;     % m^2/s - Rate of diffusion

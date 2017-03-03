@@ -69,6 +69,16 @@ function [t,sig] = plotSignal(storedPhase,p,r)
                 D = dir([dataname,'*']);
                 save(strcat(dataname,num2str(length(D)+1),'_',snames{sq}),'t','sig','p','r');
             end
+            
+            % need to add something that saves the figure out too
+            
+            % random extra stuff, plot analytical ASE solution
+            if r.plotAnalytic && (sq == 3)
+                [ta,sa] = analyticASE(t,p,r);
+                figure(r.fnum);
+                hold on;
+                plot(1000*ta,sa,'--','LineWidth',2);
+            end
         
         end
     end
@@ -152,4 +162,35 @@ return;
 function signal = ivsigASE(tarray,R2,R2s,p)
     % T2* decay, with refocusing pulse
     signal = exp(-p.TE.*R2) .* exp(-abs(tarray).*(R2s-R2));
+return;
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%     Analytical ASE solutions           %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+function [tau,signal] = analyticASE(tarray,p,r)
+    % anayltical ASE, based on He and Yablonskiy, 2007
+    tau = linspace(tarray(1),tarray(end),101);
+    
+    R2 = 1./p.T2EV;
+    zt = sum(p.vesselFraction);
+    dw = (4/3)*pi*p.gamma*p.B0*p.deltaChi0.*p.Hct.*(1-p.Y);
+    
+    R2p = dw.*zt;
+    R2s = R2 + R2p;
+    R2m = R2 - R2p;
+    
+    S1 = exp(-R2.*(p.TE-2.*tau)+zt-(2.*R2m.*tau));
+    S2 = exp(-(R2.*p.TE) - ((8/9).*zt.*(dw.*tau).^2));
+    S3 = exp(-R2.*(p.TE-2.*tau)+zt-(2.*R2s.*tau));
+
+    ti1 = find(tau>(-0.75/dw),1,'first');
+    ti2 = find(tau<(0.75/dw),1,'last');
+
+    signal = [S1(1:ti1-1), S2(ti1:ti2), S3(ti2+1:end)];
+    if r.incT2 == 0
+        signal = signal./max(signal); % normalize
+    end
+    disp(['DBV estimate: ',num2str(S3(51)-S2(51)), ' (True value: ',num2str(p.vesselFraction),')']);
+    
 return;
