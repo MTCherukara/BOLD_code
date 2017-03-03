@@ -23,13 +23,15 @@ DATA = S_sample;
 
 %% Decide Which Parameters to Infer On
 % if changing these, make sure to change PARAM_UPDATE!
-infer_on = [ 1   ,  1    ,    0    , 0    ,   0    ,   0   ,  0    ,   0   ,   0    ];
+infer_on = [ 1   ,  1    ,    0    , 0    ,   0    ,   0   ,  0    ,   0   ,   1    ];
 var_name = {'OEF','\zeta','\lambda','Hct','\Deltaf','R2(t)','S(0)' ,'R_2^e','\sigma'};
 value =    [ 0.4 ,  0.03 ,    0.1  , 0.4 ,    5    ,   6   ,  1    ,   4   ,   0.2  ]; % true values
 inits =    [ 0.3 ,  0.1  ,    0.1  , 0.5 ,    7    ,   5   ,  0.5  ,   5   ,   0.1  ]; % initial values
 limit =    [ 0   ,  0    ,    0    , 0.0 ,    0    ,   1   ,  0    ,   0   ,   0     ; ...
              1   ,  0.2  ,    0.5  , 1   ,   10    ,  30   ,  10   ,  20   ,   1    ];
 dis_t =    [ 1   ,  1    ,    1    , 1   ,    1    ,   1   ,  1    ,   1   ,   1    ];
+pr_mn =    [ 0.5 ,  0.1  ,    0.25 , 0.5 ,    5    ,  15   ,  1    ,  10   ,   0.2  ]; % prior mean
+pr_sd =    [ Inf ,  Inf  ,    Inf  , Inf ,    Inf  ,   Inf ,  Inf  ,   Inf ,   Inf  ]; % prior standard deviation
 % type of distribution to fit, 1 = normal, 2 = gamma     
 %       only use 1 (normal) for now
 
@@ -41,6 +43,8 @@ X0      = inits(  ivars);
 LIMITS  = limit(:,ivars);
 VALS    = value(  ivars);
 DISTYPE = dis_t(  ivars);
+PRMEANS = pr_mn(  ivars);
+PRSTDS  = pr_sd(  ivars);
 
 VNAME   = cell(1,n_p);
 
