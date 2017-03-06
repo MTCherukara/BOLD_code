@@ -9,6 +9,7 @@ OEF = 0.4;
 R2 = 0.11; % 110 ms
 TE = 0.3;
 Hct = 0.4;
+lam = 0.1; % CSF volume
 
 % params
 dChi = 2.64e-7;
@@ -51,19 +52,19 @@ ti2 = find(tau<(0.75/dw),1,'last');
 
 SS = [S1(1:ti1-1), S2(ti1:ti2), S3(ti2+1:end)];
 
-figure(2); hold on;
-plot(tau.*1000,SS,'b-','LineWidth',2);
-plot(tau.*1000,S3,'r--','LineWidth',3);
-plot([0,0],[0,2],'k:','LineWidth',2);
-plot([-20,20],[S3(51),S3(51)],'k-');
-plot([-20,20],[S2(51),S2(51)],'k-');
-axis([-4,12,0.84,1.03]);
-box on;
-xlabel('\tau (ms)');
-ylabel('Signal');
-set(gca,'FontSize',16);
+% figure(2); hold on;
+% plot(tau.*1000,SS,'b-','LineWidth',2);
+% plot(tau.*1000,S3,'r--','LineWidth',3);
+% plot([0,0],[0,2],'k:','LineWidth',2);
+% plot([-20,20],[S3(51),S3(51)],'k-');
+% plot([-20,20],[S2(51),S2(51)],'k-');
+% axis([-4,12,0.84,1.03]);
+% box on;
+% xlabel('\tau (ms)');
+% ylabel('Signal');
+% set(gca,'FontSize',16);
 
-disp(['DBV estimate: ',num2str(S3(51)-S2(51))]);
+% disp(['DBV estimate: ',num2str(S3(51)-S2(51))]);
 
 %% Blood component
 
@@ -73,21 +74,29 @@ R2bs = ( 14.9.*Hct ) + 14.7 + ((302.1.*Hct + 41.8).*OEF.^2);
 R2bp = R2bs-R2b;
 SB = exp(-TE*R2b).*exp(-abs(tau)*R2bp);
 
-Sb = exp(-(R2b.*(TE-2.*tau)) - (2.*R2bs.*abs(tau)));
-
 figure(3); hold on;
 plot(tau.*1000,SS./max(SS),'-','Linewidth',2);
 plot(tau.*1000,SB./max(SB),'-','LineWidth',2);
-axis([-4,12,0.84,1.03]);
+axis([-4,12,0.84,1.01]);
 box on;
 xlabel('\tau (ms)');
 ylabel('Signal');
-set(gca,'FontSize',16);
+set(gca,'FontSize',12);
 
+%% CSF component
+
+R2e = 4;
+Df  = 5;
+
+SE = real(exp(-(R2e.*TE) - (4i.*pi.*Df.*abs(tau))));
+figure(3);
+plot(tau.*1000,SE./max(SE),'-','LineWidth',2);
 
 %% Add it all up
 
-Stotal = (DBV.*SB./max(SB)) + (1-DBV).*SS./max(SS);
+Stotal = (DBV.*SB./max(SB)) + (1-DBV-lam).*SS./max(SS) + (lam.*SE./max(SE));
 
 figure(3);
 plot(tau.*1000,Stotal,'k--','LineWidth',2);
+plot([0,0],[0,2],'k:','LineWidth',2);
+legend('Tissue','Blood','CSF','Total','Location','SouthWest');
