@@ -13,7 +13,7 @@ p.D = 1e-8;     % diffusion, in m^2/s
 p.Y = 0.6;      % oxygenation fraction (1-OEF) 
 p.vesselFraction = 0.07;    % DBV
 
-numSteps = 100; % for random walk
+numSteps = 500; % for random walk
 
 p.deltaChi = p.deltaChi0.*p.Hct.*(1-p.Y);
 p.solidWalls = 0;
@@ -64,7 +64,7 @@ F1(1) = getframe(gcf);
 
 for ii = 2:numVessels
     figure(2); 
-    coords = MTC_circle(vesselOrigins(ii,1),vesselOrigins(ii,2),R(ii));
+    coords = MTC_circle(vesselOrigins(ii,1),vesselOrigins(ii,2),p.R);
     plot(coords(1,:),coords(2,:),'b-');
     drawnow;
     F1(ii) = getframe(gcf);
@@ -74,10 +74,33 @@ end
 initPosit = [0,0];
 
 % generate random walk
-protonPosits = 15.*p.stdDev.*randn(numSteps.*p.HD,2);
+protonPosits = 5.*p.stdDev.*randn(numSteps.*p.HD,2);
 cumulativePosits      = protonPosits;
 cumulativePosits(1,:) = initPosit;
 cumulativePosits      = cumsum(cumulativePosits);
+
+% prepare for inverting
+invPosits(:,:,1) = protonPosits;
+invPosits(:,:,2) = -protonPosits;
+
+invert = 2; % start with the negative version of protonPosits ready to go
+
+% loop through and find stuff out
+for jj = 2:(p.HD*numSteps)
+    
+    pos = cumulativePosits(jj,:);
+    
+    dstn = zeros(1,numVessels);
+    
+    for kk = 1:numVessels 
+        dstn(kk) = sqrt((vesselOrigins(kk,1)-pos(1)).^2 + (vesselOrigins(kk,2)-pos(2)).^2);
+    end
+    
+    if min(dstn) < p.R
+        cumulativePosits(jj:end,:) = cumulativePosits(jj-1,:) + cumsum(invPosits(jj:end,:,invert));
+        invert = mod(invert,2) + 1; % switch this between 1 and 2 each time
+    end
+end
 
 figure(2);
 plot(cumulativePosits(1,1),cumulativePosits(1,2),'rx');

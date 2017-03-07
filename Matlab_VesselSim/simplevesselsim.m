@@ -96,7 +96,7 @@ function [storedProtonPhase, p] = simplevesselsim(p)
 	% define parameters for simulation
 	p.HD = 10; % factor for higher density sampling near vessels
 	p.stdDev = sqrt(2*p.D*p.dt/p.HD);
-	p.universeSize = p.universeScale*min(p.R);
+	p.universeSize = p.universeScale*max(p.R);
 	p.numSteps = round((p.TE*2)/p.dt);
 	p.ptsPerdt = round(p.deltaTE./p.dt); %pts per deltaTE
     

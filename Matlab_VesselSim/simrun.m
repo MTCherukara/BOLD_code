@@ -40,7 +40,7 @@ p.N = 10000;
 p.R = 2e-5;     % radius, in m
 p.D = 1e-9;     % diffusion, in m^2/s
 p.Y = 0.6;      % oxygenation fraction (1-OEF) 
-p.vesselFraction = 0.05;    % DBV
+p.vesselFraction = 0.03;    % DBV
 
 
 X = p.Y*ones(1,1);
@@ -48,10 +48,11 @@ X = p.Y*ones(1,1);
 % pre-allocate phase storage arrays
 ph_steps = round((p.TE*2)/p.dt)./round(p.deltaTE./p.dt);
 Phase_u = zeros(ph_steps,p.N,length(X));
+% Phase_n = zeros(ph_steps,p.N,length(X));
 
 for j = 1:length(X)
     
-%     p.Y = X(j);
+%     p.Y = [0.95,0.7,0.6];
     p.deltaChi = p.deltaChi0.*p.Hct.*(1-p.Y); % calculate susceptibility difference
     
     disp(['Running j = ',num2str(j)]);
