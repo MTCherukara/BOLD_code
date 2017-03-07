@@ -24,9 +24,9 @@ DATA = S_sample;
 %% Decide Which Parameters to Infer On
 % if changing these, make sure to change PARAM_UPDATE!
 infer_on = [ 1   ,  1    ,    0    , 0    ,   0    ,   0   ,  0    ,   0   ,   1    ];
-var_name = {'OEF','\zeta','\lambda','Hct','\Deltaf','R2(t)','S(0)' ,'R_2^e','\sigma'};
+var_name = {'OEF','DBV'  ,'\lambda','Hct','\Deltaf','R2(t)','S(0)' ,'R_2^e','\sigma'};
 value =    [ 0.4 ,  0.03 ,    0.1  , 0.4 ,    5    ,   6   ,  1    ,   4   ,   0.2  ]; % true values
-inits =    [ 0.3 ,  0.1  ,    0.1  , 0.5 ,    7    ,   5   ,  0.5  ,   5   ,   0.1  ]; % initial values
+inits =    [ 0.4 ,  0.05 ,    0.1  , 0.5 ,    7    ,   5   ,  0.5  ,   5   ,   0.2  ]; % initial values
 limit =    [ 0   ,  0    ,    0    , 0.0 ,    0    ,   1   ,  0    ,   0   ,   0     ; ...
              1   ,  0.2  ,    0.5  , 1   ,   10    ,  30   ,  10   ,  20   ,   1    ];
 dis_t =    [ 1   ,  1    ,    1    , 1   ,    1    ,   1   ,  1    ,   1   ,   1    ];
@@ -119,7 +119,7 @@ for ii = 1:(n_burn+n_jump)
             
             % if the ratio of norms (new/old) is greater than a randomly
             % defined threshold, accept the n
-            if (L0/L1) > (2*rand)
+            if (L0/L1) > (1*rand)
                 c_acc(par) = c_acc(par) + 1;
                 X0(par) = X1(par);
                 L0 = L1;

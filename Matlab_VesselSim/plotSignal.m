@@ -12,6 +12,7 @@ function [t,sig] = plotSignal(storedPhase,p,r)
     % through them all:
     seqs   = [r.plotFID, r.plotGESSE, r.plotASE];
     snames = {'GRE'    ; 'GESSE'    ; 'ASE'};
+    lspc   = {'-'      ; '-'        ; '-o' };
     
     for sq = 1:length(seqs)
         
@@ -54,7 +55,7 @@ function [t,sig] = plotSignal(storedPhase,p,r)
             if r.display
                 figure(r.fnum);
                 hold on;
-                plot(1000*t,sig,'o-','LineWidth',2);
+                plot(1000*t,sig,lspc{sq},'LineWidth',2);
                 xlabel('Time (ms)');
                 ylabel([snames{sq},' Signal']);
                 title(r.ftit);
