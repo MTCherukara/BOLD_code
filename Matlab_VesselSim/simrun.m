@@ -30,16 +30,16 @@
 %       this script is just there to set up stuff, call that function, and 
 %       save out the results.
 
-clear variables;
+clear;
 
-save_data =1;  % set this to 1 to save storedPhase data out, or 0 not to
+save_data = 1;  % set this to 1 to save storedPhase data out, or 0 not to
 
 p=gentemplate;          % create basic set of parameters
 p.N = 10000;
  
 p.R = 2e-5;     % radius, in m
-p.D = 1e-9;     % diffusion, in m^2/s
-p.Y = 0.6;      % oxygenation fraction (1-OEF) 
+p.D = 5e-9;     % diffusion, in m^2/s
+p.Y = 0.7;      % oxygenation fraction (1-OEF) 
 p.vesselFraction = 0.03;    % DBV
 
 
@@ -48,7 +48,7 @@ X = p.Y*ones(1,1);
 % pre-allocate phase storage arrays
 ph_steps = round((p.TE*2)/p.dt)./round(p.deltaTE./p.dt);
 Phase_u = zeros(ph_steps,p.N,length(X));
-% Phase_n = zeros(ph_steps,p.N,length(X));
+Phase_n = zeros(ph_steps,p.N,length(X));
 
 for j = 1:length(X)
     
@@ -64,11 +64,16 @@ for j = 1:length(X)
 %     [sASE_u(:,j), tASE]  = MTC_plotSignal(p,Phase_u(:,:,j),'sequence','ASE','display',false);
     toc;
     
-%     tic;
-%     p.solidWalls = 1;
-%     [Phase_n(:,:,j),p] = simplevesselsim(p);
-% %     [sASE_n(:,j), tASE]  = MTC_plotSignal(p,Phase_n(:,:,j),'sequence','ASE','display',false);
-%     toc;
+    tic;
+
+    p.Y = 0.8;      % oxygenation fraction (1-OEF) 
+    p.vesselFraction = 0.05;    % DBV
+    p.deltaChi = p.deltaChi0.*p.Hct.*(1-p.Y); % calculate susceptibility difference
+
+    [Phase_n(:,:,j),p] = simplevesselsim(p);
+    p.deltaChi = p.deltaChi0.*p.Hct.*(1-p.Y); % calculate susceptibility difference
+
+    toc;
     
     disp(['  j = ',num2str(j),' completed']);   
     
