@@ -50,14 +50,14 @@ function simAnalyse
     % Text 'Select phase data file to analyse:'
     h.tx01 = uicontrol('Style','Text',...
                        'Position',[10,430,250,25],...
-                       'String','Select phase data file to anaylse:',...
+                       'String','Select first phase data file:',...
                        'FontSize',14,...
                        'HorizontalAlignment','Right');
     
     % Edit field
-    h.inpt = uicontrol('Style','Edit',...
+    h.inp1 = uicontrol('Style','Edit',...
                        'Position',[270,430,400,25],...
-                       'String','Phase data file',...
+                       'String','',...
                        'FontSize',14,...
                        'HorizontalAlignment','Left');
     
@@ -68,41 +68,65 @@ function simAnalyse
                        'FontSize',14,...
                        'Callback',{@pickData,h});
                    
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    %%%   Optionally select second data file
+    
+    % Text 'Select second phase data file:'
+    h.tx02 = uicontrol('Style','Text',...
+                       'Position',[10,400,250,25],...
+                       'String','Select second phase data file:',...
+                       'FontSize',14,...
+                       'HorizontalAlignment','Right');
+    
+    % Edit field
+    h.inp2 = uicontrol('Style','Edit',...
+                       'Position',[270,400,400,25],...
+                       'String','',...
+                       'FontSize',14,...
+                       'HorizontalAlignment','Left');
+    
+    % Browse button
+    h.but2 = uicontrol('Style','Pushbutton',...
+                       'Position',[680,400,100,25],...
+                       'String','Browse...',...
+                       'FontSize',14,...
+                       'Callback',{@pickData2,h});
+                   
                    
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     %%%   Spin echo options - these are enabled by the checkboxes below
     
     % Text - 'TE'
     h.tx12 = uicontrol('Style','Text',...
-                       'Position',[120,360,40,25],...
+                       'Position',[120,330,40,25],...
                        'String','TE:',...
                        'FontSize',14,...
                        'HorizontalAlignment','Right');
        
     % Edit field - TE - default 60 ms
     h.inTE = uicontrol('Style','Edit',...
-                       'Position',[160,360,100,25],...
+                       'Position',[160,330,100,25],...
                        'String','60',...
                        'FontSize',14,...
                        'HorizontalAlignment','Right');
     
     % Text - 'ms'
     h.tx13 = uicontrol('Style','Text',...
-                       'Position',[260,360,40,25],...
+                       'Position',[260,330,40,25],...
                        'String','ms',...
                        'Fontsize',14,...
                        'HorizontalAlignment','Left');
      
-    % Text - 'tau' (THIS CURRENTLY DOESN'T REALLY WORK)
+    % Text - 'tau' 
     h.tx14 = uicontrol('Style','Text',...
-                       'Position',[120,300,40,25],...
+                       'Position',[120,270,40,25],...
                        'String','tau:',...
                        'FontSize',14,...
                        'HorizontalAlignment','Right');
            
     % Edit field - Tau - default 2 ms
     h.inDT = uicontrol('Style','Edit',...
-                       'Position',[160,300,100,25],...
+                       'Position',[160,270,100,25],...
                        'String','2',...
                        'FontSize',14,...
                        'HorizontalAlignment','Right',...
@@ -110,7 +134,7 @@ function simAnalyse
          
     % Text - 'ms'
     h.tx15 = uicontrol('Style','Text',...
-                       'Position',[260,300,40,25],...
+                       'Position',[260,270,40,25],...
                        'String','ms',...
                        'Fontsize',14,...
                        'HorizontalAlignment','Left'); 
@@ -121,40 +145,40 @@ function simAnalyse
     
     % Section title text - 'Sequences'
     h.tx10 = uicontrol('Style','Text',...
-                       'Position',[20,390,100,25],...
+                       'Position',[20,360,100,25],...
                        'String','Sequences:',...
                        'FontSize',14,...
                        'HorizontalAlignment','Left');
     
     % Checkbox - gradient echo - no callback
     h.ch10 = uicontrol('Style','Checkbox',...
-                       'Position',[30,360,100,25],...
+                       'Position',[30,330,100,25],...
                        'String','GRE',...
                        'FontSize',14);
     
     % Checkbox - GESSE - no callback
     h.ch12 = uicontrol('Style','Checkbox',...
-                       'Position',[30,330,100,25],...
+                       'Position',[30,300,100,25],...
                        'String','GESSE',...
                        'FontSize',14);
                    
     % Checkbox - ASE - switches the Tau field on or off
     h.ch13 = uicontrol('Style','Checkbox',...
-                       'Position',[30,300,100,25],...
+                       'Position',[30,270,100,25],...
                        'String','ASE',...
                        'FontSize',14,...
                        'Callback',{@switchASE,h});
             
     % Checkbox - MASE (CURRENTLY NOT WORKING)
 	h.ch14 = uicontrol('Style','Checkbox',...
-                       'Position',[30,270,100,25],...
+                       'Position',[30,240,100,25],...
                        'String','MASE',...
                        'FontSize',14,...
                        'Enable','off');
                    
     % Checkbox - Further example (CURRENTLY NOT WORKING)
 	h.ch14 = uicontrol('Style','Checkbox',...
-                       'Position',[30,240,150,25],...
+                       'Position',[30,210,150,25],...
                        'String','another sequence',...
                        'FontSize',14,...
                        'Enable','off');
@@ -165,28 +189,28 @@ function simAnalyse
     
     % Section title text - 'Analysis options:'
     h.tx20 = uicontrol('Style','Text',...
-                       'Position',[400,390,150,25],...
+                       'Position',[400,360,150,25],...
                        'String','Analysis options:',...
                        'FontSize',14,...
                        'HorizontalAlignment','Left');
                    
     % Checkbox - aggregate - on by default
     h.chAG = uicontrol('Style','Checkbox',...
-                       'Position',[400,360,250,25],...
+                       'Position',[400,330,250,25],...
                        'String','Aggregate repeated runs',...
                        'FontSize',14,...
                        'Value',1);
                    
     % Text - 'T2:' - for when T2 effects are included
 	h.tx21 = uicontrol('Style','Text',...
-                       'Position',[450,300,40,25],...
+                       'Position',[450,270,40,25],...
                        'String','T2:',...
                        'FontSize',14,...
                        'HorizontalAlignment','Right');
                    
     % Edit field - T2 - default 110 ms
 	h.inT2 = uicontrol('Style','Edit',...
-                       'Position',[490,300,60,25],...
+                       'Position',[490,270,60,25],...
                        'String','110',...
                        'FontSize',14,...
                        'HorizontalAlignment','Right',...
@@ -194,21 +218,21 @@ function simAnalyse
                   
     % Text - 'ms'
 	h.tx22 = uicontrol('Style','Text',...
-                       'Position',[550,300,40,25],...
+                       'Position',[550,270,40,25],...
                        'String','ms',...
                        'FontSize',14,...
                        'HorizontalAlignment','Left');
                    
     % Checkbox - T2 effects - switches on the T2 option above
     h.chT2 = uicontrol('Style','Checkbox',...
-                       'Position',[400,330,200,25],...
+                       'Position',[400,300,200,25],...
                        'String','Include T2 effects',...
                        'FontSize',14,...
                        'Callback',{@switchT2,h});
                    
     % Checkbox - IV signal
     h.chIV = uicontrol('Style','Checkbox',...
-                       'Position',[400,270,250,25],...
+                       'Position',[400,240,250,25],...
                        'String','Include Intravascular signal',...
                        'FontSize',14);
    
@@ -293,14 +317,56 @@ function runAnalysis(~,~,h)
     % this runs the actual analysis of our data
     
     % first, read the users input, and load that dataset:
-    filename = get(h.inpt,'String');
+    filename = get(h.inp1,'String');
     load(filename);
+    
+    % now check whether the input file has 1 or 2 storedPhase matrices in
+    % it, and load both of them as sp1 and sp2, and define structures p1
+    % and p2 to match
+    
+    twoMats = 0; % the default will be to analyse only 1 set of values at a time
+    
+    pnames = who('*phase*','*Phase*'); % this will list all the variables with the word 'phase' in their name
+    
+    sp1 = eval(pnames{1}); % take the first 'phase' variable
+    p1 = p;
+    
+    if length(pnames) > 1
+        twoMats = 1; % we'll use this later to repeat the analysis process
+        sp2 = eval(pnames{2}); % if there are more than 3, tough...
+        p2 = p;
+    end
+    
+    % now check whether the user has specified a second input file
+    clear *phase* *Phase* p
+    if ~isempty(get(h.inp2,'String'))
+        if twoMats
+            disp('Two input matrices have already been provided!');
+            
+        else
+            filename = get(h.inp2,'String');
+            load(filename);
+            
+            twoMats = 2;
+            
+            pnames = who('*phase*','*Phase*');
+            sp2 = eval(pnames{1});
+            p2 = p;
+            
+        end
+    end
     
     % second, check user's selection of output options:
     r.display = get(h.ch31,'Value');
     r.fnum = str2double(get(h.inFG,'String'));
     r.ftit = get(h.inFT,'String');
     r.save = get(h.ch32,'Value');
+    
+    % if there are two inputs given, construct a smart title string based
+    % on the similarities/differences between their p structures
+    if (twoMats == 2) && isempty(r.ftit)
+        r.ftit = smartTitle(p1,p2);
+    end
     
     % and sequence/analysis options:
     r.plotFID       = get(h.ch10,'Value');
@@ -311,7 +377,10 @@ function runAnalysis(~,~,h)
     r.plotAnalytic  = get(h.ch01,'Value');
     
     % then pull values from the form-fillable boxes:
-    p.T2EV = 0.001*str2double(get(h.inT2,'String'));
+    p1.T2EV = 0.001*str2double(get(h.inT2,'String'));
+    if twoMats
+        p2.T2EV = p1.T2EV;
+    end
     
     r.tau  = 0.001*str2num(get(h.inDT,'String')); %#ok<*ST2NM>
     r.TE   = 0.001*str2num(get(h.inTE,'String'));
@@ -319,24 +388,13 @@ function runAnalysis(~,~,h)
     % check the value of tau supplied, if it's a single value, use it, if
     % it's a range, be careful
     if length(r.tau) == 1
-        p.tau = r.tau;
+        p1.tau = r.tau;
+        if twoMats
+            p2.tau = p1.tau;
+        end
         r.defineTau = 0;
     else
         r.defineTau = 1;
-    end
-    
-    % not that we've loaded the data, we want to see how many stored-phase
-    % type variables we have (either 1 or 2) 
-    
-    twoMats = 0; % the default will be to analyse only 1 set of values at a time
-    
-    pnames = who('*phase*','*Phase*'); % this will list all the variables with the word 'phase' in their name
-    
-    sp1 = eval(pnames{1}); % take the first 'phase' variable
-    
-    if length(pnames) > 1
-        twoMats = 1; % we'll use this later to repeat the analysis process
-        sp2 = eval(pnames{2}); % if there are more than 3, tough...
     end
     
     % check whether the user has specified aggregating repeated runs, for
@@ -357,12 +415,21 @@ function runAnalysis(~,~,h)
     
     % finally, run the analysis for all TE values given:
     for ii = 1:length(r.TE)
-        p.TE = r.TE(ii);
+        p1.TE = r.TE(ii);
         
-        plotSignal(sp1,p,r);
+        plotSignal(sp1,p1,r);
+        
         if twoMats
-            plotSignal(sp2,p,r);
+            p2.TE = r.TE(ii);
+            plotSignal(sp2,p2,r);
         end
+        
+    end
+    
+    % add a legend to the graph, under certain circumstances
+    if twoMats == 2
+        [leg1,leg2] = smartLegend(p1,p2);
+        legend(leg1,leg2,'Location','South');
     end
         
     
@@ -375,7 +442,13 @@ return;
 function pickData(~,~,handles)
     % Let the user choose a data file to analyse
     [dataname,datadir] = uigetfile('*.mat','Select Vessel Simulation Dataset...');
-    set(handles.inpt,'String',strcat(datadir,dataname));
+    set(handles.inp1,'String',strcat(datadir,dataname));
+return;
+
+function pickData2(~,~,handles)
+    % Let the user choose a data file to analyse
+    [dataname,datadir] = uigetfile('*.mat','Select Vessel Simulation Dataset...');
+    set(handles.inp2,'String',strcat(datadir,dataname));
 return;
 
 function switchASE(src,~,handles)
@@ -425,4 +498,64 @@ function matrix2D = aggregate(matrix3D)
     else
         matrix2D = reshape(matrix3D,sz(1),(sz(2)*sz(3)));
     end
+return;
+
+function tstring = smartTitle(p1,p2)
+    % parse the structures p1 and p2 in order to construct a useful title
+    % for a graph that plots both of them together
+    
+    % variables we want to think about:
+    %       Diffusion       p.D
+    %       Radius          p.R
+    %       Oxygenation     p.Y
+    %       Volume          p.vesselFraction
+    
+    tstring = ''; % initialise
+   
+    % go through in the same order as above
+    if p1.D == p2.D
+        tstring = [tstring,'D = ',num2str(p1.D.*1e9),'x10^-^9, '];
+    end
+    
+    if p1.R == p2.R
+        tstring = [tstring,'R = ',num2str(p1.R.*1e6),'\mum, '];
+    end
+    
+    if p1.Y == p2.Y
+        tstring = [tstring,'OEF = ',num2str(1-p1.Y),', '];
+    end
+    
+    if p1.vesselFraction == p2.vesselFraction
+        tstring = [tstring,'DBV = ',num2str(p1.vesselFraction),', '];
+    end
+return;
+
+function [leg1,leg2] = smartLegend(p1,p2)
+    % parse the structures p1 and p2 and find the elements that are
+    % different, and use those to generete legends for the graph
+    
+    % initialization
+    leg1 = '';
+    leg2 = '';
+    
+    if p1.D ~= p2.D
+        leg1 = [leg1,'D = ',num2str(p1.D*1e9),'x10^-^9, '];
+        leg2 = [leg2,'D = ',num2str(p2.D*1e9),'x10^-^9, '];
+    end
+    
+    if p1.R ~= p2.R
+        leg1 = [leg1,'R = ',num2str(p1.Y*1e6),'\mum, '];
+        leg2 = [leg2,'R = ',num2str(p2.Y*1e6),'\mum, '];
+    end
+    
+    if p1.Y ~= p2.Y
+        leg1 = [leg1,'OEF = ',num2str(p1.Y),', '];
+        leg2 = [leg2,'OEF = ',num2str(p2.Y),', '];
+    end
+    
+    if p1.vesselFraction ~= p2.vesselFraction
+        leg1 = [leg1,'DBV = ',num2str(p1.vesselFraction),', '];
+        leg2 = [leg2,'DBV = ',num2str(p2.vesselFraction),', '];
+    end
+    
 return;

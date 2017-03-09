@@ -22,7 +22,7 @@ function [t,sig] = plotSignal(storedPhase,p,r)
             [t,ph] = eval(strcat('phase',snames{sq},'(storedPhase,ts,p,r)'));
 
             % calculate extravascular signal
-            sigEV = abs(sum(exp(-1i.*ph),2)./p.N);
+            sigEV = abs(mean(exp(-1i.*ph),2));
 
             % account for t2 decay
             if r.incT2
@@ -53,6 +53,12 @@ function [t,sig] = plotSignal(storedPhase,p,r)
 
             % display the result
             if r.display
+                
+                % first, do some smart title related stuff
+                if sq ~= 1 && length(r.TE) == 1
+                    r.ftit = [r.ftit,' TE = ',num2str(1000*r.TE(1)),'ms'];
+                end
+                
                 figure(r.fnum);
                 hold on;
                 plot(1000*t,sig,lspc{sq},'LineWidth',2);
