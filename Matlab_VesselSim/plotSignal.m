@@ -23,14 +23,17 @@ function [t,sig] = plotSignal(storedPhase,p,r)
 
             % calculate extravascular signal
             sigEV = abs(mean(exp(-1i.*ph),2));
+            stdEV = std(exp(-1i.*ph),[],2);
 
             % account for t2 decay
             if r.incT2
                 
                 if sq == 1 || sq == 2 % do this for GRE and GESSE
                     sigEV = sigEV.*exp(-t./p.T2EV);
+                    stdEV = stdEV.*exp(-t./p.T2EV); % scale the error in the same way
                 else % do this for other sequences (e.g. ASE)
                     sigEV = sigEV.*exp(-p.TE./p.T2EV);
+                    stdEV = stdEV.*exp(-p.TE./p.T2EV);
                 end
             end
 
@@ -61,7 +64,13 @@ function [t,sig] = plotSignal(storedPhase,p,r)
                 
                 figure(r.fnum);
                 hold on;
-                plot(1000*t,sig,lspc{sq},'LineWidth',2);
+                
+                if r.plotErrors
+                    errorbar(1000*t,sig,stdEV,lspc{sq},'LineWidth',2);
+                else
+                    plot(1000*t,sig,lspc{sq},'LineWidth',2);
+                end
+                
                 xlabel('Time (ms)');
                 ylabel([snames{sq},' Signal']);
                 title(r.ftit);
@@ -76,9 +85,7 @@ function [t,sig] = plotSignal(storedPhase,p,r)
                 D = dir([dataname,'*']);
                 save(strcat(dataname,num2str(length(D)+1),'_',snames{sq}),'t','sig','p','r');
             end
-            
-            % need to add something that saves the figure out too
-            
+       
             % random extra stuff, plot analytical ASE solution
             if r.plotAnalytic && (sq == 3)
                 [ta,sa] = analyticASE(t,p,r);

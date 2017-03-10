@@ -182,7 +182,24 @@ function simAnalyse
                        'String','another sequence',...
                        'FontSize',14,...
                        'Enable','off');
-                  
+                   
+                   
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    %%%   Sequence Selection - Radiobutton version - NOT WORKING
+                 
+%     h.bg10 = uibuttongroup('Visible','off',...
+%                            'Units','pixels',...
+%                            'Position',[20,210,150,150],...
+%                            'Title','Sequences:',...
+%                            'FontSize',14);
+%                        
+%     h.rb11 = uicontrol(h.bg10,'Style','RadioButton',...
+%                               'String','GRE',...
+%                               'Position',[30,330,100,25],...
+%                               'FontSize',14);
+%                           
+%     h.bg10.Visible = 'on';
+                     
                    
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     %%%   Analysis Options
@@ -280,6 +297,12 @@ function simAnalyse
                        'Position',[60,60,250,25],...
                        'String','Also plot analytical ASE signal',...
                        'FontSize',14);   
+                   
+    % Checkbox - plot error bars
+    h.ch02 = uicontrol('Style','Checkbox',...
+                       'Position',[300,60,250,25],...
+                       'String','Show error bars',...
+                       'FontSize',14);   
     
     % Checkbox - plot graph - on by default - switches the Figure options
     h.ch31 = uicontrol('Style','Checkbox',...
@@ -373,8 +396,9 @@ function runAnalysis(~,~,h)
     r.plotGESSE     = get(h.ch12,'Value');
     r.plotASE       = get(h.ch13,'Value');
     r.incT2         = get(h.chT2,'Value');
-    r.incIV         = get(h.chIV,'Value'); % we'll worry about this later
+    r.incIV         = get(h.chIV,'Value');
     r.plotAnalytic  = get(h.ch01,'Value');
+    r.plotErrors    = get(h.ch02,'Value');
     
     % then pull values from the form-fillable boxes:
     p1.T2EV = 0.001*str2double(get(h.inT2,'String'));
@@ -426,12 +450,25 @@ function runAnalysis(~,~,h)
         
     end
     
-    % add a legend to the graph, under certain circumstances
-    if twoMats == 2
-        [leg1,leg2] = smartLegend(p1,p2);
-        legend(leg1,leg2,'Location','South');
-    end
+    if r.display
+
+        % add a legend to the graph, under certain circumstances
+        if twoMats == 2
+            leg1 = smartLegend(p1,p2,r);
+            legend(leg1,'Location','South');
+        elseif r.plotAnalytic
+            leg1 = smartLegend(p1,p1,r);
+            legend(leg1,'Location','South');
+        end
+    
+        % save the graph, if the user wants it saved
+        if r.save
+            figtitle = ['signalResults/VS_Figure_',date,'_'];
+            D = dir([figtitle,'*']);
+            saveas(gcf,strcat(dataname,num2str(length(D)+1),'.png'));
+        end
         
+    end
     
 return;
 
@@ -475,10 +512,12 @@ function switchPlot(src,~,handles)
         set(handles.inFG,'Enable','on');
         set(handles.inFT,'Enable','on');
         set(handles.ch01,'Enable','on');
+        set(handles.ch02,'Enable','on');
     else
         set(handles.inFG,'Enable','off');
         set(handles.inFT,'Enable','off');
         set(handles.ch01,'Enable','off');
+        set(handles.ch02,'Enable','off');
     end    
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -530,7 +569,7 @@ function tstring = smartTitle(p1,p2)
     end
 return;
 
-function [leg1,leg2] = smartLegend(p1,p2)
+function legs = smartLegend(p1,p2,r)
     % parse the structures p1 and p2 and find the elements that are
     % different, and use those to generete legends for the graph
     
@@ -556,6 +595,12 @@ function [leg1,leg2] = smartLegend(p1,p2)
     if p1.vesselFraction ~= p2.vesselFraction
         leg1 = [leg1,'DBV = ',num2str(p1.vesselFraction),', '];
         leg2 = [leg2,'DBV = ',num2str(p2.vesselFraction),', '];
+    end
+    
+    if r.plotAnalytic
+        legs = {['Simulated ',leg1],['Analytical ',leg1],['Simulated ',leg2],['Analytical ',leg2]};
+    else
+        legs = {leg1,leg2};
     end
     
 return;
