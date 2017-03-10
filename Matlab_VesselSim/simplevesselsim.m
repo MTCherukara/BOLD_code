@@ -211,17 +211,7 @@ function [vesselOrigins, vesselNormals, R, deltaChi, protonPosit, numVessels, ve
     vesselNormals = vesselNormals./repmat(sqrt(sum(vesselNormals.^2,2)),1,3);
     
     % calculate lengths of vessels in sphere
-    a = sum(vesselNormals.^2,2);
-    b = 2*sum(vesselOrigins.*vesselNormals,2);
-    c = sum(vesselOrigins.^2,2)-p.universeSize.^2;
-    
-    delta = b.*b-4*a.*c;
-    
-    u1 = (-b-sqrt(delta))./2./a;
-    u2 = (-b+sqrt(delta))./2./a;
-    p1 = vesselOrigins+repmat(u1,1,3).*vesselNormals;
-    p2 = vesselOrigins+repmat(u2,1,3).*vesselNormals;
-    l  = sqrt(sum((p2-p1).^2,2));
+    l = calculateLength(vesselNormals,vesselOrigins,p);
         
     % find vessel number cutoff for desired volume fractions
     cutOff = 0;
