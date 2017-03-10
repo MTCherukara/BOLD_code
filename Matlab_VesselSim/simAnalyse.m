@@ -465,7 +465,7 @@ function runAnalysis(~,~,h)
         if r.save
             figtitle = ['signalResults/VS_Figure_',date,'_'];
             D = dir([figtitle,'*']);
-            saveas(gcf,strcat(dataname,num2str(length(D)+1),'.png'));
+            saveas(gcf,strcat(figtitle,num2str(length(D)+1),'.png'));
         end
         
     end
