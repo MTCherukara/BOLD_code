@@ -10,7 +10,7 @@ clear;
 % close all;
 tic;
 %% Load Data - use 20-May-2016
-load('VS_Data_02.mat');
+load('ASE_Data_04.mat');
 
 sigma = params.sig;   % real std of noise
 sigma_weight = 2/(sigma.^2);

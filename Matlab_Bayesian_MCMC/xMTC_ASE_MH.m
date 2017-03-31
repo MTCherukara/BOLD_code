@@ -5,6 +5,8 @@
 % MT Cherukara
 % 18 May 2016 (origin)
 %
+% 31 March 2017 - Clean-up, revert back to histogram plotting
+%
 % 14 June 2016 - Changed the way graphs are plotted so that they use a
 % normal distribution rather than a horrible looking histogram. Added a
 % test feature using the resulting normal distribution to display on the
@@ -12,66 +14,73 @@
 % deviation of its true value.
 %
 % 13 June 2016 - Made various changes up to this date.
-    
 
 clear; close all;
 
 % Load Data (data from 20-May-2016 uses besselj integral and isn't normalized)
-load('ASE_Data_006.mat'); % various sigma = 0.02
+load('ASE_Data_05.mat'); % various sigma = 0.02
 DATA = S_sample;
 
+% the r structure will contain settings which will be used in the MH
+% algorithm, including which parameters are being inferred on, and what
+% values they take
+r.plot_dist = 0; % set this to 1 to plot distributions and stuff
 
 %% Decide Which Parameters to Infer On
 % if changing these, make sure to change PARAM_UPDATE!
-infer_on = [ 1   ,  1    ,    0    , 0    ,   0    ,   0   ,  0    ,   0   ,   1    ];
-var_name = {'OEF','DBV'  ,'\lambda','Hct','\Deltaf','R2(t)','S(0)' ,'R_2^e','\sigma'};
-value =    [ 0.4 ,  0.03 ,    0.1  , 0.4 ,    5    ,   6   ,  1    ,   4   ,   0.2  ]; % true values
-inits =    [ 0.4 ,  0.05 ,    0.1  , 0.5 ,    7    ,   5   ,  0.5  ,   5   ,   0.2  ]; % initial values
-limit =    [ 0   ,  0    ,    0    , 0.0 ,    0    ,   1   ,  0    ,   0   ,   0     ; ...
-             1   ,  0.2  ,    0.5  , 1   ,   10    ,  30   ,  10   ,  20   ,   1    ];
-dis_t =    [ 1   ,  1    ,    1    , 1   ,    1    ,   1   ,  1    ,   1   ,   1    ];
-pr_mn =    [ 0.5 ,  0.1  ,    0.25 , 0.5 ,    5    ,  15   ,  1    ,  10   ,   0.2  ]; % prior mean
-pr_sd =    [ Inf ,  Inf  ,    Inf  , Inf ,    Inf  ,   Inf ,  Inf  ,   Inf ,   Inf  ]; % prior standard deviation
+r.infer_on = [ 1   ,  0    ,    0    , 0    ,   0    ,   0   ,  0    ,   0   ,   0    ];
+r.var_name = {'OEF','DBV'  ,'\lambda','Hct','\Deltaf','R2(t)','S(0)' ,'R_2^e','\sigma'};
+r.value =    [ 0.4 ,  0.03 ,    0.1  , 0.4 ,    5    ,   6   ,  1    ,   4   ,   0.01  ]; % true values
+r.inits =    [ 0.4 ,  0.05 ,    0.1  , 0.5 ,    7    ,   5   ,  0.5  ,   5   ,   0.001  ]; % initial values
+r.limit =    [ 0   ,  0    ,    0    , 0.0 ,    0    ,   1   ,  0    ,   0   ,   0     ; ...
+               1   ,  0.2  ,    0.5  , 1   ,   10    ,  30   ,  10   ,  20   ,   0.1    ];
+r.dis_t =    [ 1   ,  1    ,    1    , 1   ,    1    ,   1   ,  1    ,   1   ,   1    ];
+
+% % ignore priors for now
+% pr_mn =    [ 0.5 ,  0.1  ,    0.25 , 0.5 ,    5    ,  15   ,  1    ,  10   ,   0.0001  ]; % prior mean
+% pr_sd =    [ Inf ,  Inf  ,    Inf  , Inf ,    Inf  ,   Inf ,  Inf  ,   Inf ,   Inf  ]; % prior standard deviation
 % type of distribution to fit, 1 = normal, 2 = gamma     
 %       only use 1 (normal) for now
 
-n_p = sum(infer_on);
+n_p = sum(r.infer_on); % number of parameters being inferred
 
-ivars   = find(infer_on==1);
+ivars   = find(r.infer_on==1); % positions in the standard structure of the parameters being inferred here
 
-X0      = inits(  ivars);
-LIMITS  = limit(:,ivars);
-VALS    = value(  ivars);
-DISTYPE = dis_t(  ivars);
-PRMEANS = pr_mn(  ivars);
-PRSTDS  = pr_sd(  ivars);
+X0      = r.inits(  ivars);
+LIMITS  = r.limit(:,ivars);
+VALS    = r.value(  ivars);
+DISTYPE = r.dis_t(  ivars);
+% PRMEANS = pr_mn(  ivars);     % ignore priors now
+% PRSTDS  = pr_sd(  ivars);
 
+% collect parameter names into a cell array
 VNAME   = cell(1,n_p);
-
 for var = 1:n_p
-    VNAME{var} = var_name{ivars(var)};
+    VNAME{var} = r.var_name{ivars(var)};
 end
 
 
 %% function
 % algorithm parameters
-n_burn = 5000;  % number of jumps in the 'burn-in' phase
-n_jump = 10000;  % number of jumps after the 'burn-in'
-n_samp = 10;    % rate of sampling (1 every N_SAMP jumps)
-n_updt = 10;    % rate of updating scale parameter (once every N_UPDT jumps)
-qs = 0.60;      % q_sig scaling parameter = ideal acceptance rate
+r.nb = 5000;      % number of jumps in the 'burn-in' phase
+r.nj = 10000;     % number of jumps after the 'burn-in'
+r.ns = 10;    % rate of sampling (1 every N_SAMP jumps)
+r.nu = 100;    % rate of updating scale parameter (once every N_UPDT jumps)
 
-n_p = length(X0);   % number of parameters to be inferred on
+qs = 0.6;       % q_sig scaling parameter = ideal acceptance rate
 
-% these will be used to adjust the width of the Gaussian from which new
-% values are chosen
-c_acc = zeros(1,n_p);   % counter of accepted jumps
-c_irj = zeros(1,n_p);   % counter of rejected jumps within value limits
-c_orj = zeros(1,n_p);   % counter of rejected jumps outside value limits
+% counters, these will be used to adjust the width of the Gaussian from
+% which new values are chosen
+c_acc = zeros(1,n_p);   % number of accepted jumps
+c_irj = zeros(1,n_p);   % number of jumps inside limits that were still rejected
+c_orj = zeros(1,n_p);   % number of jumps outside limits that were rejected
 
 % the range over which a function could lie, used to determine the width of
 % the Gaussian function from which new values are randomly drawn
 p_range = LIMITS(2,:) - LIMITS(1,:);
+
+% run param_update once to set the initial parameters
+params = param_update(X0,params,r.infer_on);
 
 % evaluate the function at it starting points
 S_mod = MTC_qASE_model(T_sample,params);  
@@ -80,21 +89,26 @@ S_mod = MTC_qASE_model(T_sample,params);
 L0 = norm(DATA-S_mod);
 
 % preallocate samples array
-SAMPLES = zeros(n_p,round(n_jump/n_samp));
-s_c = 0;
+SAMPLES = zeros(n_p,round(r.nj/r.ns));
+s_c = 0;        % what does this count?
 X1 = X0;
 
 % for monitoring
-L_track = zeros(1,n_burn+n_jump);
+L_track = zeros(1,r.nb+r.nj);
 l_c = 1;
 
-% initial jump size
-q_sig = 1.0.*p_range;
+% initial jump size - set to half the limits, so that 91% of possible
+%                     initial samples will be within the acceptable range,
+%                     otherwise we may just be wasting time trying to
+%                     sample too far away
+q_sig = 0.1.*p_range;
 
-for ii = 1:(n_burn+n_jump)
+% Metropolis Hastings algorithm
+for ii = 1:(r.nb+r.nj) 
+
+    jump_size = q_sig.*randn; % generate a random sample from Gaussian with variance q_sig
     
-%     jump_size = 0.4*p_range.*randn; % calculate jumps for this step
-    jump_size = q_sig.*randn;
+    % loop through parameters that are being inferred on
     for par = 1:n_p
         
         X1(par) = X0(par)+jump_size(par);
@@ -103,58 +117,74 @@ for ii = 1:(n_burn+n_jump)
         % silly by restricting them to real-valued user-imposed limits.
         if (X1(par) < LIMITS(1,par) || X1(par) > LIMITS(2,par))
             
-            c_orj(par) = c_orj(par) + 1; 
-            X1(par) = X0(par);
+            c_orj(par) = c_orj(par) + 1; % add one to the outside-rejection counter
+            X1(par) = X0(par);           % go back to the value we had before
             
         else
         
-            params = param_update(X1,params,infer_on); % update all parameters to X1
+            params = param_update(X1,params,r.infer_on); % update all parameters to X1
             
-            % evaluate function
+            % evaluate function at point (X1) in paramter-space
             S_mod = MTC_qASE_model(T_sample,params); % REMEMBER TO CHANGE BOTH OF THESE
             
-            L1 = norm(DATA-S_mod);
-            L_track(l_c) = L1;
-            l_c = l_c + 1;
+            % SS difference between the data and the function evaluated at
+            % this point (X1) in parameter-space
+            L1 = norm(DATA-S_mod); 
             
-            % if the ratio of norms (new/old) is greater than a randomly
-            % defined threshold, accept the n
-            if (L0/L1) > (1*rand)
-                c_acc(par) = c_acc(par) + 1;
+            L_track(l_c) = L1; % record the new Norm
+            l_c = l_c + 1;     % count the number of times a new norm has been generated
+            
+            % new norm L1 should be smaller than old norm L0, if it is,
+            % accept it, if it is not, accept it with a probability that is
+            % proportional to their ratio
+            if (L0/L1) > (rand)
+                
+                c_acc(par) = c_acc(par) + 1; 
                 X0(par) = X1(par);
                 L0 = L1;
-            else
+                
+            else % reject
+                
                 c_irj(par) = c_irj(par) + 1;
-                X1(par) = X0(par);
-%                 X0(par) = X1(par);
-            end
-        end
-    end
+                X1(par) = X0(par); % revert back to previous thing
+                
+            end % if (L0/L1) > (rand) 
+            
+        end % if (X1(par) < LIMITS(1,par) || X1(par) > LIMITS(2,par))
+        
+    end % for par = 1:n_p
     
 
     % once all parameters are done, update q_sig at appropriate times
-    if (mod(ii,n_updt)==0)
-        q_sig = q_sig.*qs.*(1+c_acc+c_irj+c_orj)./(1+c_irj+c_orj);
-%         q_sig = q_sig.*qs.*(1+c_acc+c_irj)./(1+c_irj);
+    if (mod(ii,r.nu)==0) % maybe this should be done less frequently?
         
+        % (1+total)/(1+rejected) - as more attempts get rejected, this
+        %                          number gets bigger, effectively widening
+        %                          the search area. Does this make sense?
+        % Yes, but only if you start with a narrow band to begin with, so
+        % q_sig should start off small. What effect does qs have?
+        q_sig = q_sig.*qs.*(1+c_acc+c_irj+c_orj)./(1+c_irj+c_orj);
+        
+        % reset the counters every time - is this necessary?
         c_acc = c_acc.*0;
         c_irj = c_irj.*0;
         c_orj = c_orj.*0;
-%         disp(['MH jump ',num2str(ii),' of ',num2str(n_burn+n_jump)]);
-    end
+        
+    end 
     
     % and save out samples
-    if ( mod(ii,n_samp)==0 && ii>n_burn )
+    if ( mod(ii,r.ns)==0 && ii>r.nb )
         s_c = s_c + 1;
         SAMPLES(:,s_c) = X1;
     end
     
     % print out once burn-in is finished
-    if (ii == n_burn)
-        disp(['Completed burn-in stage (',num2str(n_burn),' jumps)']);
+    if (ii == r.nb)
+        disp(['Completed burn-in stage (',num2str(r.nb),' jumps)']);
     end
     
-end
+% end of MH loop
+end % for ii = 1:(r.nb+r.nj) 
 
 % for monitoring
 acc_rate = c_acc./(c_acc+c_irj);
@@ -163,118 +193,90 @@ LR = L_track(2:end)./L_track(1:end-1);
 
 
 %% Distribution Analysis
+if r.plot_dist
+    ndp = 1000; % number of points in distribution pdf
 
-ndp = 1000; % number of points in distribution pdf
+    x_dist = zeros(n_p,ndp);    % pre-allocate distribution vectors
+    y_dist = zeros(n_p,ndp);
 
-x_dist = zeros(n_p,ndp);    % pre-allocate distribution vectors
-y_dist = zeros(n_p,ndp);
+    modes = zeros(1,n_p);   % pre-allocate comparison vectors
+    means = zeros(1,n_p);
+    mv    = zeros(1,n_p);
+    fits  = false(1,n_p);   % for checking if it worked
+    sigs  = zeros(1,n_p);   % for plotting standard deviation
 
-modes = zeros(1,n_p);   % pre-allocate comparison vectors
-means = zeros(1,n_p);
-mv    = zeros(1,n_p);
-fits  = false(1,n_p);   % for checking if it worked
-sigs  = zeros(1,n_p);   % for plotting standard deviation
+    for ff = 1:n_p
+        % fit a gamma function to the probability distribution
+        if DISTYPE(ff) == 2
+            PD = fitdist(SAMPLES(ff,:)','gamma');
+            x_dist(ff,:) = linspace(LIMITS(1,ff),LIMITS(2,ff),ndp);
+            y_dist(ff,:) = gampdf(x_dist(ff,:),PD.a,PD.b);
 
-for ff = 1:n_p
-    % fit a gamma function to the probability distribution
-    if DISTYPE(ff) == 2
-        PD = fitdist(SAMPLES(ff,:)','gamma');
-        x_dist(ff,:) = linspace(LIMITS(1,ff),LIMITS(2,ff),ndp);
-        y_dist(ff,:) = gampdf(x_dist(ff,:),PD.a,PD.b);
-        
-    % or fit a normal function
-    else
-        PD = fitdist(SAMPLES(ff,:)','normal');
-        x_dist(ff,:) = linspace(LIMITS(1,ff),LIMITS(2,ff),ndp);
-        y_dist(ff,:) = normpdf(x_dist(ff,:),PD.mu,PD.sigma);
-        
-        % compare accuracy (only works for normally distributed parameters)
-        if (abs(mean(SAMPLES(ff,:)) - VALS(ff)) < (PD.sigma))
-            fits(ff) = 1;
+        % or fit a normal function
+        else
+            PD = fitdist(SAMPLES(ff,:)','normal');
+            x_dist(ff,:) = linspace(LIMITS(1,ff),LIMITS(2,ff),ndp);
+            y_dist(ff,:) = normpdf(x_dist(ff,:),PD.mu,PD.sigma);
+
+            % compare accuracy (only works for normally distributed parameters)
+            if (abs(mean(SAMPLES(ff,:)) - VALS(ff)) < (PD.sigma))
+                fits(ff) = 1;
+            end
+
+            sigs(ff) = PD.sigma;
         end
+
+        % other comparisons
+        [g_pv,g_peak] = max(y_dist(ff,:));
+        mv(ff) = g_pv.*1.1;
+        modes(ff) = x_dist(g_peak);
+        means(ff) = mean(SAMPLES(ff,:));
+
+    end
+ 
+    % plot
+    for ff = 1:n_p
+
+        figure('units','normalized','outerposition',[(0.25*ff - 0.25) 0.2 0.25 0.6]);
+        plot(x_dist(ff,:),y_dist(ff,:),'k-','LineWidth',2); hold on;
+        p_true = plot([VALS(ff),VALS(ff)],[0,mv(ff)],'r-','LineWidth',3);
+        p_mean = plot([means(ff),means(ff)],[0,mv(ff)],'b:','LineWidth',3);
+        p_sd   = plot([means(ff)+sigs(ff),means(ff)+sigs(ff)],[0,mv(ff)],'b--','LineWidth',2);
+        p_sd2  = plot([means(ff)-sigs(ff),means(ff)-sigs(ff)],[0,mv(ff)],'b--','LineWidth',2);
+        axis([LIMITS(1,ff),LIMITS(2,ff),0,mv(ff)]);
+        ylabel('Posterior Density');
+        xlabel(VNAME{ff});
+        legend([p_true,p_mean,p_sd],'True value','Mean value','Mean \pm SD');
+        set(gca,'FontSize',12);
+
+        if fits(ff)
+            title([VNAME{ff},' Inferred Correctly'],'FontSize',14);
+        else
+            title([VNAME{ff},' Not Inferred Correctly'],'FontSize',14);
+        end
+    end
+
+else % if NOT r.plot_dist
+    
+    % if not distributions, just plot some histograms
+    
+    for ff = 1:n_p
         
-        sigs(ff) = PD.sigma;
-    end
+        [hn,he] = histcounts(SAMPLES(ff,:),25);
+        hp = mean([he(1:end-1);he(2:end)]); % identify the midpoints of each histogram bin
+        
+        mv = max(hn); % identify maximum value
+        
+        % plot histogram
+        figure; hold on;
+        l.hist = plot(hp,hn,'k-','LineWidth',2);
+        l.true = plot([VALS(ff),VALS(ff)],[0,1.05*mv],'r-','LineWidth',3);
+        axis([LIMITS(1,ff),LIMITS(2,ff),0,1.05*mv]);
+        ylabel('Posterior Samples');
+        xlabel(VNAME{ff});
+        set(gca,'FontSize',16);
+        set(gcf,'WindowStyle','docked');
+        
+    end % for ff = 1:n_p
     
-    % other comparisons
-    [g_pv,g_peak] = max(y_dist(ff,:));
-    mv(ff) = g_pv.*1.1;
-    modes(ff) = x_dist(g_peak);
-    means(ff) = mean(SAMPLES(ff,:));
-    
-end
-
-
-%% Histogram Analysis
-% 
-% nhp = 11; % number of histogram points
-% 
-% h_data = zeros(n_p,100); % pre-allocate histogram data arrays
-% h_posi = zeros(n_p,100);
-% 
-% modes = zeros(1,n_p);   % pre-allocate comparison vectors
-% means = zeros(1,n_p);
-% mv    = zeros(1,n_p);
-% 
-% % create invisible figure to calculate original histograms on
-% f0 = figure('visible','off');
-% 
-% for ff = 1:n_p
-%     % calculate histogram using histfit
-%     hh = histfit(SAMPLES(ff,:),nhp);
-%     
-%     % pull out key values for comparison
-%     [mvp,m_pos] = max(hh(1).YData);
-%     modes(ff) = hh(1).XData(m_pos);
-%     means(ff) = mean(SAMPLES(ff,:));
-%     
-%     % save out values of the fitted curve
-%     h_posi(ff,:) = hh(2).XData;
-%     h_data(ff,:) = hh(2).YData;
-%     
-%     mv(ff) = max([1.05*mvp,max(h_data(ff,:))]);
-% end
-
-
-%% plot histogram for any number of variables
-% % figure('units','normalized','outerposition',[0.0 0.2 (0.25*n_p) 0.6]);
-% for ff = 1:n_p
-%     
-%     figure('units','normalized','outerposition',[(0.25*ff - 0.25) 0.2 0.25 0.6]);
-% %     hist(SAMPLES(ff,:),11); hold on;
-%     plot(h_posi(ff,:),h_data(ff,:),'k-','LineWidth',2); hold on;
-%     p_true = plot([VALS(ff),VALS(ff)],[0,mv(ff)],'r-','LineWidth',3);
-%     p_mode = plot([modes(ff),modes(ff)],[0,mv(ff)],'g--','LineWidth',3);
-%     p_mean = plot([means(ff),means(ff)],[0,mv(ff)],'m:','LineWidth',3);
-%     axis([LIMITS(1,ff),LIMITS(2,ff),0,mv(ff)]);
-%     ylabel('Posterior Distribution');
-%     xlabel(VNAME{ff});
-%     title(['Posterior distribution of ',VNAME{ff},' = ',num2str(means(ff))]);
-%     legend([p_mean,p_mode,p_true],'Mean value','Modal value','True value');
-%     set(gca,'FontSize',16);
-% end
-
-
-%% plot distributions for any number of variables
-
-for ff = 1:n_p
-    
-    figure('units','normalized','outerposition',[(0.25*ff - 0.25) 0.2 0.25 0.6]);
-    plot(x_dist(ff,:),y_dist(ff,:),'k-','LineWidth',2); hold on;
-    p_true = plot([VALS(ff),VALS(ff)],[0,mv(ff)],'r-','LineWidth',3);
-    p_mean = plot([means(ff),means(ff)],[0,mv(ff)],'b:','LineWidth',3);
-    p_sd   = plot([means(ff)+sigs(ff),means(ff)+sigs(ff)],[0,mv(ff)],'b--','LineWidth',2);
-    p_sd2  = plot([means(ff)-sigs(ff),means(ff)-sigs(ff)],[0,mv(ff)],'b--','LineWidth',2);
-    axis([LIMITS(1,ff),LIMITS(2,ff),0,mv(ff)]);
-    ylabel('Posterior Density');
-    xlabel(VNAME{ff});
-    legend([p_true,p_mean,p_sd],'True value','Mean value','Mean \pm SD');
-    set(gca,'FontSize',12);
-    
-    if fits(ff)
-        title([VNAME{ff},' Inferred Correctly'],'FontSize',14);
-    else
-        title([VNAME{ff},' Not Inferred Correctly'],'FontSize',14);
-    end
-end
-
+end % if r.plot_dist
