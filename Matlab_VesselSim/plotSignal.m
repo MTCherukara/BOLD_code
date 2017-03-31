@@ -53,6 +53,11 @@ function [t,sig] = plotSignal(storedPhase,p,r)
             end
 
             sig = ((1-p.vesselFraction).*sigEV) + (p.vesselFraction.*sigIV);
+            
+            % normalization
+            if r.normalise
+                sig = sig./max(sig);
+            end
 
             % display the result
             if r.display

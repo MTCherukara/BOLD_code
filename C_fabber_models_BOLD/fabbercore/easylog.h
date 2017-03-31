@@ -8,7 +8,7 @@
 
 #pragma once
 
-#include "/opt/fmrib/fsl/src/utils/tracer_plus.h"
+#include "/usr/local/fsl/src/utils/tracer_plus.h"
 #include <iostream>
 #include <string>
 #include "assert.h"
