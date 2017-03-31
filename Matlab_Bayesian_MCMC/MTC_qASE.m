@@ -18,12 +18,13 @@ clear;
 % close all;
 
 % set it to 1 in order to save out ASE data
+plot_fig = 0;
 save_plot = 0;
 
 
 %% Model Parameters
 % noise
-params.sig  = 0.02;         % -         - noise standard deviation
+params.sig  = 0.01;         % -         - noise standard deviation
 % constants 
 params.B0   = 3.0;          % T         - static magnetic field
 params.dChi = 2.64e-7;      % parts     - susceptibility difference
@@ -40,7 +41,7 @@ params.DR2  = 2.5;          % 1/s       - D/(R^2)
 
 % scan parameters 
 params.TR   = 3;            % s         - repetition time
-params.TE   = 0.074;        % s         - echo time
+params.TE   = 0.080;        % s         - echo time
 params.alph = 90;           % degrees   - flip angle
 
 % model fitting parameters
@@ -48,7 +49,7 @@ params.S0   = 1;            % a. units  - signal
 params.R2t  = 6;            % 1/s       - rate constant, tissue
 params.R2e  = 4;            % 1/s       - rate constant, extracellular
 params.dF   = 5;            % Hz        - frequency shift
-params.lam0 = 0.100;        % no units  - ISF/CSF signal contribution
+params.lam0 = 0.000;        % no units  - ISF/CSF signal contribution
 params.zeta = 0.030;        % no units  - deoxygenated blood volume
 params.OEF  = 0.400;        % no units  - oxygen extraction fraction
 params.Hct  = 0.40;         % no units  - fractional hematocrit
@@ -66,8 +67,9 @@ params.dw   = (4/3)*pi*params.gam*params.dChi*params.Hct*params.OEF*params.B0;
 
 %% Compute Model
 
-% tau = (-16:4:64)/1000;      % for simulating data
-tau = linspace(-0.016,0.064,1000); % for visualising ( tau(286) = 0 )
+% tau = (-16:8:64)/1000;      % for simulating data
+tau = (-36:4:36)/1000;
+% tau = linspace(-0.016,0.064,1000); % for visualising ( tau(286) = 0 )
 np = length(tau);
 
 % compartment weightings
@@ -94,32 +96,34 @@ S_sample = S_total + max(S_total).*params.sig.*randn(1,np);
 S_norm = S_total./S_total(int0);
 S_sample = S_sample./S_total(int0);
 
-% plot figure
-fig1 = figure(1); clf;
-plot([0 0],[-1 2],'k--'); hold on;        % zero line
-l_tis = plot(tau*1000,(1-params.zeta)*S_tis./max(S_tis),'b--','LineWidth',2);
-% l_csf = plot(tau*1000,S_csf,'b:','LineWidth',2);
-l_bld = plot(tau*1000,params.zeta*S_bld./max(S_bld),'r:','LineWidth',2);
-l_tot = plot(tau*1000,S_norm,'k-','LineWidth',2);
-% plot(T_sample*1000,S_sample,'bx','LineWidth',2);
-xlabel('\pi-pulse offset \tau (ms)');
-ylabel('Signal');
-% title(['Asymmetric Spin Echo Signal, SNR = ',num2str(1/sigma)]);
-axis([1000*min(tau), 1000*max(tau), -0.1, 1.2]);
-legend([l_tot,l_tis,l_bld],'Total Signal','Tissue','Blood');
-set(gca,'FontSize',16);
+%% plot figure
+if plot_fig
+    fig1 = figure(1); clf;
+    plot([0 0],[-1 2],'k--'); hold on;        % zero line
+    l_tis = plot(tau*1000,(1-params.zeta)*S_tis./max(S_tis),'b--','LineWidth',2);
+    % l_csf = plot(tau*1000,S_csf,'b:','LineWidth',2);
+    l_bld = plot(tau*1000,params.zeta*S_bld./max(S_bld),'r:','LineWidth',2);
+    l_tot = plot(tau*1000,S_norm,'k-','LineWidth',2);
+    % plot(T_sample*1000,S_sample,'bx','LineWidth',2);
+    xlabel('\pi-pulse offset \tau (ms)');
+    ylabel('Signal');
+    % title(['Asymmetric Spin Echo Signal, SNR = ',num2str(1/sigma)]);
+    axis([1000*min(tau), 1000*max(tau), -0.1, 1.2]);
+    legend([l_tot,l_tis,l_bld],'Total Signal','Tissue','Blood');
+    set(gca,'FontSize',16);
 
 
-%% Save Figure
-if save_plot == 1
-    fig_dir = '/Users/mattcher/Documents/Project_1/Figures/';
-    fig_title1 = strcat('ASE_signal_',date,'_');
-    fig_list = dir(strcat(fig_dir,fig_title1,'*'));
-    fn = length(fig_list) + 1;
-    
-    fig_title = strcat(fig_dir,fig_title1,num2str(fn),'.png');
-    dat_title = strcat('Simulated_Data/ASE_signal_data_',date,'_',num2str(fn));
-    
-    save(dat_title,'T_sample','S_sample','params');
-    saveas(fig1,fig_title);
+    % Save Figure
+    if save_plot
+        fig_dir = '/Users/mattcher/Documents/Project_1/Figures/';
+        fig_title1 = strcat('ASE_signal_',date,'_');
+        fig_list = dir(strcat(fig_dir,fig_title1,'*'));
+        fn = length(fig_list) + 1;
+
+        fig_title = strcat(fig_dir,fig_title1,num2str(fn),'.png');
+        dat_title = strcat('Simulated_Data/ASE_signal_data_',date,'_',num2str(fn));
+
+        save(dat_title,'T_sample','S_sample','params');
+        saveas(fig1,fig_title);
+    end
 end

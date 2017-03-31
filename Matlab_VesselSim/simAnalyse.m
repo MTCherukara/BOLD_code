@@ -406,7 +406,7 @@ function runAnalysis(~,~,h)
     r.incIV         = get(h.chIV,'Value');
     r.plotAnalytic  = get(h.ch01,'Value');
     r.plotErrors    = get(h.ch02,'Value');
-    r.normalise     = get(h.chNM,'Value');enij
+    r.normalise     = get(h.chNM,'Value');
     
     % then pull values from the form-fillable boxes:
     p1.T2EV = 0.001*str2double(get(h.inT2,'String'));

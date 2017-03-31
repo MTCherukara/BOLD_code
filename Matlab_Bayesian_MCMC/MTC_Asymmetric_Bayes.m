@@ -6,19 +6,13 @@
 % MT Cherukara
 % 16 May 2016 (origin)
 
-clear; close all;
+clear;
+% close all;
 tic;
 %% Load Data - use 20-May-2016
-load('ASE_Data_006.mat');
-% load('Simulated_Data/ASE_signal_data_14-Jun-2016_1.mat');      % noisy data, TE = 80;
-% 17-May-2016_1     sigma = 0.00
-% 17-May-2016_2     sigma = 0.01
-% 17-May-2016_3     sigma = 0.02
-% 17-May-2016_4     sigma = 0.05
-% 17-May-2016_5     sigma = 0.10
-% 14-Jun-2016_1    sigma = 0.02, R2t = 6
+load('VS_Data_02.mat');
 
-sigma = 0.02;   % real std of noise
+sigma = params.sig;   % real std of noise
 sigma_weight = 2/(sigma.^2);
 
 ns = length(S_sample); % number of data points
@@ -68,16 +62,16 @@ S_sample = S_sample./S_sample(t0);
 
 %% Bayesian Inference on two parameters, using grid search
 
-tr1 = 0.4;  % real value of OEF = 0.5
-tr2 = 0.3; % real value of zeta = 0.03;
+tr1 = params.OEF;  % real value of OEF = 0.5
+tr2 = params.zeta; % real value of zeta = 0.03;
 
-w1 = linspace(0.1,0.9,np);
-w2 = linspace(0,1,np);
+w1 = linspace(0.1,0.7,np);
+w2 = linspace(0,0.1,np);
 
 pos = zeros(np,np);
 
 for i1 = 1:np
-    disp(['Calculating iteration ',num2str(i1),' of ',num2str(np)]);
+%     disp(['Calculating iteration ',num2str(i1),' of ',num2str(np)]);
     
     for i2 = 1:np
 
@@ -94,13 +88,14 @@ end
 % pos = pos/sum(pos(:)); % normalize posterior
 toc;
 % plot
-figure(1);
+figure();
 imagesc(w2,w1,pos); hold on; colorbar;
 plot([tr2,tr2],[  0, 30],'w-','LineWidth',2);
 plot([  0, 30],[tr1,tr1],'w-','LineWidth',2);
 ylabel('Oxygen Extraction Fraction (OEF)');
 xlabel('Deoxygenated Blood Volume (DBV)');
-% title(['SNR = ',num2str(1/sigma)]);
+title(['SNR = ',num2str(1/sigma)]);
 axis([min(w2),max(w2),min(w1),max(w1)]);
 set(gca,'FontSize',16,'YDir','normal');
+set(gcf,'WindowStyle','docked');
 
