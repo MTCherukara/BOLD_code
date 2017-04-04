@@ -1,28 +1,21 @@
 % MTC_qASE.m
-%
+
 % Quantitative Asymmetric Spin Echo Sequence Simulation. Generates data to
 % be used in Bayesian inference on parameters (MTC_Asymmetric_Bayes.m and
 % others). Based on MTC_qBOLD.m 
+
+% MT Cherukara
+% 17 May 2016 (origin)
 %
-% 
-%       Copyright (C) University of Oxford, 2016-2017
+% 27 May 2016 - Changed the way the compartments are added together, which
+% was apparently causing problems (I don't know why).
 %
-% 
-% Created by MT Cherukara, 17 May 2016
-%
-% CHANGELOG:
-%
-% 2017-04-04 (MTC). Modified the plotting parameters, removed a bunch of
-% unnecessary variables from the params struct.
-%
-% 2016-11-08 (MTC). Changed tau range to go up to 64 ms, changed some
+% 8 Nov 2016 (MTC) - Changed tau range to go up to 64 ms, changed some
 % other constants, added saving out of data sampled at key points, with
 % noise added in too.
 %
-% 2016-05-27 (MTC). Changed the way the compartments are added together,
-% which was apparently causing problems (I don't know why).
-
-
+% 4 April 2017 (MTC) - Modified the plotting parameters, removed a bunch of
+% unnecessary variables from the params struct.
 
 clear; 
 % close all;

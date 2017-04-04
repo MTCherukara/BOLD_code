@@ -1,0 +1,93 @@
+% MTC_qBOLD.m
+
+% Generates plots of BOLD signal over time, based on MTC_qASE.m, which in
+% turn is based on an older script, also named MTC_qBOLD.
+%
+% NB. CSF compartment is completely ignored here
+
+% MT Cherukara
+% 4 April 2017 (origin)
+
+clear; 
+% close all;
+
+% set it to 1 in order to plot a figure
+plot_fig = 1;
+
+
+%% Model Parameters
+% noise
+params.sig  = 0.01;         % -         - noise standard deviation
+% constants 
+params.B0   = 3.0;          % T         - static magnetic field
+params.dChi = 2.64e-7;      % parts     - susceptibility difference
+params.gam  = 2.67513e8;    % rad/s/T   - gyromagnetic ratio
+params.di   = [1 1 1].*1e-3;% m         - voxel length (assume square)
+params.Gi   = [0 1.0e-5 0]; % T/m       - magnetic field gradient (based on vessels)
+params.nHb  = 5.5e-6;       % M/mL      - intracellular Hb concentration
+params.nb   = 0.66;         % no units  - blood hemoglobin concentration (fraction)
+params.T1b  = 1.627;        % s         - T1 of blood
+params.T1t  = 1.331;        % s         - T1 of grey matter (tissue)
+params.T1e  = 4.163;        % s         - T1 of CSF (extracellular)
+params.dHb  = 9.7e-6;       % M         - conc(deoxyhaemoglobin)
+params.DR2  = 2.5;          % 1/s       - D/(R^2)
+
+% scan parameters 
+params.TR   = 3;            % s         - repetition time
+params.TE   = 0.074;        % s         - echo time
+params.alph = 90;           % degrees   - flip angle
+
+% model fitting parameters
+params.S0   = 1;            % a. units  - signal
+params.R2t  = 6;            % 1/s       - rate constant, tissue
+params.R2e  = 4;            % 1/s       - rate constant, extracellular
+params.dF   = 5;            % Hz        - frequency shift
+params.zeta = 0.030;        % no units  - deoxygenated blood volume
+params.OEF  = 0.400;        % no units  - oxygen extraction fraction
+params.Hct  = 0.40;         % no units  - fractional hematocrit
+
+
+%% Calculate values for remaining parameters
+
+% relaxation rate constant of blood
+params.R2bs = 14.9*params.Hct + 14.7 + (302.1*params.Hct + 41.8)*params.OEF^2;
+params.R2b  = 16.4*params.Hct + 4.5  + (165.2*params.Hct + 55.7)*params.OEF^2;
+
+% calculate characteristic frequency
+params.dw   = (4/3)*pi*params.gam*params.dChi*params.Hct*params.OEF*params.B0;
+
+
+%% Compute Model
+
+% tau now represents time steps from excitation (T=0) to 100 ms (TE = 0.74)
+tau = linspace(0,0.1,1000);
+np = length(tau);
+
+% compartment weightings
+w_tis = 1 - params.zeta;
+w_bld = params.zeta;
+
+% calculate compartments
+S_tis = w_tis.*MTC_SE_tissue(tau,params);
+S_bld = w_bld.*MTC_SE_blood(tau,params);
+
+% add it all together:
+S_total = params.S0.*(S_tis + S_bld);
+
+
+%% plot figure
+if plot_fig
+
+        figure('WindowStyle','docked');
+        plot(1000*tau,S_total); hold on;
+        plot(1000*tau,S_tis);
+        plot(1000*tau,S_bld);
+        
+        xlabel('Time (ms)');
+        ylabel('Sign
+        
+    
+    
+
+
+end

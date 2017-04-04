@@ -1,19 +1,25 @@
 % xMTC_ASE_MH.m
-
+%
 % Metropolis Hastings algorithm for ASE data. Based on MTC_metroBOLD.m.
-
-% MT Cherukara
-% 18 May 2016 (origin)
 %
-% 31 March 2017 - Clean-up, revert back to histogram plotting
+% 
+%       Copyright (C) University of Oxford, 2016-2017
 %
-% 14 June 2016 - Changed the way graphs are plotted so that they use a
+% 
+% Created by MT Cherukara, 18 May 2016
+%
+% CHANGELOG:
+%
+% 2017-03-31 (MTC). Clean-up, and revert back to histogram plotting.
+%
+% 2016-06-14 (MTC). Changed the way graphs are plotted so that they use a
 % normal distribution rather than a horrible looking histogram. Added a
 % test feature using the resulting normal distribution to display on the
 % graphs whether a given parameter was found to be within one standard
 % deviation of its true value.
 %
-% 13 June 2016 - Made various changes up to this date.
+% 2016-06-13 (MTC). Various changes.
+
 
 clear; close all;
 

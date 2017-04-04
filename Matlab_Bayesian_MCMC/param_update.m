@@ -4,14 +4,22 @@ function PARAMS = param_update(VALUES,PARAMS,INFER)
     %
     % For use in xMTC_metroBOLD_counter.m and similar
     %
-    % MT Cherukara
-    % 29 April 2016 (origin)
-    %    
-    % 15 June 2016 - Changed parameters that can be inferred on. Hopefully,
-    % shouldn't need to change this file any more.
     %
-    % 18 May 2016 - Changed update order to match MTC_ASE_MH.m
-
+    % 
+    %       Copyright (C) University of Oxford, 2016-2017
+    %
+    % 
+    % Created by MT Cherukara, 29 April 2016
+    %
+    % CHANGELOG:
+    %
+    % 2017-04-04 (MTC). Various changes, including adding the ability to
+    % infer upon noise.
+    %
+    % 2016-06-15 (MTC). Added more parameters that can be inferred on.
+    %
+    % 2016-05-18 (MTC). Changed update order to match MTC_ASE_MH.m.
+    
  
 % variables, for reference:
 % 'OEF','\zeta','\lambda','Hct','\Deltaf','R2(t)','S(0)' ,'R_2^e'

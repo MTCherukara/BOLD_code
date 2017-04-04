@@ -14,9 +14,16 @@ function SB = MTC_ASE_blood(TAU,PARAMS)
 % pulse from TE/2, in seconds), and a struct PARAMS containing the
 % necessary constants. Returns a vector SB, of the same length as TAU,
 % containing the measured MRI signal strength for each TAU.
+%
 % 
-% MT Cherukara
-% 17 May 2016
+%       Copyright (C) University of Oxford, 2016-2017
+%
+% 
+% Created by MT Cherukara, 17 May 2016
+%
+% CHANGELOG:
+%
+% 2017-04-04 (MTC). Various changes.
 
 % pull out constants
 R2b  = PARAMS.R2b;

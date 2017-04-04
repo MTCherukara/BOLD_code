@@ -2,14 +2,21 @@
 % Perform Bayesian inference on ASE/BOLD data from MTC_qBOLD.m
 %
 % Based on MTC_Bayes_BOLD.m
-
-% MT Cherukara
-% 16 May 2016 (origin)
+%
+% 
+%       Copyright (C) University of Oxford, 2016-2017
+%
+% 
+% Created by MT Cherukara, 17 May 2016
+%
+% CHANGELOG:
+%
+% 2017-04-04 (MTC). Various changes.
 
 clear;
 % close all;
 tic;
-%% Load Data - use 20-May-2016
+%% Load Data
 load('ASE_Data_04.mat');
 
 sigma = params.sig;   % real std of noise

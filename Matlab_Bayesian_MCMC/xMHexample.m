@@ -1,6 +1,8 @@
 % xMHexample.m
-
+%
 % an animated example of the metropolis hastings algorithm
+%
+% Created 7 March 2017
 
 clear; close all;
 
