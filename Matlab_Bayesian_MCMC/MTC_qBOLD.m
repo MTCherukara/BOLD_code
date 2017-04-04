@@ -86,9 +86,5 @@ if plot_fig
         ylabel('Signal');
         legend([l.s,l.t,l.b],'Total','Tissue','Blood','Location','NorthEast');
         set(gca,'FontSize',16);
-        
-    
-    
-
 
 end
