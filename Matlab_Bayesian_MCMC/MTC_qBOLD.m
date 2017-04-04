@@ -9,7 +9,7 @@
 %       Copyright (C) University of Oxford, 2016-2017
 %
 % 
-% Created by MT Cherukara, 17 May 2016
+% Created by MT Cherukara, 4 April 2017
 %
 % CHANGELOG:
 
@@ -30,11 +30,12 @@ params.gam  = 2.67513e8;    % rad/s/T   - gyromagnetic ratio
 
 % scan parameters 
 params.TE   = 0.074;        % s         - echo time
+params.tau  = -0.01;        % s         - 90 pulse displacement
 
 % model fitting parameters
 params.S0   = 1;            % a. units  - signal
 params.R2t  = 1/0.110;      % 1/s       - rate constant, tissue
-params.zeta = 0.030;        % no units  - deoxygenated blood volume
+params.zeta = 0.075;        % no units  - deoxygenated blood volume
 params.OEF  = 0.400;        % no units  - oxygen extraction fraction
 params.Hct  = 0.40;         % no units  - fractional hematocrit
 
@@ -66,25 +67,43 @@ S_bld = w_bld.*MTC_SE_blood(tau,params);
 % add it all together:
 S_total = params.S0.*(S_tis + S_bld);
 
+TP = params.TE/2 + params.tau;
 
 %% plot figure
 if plot_fig
 
-        figure('WindowStyle','docked'); hold on;
+        figure('WindowStyle','docked');
+        hold on; box on;
         
         % plot some lines to show the spin echo
-        plot(1000*[params.TE,params.TE],[0,1],'k-');
-        plot(1000*[params.TE/2,params.TE/2],[0,1],'k-');
+        plot(1000*[params.TE,params.TE],[0,0.15],'k-','LineWidth',2);
+        plot(1000*[params.TE,params.TE],[0.25,2],'k-','LineWidth',2);
+        plot(1000*[params.TE/2,params.TE/2],[0,2],'k--','LineWidth',2);
+        plot(1000*[TP,TP],[0,0.12],'k-','LineWidth',2);
+        plot(1000*[TP,TP],[0.28,2],'k-','LineWidth',2);
         
         % plot the signal compartments
-        l.s = plot(1000*tau,S_total,'k-','LineWidth',2);
-        l.t = plot(1000*tau,S_tis,'-','LineWidth',2);
-        l.b = plot(1000*tau,S_bld,'-','LineWidth',2);
+        l.s = plot(1000*tau,S_total,'-','LineWidth',4);
+        l.t = plot(1000*tau,S_tis,'g:','LineWidth',4);
+        l.b = plot(1000*tau,S_bld,'c:','LineWidth',4);
        
-        % labels
+        % labels on the graph
+        if params.tau
+            text(1000*params.TE,0.2,'$$TE$$',...
+                 'HorizontalAlignment','Center',...
+                 'FontSize',16,...
+                 'Interpreter','latex');
+             text(1000*TP,0.2,'$$\frac{TE}{2}-\tau$$',...
+                 'HorizontalAlignment','Center',...
+                 'FontSize',16,...
+                 'Interpreter','latex');
+        end
+        
+        % label axes
         xlabel('Time (ms)');
         ylabel('Signal');
         legend([l.s,l.t,l.b],'Total','Tissue','Blood','Location','NorthEast');
-        set(gca,'FontSize',16);
+        axis([0,100,0,1.1]);
+        set(gca,'FontSize',18);
 
 end

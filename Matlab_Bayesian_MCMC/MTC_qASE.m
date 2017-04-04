@@ -27,14 +27,14 @@
 clear; 
 % close all;
 
-% set it to 1 in order to save out ASE data
-plot_fig = 1;
-save_plot = 0;
+
+plot_fig = 0;       
+save_plot = 0;      % set to 1 in order to save out ASE data
 
 
 %% Model Parameters
 % noise
-params.sig  = 0.01;         % -         - noise standard deviation
+params.sig  = 0.0001;         % -         - noise standard deviation
 % constants 
 params.B0   = 3.0;          % T         - static magnetic field
 params.dChi = 2.64e-7;      % parts     - susceptibility difference
@@ -49,7 +49,7 @@ params.R2t  = 1/0.110;      % 1/s       - rate constant, tissue
 params.R2e  = 4;            % 1/s       - rate constant, extracellular
 params.dF   = 5;            % Hz        - frequency shift
 params.lam0 = 0.000;        % no units  - ISF/CSF signal contribution
-params.zeta = 0.030;        % no units  - deoxygenated blood volume
+params.zeta = 0.075;        % no units  - deoxygenated blood volume
 params.OEF  = 0.400;        % no units  - oxygen extraction fraction
 params.Hct  = 0.40;         % no units  - fractional hematocrit
 
@@ -97,19 +97,24 @@ S_sample = S_sample./S_total(int0);
 
 %% plot figure
 if plot_fig
-    fig1 = figure(1); clf;
-    plot([0 0],[-1 2],'k--'); hold on;        % zero line
-    l_tis = plot(tau*1000,(1-params.zeta)*S_tis./max(S_tis),'b--','LineWidth',2);
-    % l_csf = plot(tau*1000,S_csf,'b:','LineWidth',2);
-    l_bld = plot(tau*1000,params.zeta*S_bld./max(S_bld),'r:','LineWidth',2);
-    l_tot = plot(tau*1000,S_norm,'k-','LineWidth',2);
-    % plot(T_sample*1000,S_sample,'bx','LineWidth',2);
+    fig1 = figure('WindowStyle','docked');
+    hold on; box on;
+    
+    % plot some lines
+    plot([0 0],[-1 2],'k--','LineWidth',2);
+    
+    % plot the signal compartments
+    l.s = plot(1000*tau,S_norm,'-','LineWidth',4);
+    l.t = plot(1000*tau,(1-params.zeta)*S_tis./max(S_tis),'g:','LineWidth',4);
+    l.b = plot(1000*tau,params.zeta*S_bld./max(S_bld),    'c:','LineWidth',4);
+    
+    % labels on axes
     xlabel('\pi-pulse offset \tau (ms)');
     ylabel('Signal');
     % title(['Asymmetric Spin Echo Signal, SNR = ',num2str(1/sigma)]);
-    axis([1000*min(tau), 1000*max(tau), -0.1, 1.2]);
-    legend([l_tot,l_tis,l_bld],'Total Signal','Tissue','Blood');
-    set(gca,'FontSize',16);
+    axis([1000*min(tau), 1000*max(tau), -0.1, 1.1]);
+    legend([l.s,l.t,l.b],'Total','Tissue','Blood','Location','NorthEast');
+    set(gca,'FontSize',18);
 
 
     % Save Figure
@@ -125,4 +130,11 @@ if plot_fig
         save(dat_title,'T_sample','S_sample','params');
         saveas(fig1,fig_title);
     end
-end
+else % if plot_fig
+    
+    figure('WindowStyle','docked');
+    hold on; box on;
+    plot(1000*tau,S_norm,'k-');
+    plot(1000*T_sample,S_sample,'x');
+    
+end % if plot_fig

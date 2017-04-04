@@ -18,6 +18,11 @@ function [ST,FC] = MTC_SE_tissue(T,PARAMS)
 %
 % 
 % Created by MT Cherukara, 29 April 2016
+%
+% CHANGELOG:
+%
+% 2017-04-04 (MTC). Added a displacement tau to the position of the 90
+% degree pulse, which happens at time TP = (TE/2) + tau
 
 
 ST = zeros(1,length(T)); % preallocate output array
@@ -27,22 +32,23 @@ FC = zeros(1,length(T));
 tc = 1./PARAMS.dw;
 zeta = PARAMS.zeta;
 R2 = PARAMS.R2t;
-SE = PARAMS.TE;
+TE = PARAMS.TE;
+TP = (TE./2) + PARAMS.tau;
 
 for i = 1:length(T)
     t = T(i);
     
-    % first regime T < SE/2
-    if t < (SE/2)
+    % first regime T < TP
+    if t < TP
         ttc = t./tc;
         
-    % third regime T > SE
-    elseif t > SE
-        ttc = (t-SE)./tc;
+    % third regime T > (TP*2)
+    elseif t > (TP*2)
+        ttc = (t-(TP*2))./tc;
         
     % second regime (between SE/2 and SE)
     else
-        ttc = (SE-t)./tc;
+        ttc = ((TP*2)-t)./tc;
         
     end
     
