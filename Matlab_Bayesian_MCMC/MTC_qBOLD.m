@@ -14,7 +14,7 @@
 % CHANGELOG:
 
 clear; 
-close all;
+% close all;
 
 % set it to 1 in order to plot a figure
 plot_fig = 1;
@@ -101,7 +101,7 @@ if plot_fig
         
         % label axes
         xlabel('Time (ms)');
-        ylabel('Signal');
+        ylabel('Magnetization');
         legend([l.s,l.t,l.b],'Total','Tissue','Blood','Location','NorthEast');
         axis([0,100,0,1.1]);
         set(gca,'FontSize',18);

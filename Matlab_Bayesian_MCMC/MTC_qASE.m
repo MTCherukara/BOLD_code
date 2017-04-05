@@ -28,13 +28,13 @@ clear;
 % close all;
 
 
-plot_fig = 0;       
+plot_fig = 1;       
 save_plot = 0;      % set to 1 in order to save out ASE data
 
 
 %% Model Parameters
 % noise
-params.sig  = 0.0001;         % -         - noise standard deviation
+params.sig  = 0.01;         % -         - noise standard deviation
 % constants 
 params.B0   = 3.0;          % T         - static magnetic field
 params.dChi = 2.64e-7;      % parts     - susceptibility difference
@@ -66,8 +66,8 @@ params.dw   = (4/3)*pi*params.gam*params.dChi*params.Hct*params.OEF*params.B0;
 
 %% Compute Model
 
-% tau = (-16:8:64)/1000;      % for simulating data
-tau = (-36:4:36)/1000;
+tau = (-16:8:64)/1000;      % for simulating data
+% tau = (-36:4:36)/1000;
 % tau = linspace(-0.016,0.064,1000); % for visualising ( tau(286) = 0 )
 np = length(tau);
 
@@ -90,7 +90,7 @@ S_total = params.S0.*(S_tis + S_bld);
 T_sample = tau;
 S_sample = S_total + max(S_total).*params.sig.*randn(1,np);
 
-[~,int0] = find(tau>0,1);
+[~,int0] = find(tau>=0,1);
 
 S_norm = S_total./S_total(int0);
 S_sample = S_sample./S_total(int0);
@@ -124,11 +124,11 @@ if plot_fig
         fig_list = dir(strcat(fig_dir,fig_title1,'*'));
         fn = length(fig_list) + 1;
 
-        fig_title = strcat(fig_dir,fig_title1,num2str(fn),'.png');
-        dat_title = strcat('Simulated_Data/ASE_signal_data_',date,'_',num2str(fn));
+%         fig_title = strcat(fig_dir,fig_title1,num2str(fn),'.png');
+%         saveas(fig1,fig_title);
 
+        dat_title = strcat('ASE_signal_data_',date,'_',num2str(fn));
         save(dat_title,'T_sample','S_sample','params');
-        saveas(fig1,fig_title);
     end
 else % if plot_fig
     
