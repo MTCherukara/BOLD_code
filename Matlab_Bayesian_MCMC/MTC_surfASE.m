@@ -10,12 +10,12 @@ close all;
 %% Set Parameters
 
 % noise
-params.sig  = 0.00;
+params.sig  = 0.05;
 
 tau = (-20:80)./1000;
 TE  = (20:80)./1000;
-OEF = 0.35:0.01:0.6;
-DBV = 0.01:0.001:0.05;
+OEF = 0.30:0.05:0.8;
+DBV = 0.01:0.005:0.05;
 
 
 % constants 
@@ -59,42 +59,6 @@ for iO = 1:length(OEF)
     end
 end
 
+%% Save out results
+save('ASE_SurfData_sigma_5','S0','TE','tau','OEF','DBV','params');
 
-%% Analysis
-
-% choose which values of OEF and DBV we want to specifically look at
-OEF_1 = 0.40;
-DBV_1 = 0.03;
-
-[~,i1] = min(abs(OEF - OEF_1));
-[~,i2] = min(abs(DBV - DBV_1));
-
-% isolate 3D matrices for those chosen values
-SY = squeeze(S0(:,i2,:,:));     % matrix with changes in OEF (or Y)
-SZ = squeeze(S0(i1,:,:,:));     % matrix with changes in DBV (or Z)
-
-% loop through all points on the surface to calculate the gradient at each
-SYG = squeeze( (SY(1,:,:) - SY(end,:,:))./SY(1,:,:) );
-SZG = squeeze( (SZ(1,:,:) - SZ(end,:,:))./SZ(1,:,:) );
-
-
-%% Plot Results
-figure(1);
-imagesc(1000*tau,1000*TE,SYG); hold on;
-c=colorbar;
-xlabel('180 Pulse Offset \tau (ms)');
-ylabel('Echo Time TE (ms)');
-title('Effect of Changing OEF on Signal')
-set(gca,'FontSize',16,'YDir','normal');
-set(c,'FontSize',16)
-set(gcf,'WindowStyle','docked');
-
-figure(2);
-imagesc(1000*tau,1000*TE,SZG); hold on;
-c=colorbar;
-xlabel('180 Pulse Offset \tau (ms)');
-ylabel('Echo Time TE (ms)');
-title('Effect of Changing DBV on Signal')
-set(gca,'FontSize',16,'YDir','normal');
-set(c,'FontSize',16)
-set(gcf,'WindowStyle','docked');
