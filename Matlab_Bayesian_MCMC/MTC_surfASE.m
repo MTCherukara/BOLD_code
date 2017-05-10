@@ -32,17 +32,9 @@ params.lam0 = 0.000;        % no units  - ISF/CSF signal contribution
 params.Hct  = 0.40;         % no units  - fractional hematocrit
 
 
-%% Calculate remaining parameters
-
-% relaxation rate constant of blood
-
-
-
-
-
-
 %% Generate Surface
 S0 = zeros(length(OEF),length(DBV),length(TE),length(tau));
+nt = length(TE).*length(tau);   % number of points on surface, for loops
 
 for iO = 1:length(OEF)
     
@@ -68,12 +60,41 @@ for iO = 1:length(OEF)
 end
 
 
+%% Analysis
+
+% choose which values of OEF and DBV we want to specifically look at
+OEF_1 = 0.40;
+DBV_1 = 0.03;
+
+[~,i1] = min(abs(OEF - OEF_1));
+[~,i2] = min(abs(DBV - DBV_1));
+
+% isolate 3D matrices for those chosen values
+SY = squeeze(S0(:,i2,:,:));     % matrix with changes in OEF (or Y)
+SZ = squeeze(S0(i1,:,:,:));     % matrix with changes in DBV (or Z)
+
+% loop through all points on the surface to calculate the gradient at each
+SYG = squeeze( (SY(1,:,:) - SY(end,:,:))./SY(1,:,:) );
+SZG = squeeze( (SZ(1,:,:) - SZ(end,:,:))./SZ(1,:,:) );
+
+
 %% Plot Results
-% figure();
-% imagesc(1000*tau,1000*TE,S0'); hold on;
-% c=colorbar;
-% xlabel('180 Pulse Offset \tau (ms)');
-% ylabel('Echo Time TE (ms)');
-% set(gca,'FontSize',14,'YDir','normal');
-% set(c,'FontSize',14)
-% set(gcf,'WindowStyle','docked');
+figure(1);
+imagesc(1000*tau,1000*TE,SYG); hold on;
+c=colorbar;
+xlabel('180 Pulse Offset \tau (ms)');
+ylabel('Echo Time TE (ms)');
+title('Effect of Changing OEF on Signal')
+set(gca,'FontSize',16,'YDir','normal');
+set(c,'FontSize',16)
+set(gcf,'WindowStyle','docked');
+
+figure(2);
+imagesc(1000*tau,1000*TE,SZG); hold on;
+c=colorbar;
+xlabel('180 Pulse Offset \tau (ms)');
+ylabel('Echo Time TE (ms)');
+title('Effect of Changing DBV on Signal')
+set(gca,'FontSize',16,'YDir','normal');
+set(c,'FontSize',16)
+set(gcf,'WindowStyle','docked');
