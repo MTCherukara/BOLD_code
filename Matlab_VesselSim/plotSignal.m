@@ -136,29 +136,70 @@ return;
 function [tt,Phase] = phaseASE(storedPhase,tarray,p,r)
     % calculate the phase from an ASE sequence
     
-    Tind = find(round(tarray.*1000) == round(p.TE.*1000),1,'first');
+    np = size(storedPhase,1); % number of time-points we have available
+    t0 = p.deltaTE:p.deltaTE:p.deltaTE*np; % list of time-points
     
-    for k = 1:Tind-1
-        Phase(k,:) = sum(storedPhase(1:k,:),1)-sum(storedPhase(k+1:Tind,:),1);
-    end
+    % shift t0 so that 0 is at TE/2
+    t0 = t0 - p.TE/2;
     
-    % these are the point we want, given the tau value chosen by the user
+    % define the tau values that we want
     if r.defineTau == 1
+        % if the user has specified an array of tau values
         tt = r.tau';
-    else
-        tt = (-p.TE/2:p.tau:p.TE/2)';
+        
+    else % the user has specified an increment
+        
+        % define tau values up to and including 0, then above 0 separately,
+        % thus ensuring that 0 is included
+        tt = [ -fliplr(0:p.tau:p.TE/2), p.tau:p.tau:p.TE ];
         tt = tt(2:end-1);
     end
     
-    % these are all the time-points that are available
-    t0 = (-p.TE/2:p.deltaTE:p.TE/2)';
-    t0 = t0(2:end-1);
-    
     % find the indices of points in t0 that are also in tt
-    [~,~,it] = intersect(tt,t0);
+    [~,it] = ismembertol(tt,t0,1e-6); % works better than INTERSECT
+    it = it(it~=0); % remove zeros which result from ISMEMBERTOL
     
-    % select the right elements in Phase
-    Phase = Phase(it,:);
+    % readout time
+    Tind = find(round(tarray.*1000) == round(p.TE.*1000),1,'first');
+    
+    % compute phase for each inversion time
+    Phase = zeros(length(it),size(storedPhase,2));
+    for k = 1:length(it)
+        Phase(k,:) = sum(storedPhase(1:k,:),1) - sum(storedPhase(k+1:Tind,:),1);
+    end
+%     
+%     Tind = find(round(tarray.*1000) == round(p.TE.*1000),1,'first');
+%     
+%     for k = 1:size(storedPhase,1)
+%         % computes Phase as with an inversion at each possible step - this
+%         % should actually only be done after the range of tau values is
+%         % defined, to save time
+%         Phase(k,:) = sum(storedPhase(1:k,:),1)-sum(storedPhase(k+1:end,:),1);
+%     end
+%     
+%     % these are the point we want, given the tau value chosen by the user
+%     if r.defineTau == 1
+%         tt = r.tau';
+%         t0min = p.deltaTE;
+%        
+%     else
+%         tt = (-p.TE/2:p.tau:p.TE/2)';
+%         tt = tt(2:end-1);
+%     end
+%     
+%     % at this point, we want to be able to pick out points from Phase that
+%     % are not just within TE/2 of the spin echo, specifically, we want to
+%     % be able to go beyond that in time
+%     
+%     % these are all the time-points that are available
+%     t0 = (-p.TE/2:p.deltaTE:p.TE/2)';
+%     t0 = t0(2:end-1);
+%     
+%     % find the indices of points in t0 that are also in tt
+%     [~,~,it] = intersect(tt,t0);
+%     
+%     % select the right elements in Phase
+%     Phase = Phase(it,:);
     
 return;
 
