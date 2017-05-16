@@ -151,7 +151,7 @@ function [tt,Phase] = phaseASE(storedPhase,tarray,p,r)
         
         % define tau values up to and including 0, then above 0 separately,
         % thus ensuring that 0 is included
-        tt = [ -fliplr(0:p.tau:p.TE/2), p.tau:p.tau:p.TE ];
+        tt = [ -fliplr(0:p.tau:p.TE/2), p.tau:p.tau:p.TE/2 ];
         tt = tt(2:end-1);
     end
     
@@ -165,42 +165,9 @@ function [tt,Phase] = phaseASE(storedPhase,tarray,p,r)
     % compute phase for each inversion time
     Phase = zeros(length(it),size(storedPhase,2));
     for k = 1:length(it)
-        Phase(k,:) = sum(storedPhase(1:k,:),1) - sum(storedPhase(k+1:Tind,:),1);
+        Phase(k,:) = sum(storedPhase(1:it(k),:),1) - sum(storedPhase(it(k)+1:Tind,:),1);
     end
-%     
-%     Tind = find(round(tarray.*1000) == round(p.TE.*1000),1,'first');
-%     
-%     for k = 1:size(storedPhase,1)
-%         % computes Phase as with an inversion at each possible step - this
-%         % should actually only be done after the range of tau values is
-%         % defined, to save time
-%         Phase(k,:) = sum(storedPhase(1:k,:),1)-sum(storedPhase(k+1:end,:),1);
-%     end
-%     
-%     % these are the point we want, given the tau value chosen by the user
-%     if r.defineTau == 1
-%         tt = r.tau';
-%         t0min = p.deltaTE;
-%        
-%     else
-%         tt = (-p.TE/2:p.tau:p.TE/2)';
-%         tt = tt(2:end-1);
-%     end
-%     
-%     % at this point, we want to be able to pick out points from Phase that
-%     % are not just within TE/2 of the spin echo, specifically, we want to
-%     % be able to go beyond that in time
-%     
-%     % these are all the time-points that are available
-%     t0 = (-p.TE/2:p.deltaTE:p.TE/2)';
-%     t0 = t0(2:end-1);
-%     
-%     % find the indices of points in t0 that are also in tt
-%     [~,~,it] = intersect(tt,t0);
-%     
-%     % select the right elements in Phase
-%     Phase = Phase(it,:);
-    
+
 return;
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
