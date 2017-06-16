@@ -4,6 +4,14 @@ function [t,sig] = plotSignal(storedPhase,p,r)
     % Based on plotresults.m (NP Blockley, 2016).
     %
     % Created by MT Cherukara, February 2017
+    %
+    % CHANGELOG:
+    %
+    % 2017-05-18 (MTC). Made it possible for the user to specify an
+    %       arbitrary set of tau values in ASE, while slightly improving
+    %       the way in which ASE signal is calculated, and ensuring that
+    %       the (tau=0) point is always included in output data.
+    
     
     % define time range
     ts = (p.deltaTE:p.deltaTE:(p.numSteps*p.deltaTE/p.ptsPerdt))';

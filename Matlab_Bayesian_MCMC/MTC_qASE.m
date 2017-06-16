@@ -29,12 +29,13 @@ clear;
 
 
 plot_fig = 1;       
-save_plot = 0;      % set to 1 in order to save out ASE data
+save_plot = 1;      % set to 1 in order to save out ASE data
 
 
 %% Model Parameters
 % noise
-params.sig  = 0.01;         % -         - noise standard deviation
+SNR = 150;
+params.sig  = 1/SNR;         % -         - noise standard deviation
 % constants 
 params.B0   = 3.0;          % T         - static magnetic field
 params.dChi = 2.64e-7;      % parts     - susceptibility difference
@@ -49,7 +50,7 @@ params.R2t  = 1/0.110;      % 1/s       - rate constant, tissue
 params.R2e  = 4;            % 1/s       - rate constant, extracellular
 params.dF   = 5;            % Hz        - frequency shift
 params.lam0 = 0.000;        % no units  - ISF/CSF signal contribution
-params.zeta = 0.075;        % no units  - deoxygenated blood volume
+params.zeta = 0.030;        % no units  - deoxygenated blood volume
 params.OEF  = 0.400;        % no units  - oxygen extraction fraction
 params.Hct  = 0.40;         % no units  - fractional hematocrit
 
@@ -92,8 +93,9 @@ S_sample = S_total + max(S_total).*params.sig.*randn(1,np);
 
 [~,int0] = find(tau>=0,1);
 
-S_norm = S_total./S_total(int0);
-S_sample = S_sample./S_total(int0);
+S_norm = S_total; % don't normalise
+% S_norm = S_total./S_total(int0);
+% S_sample = S_sample./S_total(int0);
 
 %% plot figure
 if plot_fig
@@ -105,15 +107,16 @@ if plot_fig
     
     % plot the signal compartments
     l.s = plot(1000*tau,S_norm,'-','LineWidth',4);
-    l.t = plot(1000*tau,(1-params.zeta)*S_tis./max(S_tis),'g:','LineWidth',4);
-    l.b = plot(1000*tau,params.zeta*S_bld./max(S_bld),    'c:','LineWidth',4);
+    l.t = plot(1000*tau,(1-params.zeta)*S_tis./max(S_tis),'g-','LineWidth',4);
+    l.b = plot(1000*tau,params.zeta*S_bld./max(S_bld),    '-','LineWidth',4);
     
     % labels on axes
-    xlabel('\pi-pulse offset \tau (ms)');
+    xlabel('Spin Echo Displacement \tau (ms)');
     ylabel('Signal');
+    title('qBOLD Signal Measured Using ASE');
     % title(['Asymmetric Spin Echo Signal, SNR = ',num2str(1/sigma)]);
     axis([1000*min(tau), 1000*max(tau), -0.1, 1.1]);
-    legend([l.s,l.t,l.b],'Total','Tissue','Blood','Location','NorthEast');
+    legend([l.s,l.t,l.b],'Total Signal','Parenchyma','Venous Blood','Location','NorthEast');
     set(gca,'FontSize',18);
 
 

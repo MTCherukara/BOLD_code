@@ -19,14 +19,23 @@
 %
 % CHANGELOG:
 %
+% 2017-05-18 (MTC). Added input options so that the function can be called
+% from the command line without the need for the GUI (this will enable easy
+% repeated calls)
+%
 % 2017-02-23 (MTC). Added GUI.
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%     (main) simAnalyse               %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-function simAnalyse
+function simAnalyse(varargin)
     close all;
+    
+    % first, check to see if any input arguments have been provided, if
+    % not, display the GUI
+    if nargin == 0
+        disp('Display the gui!');
     
     % h - structure containing all ui element handles
     % r - structure containing all random parameter information
@@ -335,8 +344,40 @@ function simAnalyse
                        'String','Plot',...
                        'FontSize',18,...
                        'Callback',{@runAnalysis,h});
-                   
     
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    %%%     Non-Gui version             %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    % if some inputs have been provided, fill in the rest automatically,
+    % then get to work with the processing, without displaying the GUI
+    else % length(varargin) == 0
+        
+        % parse arguments
+        p = inputParser;
+
+        % possible values for type of sequence
+        expectedSeq = {'GRE','GESSE','ASE'};
+        
+        % need the user to specify an input phase data file
+        addRequired(p,'phasedata', @(x) isa(x,'char'));
+        
+        % optional parameters, to be supplied as name-value pairs
+        addParameter(p,'TE',60);        % TE        -   60 ms
+        addParameter(p,'tau',2);        % tau       -	2 ms
+        addParameter(p,'normalise',1);  % normalise -   yes
+        addParameter(p,'incT2',1);      % T2 effect -   include
+        addParameter(p,'T2',110);       % T2 value  -   110 ms
+        addParameter(p,'incIV',1);      % blood signal - include
+        addParameter(p,'display',0);    % display plot - no
+        addParameter(p,'save',0);       % save results - yes
+        addParameter(p,'seq','ASE',@(x) any(validatestring(x,expectedSeq)));
+        
+        parse(p,varargin{:});
+        
+        % now send the results to an alternative version of runAnalysis
+        runAnalysisLine(p);
+        
+    end % length(varargin) == 0
                   
 return;
 
@@ -478,8 +519,91 @@ function runAnalysis(~,~,h)
         
     end
     
-return;
+return; % runAnalysis
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%     runAnalysisLine                 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+function runAnalysisLine(h)
+    % the same as runAnalysis, but it takes inputs from p.Results (input
+    % parser) rather than from GUI:
+    
+    % first, read the users input, and load that dataset:
+    load(h.Results.phasedata);
+    
+    % check that the input file has 1 storedPhase matrix, if not, throw an
+    % error
+    pnames = who('*phase*','*Phase*');
+    if length(pnames) > 1
+        error('Pick an input file with one matrix in it!')
+        return;
+    end
+    
+    sp1 = eval(pnames{1}); % take the first 'phase' variable
+    sp1 = aggregate(sp1); % aggregate repeated runs (if there are any)
+    p1 = p;
+    
+    r = h.Results;
+    
+    p1.T2EV = 0.001*h.Results.T2; % extravascular T2 (default 110 ms)
+    
+    r.tau = 0.001*h.Results.tau; % convert TE and tau values to s from ms
+    r.TE  = 0.001*h.Results.TE;
+    
+    % variables that we don't care about
+    r.fnum = 1;         % figure number
+    r.ftit = '';        % figure title
+    r.plotAnalytic = 0; % analytic signal
+    r.plotErrors = 0;   % errorbars
+    
+    if strcmp(h.Results.seq,'GRE')
+        r.plotFID   = 1;
+        r.plotGESSE = 0;
+        r.plotASE   = 0;
+    elseif strcmp(h.Results.seq,'GESSE')
+        r.plotFID   = 0;
+        r.plotGESSE = 1;
+        r.plotASE   = 0;
+    else
+        r.plotFID   = 0;
+        r.plotGESSE = 0;
+        r.plotASE   = 1;
+    end
+        
+    % check the value of tau supplied, if it's a single value, use it, if
+    % it's a range, be careful
+    if length(r.tau) == 1
+        p1.tau = r.tau;
+        r.defineTau = 0;
+    else
+        r.defineTau = 1;
+    end
+    
+    % finally, run the analysis for all TE values given:
+    for ii = 1:length(r.TE)
+        p1.TE = r.TE(ii);
+        
+        plotSignal(sp1,p1,r); 
+    end
+    
+    if r.display
+
+        % add a legend to the graph, under certain circumstances
+        if r.plotAnalytic
+            leg1 = smartLegend(p1,p1,r);
+            legend(leg1,'Location','South');
+        end
+    
+        % save the graph, if the user wants it saved
+        if r.save
+            figtitle = ['signalResults/VS_Figure_',date,'_'];
+            D = dir([figtitle,'*']);
+            saveas(gcf,strcat(figtitle,num2str(length(D)+1),'.png'));
+        end
+        
+    end % if r.display
+    
+return; % runAnalysisLine
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%     GUI called functions            %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
