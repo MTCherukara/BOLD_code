@@ -1,0 +1,17 @@
+out.tmp*
+logfile
+build_release
+build_debug
+CVS
+*.o
+*~
+*.a
+.DS_Store
+depend.mk
+testfabber
+doc
+.sconsign.dblite
+Debug
+Release
+out*
+*.pyc
