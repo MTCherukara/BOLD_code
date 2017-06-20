@@ -77,19 +77,19 @@ R2tr = R2t - R2tp; % rephasing rate R2*_
 %% Third Version (constants)
 
 % define the regime changes in the case where tau is negative
-c1 = find(abs(TAU)<(0.75./dw),1);
-c2 = find(TAU>(0.75./dw),1);
+c1 = find(abs(TAU)<(1.5./dw),1);
+c2 = find(TAU>(1.5./dw),1);
 
 % pre-allocate
 ST = zeros(1,length(TAU));
 
 % long negative tau regime
-ST(1:c1-1) = exp(zeta+(2*zeta*dw*TAU(1:c1-1)));
+ST(1:c1-1) = exp(zeta+(zeta*dw*TAU(1:c1-1)));
 
 % non-linear short tau regime
-ST(c1:c2)  = exp(-(8/9*zeta*(dw.*TAU(c1:c2)).^2));
+ST(c1:c2)  = exp(-(0.3*zeta*(dw.*TAU(c1:c2)).^2));
 
 % long positive tau regime
-ST(c2:end) = exp(zeta-(2*zeta*dw*TAU(c2:end)));
+ST(c2:end) = exp(zeta-(zeta*dw*TAU(c2:end)));
 
 ST = ST.*exp(-R2t.*TE);

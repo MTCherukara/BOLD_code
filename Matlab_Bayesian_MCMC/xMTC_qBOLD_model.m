@@ -6,11 +6,12 @@
 clear; close all;
 
 % constant parameters
+OEF = 0.40
 DBV = 0.03;
 R2t = 1; % make this slower than normal so we can see it better
-dw  = 142; % apparently
+dw  = 355*OEF;
 TE  = 0.074; % 74 ms
-tau = 0.00; 
+tau = 0.01; 
 
 n = 1000; % number of points
 
@@ -50,16 +51,16 @@ for ii = 1:n
         Sas(ii) = exp(DBV-DBV.*dw.*tt);
         
     % short t, around echo
-    elseif abs(tt-TE) < tsw
-        Sas(ii) = exp(-(0.3).*DBV.*(dw.*(TE-tt)).^2);
+    elseif abs(tt-TE+tau) < tsw
+        Sas(ii) = exp(-(0.3).*DBV.*(dw.*(TE-tt-tau)).^2);
         
     % long t, after echo
-    elseif tt > (TE+tsw)
-        Sas(ii) = exp(DBV-DBV.*dw.*(tt-TE));
+    elseif tt > (TE+tsw-tau)
+        Sas(ii) = exp(DBV-DBV.*dw.*(tt-TE+tau));
         
     % long t, after flip but before echo
     else
-        Sas(ii) = exp(DBV-DBV.*dw.*(TE-tt));
+        Sas(ii) = exp(DBV-DBV.*dw.*(TE-tau-tt));
     end % if
         
 end % for ii = 1:n
@@ -75,10 +76,11 @@ plot([Tf,Tf],[-1,1],'k--');
 p.a = plot(t,log(Sr2),'-','LineWidth',2);
 p.b = plot(t,log(Szt),'-','LineWidth',2);
 p.c = plot(t,log(Sr2.*Szt),'-','LineWidth',2);
-p.d = plot(t,log(Sr2.*Sas),'-','LineWidth',2);
-axis([0.06,0.09,-0.2,0.1]);
+p.d = plot(t,log(Sr2.*Sas),':','LineWidth',2);
+% axis([0.06,0.09,-0.2,0.1]);
+axis([0, 0.1, -0.3, 0.1]);
 
-legend([p.a,p.b,p.c],'R2 decay','Vascular Effect','Total','Location','SouthWest');
+legend([p.a,p.b,p.c,p.d],'R2 decay','Vascular Effect','Complete Model','Asymptotic Model','Location','SouthWest');
 xlabel('Time (s)');
 ylabel('Log signal');
 set(gca,'FontSize',16);

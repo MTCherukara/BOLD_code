@@ -17,7 +17,7 @@ clear;
 % close all;
 tic;
 %% Load Data
-load('ASE_Data_NoNorm.mat');
+load('ASE_rightmodel.mat');
 
 sigma = params.sig;   % real std of noise
 sigma_weight = 2/(sigma.^2);
