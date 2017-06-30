@@ -24,22 +24,23 @@
 clear; close all;
 
 % Load Data (data from 20-May-2016 uses besselj integral and isn't normalized)
-load('ASE_Data_05.mat'); % various sigma = 0.02
+load('ASE_norm002.mat'); % various sigma = 0.02
 DATA = S_sample;
 
 % the r structure will contain settings which will be used in the MH
 % algorithm, including which parameters are being inferred on, and what
 % values they take
 r.plot_dist = 0; % set this to 1 to plot distributions and stuff
+                 % or to 0 to plot histogram peaks
 
 %% Decide Which Parameters to Infer On
 % if changing these, make sure to change PARAM_UPDATE!
-r.infer_on = [ 1   ,  0    ,    0    , 0    ,   0    ,   0   ,  0    ,   0   ,   0    ];
+r.infer_on = [ 1   ,  0    ,    0    , 0   ,    0    ,   0   ,  0    ,   0   ,   0    ];
 r.var_name = {'OEF','DBV'  ,'\lambda','Hct','\Deltaf','R2(t)','S(0)' ,'R_2^e','\sigma'};
-r.value =    [ 0.4 ,  0.03 ,    0.1  , 0.4 ,    5    ,   6   ,  1    ,   4   ,   0.01  ]; % true values
-r.inits =    [ 0.4 ,  0.05 ,    0.1  , 0.5 ,    7    ,   5   ,  0.5  ,   5   ,   0.001  ]; % initial values
+r.value =    [ 0.4 ,  0.03 ,    0.0  , 0.34,    5    ,   6   ,  1    ,   4   ,   0.01 ]; % true values
+r.inits =    [ 0.4 ,  0.05 ,    0.1  , 0.5 ,    7    ,   5   ,  0.5  ,   5   ,   0.001]; % initial values
 r.limit =    [ 0   ,  0    ,    0    , 0.0 ,    0    ,   1   ,  0    ,   0   ,   0     ; ...
-               1   ,  0.2  ,    0.5  , 1   ,   10    ,  30   ,  10   ,  20   ,   0.1    ];
+               1   ,  0.2  ,    0.5  , 1   ,   10    ,  30   ,  10   ,  20   ,   0.1  ];
 r.dis_t =    [ 1   ,  1    ,    1    , 1   ,    1    ,   1   ,  1    ,   1   ,   1    ];
 
 % % ignore priors for now
@@ -68,10 +69,10 @@ end
 
 %% function
 % algorithm parameters
-r.nb = 5000;      % number of jumps in the 'burn-in' phase
+r.nb = 10000;      % number of jumps in the 'burn-in' phase
 r.nj = 10000;     % number of jumps after the 'burn-in'
 r.ns = 10;    % rate of sampling (1 every N_SAMP jumps)
-r.nu = 100;    % rate of updating scale parameter (once every N_UPDT jumps)
+r.nu = 10;    % rate of updating scale parameter (once every N_UPDT jumps)
 
 qs = 0.6;       % q_sig scaling parameter = ideal acceptance rate
 

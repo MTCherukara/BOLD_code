@@ -22,6 +22,9 @@ function ST = MTC_ASE_tissue(TAU,PARAMS)
 %
 % CHANGELOG:
 %
+% 2017-06-26 (MTC). Corrected the asymptotic solutions, and switched to
+% using tau correctly.
+%
 % 2017-04-04 (MTC). Reverted back to using the asymptotic solutions of the
 % qBOLD model.
 %
@@ -36,28 +39,7 @@ dw   = PARAMS.dw;
 zeta = PARAMS.zeta;
 R2t  = PARAMS.R2t;
 R2tp = zeta.*dw;
-R2ts = R2t + R2tp;
-R2tr = R2t - R2tp; % rephasing rate R2*_
 
-%% Old Version
-% % define the regime changes in the case where tau is negative
-% c1 = find(abs(TAU)<(0.75./dw),1);
-% c2 = find(TAU>(0.75./dw),1);
-% 
-% % pre-allocate
-% ST = zeros(1,length(TAU));
-% 
-% % define S(TE) as point of comparison
-% ST0 = exp(-(TE - 2*TAU).*R2t);
-% 
-% % long negative tau regime
-% ST(1:c1-1) = ST0(1:c1-1) .* exp(zeta - 2.*R2tr.*TAU(1:c1-1));
-% 
-% % non-linear short tau regime
-% ST(c1:c2)  = exp(-(8/9).*zeta.*(dw.*TAU(c1:c2)).^2 - R2t.*TE);
-% 
-% % long positive tau regime
-% ST(c2:end) = ST0(c2:end) .* exp(zeta - 2.*R2ts.*TAU(c2:end));
 
 %% New Version
 %   

@@ -44,4 +44,4 @@ S_bld = w_bld.*MTC_ASE_blood(T,PARAMS);
 S = PARAMS.S0.*(S_tis + S_csf + S_bld);
 
 % add noise
-S = S + max(S).*PARAMS.sig.*randn(1,length(T));
+% S = S + max(S).*PARAMS.sig.*randn(1,length(T));

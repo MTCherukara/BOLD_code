@@ -34,7 +34,7 @@ save_plot = 1;      % set to 1 in order to save out ASE data
 
 %% Model Parameters
 % noise
-SNR = 100;
+SNR = 1000;
 params.sig  = 1/SNR;         % -         - noise standard deviation
 % constants 
 params.B0   = 3.0;          % T         - static magnetic field
@@ -52,7 +52,7 @@ params.dF   = 5;            % Hz        - frequency shift
 params.lam0 = 0.000;        % no units  - ISF/CSF signal contribution
 params.zeta = 0.030;        % no units  - deoxygenated blood volume
 params.OEF  = 0.400;        % no units  - oxygen extraction fraction
-params.Hct  = 0.40;         % no units  - fractional hematocrit
+params.Hct  = 0.340;        % no units  - fractional hematocrit
 
 
 %% Calculate values for remaining parameters
@@ -67,7 +67,7 @@ params.dw   = (4/3)*pi*params.gam*params.dChi*params.Hct*params.OEF*params.B0;
 
 %% Compute Model
 
-tau = (-16:8:64)/1000;      % for simulating data
+tau = (-16:4:64)/1000;      % for simulating data
 % tau = (-36:4:36)/1000;
 % tau = linspace(-0.016,0.064,1000); % for visualising ( tau(286) = 0 )
 np = length(tau);
@@ -93,9 +93,9 @@ S_sample = S_total + max(S_total).*params.sig.*randn(1,np);
 
 [~,int0] = find(tau>=0,1);
 
-S_norm = S_total; % don't normalise
-% S_norm = S_total./S_total(int0);
-% S_sample = S_sample./S_total(int0);
+% S_norm = S_total; % don't normalise
+S_norm = S_total./S_total(int0);
+S_sample = S_sample./S_total(int0);
 
 %% plot figure
 if plot_fig

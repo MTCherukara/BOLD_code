@@ -17,7 +17,7 @@ clear;
 % close all;
 tic;
 %% Load Data
-load('ASE_rightmodel.mat');
+load('ASE_nonorm002.mat');
 
 sigma = params.sig;   % real std of noise
 sigma_weight = 2/(sigma.^2);
@@ -72,10 +72,10 @@ params.lam0 = 0;
 %% Bayesian Inference on two parameters, using grid search
 
 tr1 = params.OEF;  % real value of OEF = 0.5
-tr2 = params.zeta; % real value of zeta = 0.03;
+tr2 = params.R2t; % real value of zeta = 0.03;
 
 w1 = linspace(0,1.0,np);
-w2 = linspace(0,0.1,np);
+w2 = linspace(5,15,np);
 
 pos = zeros(np,np);
 
@@ -85,7 +85,7 @@ for i1 = 1:np
     for i2 = 1:np
 
             params.OEF = w1(i1);
-            params.zeta = w2(i2);
+            params.R2t = w2(i2);
 
             S_mod = MTC_qASE_model(T_sample,params);
 %             S_mod = S_mod./S_mod(t0);
@@ -103,8 +103,8 @@ c=colorbar;
 plot([tr2,tr2],[  0, 30],'w-','LineWidth',2);
 plot([  0, 30],[tr1,tr1],'w-','LineWidth',2);
 ylabel('Oxygen Extraction Fraction (OEF)');
-% xlabel('Tissue Reversible Dephasing (R_2^t'')');
-xlabel('Deoxygenated Blood Volume (DBV)');
+xlabel('Tissue Dephasing Rate (R_2^t)');
+% xlabel('Deoxygenated Blood Volume (DBV)');
 ylabel(c,'Posterior Probability Density');
 % title(['SNR = ',num2str(1/sigma)]);
 axis([min(w2),max(w2),min(w1),max(w1)]);
