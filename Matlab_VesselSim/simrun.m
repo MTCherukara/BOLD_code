@@ -39,7 +39,7 @@ p.N = 10000;
  
 p.R = 1e-4;     % radius, in m
 p.D = 0;     % diffusion, in m^2/s
-p.Y = 0.6;      % oxygenation fraction (1-OEF) 
+p.Y = 0.4;      % oxygenation fraction (1-OEF) 
 p.vesselFraction = 0.03;    % DBV
 
 
@@ -58,7 +58,7 @@ for j = 1:length(X)
     
     tic;
     p.solidWalls = 0;
-    [Phase_u(:,:,j),p] = simplevesselsim(p);
+    [Phase_u(:,:,j),p] = MTC_vesselsim(p);
     % we don't even need to do this plotSignal stuff at all at this stage
 %     [sASE_u(:,j), tASE]  = MTC_plotSignal(p,Phase_u(:,:,j),'sequence','ASE','display',false);
     toc;
@@ -87,7 +87,7 @@ if save_data
     else
         diffterm = '_Diffusion_';
     end
-    dataname = ['storedPhase/VesselSim_data_',date,diffterm];
+    dataname = ['newStoredPhase/VSdata_',date,diffterm];
     D = dir([dataname,'*']);
     
     % check whether we've created two sets of storedPhase, and save all

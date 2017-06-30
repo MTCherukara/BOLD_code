@@ -35,7 +35,7 @@ function simAnalyse(varargin)
     % first, check to see if any input arguments have been provided, if
     % not, display the GUI
     if nargin == 0
-        disp('Display the gui!');
+%         disp('Display the gui!');
     
     % h - structure containing all ui element handles
     % r - structure containing all random parameter information
