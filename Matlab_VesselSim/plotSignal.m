@@ -7,6 +7,8 @@ function [t,sig] = plotSignal(storedPhase,p,r)
     %
     % CHANGELOG:
     %
+    % 2017-07-03 (MTC). Made it possible to plot signal on a log scale
+    %
     % 2017-05-18 (MTC). Made it possible for the user to specify an
     %       arbitrary set of tau values in ASE, while slightly improving
     %       the way in which ASE signal is calculated, and ensuring that
@@ -81,11 +83,16 @@ function [t,sig] = plotSignal(storedPhase,p,r)
                 if r.plotErrors
                     errorbar(1000*t,sig,stdEV,lspc{sq},'LineWidth',2);
                 else
-                    plot(1000*t,sig,lspc{sq},'LineWidth',2);
+                    if r.plotLog
+                        plot(1000*t,log(sig),lspc{sq},'LineWidth',2);
+                        ylabel(['log(',snames{sq},' Signal)']);
+                    else
+                        plot(1000*t,sig,lspc{sq},'LineWidth',2);
+                        ylabel([snames{sq},' Signal']);
+                    end
                 end
                 
                 xlabel('Time (ms)');
-                ylabel([snames{sq},' Signal']);
                 title(r.ftit);
                 set(gca,'FontSize',14);
                 box on;

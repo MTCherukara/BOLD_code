@@ -19,6 +19,9 @@
 %
 % CHANGELOG:
 %
+% 2017-07-03 (MTC). Added the option to plot signal on a logarithmic scale
+% (also made changes to plotSignal.m)
+%
 % 2017-05-18 (MTC). Added input options so that the function can be called
 % from the command line without the need for the GUI (this will enable easy
 % repeated calls)
@@ -112,10 +115,10 @@ function simAnalyse(varargin)
                        'FontSize',14,...
                        'HorizontalAlignment','Right');
        
-    % Edit field - TE - default 60 ms
+    % Edit field - TE - default 74 ms
     h.inTE = uicontrol('Style','Edit',...
                        'Position',[160,330,100,25],...
-                       'String','60',...
+                       'String','74',...
                        'FontSize',14,...
                        'HorizontalAlignment','Right');
     
@@ -139,7 +142,7 @@ function simAnalyse(varargin)
                        'String','2',...
                        'FontSize',14,...
                        'HorizontalAlignment','Right',...
-                       'Enable','off');
+                       'Enable','on'); % switched on by default
          
     % Text - 'ms'
     h.tx15 = uicontrol('Style','Text',...
@@ -172,10 +175,13 @@ function simAnalyse(varargin)
                        'FontSize',14);
                    
     % Checkbox - ASE - switches the Tau field on or off
+    %       this will be switched on by default, because it's the only one
+    %       we actually use!
     h.ch13 = uicontrol('Style','Checkbox',...
                        'Position',[30,270,100,25],...
                        'String','ASE',...
                        'FontSize',14,...
+                       'Value',1,...
                        'Callback',{@switchASE,h});
             
     % Checkbox - MASE (CURRENTLY NOT WORKING)
@@ -191,24 +197,7 @@ function simAnalyse(varargin)
                        'String','another sequence',...
                        'FontSize',14,...
                        'Enable','off');
-                   
-                   
-    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    %%%   Sequence Selection - Radiobutton version - NOT WORKING
-                 
-%     h.bg10 = uibuttongroup('Visible','off',...
-%                            'Units','pixels',...
-%                            'Position',[20,210,150,150],...
-%                            'Title','Sequences:',...
-%                            'FontSize',14);
-%                        
-%     h.rb11 = uicontrol(h.bg10,'Style','RadioButton',...
-%                               'String','GRE',...
-%                               'Position',[30,330,100,25],...
-%                               'FontSize',14);
-%                           
-%     h.bg10.Visible = 'on';
-                     
+ 
                    
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     %%%   Analysis Options
@@ -318,7 +307,13 @@ function simAnalyse(varargin)
     h.ch02 = uicontrol('Style','Checkbox',...
                        'Position',[300,60,250,25],...
                        'String','Show error bars',...
-                       'FontSize',14);   
+                       'FontSize',14); 
+                   
+    % Checkbox - plot on log scale
+    h.ch03 = uicontrol('Style','Checkbox',...
+                       'Position',[450,60,250,25],...
+                       'String','Plot ln(Signal)',...
+                       'FontSize',14); 
     
     % Checkbox - plot graph - on by default - switches the Figure options
     h.ch31 = uicontrol('Style','Checkbox',...
@@ -370,6 +365,7 @@ function simAnalyse(varargin)
         addParameter(p,'incIV',1);      % blood signal - include
         addParameter(p,'display',0);    % display plot - no
         addParameter(p,'save',0);       % save results - yes
+        addParameter(p,'log',0);        % log plot     - no
         addParameter(p,'seq','ASE',@(x) any(validatestring(x,expectedSeq)));
         
         parse(p,varargin{:});
@@ -448,6 +444,7 @@ function runAnalysis(~,~,h)
     r.plotAnalytic  = get(h.ch01,'Value');
     r.plotErrors    = get(h.ch02,'Value');
     r.normalise     = get(h.chNM,'Value');
+    r.plotLog       = get(h.ch03,'Value');
     
     % then pull values from the form-fillable boxes:
     p1.T2EV = 0.001*str2double(get(h.inT2,'String'));
@@ -645,11 +642,13 @@ function switchPlot(src,~,handles)
         set(handles.inFT,'Enable','on');
         set(handles.ch01,'Enable','on');
         set(handles.ch02,'Enable','on');
+        set(handles.ch03,'Enable','on');
     else
         set(handles.inFG,'Enable','off');
         set(handles.inFT,'Enable','off');
         set(handles.ch01,'Enable','off');
         set(handles.ch02,'Enable','off');
+        set(handles.ch03,'Enable','off');
     end    
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

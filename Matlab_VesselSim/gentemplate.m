@@ -5,7 +5,7 @@ function p=gentemplate
     p.B0    = 3;        % T     - Static magnetic field
     p.TE    = 60e-3;    % s     - Echo time
     p.dt    = 200e-6;   % s     - Time between steps (0.2ms) - leads to having 10 points per T
-    p.Hct   = 0.4;      % -     - Fractional haematocrit
+    p.Hct   = 0.34;      % -     - Fractional haematocrit
     p.Y     = 0.6;      % -     - (1-OEF)
     p.N     = 10000;    % -     - Number of particles
     
