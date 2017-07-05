@@ -37,7 +37,7 @@ save_data = 1;  % set this to 1 to save storedPhase data out, or 0 not to
 p=gentemplate;          % create basic set of parameters
 p.N = 10000;
  
-p.R = 1e-4;     % radius, in m
+p.R = 5.5e-5;     % radius, in m
 p.D = 1e-9;     % diffusion, in m^2/s
 p.Y = 0.6;      % oxygenation fraction (1-OEF) 
 p.vesselFraction = 0.03;    % DBV

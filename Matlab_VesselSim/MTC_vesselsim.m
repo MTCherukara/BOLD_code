@@ -98,6 +98,14 @@ function [vesselOrigins, vesselNormals, R, deltaChi, protonPosit, numVessels, ve
     	disp('Error: Increase max vessels!');
     end
     
+    % in order to make a distribution of R values, we will first fill with
+    % a bunch of vessels of the same radius, mean(R), for the sake of
+    % volume fraction calculating, then we will impose the distribution on
+    % the ones left over.
+    
+    % If we want them to range evenly from 10um to 100um, the mean value
+    % should be 55um = 5.5e-5 m.
+    
     R               = R(1:cutOff);
     vesselOrigins   = vesselOrigins(1:cutOff,:);
     vesselNormals   = vesselNormals(1:cutOff,:);
@@ -109,6 +117,7 @@ function [vesselOrigins, vesselNormals, R, deltaChi, protonPosit, numVessels, ve
     % blood coming in from arterioles) and 0.6 (deoxygenated blood going
     % out from capillary bed into venules)
     
+    % OEF stuff
 %     % Normal distribution
 %     vOxygen   = p.Y + 0.15*randn(cutOff,1); % N(Y,0.15) - set such that the p.Y parameter is the mean
 %     vOxygen(vOxygen > 0.98) = 0.98; % make sure no values are too high
@@ -121,6 +130,10 @@ function [vesselOrigins, vesselNormals, R, deltaChi, protonPosit, numVessels, ve
     vOxygen = p.Y.*ones(cutOff,1);
     
     deltaChi  = p.deltaChi0*p.Hct.*(1-vOxygen);
+    
+    % Radius stuff, linear distribution
+%     R = p.R - 4.5e-5 + (9e-5)*rand(cutOff,1);
+    
     
     protonPosit = [0 0 0];
     
