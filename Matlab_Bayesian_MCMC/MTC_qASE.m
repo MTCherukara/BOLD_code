@@ -93,9 +93,9 @@ S_sample = S_total + max(S_total).*params.sig.*randn(1,np);
 
 [~,int0] = find(tau>=0,1);
 
-% S_norm = S_total; % don't normalise
-S_norm = S_total./S_total(int0);
-S_sample = S_sample./S_total(int0);
+S_norm = S_total; % don't normalise
+% S_norm = S_total./S_total(int0);
+% S_sample = S_sample./S_total(int0);
 
 %% plot figure
 if plot_fig

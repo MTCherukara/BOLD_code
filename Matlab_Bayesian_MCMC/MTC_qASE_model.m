@@ -19,6 +19,11 @@ function S = MTC_qASE_model(T,PARAMS)
     %
     % CHANGELOG:
     %
+    % 2017-07-10 (MTC). Commented out the PARAMS.dw recalculation in order
+    % to use this for the R2' and zeta estimation (alongside
+    % MTC_qASE_model_long.m). This should be put back to normal if using
+    % this for any other grid-search (e.g. the classic OEF-DBV)
+    %
     % 2016-05-27 (MTC). Updated the way the compartments were summed up.
    
     
@@ -28,7 +33,9 @@ PARAMS.R2b  = 14.9*PARAMS.Hct + 14.7 + (302.1*PARAMS.Hct + 41.8)*PARAMS.OEF^2;
 PARAMS.R2bs = 16.4*PARAMS.Hct + 4.5  + (165.2*PARAMS.Hct + 55.7)*PARAMS.OEF^2;
 
 %  characteristic frequency
-PARAMS.dw   = (4/3)*pi*PARAMS.gam*PARAMS.dChi*PARAMS.Hct*PARAMS.OEF*PARAMS.B0;
+%%% uncomment this again before doing anything other than R2' inference!!!
+    % PARAMS.dw   = (4/3)*pi*PARAMS.gam*PARAMS.dChi*PARAMS.Hct*PARAMS.OEF*PARAMS.B0;
+%%%
 
 % compartment weightings
 w_tis = 1 - PARAMS.lam0 - PARAMS.zeta;

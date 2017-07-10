@@ -17,13 +17,13 @@ clear;
 % close all;
 tic;
 %% Load Data
-load('ASE_nonorm002.mat');
+load('ASE_signal_data_10-Jul-2017_1.mat');
 
 sigma = params.sig;   % real std of noise
 sigma_weight = 2/(sigma.^2);
 
 ns = length(S_sample); % number of data points
-np = 1000; % number of points to perform Bayesian analysis on
+np = 100; % number of points to perform Bayesian analysis on
 
 % remove CSF component
 params.lam0 = 0;
@@ -70,12 +70,55 @@ params.lam0 = 0;
 % set(gca,'FontSize',16);
 
 %% Bayesian Inference on two parameters, using grid search
+% % 
+% % tr1 = params.OEF;  % real value of OEF = 0.5
+% % tr2 = params.R2t; % real value of zeta = 0.03;
+% % 
+% % w1 = linspace(0,1.0,np);
+% % w2 = linspace(5,15,np);
+% % 
+% % pos = zeros(np,np);
+% % 
+% % for i1 = 1:np
+% % %     disp(['Calculating iteration ',num2str(i1),' of ',num2str(np)]);
+% %     
+% %     for i2 = 1:np
+% % 
+% %             params.OEF = w1(i1);
+% %             params.R2t = w2(i2);
+% % 
+% %             S_mod = MTC_qASE_model(T_sample,params);
+% % %             S_mod = S_mod./S_mod(t0);
+% % 
+% %             pos(i1,i2) = exp(-sum((S_sample-S_mod).^2)./(sigma));
+% %     end
+% % end
+% % 
+% % % pos = pos/sum(pos(:)); % normalize posterior
+% % toc;
+% % % plot
+% % figure();
+% % imagesc(w2,w1,pos); hold on;
+% % c=colorbar;
+% % plot([tr2,tr2],[  0, 30],'w-','LineWidth',2);
+% % plot([  0, 30],[tr1,tr1],'w-','LineWidth',2);
+% % ylabel('Oxygen Extraction Fraction (OEF)');
+% % xlabel('Tissue Dephasing Rate (R_2^t)');
+% % % xlabel('Deoxygenated Blood Volume (DBV)');
+% % ylabel(c,'Posterior Probability Density');
+% % % title(['SNR = ',num2str(1/sigma)]);
+% % axis([min(w2),max(w2),min(w1),max(w1)]);
+% % set(gca,'FontSize',18,'YDir','normal');
+% % set(c,'FontSize',20)
+% % set(gcf,'WindowStyle','docked');
 
-tr1 = params.OEF;  % real value of OEF = 0.5
-tr2 = params.R2t; % real value of zeta = 0.03;
+%% Bayesian Inference on DBV and R2', using grid search
 
-w1 = linspace(0,1.0,np);
-w2 = linspace(5,15,np);
+tr1 = params.dw.*params.zeta;   % real value of R2' = 3.62;
+tr2 = params.zeta;              % real value of DBV = 0.03;
+
+w1 = linspace(1,10,np);         % R2' between 1 and 10 (s^-1)
+w2 = linspace(0,0.1,np);        % DBV between 0 and 0.1 (no units)    
 
 pos = zeros(np,np);
 
@@ -84,13 +127,32 @@ for i1 = 1:np
     
     for i2 = 1:np
 
-            params.OEF = w1(i1);
-            params.R2t = w2(i2);
-
-            S_mod = MTC_qASE_model(T_sample,params);
+            params.R2p  = w1(i1);
+            params.zeta = w2(i2);
+            
+            % calculate long-tau T_sample values here
+            Iedge = find(T_sample>(1.5*params.zeta/params.R2p),1);
+            T_long = T_sample(Iedge:end);
+            
+            S_long = MTC_qASE_model_long(T_long,params);
+            
+            
+            posl = exp(-sum((S_sample(Iedge:end)-S_long).^2)./sigma);
+            
+            % calculate zeta fit using the other T values - don't forget to
+            % uncomment this line in MTC_qASE_model.m when we're done
+            params.dw = params.R2p./params.zeta;
+            
+            T_short = T_sample(1:Iedge-1);
+            S_short = MTC_qASE_model(T_short,params);
+            
+            poss = exp(-sum((S_sample(1:Iedge-1)-S_short).^2)./sigma);
+            
+            pos(i1,i2) = ((length(T_short).*poss) + (length(T_long).*posl))./length(T_sample);
+%             S_mod = MTC_qASE_model(T_sample,params);
 %             S_mod = S_mod./S_mod(t0);
 
-            pos(i1,i2) = exp(-sum((S_sample-S_mod).^2)./(sigma));
+%             pos(i1,i2) = exp(-sum((S_sample-S_mod).^2)./(sigma));
     end
 end
 
@@ -102,9 +164,8 @@ imagesc(w2,w1,pos); hold on;
 c=colorbar;
 plot([tr2,tr2],[  0, 30],'w-','LineWidth',2);
 plot([  0, 30],[tr1,tr1],'w-','LineWidth',2);
-ylabel('Oxygen Extraction Fraction (OEF)');
-xlabel('Tissue Dephasing Rate (R_2^t)');
-% xlabel('Deoxygenated Blood Volume (DBV)');
+ylabel('Reversible Dephasing Rate (R_2'')');
+xlabel('Deoxygenated Blood Volume (DBV)');
 ylabel(c,'Posterior Probability Density');
 % title(['SNR = ',num2str(1/sigma)]);
 axis([min(w2),max(w2),min(w1),max(w1)]);
