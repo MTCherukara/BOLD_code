@@ -1,11 +1,15 @@
-include ${FSLCONFDIR}/default.mk
+include ${FSLDIR}/config/apple-darwin12-gcc4.2/systemvars.mk
+include ${FSLDIR}/config/apple-darwin12-gcc4.2/externallibs.mk
+include ${FSLDIR}/config/common/vars.mk
+include ${FSLDIR}/config/common/rules.mk 
 
 PROJNAME = fabber_core
 
 USRINCFLAGS = -I${INC_NEWMAT} -I${INC_PROB} -I${INC_BOOST}
 USRLDFLAGS = -L${LIB_NEWMAT} -L${LIB_PROB} -L/lib64
 
-LIBS = -lutils -lnewimage -lmiscmaths -lprob -lnewmat -lfslio -lniftiio -lznz -lz -ldl
+# attempting to fix the problem of missing std library, by adding -lc++
+LIBS = -lutils -lnewimage -lmiscmaths -lprob -lnewmat -lfslio -lniftiio -lznz -lz -ldl -lc++
 
 #
 # Executables
