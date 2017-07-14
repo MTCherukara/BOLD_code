@@ -11,6 +11,8 @@ USRLDFLAGS = -L${LIB_NEWMAT} -L${LIB_PROB} -L/usr/lib
 
 LIBS = -lutils -lnewimage -lmiscmaths -lprob -lnewmat -lfslio -lniftiio -lznz -lz -ldl
 
+CXX = clang++
+
 #
 # Executables
 #
