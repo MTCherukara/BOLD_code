@@ -5,7 +5,7 @@ include ${FSLDIR}/config/common/rules.mk
 
 PROJNAME = fabber_core
 
-USRINCFLAGS = -I${INC_NEWMAT} -I${INC_PROB} -I${INC_BOOST} -I/usr/include
+USRINCFLAGS = -I${INC_NEWMAT} -I${INC_PROB} -I${INC_BOOST} -I/usr/include/c++/4.2.1
 USRLDFLAGS = -L${LIB_NEWMAT} -L${LIB_PROB} -L/usr/lib
 # replaced -L/lib64 with -L/usr/include/c++/4.2.1 
 

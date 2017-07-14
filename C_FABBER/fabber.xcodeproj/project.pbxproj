@@ -44,6 +44,38 @@
 		6EE01DFA1F18C8C9009D84F3 /* libnewmat.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 6EE01DF91F18C8C9009D84F3 /* libnewmat.a */; };
 		6EE01DFC1F18C8E3009D84F3 /* libprob.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 6EE01DFB1F18C8E3009D84F3 /* libprob.a */; };
 		6EE01DFE1F18C8F3009D84F3 /* libz.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 6EE01DFD1F18C8F3009D84F3 /* libz.a */; };
+		6EE01E071F18D7A3009D84F3 /* rundata_newimage.cc in Sources */ = {isa = PBXBuildFile; fileRef = 6EE01DBF1F18C33D009D84F3 /* rundata_newimage.cc */; };
+		6EE01E081F18D7B7009D84F3 /* fabber_core.cc in Sources */ = {isa = PBXBuildFile; fileRef = 6EE01D9A1F18C33D009D84F3 /* fabber_core.cc */; };
+		6EE01E091F18DAF3009D84F3 /* libfabberexec.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 6EE01E031F18D6AA009D84F3 /* libfabberexec.a */; };
+		6EE01E131F18DF78009D84F3 /* libfabbercore.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 6EE01E0F1F18DF72009D84F3 /* libfabbercore.a */; };
+		6EE01E141F18DF82009D84F3 /* convergence.cc in Sources */ = {isa = PBXBuildFile; fileRef = 6EE01D8A1F18C33D009D84F3 /* convergence.cc */; };
+		6EE01E151F18DF86009D84F3 /* covariance_cache.cc in Sources */ = {isa = PBXBuildFile; fileRef = 6EE01D8C1F18C33D009D84F3 /* covariance_cache.cc */; };
+		6EE01E161F18DF8A009D84F3 /* dist_gamma.cc in Sources */ = {isa = PBXBuildFile; fileRef = 6EE01D901F18C33D009D84F3 /* dist_gamma.cc */; };
+		6EE01E181F18DF9B009D84F3 /* dist_mvn.cc in Sources */ = {isa = PBXBuildFile; fileRef = 6EE01D921F18C33D009D84F3 /* dist_mvn.cc */; };
+		6EE01E1A1F18DFA1009D84F3 /* easylog.cc in Sources */ = {isa = PBXBuildFile; fileRef = 6EE01D951F18C33D009D84F3 /* easylog.cc */; };
+		6EE01E1B1F18DFA7009D84F3 /* fabber_capi.cc in Sources */ = {isa = PBXBuildFile; fileRef = 6EE01D981F18C33D009D84F3 /* fabber_capi.cc */; };
+		6EE01E1C1F18DFB1009D84F3 /* fabber_core.cc in Sources */ = {isa = PBXBuildFile; fileRef = 6EE01D9A1F18C33D009D84F3 /* fabber_core.cc */; };
+		6EE01E1D1F18DFB3009D84F3 /* fabber_main.cc in Sources */ = {isa = PBXBuildFile; fileRef = 6EE01D9C1F18C33D009D84F3 /* fabber_main.cc */; };
+		6EE01E1E1F18DFB6009D84F3 /* factories.cc in Sources */ = {isa = PBXBuildFile; fileRef = 6EE01D9E1F18C33D009D84F3 /* factories.cc */; };
+		6EE01E1F1F18DFB9009D84F3 /* fwdmodel_linear.cc in Sources */ = {isa = PBXBuildFile; fileRef = 6EE01DA01F18C33D009D84F3 /* fwdmodel_linear.cc */; };
+		6EE01E201F18DFC0009D84F3 /* fwdmodel_poly.cc in Sources */ = {isa = PBXBuildFile; fileRef = 6EE01DA21F18C33D009D84F3 /* fwdmodel_poly.cc */; };
+		6EE01E211F18DFC2009D84F3 /* fwdmodel.cc in Sources */ = {isa = PBXBuildFile; fileRef = 6EE01DA41F18C33D009D84F3 /* fwdmodel.cc */; };
+		6EE01E221F18DFC5009D84F3 /* inference_nlls.cc in Sources */ = {isa = PBXBuildFile; fileRef = 6EE01DA61F18C33D009D84F3 /* inference_nlls.cc */; };
+		6EE01E231F18DFC7009D84F3 /* inference_spatialvb_exp.cc in Sources */ = {isa = PBXBuildFile; fileRef = 6EE01DA81F18C33D009D84F3 /* inference_spatialvb_exp.cc */; };
+		6EE01E241F18DFC9009D84F3 /* inference_spatialvb.cc in Sources */ = {isa = PBXBuildFile; fileRef = 6EE01DAA1F18C33D009D84F3 /* inference_spatialvb.cc */; };
+		6EE01E251F18DFCC009D84F3 /* inference_vb.cc in Sources */ = {isa = PBXBuildFile; fileRef = 6EE01DAC1F18C33D009D84F3 /* inference_vb.cc */; };
+		6EE01E261F18DFCF009D84F3 /* inference.cc in Sources */ = {isa = PBXBuildFile; fileRef = 6EE01DAE1F18C33D009D84F3 /* inference.cc */; };
+		6EE01E271F18DFD2009D84F3 /* motioncorr.cc in Sources */ = {isa = PBXBuildFile; fileRef = 6EE01DB21F18C33D009D84F3 /* motioncorr.cc */; };
+		6EE01E281F18DFD5009D84F3 /* noisemodel_ar.cc in Sources */ = {isa = PBXBuildFile; fileRef = 6EE01DB51F18C33D009D84F3 /* noisemodel_ar.cc */; };
+		6EE01E291F18DFD7009D84F3 /* noisemodel_white.cc in Sources */ = {isa = PBXBuildFile; fileRef = 6EE01DB71F18C33D009D84F3 /* noisemodel_white.cc */; };
+		6EE01E2A1F18DFD9009D84F3 /* noisemodel.cc in Sources */ = {isa = PBXBuildFile; fileRef = 6EE01DB91F18C33D009D84F3 /* noisemodel.cc */; };
+		6EE01E2B1F18DFDC009D84F3 /* rundata_array.cc in Sources */ = {isa = PBXBuildFile; fileRef = 6EE01DBD1F18C33D009D84F3 /* rundata_array.cc */; };
+		6EE01E2C1F18DFDF009D84F3 /* rundata_newimage.cc in Sources */ = {isa = PBXBuildFile; fileRef = 6EE01DBF1F18C33D009D84F3 /* rundata_newimage.cc */; };
+		6EE01E2D1F18DFE1009D84F3 /* rundata.cc in Sources */ = {isa = PBXBuildFile; fileRef = 6EE01DC11F18C33D009D84F3 /* rundata.cc */; };
+		6EE01E2E1F18DFE4009D84F3 /* setup.cc in Sources */ = {isa = PBXBuildFile; fileRef = 6EE01DC41F18C33D009D84F3 /* setup.cc */; };
+		6EE01E2F1F18DFE7009D84F3 /* tools.cc in Sources */ = {isa = PBXBuildFile; fileRef = 6EE01DC71F18C33D009D84F3 /* tools.cc */; };
+		6EE01E301F18DFE9009D84F3 /* version.cc in Sources */ = {isa = PBXBuildFile; fileRef = 6EE01DC91F18C33D009D84F3 /* version.cc */; };
+		6EE01E311F18DFFE009D84F3 /* libfabberexec.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 6EE01E031F18D6AA009D84F3 /* libfabberexec.a */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -101,7 +133,7 @@
 		6EE01DAE1F18C33D009D84F3 /* inference.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = inference.cc; sourceTree = "<group>"; };
 		6EE01DAF1F18C33D009D84F3 /* inference.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = inference.h; sourceTree = "<group>"; };
 		6EE01DB01F18C33D009D84F3 /* LICENSE */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = LICENSE; sourceTree = "<group>"; };
-		6EE01DB11F18C33D009D84F3 /* Makefile */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.make; path = Makefile; sourceTree = "<group>"; };
+		6EE01DB11F18C33D009D84F3 /* Makefile */ = {isa = PBXFileReference; explicitFileType = sourcecode.make; fileEncoding = 4; path = Makefile; sourceTree = "<group>"; };
 		6EE01DB21F18C33D009D84F3 /* motioncorr.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = motioncorr.cc; sourceTree = "<group>"; };
 		6EE01DB31F18C33D009D84F3 /* motioncorr.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = motioncorr.h; sourceTree = "<group>"; };
 		6EE01DB41F18C33D009D84F3 /* mvn_tool */ = {isa = PBXFileReference; lastKnownFileType = folder; path = mvn_tool; sourceTree = "<group>"; };
@@ -138,6 +170,8 @@
 		6EE01DF91F18C8C9009D84F3 /* libnewmat.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libnewmat.a; path = ../../../../../../usr/local/fsl/extras/lib/libnewmat.a; sourceTree = "<group>"; };
 		6EE01DFB1F18C8E3009D84F3 /* libprob.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libprob.a; path = ../../../../../../usr/local/fsl/extras/lib/libprob.a; sourceTree = "<group>"; };
 		6EE01DFD1F18C8F3009D84F3 /* libz.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libz.a; path = ../../../../../../usr/local/fsl/extras/lib/libz.a; sourceTree = "<group>"; };
+		6EE01E031F18D6AA009D84F3 /* libfabberexec.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libfabberexec.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		6EE01E0F1F18DF72009D84F3 /* libfabbercore.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libfabbercore.a; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -145,9 +179,11 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				6EE01E091F18DAF3009D84F3 /* libfabberexec.a in Frameworks */,
 				6EE01DEC1F18C73D009D84F3 /* libstdc++.dylib in Frameworks */,
 				6EE01DFE1F18C8F3009D84F3 /* libz.a in Frameworks */,
 				6EE01DEE1F18C78C009D84F3 /* libznz.a in Frameworks */,
+				6EE01E131F18DF78009D84F3 /* libfabbercore.a in Frameworks */,
 				6EE01DF81F18C80E009D84F3 /* libniftiio.a in Frameworks */,
 				6EE01DF61F18C7E9009D84F3 /* libfslio.a in Frameworks */,
 				6EE01DFA1F18C8C9009D84F3 /* libnewmat.a in Frameworks */,
@@ -155,6 +191,21 @@
 				6EE01DF41F18C7A0009D84F3 /* libmiscmaths.a in Frameworks */,
 				6EE01DF21F18C79D009D84F3 /* libnewimage.a in Frameworks */,
 				6EE01DF01F18C793009D84F3 /* libutils.a in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		6EE01E001F18D6AA009D84F3 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		6EE01E0C1F18DF72009D84F3 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				6EE01E311F18DFFE009D84F3 /* libfabberexec.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -240,6 +291,8 @@
 			isa = PBXGroup;
 			children = (
 				6EE01D7E1F18C26C009D84F3 /* fabber */,
+				6EE01E031F18D6AA009D84F3 /* libfabberexec.a */,
+				6EE01E0F1F18DF72009D84F3 /* libfabbercore.a */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -264,6 +317,23 @@
 		};
 /* End PBXGroup section */
 
+/* Begin PBXHeadersBuildPhase section */
+		6EE01E011F18D6AA009D84F3 /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		6EE01E0D1F18DF72009D84F3 /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXHeadersBuildPhase section */
+
 /* Begin PBXNativeTarget section */
 		6EE01D7D1F18C26C009D84F3 /* fabber */ = {
 			isa = PBXNativeTarget;
@@ -282,6 +352,40 @@
 			productReference = 6EE01D7E1F18C26C009D84F3 /* fabber */;
 			productType = "com.apple.product-type.tool";
 		};
+		6EE01E021F18D6AA009D84F3 /* fabberexec */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 6EE01E041F18D6AA009D84F3 /* Build configuration list for PBXNativeTarget "fabberexec" */;
+			buildPhases = (
+				6EE01DFF1F18D6AA009D84F3 /* Sources */,
+				6EE01E001F18D6AA009D84F3 /* Frameworks */,
+				6EE01E011F18D6AA009D84F3 /* Headers */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = fabberexec;
+			productName = fabberexec;
+			productReference = 6EE01E031F18D6AA009D84F3 /* libfabberexec.a */;
+			productType = "com.apple.product-type.library.static";
+		};
+		6EE01E0E1F18DF72009D84F3 /* fabbercore */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 6EE01E101F18DF72009D84F3 /* Build configuration list for PBXNativeTarget "fabbercore" */;
+			buildPhases = (
+				6EE01E0B1F18DF72009D84F3 /* Sources */,
+				6EE01E0C1F18DF72009D84F3 /* Frameworks */,
+				6EE01E0D1F18DF72009D84F3 /* Headers */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = fabbercore;
+			productName = fabbercore;
+			productReference = 6EE01E0F1F18DF72009D84F3 /* libfabbercore.a */;
+			productType = "com.apple.product-type.library.static";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -292,6 +396,14 @@
 				ORGANIZATIONNAME = "Matthew Cherukara";
 				TargetAttributes = {
 					6EE01D7D1F18C26C009D84F3 = {
+						CreatedOnToolsVersion = 8.3;
+						ProvisioningStyle = Automatic;
+					};
+					6EE01E021F18D6AA009D84F3 = {
+						CreatedOnToolsVersion = 8.3;
+						ProvisioningStyle = Automatic;
+					};
+					6EE01E0E1F18DF72009D84F3 = {
 						CreatedOnToolsVersion = 8.3;
 						ProvisioningStyle = Automatic;
 					};
@@ -310,6 +422,8 @@
 			projectRoot = "";
 			targets = (
 				6EE01D7D1F18C26C009D84F3 /* fabber */,
+				6EE01E021F18D6AA009D84F3 /* fabberexec */,
+				6EE01E0E1F18DF72009D84F3 /* fabbercore */,
 			);
 		};
 /* End PBXProject section */
@@ -346,6 +460,49 @@
 				6EE01DD51F18C33D009D84F3 /* fwdmodel_poly.cc in Sources */,
 				6EE01DCF1F18C33D009D84F3 /* easylog.cc in Sources */,
 				6EE01DCE1F18C33D009D84F3 /* dist_mvn.cc in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		6EE01DFF1F18D6AA009D84F3 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				6EE01E081F18D7B7009D84F3 /* fabber_core.cc in Sources */,
+				6EE01E071F18D7A3009D84F3 /* rundata_newimage.cc in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		6EE01E0B1F18DF72009D84F3 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				6EE01E1D1F18DFB3009D84F3 /* fabber_main.cc in Sources */,
+				6EE01E271F18DFD2009D84F3 /* motioncorr.cc in Sources */,
+				6EE01E291F18DFD7009D84F3 /* noisemodel_white.cc in Sources */,
+				6EE01E281F18DFD5009D84F3 /* noisemodel_ar.cc in Sources */,
+				6EE01E301F18DFE9009D84F3 /* version.cc in Sources */,
+				6EE01E1B1F18DFA7009D84F3 /* fabber_capi.cc in Sources */,
+				6EE01E241F18DFC9009D84F3 /* inference_spatialvb.cc in Sources */,
+				6EE01E1C1F18DFB1009D84F3 /* fabber_core.cc in Sources */,
+				6EE01E2E1F18DFE4009D84F3 /* setup.cc in Sources */,
+				6EE01E1E1F18DFB6009D84F3 /* factories.cc in Sources */,
+				6EE01E231F18DFC7009D84F3 /* inference_spatialvb_exp.cc in Sources */,
+				6EE01E2C1F18DFDF009D84F3 /* rundata_newimage.cc in Sources */,
+				6EE01E2F1F18DFE7009D84F3 /* tools.cc in Sources */,
+				6EE01E1F1F18DFB9009D84F3 /* fwdmodel_linear.cc in Sources */,
+				6EE01E211F18DFC2009D84F3 /* fwdmodel.cc in Sources */,
+				6EE01E261F18DFCF009D84F3 /* inference.cc in Sources */,
+				6EE01E2D1F18DFE1009D84F3 /* rundata.cc in Sources */,
+				6EE01E2A1F18DFD9009D84F3 /* noisemodel.cc in Sources */,
+				6EE01E161F18DF8A009D84F3 /* dist_gamma.cc in Sources */,
+				6EE01E251F18DFCC009D84F3 /* inference_vb.cc in Sources */,
+				6EE01E141F18DF82009D84F3 /* convergence.cc in Sources */,
+				6EE01E151F18DF86009D84F3 /* covariance_cache.cc in Sources */,
+				6EE01E2B1F18DFDC009D84F3 /* rundata_array.cc in Sources */,
+				6EE01E221F18DFC5009D84F3 /* inference_nlls.cc in Sources */,
+				6EE01E201F18DFC0009D84F3 /* fwdmodel_poly.cc in Sources */,
+				6EE01E1A1F18DFA1009D84F3 /* easylog.cc in Sources */,
+				6EE01E181F18DF9B009D84F3 /* dist_mvn.cc in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -477,6 +634,58 @@
 			};
 			name = Release;
 		};
+		6EE01E051F18D6AA009D84F3 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				EXECUTABLE_PREFIX = lib;
+				HEADER_SEARCH_PATHS = (
+					/usr/include,
+					"/usr/local/fsl/extras/include/**",
+					"/usr/loca/fsl/include/**",
+				);
+				LIBRARY_SEARCH_PATHS = (
+					/usr/lib,
+					/usr/local/fsl/lib,
+					/usr/local/fsl/extras/lib,
+				);
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		6EE01E061F18D6AA009D84F3 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				EXECUTABLE_PREFIX = lib;
+				HEADER_SEARCH_PATHS = (
+					/usr/include,
+					"/usr/local/fsl/extras/include/**",
+					"/usr/loca/fsl/include/**",
+				);
+				LIBRARY_SEARCH_PATHS = (
+					/usr/lib,
+					/usr/local/fsl/lib,
+					/usr/local/fsl/extras/lib,
+				);
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
+		6EE01E111F18DF72009D84F3 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				EXECUTABLE_PREFIX = lib;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		6EE01E121F18DF72009D84F3 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				EXECUTABLE_PREFIX = lib;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -497,6 +706,22 @@
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
+		};
+		6EE01E041F18D6AA009D84F3 /* Build configuration list for PBXNativeTarget "fabberexec" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				6EE01E051F18D6AA009D84F3 /* Debug */,
+				6EE01E061F18D6AA009D84F3 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+		};
+		6EE01E101F18DF72009D84F3 /* Build configuration list for PBXNativeTarget "fabbercore" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				6EE01E111F18DF72009D84F3 /* Debug */,
+				6EE01E121F18DF72009D84F3 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
 		};
 /* End XCConfigurationList section */
 	};
