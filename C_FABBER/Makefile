@@ -1,3 +1,4 @@
+# include ${FSLCONFDIR}/default.mk
 include ${FSLDIR}/config/apple-darwin12-gcc4.2/systemvars.mk
 include ${FSLDIR}/config/apple-darwin12-gcc4.2/externallibs.mk
 include ${FSLDIR}/config/common/vars.mk
@@ -5,13 +6,12 @@ include ${FSLDIR}/config/common/rules.mk
 
 PROJNAME = fabber_core
 
-USRINCFLAGS = -I${INC_NEWMAT} -I${INC_PROB} -I${INC_BOOST} -I/usr/include/c++/4.2.1
-USRLDFLAGS = -L${LIB_NEWMAT} -L${LIB_PROB} -L/usr/lib
+USRINCFLAGS = -I${INC_NEWMAT} -I${INC_PROB} -I${INC_BOOST}
+USRLDFLAGS = -L${LIB_NEWMAT} -L${LIB_PROB} -L/lib64
 # replaced -L/lib64 with -L/usr/include/c++/4.2.1 
 
 LIBS = -lutils -lnewimage -lmiscmaths -lprob -lnewmat -lfslio -lniftiio -lznz -lz -ldl
 
-CXX = clang++
 
 #
 # Executables

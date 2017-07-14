@@ -6,7 +6,7 @@ if(APPLE)
   # Uncomment to force use of libstdc++ on Mac as
   # FSL uses this by default. Not required if building FSL from
   # Cmake sources
-  # set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -stdlib=libstdc++")
+   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -stdlib=libstdc++")
   # Get rid of CMake warning
   set(CMAKE_MACOSX_RPATH ON)
 endif(APPLE)
