@@ -49,7 +49,6 @@ namespace OXASL {
 
 // Evaluation of qBOLD model, 2 compartments, ASE acquisition
     double QBOLDModel_ASE2C::EvaluateSignal(const double tau, const double TE, const double OEF, const double DBV, const double R2t) const {
-        Tracer_Plus tr("BOLD:evaluate_ase2c");
 
         // variables
         double SA;  // total signal
@@ -77,12 +76,12 @@ namespace OXASL {
         }
         else
         {
-            St = exp(-0.3*DBV*pow(dw*tau,2))
+            St = exp(-0.3*DBV*pow(dw*tau,2.0));
         }
         
         // Evaluate Sb
-        R2b  = 10.076 + (111.868*pow(OEF,2));
-        R2bs = 19.766 + (144.514*pow(OEF,2));
+        R2b  = 10.076 + (111.868*pow(OEF,2.0));
+        R2bs = 19.766 + (144.514*pow(OEF,2.0));
 
         Sb = exp(-R2b*(TE-tau))*exp(-R2bs*abs(tau));
 

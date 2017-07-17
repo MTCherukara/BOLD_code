@@ -15,7 +15,7 @@
 
 #include "fabber_core/fwdmodel.h"
 #include "miscmaths/miscmaths.h" // these are in asl_models.h, so it probably won't hurt
-#include "miscmaths/miscprob.h"
+// #include "miscmaths/miscprob.h" // currently can't find this thing...
 
 using namespace MISCMATHS;
 
@@ -61,14 +61,14 @@ namespace OXASL {
   protected:
     ColumnVector priors; // list of prior means, followed by precisions
 
-  } // class QBOLDModel
+  }; // class QBOLDModel
 
   // specific QBOLD model - two-compartment ASE data
   class QBOLDModel_ASE2C : public QBOLDModel {
     virtual double EvaluateSignal(const double tau, const double TE, const double OEF, const double DBV, const double R2t) const;
     virtual string Name() const { return "ASE 2 Compartments"; }
 
-  } // class QBOLDModel_ASE2C
+  }; // class QBOLDModel_ASE2C
 
 } // namespace OXASL
 
