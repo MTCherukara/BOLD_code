@@ -1,7 +1,11 @@
-// fwdmodel_sine.h - A simple sine curve fitting model
+/*   fwdmodel_qbold.h - The ASE qBOLD curve fitting model
 
-#ifndef FWDMODEL_SINE_H
-#define FWDMODEL_SINE_H
+ Matthew Cherukara, IBME
+
+ Copyright (C) 2017 University of Oxford  */
+
+#ifndef FWDMODEL_QBOLD_H
+#define FWDMODEL_QBOLD_H
 
 #include "fabber_core/fwdmodel.h"
 
@@ -9,11 +13,11 @@
 
 #include <string>
 
-class SineFwdModel : public FwdModel {
+class QBoldFwdModel : public FwdModel {
 public:
     static FwdModel* NewInstance();
 
-    SineFwdModel()
+    QBoldFwdModel()
         : m_include_offset(false)
     {
     }
@@ -30,7 +34,7 @@ public:
 
 private:
     bool m_include_offset;
-    static FactoryRegistration<FwdModelFactory, SineFwdModel> registration;
+    static FactoryRegistration<FwdModelFactory, QBoldFwdModel> registration;
 };
 
-#endif
+#endif // FWDMODEL_QBOLD_H

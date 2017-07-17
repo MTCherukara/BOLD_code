@@ -1,6 +1,6 @@
 include ${FSLCONFDIR}/default.mk
 
-MODELS_NAME=sine
+MODELS_NAME=qbold
 
 PROJNAME = fabber_${MODELS_NAME}
 

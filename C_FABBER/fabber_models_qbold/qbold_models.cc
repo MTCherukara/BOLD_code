@@ -1,5 +1,5 @@
-#include "sine_models.h"
-#include "fwdmodel_sine.h"
+#include "qbold_models.h"
+#include "fwdmodel_qbold.h"
 
 #include <fabber_core/fwdmodel.h>
 
@@ -14,7 +14,7 @@ const char *CALL get_model_name(int index)
     switch (index)
     {
     case 0:
-        return "sine";
+        return "qbold";
         break;
     default:
         return NULL;
@@ -23,9 +23,9 @@ const char *CALL get_model_name(int index)
 
 NewInstanceFptr CALL get_new_instance_func(const char *name)
 {
-    if (string(name) == "sine")
+    if (string(name) == "qbold")
     {
-        return SineFwdModel::NewInstance;
+        return QBoldFwdModel::NewInstance;
     }
     else
     {

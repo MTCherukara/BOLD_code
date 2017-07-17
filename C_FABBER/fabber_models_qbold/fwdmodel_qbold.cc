@@ -1,6 +1,10 @@
-//  fwdmodel_sine.cc - Implements a simple sine curve fitting model
+/*   fwdmodel_qbold.cc - Implements the ASE qBOLD curve fitting model
 
-#include "fwdmodel_sine.h"
+ Matthew Cherukara, IBME
+
+ Copyright (C) 2017 University of Oxford  */
+
+#include "fwdmodel_qbold.h"
 
 #include "fabber_core/fwdmodel.h"
 
@@ -9,19 +13,19 @@
 using namespace std;
 using namespace NEWMAT;
 
-FactoryRegistration<FwdModelFactory, SineFwdModel> SineFwdModel::registration("sine");
+FactoryRegistration<FwdModelFactory, QBoldFwdModel> QBoldFwdModel::registration("qbold");
 
-FwdModel *SineFwdModel::NewInstance()
+FwdModel *QBoldFwdModel::NewInstance()
 {
-    return new SineFwdModel();
+    return new QBoldFwdModel();
 }
 
-string SineFwdModel::GetDescription() const
+string QBoldFwdModel::GetDescription() const
 {
-    return "Example model which uses a sine function";
+    return "ASE qBOLD model";
 }
 
-string SineFwdModel::ModelVersion() const
+string QBoldFwdModel::ModelVersion() const
 {
     return "1.0";
 }
@@ -31,7 +35,7 @@ static OptionSpec OPTIONS[] = {
     { "" }
 };
 
-void SineFwdModel::GetOptions(vector<OptionSpec> &opts) const
+void QBoldFwdModel::GetOptions(vector<OptionSpec> &opts) const
 {
     for (int i = 0; OPTIONS[i].name != ""; i++)
     {
@@ -39,12 +43,12 @@ void SineFwdModel::GetOptions(vector<OptionSpec> &opts) const
     }
 }
 
-void SineFwdModel::Initialize(FabberRunData &rundata)
+void QBoldFwdModel::Initialize(FabberRunData &rundata)
 {
     m_include_offset = rundata.GetBool("use-offset");
 }
 
-int SineFwdModel::NumParams() const
+int QBoldFwdModel::NumParams() const
 {
     if (m_include_offset)
         return 4;
@@ -52,7 +56,7 @@ int SineFwdModel::NumParams() const
         return 3;
 }
 
-void SineFwdModel::NameParams(vector<string> &names) const
+void QBoldFwdModel::NameParams(vector<string> &names) const
 {
     names.clear();
     names.push_back("a");
@@ -62,7 +66,7 @@ void SineFwdModel::NameParams(vector<string> &names) const
         names.push_back("d");
 }
 
-void SineFwdModel::HardcodedInitialDists(MVNDist &prior, MVNDist &posterior) const
+void QBoldFwdModel::HardcodedInitialDists(MVNDist &prior, MVNDist &posterior) const
 {
     int num_params = NumParams();
     // Check we have been given a distribution of the right number of parameters
@@ -72,7 +76,7 @@ void SineFwdModel::HardcodedInitialDists(MVNDist &prior, MVNDist &posterior) con
     posterior = prior;
 }
 
-void SineFwdModel::Evaluate(const ColumnVector &params, ColumnVector &result) const
+void QBoldFwdModel::Evaluate(const ColumnVector &params, ColumnVector &result) const
 {
     // Check we have been given the right number of parameters
     assert(params.Nrows() == NumParams());

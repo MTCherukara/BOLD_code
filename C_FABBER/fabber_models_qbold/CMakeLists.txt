@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 2.7)
 
 # For single model you should only need to change the line below, if your files keep to the naming convention!
-set(MODELS_NAME sine)
+set(MODELS_NAME qbold)
 
 # For multiple models you may need to add your model source code files below
 set(MODELS_SRC fwdmodel_${MODELS_NAME}.cc)
@@ -11,7 +11,7 @@ add_executable(fabber_${MODELS_NAME} ${MODELS_SRC} fabber_main.cc)
 
 if(APPLE)
   # Uncomment to force use of libstdc++ on Mac (if FSL build uses this and you cannot link otherwise)
-  #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -stdlib=libstdc++")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -stdlib=libstdc++")
   # Get rid of CMake warning
   set(CMAKE_MACOSX_RPATH ON)
 endif(APPLE)
