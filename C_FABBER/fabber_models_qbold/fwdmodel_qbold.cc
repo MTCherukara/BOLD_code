@@ -9,7 +9,7 @@
 #include "fabber_core/fwdmodel.h"
 
 #include <math.h>
-
+#include <iostream.h>
 
 using namespace std;
 using namespace NEWMAT;
@@ -50,9 +50,30 @@ void QBoldFwdModel::GetOptions(vector<OptionSpec> &opts) const
 // ------------------------------------------------------------------------------------------
 // --------         Initialize                  ---------------------------------------------
 // ------------------------------------------------------------------------------------------
-void QBoldFwdModel::Initialize(FabberRunData &rundata)
+void QBoldFwdModel::Initialize(ArgsType &args)
 {
-    m_include_offset = rundata.GetBool("use-offset");
+    // read through input arguments using &args
+    TE = convertTo<double>(args.ReadWithDefault("TE","0.074"));
+
+    // collect tau values
+    string tau_temp;
+
+    // this parses through the input args for tau1=X, tau2=X and so on, until it reaches a
+    // tau that isn't supplied in the argument, and it adds all these to the ColumnVector
+    // called tau_list
+    while (true)
+    {
+        int N = tau_list.Nrows()+1;
+        tau_temp = args.ReadWithDefault("tau"+stringify(N), "stop!");
+        if (tau_temp == "stop!") break;
+
+        ColumnVector tmp(1);
+        tmp = convertTo<double>(tau_temp);
+        tau_list &= tmp;
+    }
+
+    taus = tau_list; // why is this necessary?
+    
 } // Initialize
 
 
