@@ -10,6 +10,7 @@
 
 #include <math.h>
 
+
 using namespace std;
 using namespace NEWMAT;
 
@@ -18,12 +19,12 @@ using namespace NEWMAT;
 // ------------------------------------------------------------------------------------------
 FactoryRegistration<FwdModelFactory, QBoldFwdModel> QBoldFwdModel::registration("qbold");
 
-FwdModel *QBoldFwdModel::NewInstance()
+FwdModel *QBoldFwdModel::NewInstance() // unchanged
 {
     return new QBoldFwdModel();
 } // NewInstance
 
-string QBoldFwdModel::GetDescription() const
+string QBoldFwdModel::GetDescription() const 
 {
     return "ASE qBOLD model";
 } // GetDescription

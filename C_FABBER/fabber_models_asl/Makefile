@@ -1,8 +1,4 @@
-# include ${FSLCONFDIR}/default.mk
-include ${FSLDIR}/config/apple-darwin12-gcc4.2/systemvars.mk
-include ${FSLDIR}/config/apple-darwin12-gcc4.2/externallibs.mk
-include ${FSLDIR}/config/common/vars.mk
-include ${FSLDIR}/config/common/rules.mk 
+include ${FSLCONFDIR}/default.mk
 
 PROJNAME = fabber_asl
 

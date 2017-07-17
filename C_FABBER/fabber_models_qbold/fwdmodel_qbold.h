@@ -8,6 +8,7 @@
 #define FWDMODEL_QBOLD_H
 
 #include "fabber_core/fwdmodel.h"
+#include "fabber_core/inference.h"
 
 #include "newmat.h"
 
@@ -42,7 +43,6 @@ public:
             - Model declaration (e.g. QBOLDMODEL* QBOLD_model)
     */
 private:
-    bool m_include_offset; // is this a sine-specific thing? Perhapsibly
     static FactoryRegistration<FwdModelFactory, QBoldFwdModel> registration;
 };
 
