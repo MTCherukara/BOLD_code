@@ -8,7 +8,7 @@ clear; clf;
 p = gentemplate;
 p.vesselFraction = 0.02;
 
-nReps = 20; % number of repeats to do at each radius
+nReps = 100; % number of repeats to do at each radius
 
 R = (10:5:200)*1e-6; % range from 10 to 200 um
 

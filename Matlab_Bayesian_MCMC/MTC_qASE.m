@@ -34,7 +34,7 @@ save_plot = 1;      % set to 1 in order to save out ASE data
 
 %% Model Parameters
 % noise
-SNR = 1000;
+SNR = 100;
 params.sig  = 1/SNR;         % -         - noise standard deviation
 % constants 
 params.B0   = 3.0;          % T         - static magnetic field
