@@ -125,6 +125,14 @@ void QBoldFwdModel::HardcodedInitialDists(MVNDist &prior, MVNDist &posterior) co
 // ------------------------------------------------------------------------------------------
 void QBoldFwdModel::Evaluate(const ColumnVector &params, ColumnVector &result) const
 {
+
+    /*  what we're basically going to do is replace most of this method with a call to a
+        method defined by the choice of model, which will be listed in qbold_models.cc, here
+        all we'll have to do is make collect parameters using paramcpy and shoot them over.
+        At least, that's the idea. 
+    */
+
+
     // Check we have been given the right number of parameters
     assert(params.Nrows() == NumParams());
     result.ReSize(data.Nrows());

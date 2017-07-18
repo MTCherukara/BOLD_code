@@ -1,8 +1,9 @@
 #!/bin/bash
 
-./fabber --method=vb --noise=white --max-iterations=10 --model=qbold \
+./fabber --method=vb --noise=white --max-iterations=10 \
     --output=../../Data/Fabber_Results/ \
     --data1=../../Data/subject_01_ASE.nii.gz \
+    --model=qbold \
     --mask=../../Data/subject_01_brains_mask.nii.gz \
     --TE=0.074 \
     --tau1=-0.016 --tau2=-0.008 --tau3=0.0 --tau4=0.008 --tau5=0.016 --tau6=0.024 \
