@@ -9,7 +9,12 @@
 #include "fabber_core/fwdmodel.h"
 
 #include <math.h>
-#include <iostream.h>
+#include <iostream>
+#include <vector>
+#include <string>
+#include <newmatio.h>
+#include <stdexcept> 
+#include <cmath>
 
 using namespace std;
 using namespace NEWMAT;
@@ -17,7 +22,8 @@ using namespace NEWMAT;
 // ------------------------------------------------------------------------------------------
 // --------         Generic Methods             ---------------------------------------------
 // ------------------------------------------------------------------------------------------
-FactoryRegistration<FwdModelFactory, QBoldFwdModel> QBoldFwdModel::registration("qbold");
+FactoryRegistration<FwdModelFactory, QBoldFwdModel>
+    QBoldFwdModel::registration("qBOLD");
 
 FwdModel *QBoldFwdModel::NewInstance() // unchanged
 {
@@ -78,24 +84,16 @@ void QBoldFwdModel::Initialize(ArgsType &args)
 
 
 // ------------------------------------------------------------------------------------------
-// --------         Defining Parameters       ---------------------------------------------
+// --------         NameParameters              ---------------------------------------------
 // ------------------------------------------------------------------------------------------
-int QBoldFwdModel::NumParams() const
-{
-    if (m_include_offset)
-        return 4;
-    else
-        return 3;
-} // NumParams
 
 void QBoldFwdModel::NameParams(vector<string> &names) const
 {
     names.clear();
-    names.push_back("a");
-    names.push_back("b");
-    names.push_back("c");
-    if (m_include_offset)
-        names.push_back("d");
+
+    names.push_back("OEF"); // parameter 1 - OEF
+    names.push_back("DBV"); // parameter 2 - DBV
+
 } // NameParams
 
 // ------------------------------------------------------------------------------------------
@@ -103,12 +101,22 @@ void QBoldFwdModel::NameParams(vector<string> &names) const
 // ------------------------------------------------------------------------------------------
 void QBoldFwdModel::HardcodedInitialDists(MVNDist &prior, MVNDist &posterior) const
 {
-    int num_params = NumParams();
-    // Check we have been given a distribution of the right number of parameters
-    assert(prior.means.Nrows() == num_params);
-    prior.means = 1;
-    prior.SetPrecisions(IdentityMatrix(num_params) * 1e-12);
-    posterior = prior;
+    // make sure we have the right number of means specified
+    assert(prior.means.Nrows() == NumParams());
+
+    // create diagonal matrix to store precisions
+    SymmetricMatrix precisions = IdentityMatrix(NumParams()) *1e-12;
+
+    prior.means(1) = 0.5;  // set initial guess of OEF to be 0.5
+    prior.means(2) = 0.05; // set initial guess of DBV to be 0.05
+
+    precisions(1, 1) = 10; // set both priors to be completely uniformative
+    precisions(2, 2) = 10; 
+
+    prior.SetPrecisions(precisions);
+
+    posterior = prior; // we don't need to change the initial guess (at least, not at this stage)
+    
 
 } // HardcodedInitialDists
 
@@ -121,13 +129,60 @@ void QBoldFwdModel::Evaluate(const ColumnVector &params, ColumnVector &result) c
     assert(params.Nrows() == NumParams());
     result.ReSize(data.Nrows());
 
-    for (int i = 1; i <= data.Nrows(); i++)
+    ColumnVector paramcpy = params;
+
+    // calculated parameters
+    double St;  // tissue signal
+    double Sb;  // blood signal
+
+    // derived parameters
+    double dw;
+    double R2b;
+    double R2bs;
+    double R2tp;
+
+    // parameters
+    double OEF;
+    double DBV;
+
+    // pull out parameter values
+    OEF = paramcpy(1);
+    DBV = paramcpy(2); 
+
+    // now evaluate the static dephasing qBOLD model for 2 compartments
+    dw = 301.7433*OEF;
+    R2tp = DBV*dw;
+
+    R2b  = 10.076 + (111.868*pow(OEF,2.0));
+    R2bs = 19.766 + (144.514*pow(OEF,2.0));
+
+    // loop through taus
+    result.ReSize(taus.Nrows());
+
+    for (int i = 1; i <= taus.Nrows(); i++)
     {
-        float t = float(i) / data.Nrows();
-        double res = params(1) * sin(params(2) * (t - params(3)));
-        if (m_include_offset)
-            res += params(4);
-        result(i) = res;
-    } // for (int i = 1; i <= data.Nrows(); i++)
+        double tau = taus(i);
+
+        if (tau < (-1.5/dw))
+        {
+            St = exp(DBV + (R2tp*tau));
+        }
+        else if (tau > (1.5/dw))
+        {
+            St = exp(DBV - (R2tp*tau));
+        }
+        else
+        {
+            St = exp(-0.3*DBV*pow(dw*tau,2.0));
+        }
+
+        Sb = exp(-R2b*(TE-tau)*exp(-R2bs*abs(tau)));
+
+        // Total signal
+        result(i) = ((1-DBV)*St) + (DBV*Sb);
+
+    } // for (int i = 1; i <= taus.Nrows(); i++)
+
+    return;
 
 } // Evaluate

@@ -45,6 +45,8 @@ NewInstanceFptr CALL get_new_instance_func(const char *name)
 } // get_new_instance_func
 } // extern "C"
 
+// It's possible that we don't need this at all...
+/*
 namespace OXASL {
 
 // Evaluation of qBOLD model, 2 compartments, ASE acquisition
@@ -95,3 +97,4 @@ namespace OXASL {
 }
 
 // Here, define the kc function for the specific version of the qBOLD model we're using
+*/ 

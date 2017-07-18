@@ -27,15 +27,11 @@ public:
     virtual string GetDescription() const;
 
     virtual void NameParams(vector<string> &names) const;
-    virtual int NumParams() const { return 4; } // do something about this
+    virtual int NumParams() const { return 2; } // OEF, DBV
     virtual void HardcodedInitialDists(MVNDist &prior, MVNDist &posterior) const;
     virtual void Evaluate(const NEWMAT::ColumnVector &params, NEWMAT::ColumnVector &result) const;
 
 protected:
-    // Derived Parameters
-    double dw;
-    double R2b;
-    double R2bs;
 
     // Scan Parameters
     NEWMAT::ColumnVector tau_list;
@@ -43,7 +39,7 @@ protected:
     double TE;
 
     // Model declaration
-    QBOLDModel* QBOLD_Model
+    // QBOLDModel* QBOLD_Model;
 
     /* add Protected parameters for:
             - Fitting parameter look-up indices (may not be necessary if we always fit the same ones)
