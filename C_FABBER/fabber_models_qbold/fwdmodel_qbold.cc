@@ -23,7 +23,7 @@ using namespace NEWMAT;
 // --------         Generic Methods             ---------------------------------------------
 // ------------------------------------------------------------------------------------------
 FactoryRegistration<FwdModelFactory, QBoldFwdModel>
-    QBoldFwdModel::registration("qBOLD");
+    QBoldFwdModel::registration("qbold");
 
 FwdModel *QBoldFwdModel::NewInstance() // unchanged
 {
