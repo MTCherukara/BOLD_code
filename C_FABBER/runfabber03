@@ -1,7 +1,8 @@
 #!/bin/bash
 
 ./fabber_qbold --method=spatialvb --noise=white --max-iterations=10 --allow-bad-voxels \
-    --param-spatial-priors=MM \
+    --param-spatial-priors=SS \
+    --save-residuals --save-model-fit \
     --output=../../Data/Fabber_Results/ \
     --data1=../../Data/subject_03l_ASE_norm.nii.gz \
     --model=qbold \

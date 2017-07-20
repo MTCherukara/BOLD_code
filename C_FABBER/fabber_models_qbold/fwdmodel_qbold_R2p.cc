@@ -24,7 +24,7 @@ using namespace NEWMAT;
 // --------         Generic Methods             ---------------------------------------------
 // ------------------------------------------------------------------------------------------
 FactoryRegistration<FwdModelFactory, R2primeFwdModel>
-    R2primeFwdModel::registration("qBOLDR2p");
+    R2primeFwdModel::registration("qboldR2p");
 
 FwdModel *R2primeFwdModel::NewInstance() // unchanged
 {
