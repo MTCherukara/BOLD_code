@@ -24,7 +24,7 @@ using namespace NEWMAT;
 // --------         Generic Methods             ---------------------------------------------
 // ------------------------------------------------------------------------------------------
 FactoryRegistration<FwdModelFactory, R2primeFwdModel>
-    R2primeFwdModel::registration("qBOLD-R2p");
+    R2primeFwdModel::registration("qBOLDR2p");
 
 FwdModel *R2primeFwdModel::NewInstance() // unchanged
 {
@@ -114,10 +114,6 @@ void R2primeFwdModel::HardcodedInitialDists(MVNDist &prior, MVNDist &posterior) 
 // ------------------------------------------------------------------------------------------
 void R2primeFwdModel::Evaluate(const ColumnVector &params, ColumnVector &result) const
 {
-
-    // This function should be different!
-
-
     // Check we have been given the right number of parameters
     assert(params.Nrows() == NumParams());
     result.ReSize(data.Nrows());
@@ -132,19 +128,19 @@ void R2primeFwdModel::Evaluate(const ColumnVector &params, ColumnVector &result)
     double dw;
     double R2b;
     double R2bs;
-    double R2tp;
+    double OEF;
 
     // parameters
-    double OEF;
+    double R2p;
     double DBV;
 
     // pull out parameter values
-    OEF = paramcpy(1);
+    R2p = paramcpy(1);
     DBV = paramcpy(2); 
 
     // now evaluate the static dephasing qBOLD model for 2 compartments
-    dw = 301.7433*OEF;
-    R2tp = DBV*dw;
+    dw = R2p/DBV;
+    OEF = dw/301.7433;
 
     R2b  = 10.076 + (111.868*pow(OEF,2.0));
     R2bs = 19.766 + (144.514*pow(OEF,2.0));
@@ -158,11 +154,11 @@ void R2primeFwdModel::Evaluate(const ColumnVector &params, ColumnVector &result)
 
         if (tau < (-1.5/dw))
         {
-            St = exp(DBV + (R2tp*tau));
+            St = exp(DBV + (R2p*tau));
         }
         else if (tau > (1.5/dw))
         {
-            St = exp(DBV - (R2tp*tau));
+            St = exp(DBV - (R2p*tau));
         }
         else
         {
