@@ -862,3 +862,4 @@ void FabberRunData::CheckSize(std::string key, const NEWMAT::Matrix &mat)
         }
     }
 }
+
