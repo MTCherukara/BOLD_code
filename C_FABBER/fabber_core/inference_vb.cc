@@ -6,6 +6,8 @@
 
 /*  CCOPYRIGHT */
 
+// 24/7 (MTC) - we'll go through this file and try to figure out what it does...
+
 #include "inference_vb.h"
 
 #include "convergence.h"
@@ -18,12 +20,16 @@
 
 using namespace NEWMAT;
 
+// output stuff 
 std::ostream &operator<<(std::ostream &out, const PriorType &value)
 {
     return out << "PriorType: Parameter " << value.m_param_name << " type: " << value.m_type << " filename: "
                << value.m_filename << " precision: " << value.m_prec << endl;
 }
 
+// ------------------------------------------------------------------------------------------------
+// -----     PriorType stuff     ------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------
 PriorType::PriorType()
 {
 }
@@ -96,7 +102,7 @@ PriorType::PriorType(unsigned int idx, vector<string> param_names, FabberRunData
         //		LOG << "PriorType::Reading Image prior (" << m_param_name << "): " << m_filename << endl;
         m_image = data.GetVoxelData(m_filename).AsRow();
     }
-}
+} // PriorType::PriorType(unsigned int idx, vector<string> param_names, FabberRunData &data)
 
 string PriorType::GetTypesString(FabberRunData &rundata, unsigned int num_params)
 {
@@ -137,6 +143,9 @@ void PriorType::SetPrior(MVNDist *prior, int voxel)
     }
 }
 
+// ------------------------------------------------------------------------------------------------
+// -----     OptionSpec stuff     -----------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------
 static OptionSpec OPTIONS[] = {
     { "noise", OPT_STR, "Noise model to use (white or ar1)", OPT_REQ, "" },
     { "convergence", OPT_STR, "Name of method for detecting convergence", OPT_NONREQ, "maxits" },
@@ -172,11 +181,19 @@ static OptionSpec OPTIONS[] = {
     { "" },
 };
 
+// ------------------------------------------------------------------------------------------------
+// -----     VariationalBayesInferenceTechnique     -----------------------------------------------
+// ------------------------------------------------------------------------------------------------
+
+// constructor
 InferenceTechnique *VariationalBayesInferenceTechnique::NewInstance()
 {
     return new VariationalBayesInferenceTechnique();
 }
 
+// ------------------------------------------------------------------------------------------------
+// -----     Report on Stuff     ------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------
 void VariationalBayesInferenceTechnique::GetOptions(vector<OptionSpec> &opts) const
 {
     InferenceTechnique::GetOptions(opts);
@@ -196,6 +213,9 @@ string VariationalBayesInferenceTechnique::GetVersion() const
     return "1.0"; // FIXME
 }
 
+// ------------------------------------------------------------------------------------------------
+// -----     Initialization    --------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------
 void VariationalBayesInferenceTechnique::InitializeMVNFromParam(FabberRunData &args, MVNDist *dist, string param_key)
 {
     string filename = args.GetStringDefault(param_key, "modeldefault");

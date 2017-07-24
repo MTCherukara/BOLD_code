@@ -67,7 +67,9 @@ void FabberRunDataNewimage::SetExtentFromData()
         m_mask.binarise(1e-16, m_mask.max() + 1, exclusive);
         DumpVolumeInfo(m_mask, LOG);
         SetCoordsFromExtent(m_mask.xsize(), m_mask.ysize(), m_mask.zsize());
-    }
+
+    } // if (m_have_mask)
+
     else
     {
         // Make sure the coords are loaded from the main data even if we don't
@@ -81,8 +83,10 @@ void FabberRunDataNewimage::SetExtentFromData()
         volume<float> main_vol;
         read_volume(main_vol, data_fname);
         SetCoordsFromExtent(main_vol.xsize(), main_vol.ysize(), main_vol.zsize());
-    }
-}
+
+    } // if (m_have_mask) ... else 
+
+} // void FabberRunDataNewimage::SetExtentFromData()
 
 const Matrix &FabberRunDataNewimage::LoadVoxelData(const std::string &filename)
 {
@@ -135,7 +139,8 @@ const Matrix &FabberRunDataNewimage::LoadVoxelData(const std::string &filename)
     }
 
     return m_voxel_data[filename];
-}
+
+} // const Matrix &FabberRunDataNewimage::LoadVoxelData(const std::string &filename)
 
 void FabberRunDataNewimage::SaveVoxelData(const std::string &filename, NEWMAT::Matrix &data, VoxelDataType data_type)
 {
@@ -203,4 +208,4 @@ void FabberRunDataNewimage::SetCoordsFromExtent(int nx, int ny, int nz)
     {
         SetVoxelCoords(coordvol.matrix());
     }
-}
+} // void FabberRunDataNewimage::SaveVoxelData(const std::string &filename, NEWMAT::Matrix &data, VoxelDataType data_type)

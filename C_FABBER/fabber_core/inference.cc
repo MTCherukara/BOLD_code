@@ -88,7 +88,7 @@ void InferenceTechnique::Initialize(FwdModel *fwd_model, FabberRunData &rundata)
             << "InferenceTechnique::Note that you should get very few (if any) exceptions like this;"
             << "InferenceTechnique::they are probably due to bugs or a numerically unstable model.";
     }
-}
+} // void InferenceTechnique::Initialize(FwdModel *fwd_model, FabberRunData &rundata)
 
 void InferenceTechnique::SaveResults(FabberRunData &rundata) const
 {
@@ -194,7 +194,7 @@ void InferenceTechnique::SaveResults(FabberRunData &rundata) const
 #endif
 
     LOG << "InferenceTechnique::Done writing results." << endl;
-}
+} // void InferenceTechnique::SaveResults(FabberRunData &rundata) const
 
 void InferenceTechnique::InitMVNFromFile(string continueFromFile, FabberRunData &rundata, string paramFilename = "")
 {

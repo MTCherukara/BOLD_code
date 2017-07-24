@@ -115,12 +115,14 @@ int execute(int argc, char **argv)
             }
 
             return 0;
-        }
+        } // if (params->GetBool("help") || argc == 1)
+
         if (params->GetBool("version"))
         {
             Version();
             return 0;
-        }
+        } // if (params->GetBool("version"))
+
         else if (params->GetBool("listmodels"))
         {
             vector<string> models = FwdModel::GetKnown();
@@ -131,7 +133,8 @@ int execute(int argc, char **argv)
             }
 
             return 0;
-        }
+        } // if (params->GetBool("listmodels"))
+
         else if (params->GetBool("listmethods"))
         {
             vector<string> infers = InferenceTechnique::GetKnown();
@@ -142,7 +145,8 @@ int execute(int argc, char **argv)
             }
 
             return 0;
-        }
+        } // if (params->GetBool("listmethods"))
+
 
         // Make sure command line tool creates a parameter names file
         params->SetBool("dump-param-names");
@@ -157,14 +161,16 @@ int execute(int argc, char **argv)
 
         params->SetExtentFromData();
         PercentProgressCheck percent;
-        params->Run(&percent);
+        params->Run(&percent); // this line seems important
 
         log.ReissueWarnings();
 
         // Only Gzip the logfile if we exit normally
         gzLog = params->GetBool("gzip-log");
         ret = 0;
-    }
+
+    } // try
+
     catch (const exception &e)
     {
         log.ReissueWarnings();

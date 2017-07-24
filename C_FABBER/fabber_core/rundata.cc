@@ -269,7 +269,8 @@ void FabberRunData::Run(ProgressCheck *progress)
     LOG << "FabberRunData::Start time: " << ctime(&startTime); // Bizarrely, ctime() ends with a \n.
     LOG << "FabberRunData::End time: " << ctime(&endTime);
     LOG << "FabberRunData::Duration: " << endTime - startTime << " seconds." << endl;
-}
+    
+} // void FabberRunData::Run(ProgressCheck *progress)
 
 static string trim(string const &str)
 {
