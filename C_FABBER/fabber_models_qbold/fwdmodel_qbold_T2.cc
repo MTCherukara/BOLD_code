@@ -134,19 +134,16 @@ void T2qBoldFwdModel::Evaluate(const ColumnVector &params, ColumnVector &result)
     double dw;
     double R2b;
     double R2bs;
-    double OEF;
+    double R2tp;
 
     // parameters
-    double R2p;
-    double DBV;
-
-    // pull out parameter values
-    R2p = paramcpy(1);
-    DBV = paramcpy(2); 
+    double OEF = paramcpy(1);
+    double DBV = paramcpy(2);
+    double T2  = paramcpy(3);
 
     // now evaluate the static dephasing qBOLD model for 2 compartments
-    dw = R2p/DBV;
-    OEF = dw/301.7433;
+    dw = 301.7433*OEF;
+    R2tp = DBV*dw;
 
     R2b  = 10.076 + (111.868*pow(OEF,2.0));
     R2bs = 19.766 + (144.514*pow(OEF,2.0));
@@ -160,17 +157,21 @@ void T2qBoldFwdModel::Evaluate(const ColumnVector &params, ColumnVector &result)
 
         if (tau < (-1.5/dw))
         {
-            St = exp(DBV + (R2p*tau));
+            St = exp(DBV + (R2tp*tau));
         }
         else if (tau > (1.5/dw))
         {
-            St = exp(DBV - (R2p*tau));
+            St = exp(DBV - (R2tp*tau));
         }
         else
         {
             St = exp(-0.3*DBV*pow(dw*tau,2.0));
         }
 
+        // add in the T2 effect to St
+        St *= exp(-TE/T2);
+
+        // blood signal
         Sb = exp(-R2b*(TE-tau)*exp(-R2bs*abs(tau)));
 
         // Total signal
@@ -181,3 +182,4 @@ void T2qBoldFwdModel::Evaluate(const ColumnVector &params, ColumnVector &result)
     return;
 
 } // Evaluate
+
