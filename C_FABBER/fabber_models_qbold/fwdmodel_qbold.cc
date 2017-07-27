@@ -110,8 +110,8 @@ void QBoldFwdModel::HardcodedInitialDists(MVNDist &prior, MVNDist &posterior) co
     prior.means(1) = 0.4;  // set initial guess of OEF to be 0.5
     prior.means(2) = 0.05; // set initial guess of DBV to be 0.05
 
-    precisions(1, 1) = 1; // set both priors to be completely uninformative
-    precisions(2, 2) = 1; 
+    precisions(1, 1) = 10; // set both priors to be completely uninformative
+    precisions(2, 2) = 10; 
 
     prior.SetPrecisions(precisions);
 
@@ -184,7 +184,10 @@ void QBoldFwdModel::Evaluate(const ColumnVector &params, ColumnVector &result) c
             St = exp(-0.3*DBV*pow(dw*tau,2.0));
         }
 
-        Sb = exp(-R2b*(TE-tau)*exp(-R2bs*abs(tau)));
+        // Sb = exp(-R2b*(TE-tau))*exp(-R2bs*abs(tau));
+
+        // Blood signal - new version that doesn't include TE
+        Sb = exp(R2b*tau)*exp(-R2bs*abs(tau));
 
         // Total signal
         result(i) = ((1-DBV)*St) + (DBV*Sb);

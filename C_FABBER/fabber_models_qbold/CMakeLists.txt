@@ -4,7 +4,7 @@ cmake_minimum_required(VERSION 2.7)
 set(MODELS_NAME qbold)
 
 # For multiple models you may need to add your model source code files below
-set(MODELS_SRC fwdmodel_qbold.cc fwdmodel_qbold_R2p.cc fwdmodel_qbold_T2.cc)
+set(MODELS_SRC fwdmodel_qbold.cc fwdmodel_qbold_R2p.cc)
 
 add_library(fabber_models_${MODELS_NAME} SHARED ${MODELS_SRC} ${MODELS_NAME}_models.cc)
 add_executable(fabber_${MODELS_NAME} ${MODELS_SRC} fabber_main.cc)
