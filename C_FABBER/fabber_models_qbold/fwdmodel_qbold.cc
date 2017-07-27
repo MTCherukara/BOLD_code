@@ -107,11 +107,11 @@ void QBoldFwdModel::HardcodedInitialDists(MVNDist &prior, MVNDist &posterior) co
     // create diagonal matrix to store precisions
     SymmetricMatrix precisions = IdentityMatrix(NumParams()) *1e-12;
 
-    prior.means(1) = 0.4;  // set initial guess of OEF to be 0.5
+    prior.means(1) = 0.5;  // set initial guess of OEF to be 0.5
     prior.means(2) = 0.05; // set initial guess of DBV to be 0.05
 
-    precisions(1, 1) = 10; // set both priors to be completely uninformative
-    precisions(2, 2) = 10; 
+    precisions(1, 1) = 1; // set both priors to be completely uninformative
+    precisions(2, 2) = 1; 
 
     prior.SetPrecisions(precisions);
 
@@ -184,8 +184,6 @@ void QBoldFwdModel::Evaluate(const ColumnVector &params, ColumnVector &result) c
             St = exp(-0.3*DBV*pow(dw*tau,2.0));
         }
 
-        // Sb = exp(-R2b*(TE-tau))*exp(-R2bs*abs(tau));
-
         // Blood signal - new version that doesn't include TE
         Sb = exp(R2b*tau)*exp(-R2bs*abs(tau));
 
@@ -193,6 +191,15 @@ void QBoldFwdModel::Evaluate(const ColumnVector &params, ColumnVector &result) c
         result(i) = ((1-DBV)*St) + (DBV*Sb);
 
     } // for (int i = 1; i <= taus.Nrows(); i++)
+
+    // alternative, if OEF or DBV are outside the bounds
+    if (OEF > 1.0 || OEF < 0.0 || DBV > 1.0 || DBV < 0.0)
+    {
+        for (int i = 1; i <= taus.Nrows(); i++)
+        {
+            result(i) = 0.0;
+        }
+    }
 
     return;
 
