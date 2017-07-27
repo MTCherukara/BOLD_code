@@ -94,13 +94,13 @@ void R2primeFwdModel::HardcodedInitialDists(MVNDist &prior, MVNDist &posterior) 
     assert(prior.means.Nrows() == NumParams());
 
     // create diagonal matrix to store precisions
-    SymmetricMatrix precisions = IdentityMatrix(NumParams()) *1e-6;
+    SymmetricMatrix precisions = IdentityMatrix(NumParams()) *1e-12;
 
     prior.means(1) = 5;     // set initial guess of R2p to be 5
-    prior.means(2) = 0.05;  // set initial guess of DBV to be 0.05
+    prior.means(2) = 0.1;  // set initial guess of DBV to be 0.05
 
-    precisions(1, 1) = 10;  // set both priors to be completely uniformative
-    precisions(2, 2) = 10; 
+    precisions(1, 1) = 1;  // set both priors to be completely uniformative
+    precisions(2, 2) = 1; 
 
     prior.SetPrecisions(precisions);
 
@@ -173,7 +173,7 @@ void R2primeFwdModel::Evaluate(const ColumnVector &params, ColumnVector &result)
     } // for (int i = 1; i <= taus.Nrows(); i++)
 
     // alternative, if R2p or DBV are outside the bounds
-    if (R2p < 0.0 || DBV > 1.0 || DBV < 0.0)
+    if (R2p > 50.0 || R2p < 0.0 || DBV > 1.0 || DBV < 0.0)
     {
         for (int i = 1; i <= taus.Nrows(); i++)
         {
