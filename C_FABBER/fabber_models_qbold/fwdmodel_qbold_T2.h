@@ -37,6 +37,33 @@ protected:
     NEWMAT::ColumnVector taus;
     double TE;
 
+    // Lookup starting indices of parameters
+    int OEF_index() const
+    {
+        return (infer_OEF ? 1 : 0);
+    }
+
+    int DBV_index() const
+    {
+        return OEF_index() + (infer_DBV ? 1 : 0);
+    }
+
+    int R2t_index() const
+    {
+        return DBV_index() + (infer_R2t ? 1 : 0);
+    }
+
+    int S0_index() const
+    {
+        return R2t_index() + (infer_S0 ? 1 : 0);
+    }
+
+    // Which parameters will we infer on
+    bool infer_OEF;
+    bool infer_DBV;
+    bool infer_R2t;
+    bool infer_S0;
+
 private:
     static FactoryRegistration<FwdModelFactory, T2qBoldFwdModel> registration;
 };

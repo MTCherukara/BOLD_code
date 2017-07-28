@@ -47,6 +47,12 @@ string T2qBoldFwdModel::ModelVersion() const
 // ------------------------------------------------------------------------------------------
 void T2qBoldFwdModel::Initialize(ArgsType &args)
 {
+    // Parse input to decide which parameters to infer on
+    infer_OEF = args.ReadBool("inferOEF");
+    infer_DBV = args.ReadBool("inferDBV");
+    infer_R2t = args.ReadBool("inferR2t");
+    infer_S0 = args.ReadBool("inferS0");
+
     // read through input arguments using &args
     TE = convertTo<double>(args.ReadWithDefault("TE","0.074"));
 
@@ -68,6 +74,26 @@ void T2qBoldFwdModel::Initialize(ArgsType &args)
     }
 
     taus = tau_list; // why is this necessary?
+
+    // add information to the log
+    LOG << "Inference using development model" << endl;
+    LOG << "    Parameters: TE = " << TE << ", n taus = " << taus.Nrows() << endl;
+    if (infer_OEF)
+    {
+        LOG << "Infering on OEF " << endl;
+    }
+    if (infer_DBV)
+    {
+        LOG << "Inferring on DBV " << endl;
+    }
+    if (infer_R2t)
+    {
+        LOG << "Inferring on R2/T2 of tissue" << endl;
+    }
+    if (infer_S0)
+    {
+        LOG << "Inferring on scaling parameter S0" << endl;
+    }
     
 } // Initialize
 
@@ -80,10 +106,22 @@ void T2qBoldFwdModel::NameParams(vector<string> &names) const
 {
     names.clear();
 
-    names.push_back("OEF"); // parameter 1 - OEF
-    names.push_back("DBV"); // parameter 2 - DBV
-    names.push_back("R2t");  // parameter 3 - R2 (of tissue)
-    names.push_back("S0");  // parameter 4 - S0 scaling factor
+    if (inter_OEF)
+    {
+        names.push_back("OEF"); // parameter 1 - OEF
+    }
+    if (infer_DBV)
+    {
+        names.push_back("DBV"); // parameter 2 - DBV
+    }
+    if (infer_R2t)
+    {
+        names.push_back("R2t");  // parameter 3 - R2 (of tissue)
+    }
+    if (infer_S0)
+    {
+        names.push_back("S0");  // parameter 4 - S0 scaling factor
+    }
 
 } // NameParams
 
@@ -98,19 +136,61 @@ void T2qBoldFwdModel::HardcodedInitialDists(MVNDist &prior, MVNDist &posterior) 
     // create diagonal matrix to store precisions
     SymmetricMatrix precisions = IdentityMatrix(NumParams()) *1e-12;
 
-    prior.means(1) = 0.5;   // set initial guess of OEF to be 0.5
-    prior.means(2) = 0.05;  // set initial guess of DBV to be 0.05
-    prior.means(3) = 10.0;  // set initial guess of R2t to be 10 Hz
-    prior.means(4) = 100.0; // set initial guess of S0 to be 100 
+    if (infer_OEF)
+    {
+        prior.means(OEF_index()) = 0.5;
+        precisions(OEF_index(), OEF_index()) = 1;
+    }
 
-    precisions(1, 1) = 1;  // set all priors to be completely uniformative
-    precisions(2, 2) = 1; 
-    precisions(3, 3) = 1; 
-    precisions(4, 4) = 1; 
+    if (infer_DBV)
+    {
+        prior.means(DBV_index()) = 0.05;
+        precisions(DBV_index(), DBV_index()) = 1;
+    }
+
+    if (infer_R2t)
+    {
+        prior.means(R2t_index()) = 9;
+        precisions(R2t_index(), R2t_index()) = 1;
+    }
+
+    if (infer_S0)
+    {
+        prior.means(S0_index()) = 100;
+        precisions(S0_index(), S0_index()) = 1;
+    }
 
     prior.SetPrecisions(precisions);
 
-    posterior = prior; // we don't need to change the initial guess (at least, not at this stage)
+    posterior = prior;
+
+    // Choose more sensible initial posteriors
+
+    if (infer_OEF)
+    {
+        posterior.means(OEF_index()) = 0.5;
+        precisions(OEF_index(), OEF_index()) = 1;
+    }
+
+    if (infer_DBV)
+    {
+        posterior.means(DBV_index()) = 0.05;
+        precisions(DBV_index(), DBV_index()) = 1;
+    }
+
+    if (infer_R2t)
+    {
+        posterior.means(R2t_index()) = 9;
+        precisions(R2t_index(), R2t_index()) = 1;
+    }
+
+    if (infer_S0)
+    {
+        posterior.means(S0_index()) = 100;
+        precisions(S0_index(), S0_index()) = 1;
+    }
+
+    posterior.setPrecisions(precisions);
     
 
 } // HardcodedInitialDists
@@ -139,10 +219,82 @@ void T2qBoldFwdModel::Evaluate(const ColumnVector &params, ColumnVector &result)
     double R2tp;
 
     // parameters
-    double OEF = paramcpy(1);
-    double DBV = paramcpy(2);
-    double R2t = paramcpy(3);
-    double S0  = paramcpy(4);
+    double OEF;
+    double DBV;
+    double R2t;
+    double S0;
+
+    // make sure parameter values are sensible - this may not be so great...
+    if (infer_OEF)
+    {
+        if (params(OEF_index()) > 1.0)
+        {
+            paramcpy(OEF_index()) = 1.0;
+        }
+        if (params(OEF_index()) < 0.0001)
+        {
+            paramcpy(OEF_index()) = 0.0001;
+        }
+    }
+    if (infer_DBV)
+    {
+        if (params(DBV_index()) > 1.0)
+        {
+            paramcpy(DBV_index()) = 1.0;
+        }
+        if (params(DBV_index()) < 0.0001)
+        {
+            paramcpy(DBV_index()) = 0.0001;
+        }
+    }
+    if (infer_R2t)
+    {
+        if (params(R2t_index()) < 0.0001)
+        {
+            paramcpy(R2t_index()) = 0.0001;
+        }
+    }
+    if (infer_S0)
+    {
+        if (params(S0_index()) < 0.0001)
+        {
+            paramcpy(S0_index()) = 0.0001;
+        }
+    }
+
+    // assign values to parameters
+    if (infer_OEF)
+    {
+        OEF = paramcpy(OEF_index());
+    }
+    else
+    {
+        OEF = 0.4;
+    }
+    if (infer_DBV)
+    {
+        DBV = paramcpy(DBV_index());
+    }
+    else
+    {
+        DBV = 0.03;
+    }
+    if (infer_R2t)
+    {
+        R2t = paramcpy(R2t_index());
+    }
+    else
+    {
+        R2t = 9.09;
+    }
+    if (infer_S0)
+    {
+        S0 = paramcpy(S0_index());
+    }
+    else
+    {
+        S0 = 100.0;
+    }
 
     // now evaluate the static dephasing qBOLD model for 2 compartments
     dw = 301.7433*OEF;
@@ -182,6 +334,7 @@ void T2qBoldFwdModel::Evaluate(const ColumnVector &params, ColumnVector &result)
 
     } // for (int i = 1; i <= taus.Nrows(); i++)
 
+    /*
     // alternative, if OEF or DBV are outside the bounds
     if (OEF > 1.0 || OEF < 0.0 || DBV > 1.0 || DBV < 0.0 || R2t > 50.0 || R2t < 0.0 || S0 > 1000.0 || S0 < 0.0 )
     {
@@ -190,6 +343,7 @@ void T2qBoldFwdModel::Evaluate(const ColumnVector &params, ColumnVector &result)
             result(i) = 0.0;
         }
     }
+    */
 
     return;
 
