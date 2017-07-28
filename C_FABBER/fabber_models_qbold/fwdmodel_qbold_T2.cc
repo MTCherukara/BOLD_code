@@ -106,7 +106,7 @@ void T2qBoldFwdModel::NameParams(vector<string> &names) const
 {
     names.clear();
 
-    if (inter_OEF)
+    if (infer_OEF)
     {
         names.push_back("OEF"); // parameter 1 - OEF
     }
@@ -134,7 +134,7 @@ void T2qBoldFwdModel::HardcodedInitialDists(MVNDist &prior, MVNDist &posterior) 
     assert(prior.means.Nrows() == NumParams());
 
     // create diagonal matrix to store precisions
-    SymmetricMatrix precisions = IdentityMatrix(NumParams()) *1e-12;
+    SymmetricMatrix precisions = IdentityMatrix(NumParams()) *1e-6;
 
     if (infer_OEF)
     {
@@ -151,13 +151,13 @@ void T2qBoldFwdModel::HardcodedInitialDists(MVNDist &prior, MVNDist &posterior) 
     if (infer_R2t)
     {
         prior.means(R2t_index()) = 9;
-        precisions(R2t_index(), R2t_index()) = 1;
+        precisions(R2t_index(), R2t_index()) = 1e-3;
     }
 
     if (infer_S0)
     {
         prior.means(S0_index()) = 100;
-        precisions(S0_index(), S0_index()) = 1;
+        precisions(S0_index(), S0_index()) = 1e-4;
     }
 
     prior.SetPrecisions(precisions);
@@ -181,16 +181,16 @@ void T2qBoldFwdModel::HardcodedInitialDists(MVNDist &prior, MVNDist &posterior) 
     if (infer_R2t)
     {
         posterior.means(R2t_index()) = 9;
-        precisions(R2t_index(), R2t_index()) = 1;
+        precisions(R2t_index(), R2t_index()) = 0.1;
     }
 
     if (infer_S0)
     {
         posterior.means(S0_index()) = 100;
-        precisions(S0_index(), S0_index()) = 1;
+        precisions(S0_index(), S0_index()) = 0.001;
     }
 
-    posterior.setPrecisions(precisions);
+    posterior.SetPrecisions(precisions);
     
 
 } // HardcodedInitialDists
@@ -261,6 +261,7 @@ void T2qBoldFwdModel::Evaluate(const ColumnVector &params, ColumnVector &result)
             paramcpy(S0_index()) = 0.0001;
         }
     }
+    
 
     // assign values to parameters
     if (infer_OEF)
@@ -334,16 +335,7 @@ void T2qBoldFwdModel::Evaluate(const ColumnVector &params, ColumnVector &result)
 
     } // for (int i = 1; i <= taus.Nrows(); i++)
 
-    /*
-    // alternative, if OEF or DBV are outside the bounds
-    if (OEF > 1.0 || OEF < 0.0 || DBV > 1.0 || DBV < 0.0 || R2t > 50.0 || R2t < 0.0 || S0 > 1000.0 || S0 < 0.0 )
-    {
-        for (int i = 1; i <= taus.Nrows(); i++)
-        {
-            result(i) = 0.0;
-        }
-    }
-    */
+
 
     return;
 
