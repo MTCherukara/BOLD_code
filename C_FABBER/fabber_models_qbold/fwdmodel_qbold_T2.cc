@@ -82,7 +82,8 @@ void T2qBoldFwdModel::NameParams(vector<string> &names) const
 
     names.push_back("OEF"); // parameter 1 - OEF
     names.push_back("DBV"); // parameter 2 - DBV
-    names.push_back("T2");  // parameter 3 - T2 (of tissue)
+    names.push_back("R2t");  // parameter 3 - R2 (of tissue)
+    names.push_back("S0");  // parameter 4 - S0 scaling factor
 
 } // NameParams
 
@@ -97,14 +98,15 @@ void T2qBoldFwdModel::HardcodedInitialDists(MVNDist &prior, MVNDist &posterior) 
     // create diagonal matrix to store precisions
     SymmetricMatrix precisions = IdentityMatrix(NumParams()) *1e-12;
 
-    prior.means(1) = 0.5;   // set initial guess of R2p to be 5
+    prior.means(1) = 0.5;   // set initial guess of OEF to be 0.5
     prior.means(2) = 0.05;  // set initial guess of DBV to be 0.05
-    prior.means(3) = 0.11;  // set initial guess of T2 to be 110 ms
+    prior.means(3) = 10.0;  // set initial guess of R2t to be 10 Hz
+    prior.means(4) = 100.0; // set initial guess of S0 to be 100 
 
     precisions(1, 1) = 1;  // set all priors to be completely uniformative
     precisions(2, 2) = 1; 
     precisions(3, 3) = 1; 
-
+    precisions(4, 4) = 1; 
 
     prior.SetPrecisions(precisions);
 
@@ -139,7 +141,8 @@ void T2qBoldFwdModel::Evaluate(const ColumnVector &params, ColumnVector &result)
     // parameters
     double OEF = paramcpy(1);
     double DBV = paramcpy(2);
-    double T2  = paramcpy(3);
+    double R2t = paramcpy(3);
+    double S0  = paramcpy(4);
 
     // now evaluate the static dephasing qBOLD model for 2 compartments
     dw = 301.7433*OEF;
@@ -169,15 +172,24 @@ void T2qBoldFwdModel::Evaluate(const ColumnVector &params, ColumnVector &result)
         }
 
         // add in the T2 effect to St
-        St *= exp(-TE/T2);
+        St *= exp(-R2t*TE);
 
         // blood signal
         Sb = exp(-R2b*(TE-tau)*exp(-R2bs*abs(tau)));
 
         // Total signal
-        result(i) = ((1-DBV)*St) + (DBV*Sb);
+        result(i) = S0*((1-DBV)*St) + (DBV*Sb);
 
     } // for (int i = 1; i <= taus.Nrows(); i++)
+
+    // alternative, if OEF or DBV are outside the bounds
+    if (OEF > 1.0 || OEF < 0.0 || DBV > 1.0 || DBV < 0.0 || R2t > 50.0 || R2t < 0.0 || S0 > 1000.0 || S0 < 0.0 )
+    {
+        for (int i = 1; i <= taus.Nrows(); i++)
+        {
+            result(i) = 0.0;
+        }
+    }
 
     return;
 

@@ -26,7 +26,7 @@ public:
     virtual string GetDescription() const;
 
     virtual void NameParams(vector<string> &names) const;
-    virtual int NumParams() const { return 3; } // OEF, DBV, T2
+    virtual int NumParams() const { return 4; } // OEF, DBV, R2t, S0
     virtual void HardcodedInitialDists(MVNDist &prior, MVNDist &posterior) const;
     virtual void Evaluate(const NEWMAT::ColumnVector &params, NEWMAT::ColumnVector &result) const;
 
@@ -38,7 +38,7 @@ protected:
     double TE;
 
 private:
-    static FactoryRegistration<FwdModelFactory, R2primeFwdModel> registration;
+    static FactoryRegistration<FwdModelFactory, T2qBoldFwdModel> registration;
 };
 
 #endif // FWDMODEL_QBOLD_T2_H
