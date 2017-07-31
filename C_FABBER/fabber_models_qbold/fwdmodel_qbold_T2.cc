@@ -225,6 +225,7 @@ void T2qBoldFwdModel::Evaluate(const ColumnVector &params, ColumnVector &result)
     double S0;
 
     // make sure parameter values are sensible - this may not be so great...
+    /*
     if (infer_OEF)
     {
         if (params(OEF_index()) > 1.0)
@@ -261,12 +262,12 @@ void T2qBoldFwdModel::Evaluate(const ColumnVector &params, ColumnVector &result)
             paramcpy(S0_index()) = 0.0001;
         }
     }
-    
+    */
 
     // assign values to parameters
     if (infer_OEF)
     {
-        OEF = paramcpy(OEF_index());
+        OEF = pow(pow(paramcpy(OEF_index()),2.0),0.5);
     }
     else
     {
@@ -274,7 +275,7 @@ void T2qBoldFwdModel::Evaluate(const ColumnVector &params, ColumnVector &result)
     }
     if (infer_DBV)
     {
-        DBV = paramcpy(DBV_index());
+        DBV = pow(pow(paramcpy(DBV_index()),2.0),0.5);
     }
     else
     {
@@ -282,7 +283,7 @@ void T2qBoldFwdModel::Evaluate(const ColumnVector &params, ColumnVector &result)
     }
     if (infer_R2t)
     {
-        R2t = paramcpy(R2t_index());
+        R2t = pow(pow(paramcpy(R2t_index()),2.0),0.5);
     }
     else
     {
@@ -290,7 +291,7 @@ void T2qBoldFwdModel::Evaluate(const ColumnVector &params, ColumnVector &result)
     }
     if (infer_S0)
     {
-        S0 = paramcpy(S0_index());
+        S0 = pow(pow(paramcpy(S0_index()),2.0),0.5);
     }
     else
     {
@@ -335,6 +336,14 @@ void T2qBoldFwdModel::Evaluate(const ColumnVector &params, ColumnVector &result)
 
     } // for (int i = 1; i <= taus.Nrows(); i++)
 
+    // alternatives for ridiculous values
+    if (OEF > 1.0 || DBV > 1.0 )
+    {
+        for (int i = 1; i <= taus.Nrows(); i++)
+        {
+            result(i) = 0.0001;
+        }
+    }
 
 
     return;
