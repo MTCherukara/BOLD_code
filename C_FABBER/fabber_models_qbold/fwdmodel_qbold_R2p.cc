@@ -284,7 +284,7 @@ void R2primeFwdModel::Evaluate(const ColumnVector &params, ColumnVector &result)
         Sb = exp(-R2b*(TE-tau)*exp(-R2bs*abs(tau)));
 
         // Total signal
-        result(i) = ((1-DBV)*St) + (DBV*Sb);
+        result(i) = S0*(((1-DBV)*St) + (DBV*Sb));
 
     } // for (int i = 1; i <= taus.Nrows(); i++)
 
