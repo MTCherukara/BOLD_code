@@ -26,7 +26,10 @@ public:
     virtual string GetDescription() const;
 
     virtual void NameParams(vector<string> &names) const;
-    virtual int NumParams() const { return 4; } // OEF, DBV, R2t, S0
+    virtual int NumParams() const 
+    {
+        return (infer_OEF ? 1 : 0) + (infer_DBV ? 1 : 0) + (infer_R2t ? 1 : 0) + (infer_S0 ? 1 : 0);
+    }
     virtual void HardcodedInitialDists(MVNDist &prior, MVNDist &posterior) const;
     virtual void Evaluate(const NEWMAT::ColumnVector &params, NEWMAT::ColumnVector &result) const;
 

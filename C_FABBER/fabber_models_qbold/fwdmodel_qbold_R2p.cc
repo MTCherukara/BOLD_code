@@ -47,6 +47,11 @@ string R2primeFwdModel::ModelVersion() const
 // ------------------------------------------------------------------------------------------
 void R2primeFwdModel::Initialize(ArgsType &args)
 {
+    infer_R2p = args.ReadBool("inferR2p");
+    infer_DBV = args.ReadBool("inferDBV");
+    infer_R2t = args.ReadBool("inferR2t");
+    infer_S0 = args.ReadBool("inferS0");
+
     // read through input arguments using &args
     TE = convertTo<double>(args.ReadWithDefault("TE","0.074"));
 
@@ -68,6 +73,26 @@ void R2primeFwdModel::Initialize(ArgsType &args)
     }
 
     taus = tau_list; // why is this necessary?
+
+    // add information to the log
+    LOG << "Inference using development model" << endl;
+    LOG << "    Parameters: TE = " << TE << ", n taus = " << taus.Nrows() << endl;
+    if (infer_R2p)
+    {
+        LOG << "Infering on R2p " << endl;
+    }
+    if (infer_DBV)
+    {
+        LOG << "Inferring on DBV " << endl;
+    }
+    if (infer_R2t)
+    {
+        LOG << "Inferring on R2/T2 of tissue" << endl;
+    }
+    if (infer_S0)
+    {
+        LOG << "Inferring on scaling parameter S0" << endl;
+    }
     
 } // Initialize
 
@@ -80,8 +105,22 @@ void R2primeFwdModel::NameParams(vector<string> &names) const
 {
     names.clear();
 
-    names.push_back("R2p"); // parameter 1 - R2p
-    names.push_back("DBV"); // parameter 2 - DBV
+    if (infer_R2p)
+    {
+        names.push_back("R2p"); // parameter 1 - R2 prime
+    }
+    if (infer_DBV)
+    {
+        names.push_back("DBV"); // parameter 2 - DBV
+    }
+    if (infer_R2t)
+    {
+        names.push_back("R2t");  // parameter 3 - R2 (of tissue)
+    }
+    if (infer_S0)
+    {
+        names.push_back("S0");  // parameter 4 - S0 scaling factor
+    }
 
 } // NameParams
 
@@ -94,18 +133,59 @@ void R2primeFwdModel::HardcodedInitialDists(MVNDist &prior, MVNDist &posterior) 
     assert(prior.means.Nrows() == NumParams());
 
     // create diagonal matrix to store precisions
-    SymmetricMatrix precisions = IdentityMatrix(NumParams()) *1e-4;
+    SymmetricMatrix precisions = IdentityMatrix(NumParams()) *1e-6;
 
-    prior.means(1) = 5.0;     // set initial guess of R2p to be 5
-    prior.means(2) = 0.2;  // set initial guess of DBV to be 0.05
+    if (infer_R2p)
+    {
+        prior.means(R2p_index()) = 5.0;
+        precisions(R2p_index(), R2p_index()) = 1e-3;
+    }
 
-    precisions(1, 1) = 1;  // set both priors to be completely uniformative
-    precisions(2, 2) = 1; 
+    if (infer_DBV)
+    {
+        prior.means(DBV_index()) = 0.05;
+        precisions(DBV_index(), DBV_index()) = 1;
+    }
+
+    if (infer_R2t)
+    {
+        prior.means(R2t_index()) = 9;
+        precisions(R2t_index(), R2t_index()) = 1e-3;
+    }
+
+    if (infer_S0)
+    {
+        prior.means(S0_index()) = 100;
+        precisions(S0_index(), S0_index()) = 1e-4;
+    }
 
     prior.SetPrecisions(precisions);
 
     posterior = prior; // we don't need to change the initial guess (at least, not at this stage)
     
+    if (infer_R2p)
+    {
+        posterior.means(R2p_index()) = 5.0;
+        precisions(R2p_index(), R2p_index()) = 0.1;
+    }
+
+    if (infer_DBV)
+    {
+        posterior.means(DBV_index()) = 0.05;
+        precisions(DBV_index(), DBV_index()) = 1;
+    }
+
+    if (infer_R2t)
+    {
+        posterior.means(R2t_index()) = 9;
+        precisions(R2t_index(), R2t_index()) = 0.1;
+    }
+
+    if (infer_S0)
+    {
+        posterior.means(S0_index()) = 100;
+        precisions(S0_index(), S0_index()) = 0.001;
+    }
 
 } // HardcodedInitialDists
 
@@ -133,10 +213,42 @@ void R2primeFwdModel::Evaluate(const ColumnVector &params, ColumnVector &result)
     // parameters
     double R2p;
     double DBV;
+    double R2t;
+    double S0;
 
-    // pull out parameter values
-    R2p = paramcpy(1);
-    DBV = paramcpy(2); 
+    // assign values to parameters
+    if (infer_R2p)
+    {
+        R2p = pow(pow(paramcpy(R2p_index()),2.0),0.5);
+    }
+    else
+    {
+        R2p = 5.0;
+    }
+    if (infer_DBV)
+    {
+        DBV = pow(pow(paramcpy(DBV_index()),2.0),0.5);
+    }
+    else
+    {
+        DBV = 0.03;
+    }
+    if (infer_R2t)
+    {
+        R2t = pow(pow(paramcpy(R2t_index()),2.0),0.5);
+    }
+    else
+    {
+        R2t = 9.09;
+    }
+    if (infer_S0)
+    {
+        S0 = pow(pow(paramcpy(S0_index()),2.0),0.5);
+    }
+    else
+    {
+        S0 = 100.0;
+    }
 
     // now evaluate the static dephasing qBOLD model for 2 compartments
     dw = R2p/DBV;
@@ -165,23 +277,27 @@ void R2primeFwdModel::Evaluate(const ColumnVector &params, ColumnVector &result)
             St = exp(-0.3*DBV*pow(dw*tau,2.0));
         }
 
-        Sb = exp(R2b*tau)*exp(-R2bs*abs(tau));
+        // add in the T2 effect to St
+        St *= exp(-R2t*TE);
+
+        // blood signal
+        Sb = exp(-R2b*(TE-tau)*exp(-R2bs*abs(tau)));
 
         // Total signal
         result(i) = ((1-DBV)*St) + (DBV*Sb);
 
     } // for (int i = 1; i <= taus.Nrows(); i++)
 
-    /*
-    // alternative, if R2p or DBV are outside the bounds
-    if (R2p > 50.0 || R2p < 0.0 || DBV > 1.0 || DBV < 0.001)
+    
+    // alternative, if DBV is outside the bounds
+    if ( DBV > 1.0 )
     {
         for (int i = 1; i <= taus.Nrows(); i++)
         {
-            result(i) = 0.0;
+            result(i) = 0.0001;
         }
     }
-    */
+    
 
     return;
 

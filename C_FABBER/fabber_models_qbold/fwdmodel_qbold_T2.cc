@@ -180,7 +180,7 @@ void T2qBoldFwdModel::HardcodedInitialDists(MVNDist &prior, MVNDist &posterior) 
 
     if (infer_R2t)
     {
-        posterior.means(R2t_index()) = 9;
+        posterior.means(R2t_index()) = 9.0;
         precisions(R2t_index(), R2t_index()) = 0.1;
     }
 
