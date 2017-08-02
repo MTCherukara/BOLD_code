@@ -286,8 +286,11 @@ void MVNDist::Load(vector<MVNDist *> &mvns, const string &filename, FabberRunDat
     // Load. First this is converted into
     // a matrix whose columns are the voxels
     // and rows are the data
+
+    // MTC - this calls FabberRunDataArray::GetVoxelData, which is in rundata_array.cc, and in turn
+    // calls FabberRunData::GetVoxelData, which is in rundata.cc (l.666)
     Matrix voxel_data = data.GetVoxelData(filename);
-    MVNDist::Load(mvns, voxel_data, log);
+    MVNDist::Load(mvns, voxel_data, log); // this goes on to the next method ::Load 
 }
 
 void MVNDist::Load(vector<MVNDist *> &mvns, Matrix &voxel_data, EasyLog *log)
