@@ -49,7 +49,6 @@ void R2primeFwdModel::Initialize(ArgsType &args)
 {
     infer_R2p = args.ReadBool("inferR2p");
     infer_DBV = args.ReadBool("inferDBV");
-    infer_R2t = args.ReadBool("inferR2t");
     infer_S0 = args.ReadBool("inferS0");
 
     // read through input arguments using &args
@@ -85,10 +84,6 @@ void R2primeFwdModel::Initialize(ArgsType &args)
     {
         LOG << "Inferring on DBV " << endl;
     }
-    if (infer_R2t)
-    {
-        LOG << "Inferring on R2/T2 of tissue" << endl;
-    }
     if (infer_S0)
     {
         LOG << "Inferring on scaling parameter S0" << endl;
@@ -112,10 +107,6 @@ void R2primeFwdModel::NameParams(vector<string> &names) const
     if (infer_DBV)
     {
         names.push_back("DBV"); // parameter 2 - DBV
-    }
-    if (infer_R2t)
-    {
-        names.push_back("R2t");  // parameter 3 - R2 (of tissue)
     }
     if (infer_S0)
     {
@@ -147,12 +138,6 @@ void R2primeFwdModel::HardcodedInitialDists(MVNDist &prior, MVNDist &posterior) 
         precisions(DBV_index(), DBV_index()) = 1;
     }
 
-    if (infer_R2t)
-    {
-        prior.means(R2t_index()) = 9;
-        precisions(R2t_index(), R2t_index()) = 1e-3;
-    }
-
     if (infer_S0)
     {
         prior.means(S0_index()) = 100;
@@ -173,12 +158,6 @@ void R2primeFwdModel::HardcodedInitialDists(MVNDist &prior, MVNDist &posterior) 
     {
         posterior.means(DBV_index()) = 0.05;
         precisions(DBV_index(), DBV_index()) = 1;
-    }
-
-    if (infer_R2t)
-    {
-        posterior.means(R2t_index()) = 9;
-        precisions(R2t_index(), R2t_index()) = 0.1;
     }
 
     if (infer_S0)
@@ -213,7 +192,6 @@ void R2primeFwdModel::Evaluate(const ColumnVector &params, ColumnVector &result)
     // parameters
     double R2p;
     double DBV;
-    double R2t;
     double S0;
 
     // assign values to parameters
@@ -232,14 +210,6 @@ void R2primeFwdModel::Evaluate(const ColumnVector &params, ColumnVector &result)
     else
     {
         DBV = 0.03;
-    }
-    if (infer_R2t)
-    {
-        R2t = abs(paramcpy(R2t_index()));
-    }
-    else
-    {
-        R2t = 9.09;
     }
     if (infer_S0)
     {
@@ -277,14 +247,8 @@ void R2primeFwdModel::Evaluate(const ColumnVector &params, ColumnVector &result)
             St = exp(-0.3*DBV*pow(dw*tau,2.0));
         }
 
-        // add in the T2 effect to St
-        St *= exp(-R2t*TE);
-
-        // blood signal
-        Sb = exp(-R2b*(TE-tau)*exp(-R2bs*abs(tau)));
-
         // Total signal
-        result(i) = S0*(((1-DBV)*St) + (DBV*Sb));
+        result(i) = S0*St;
 
     } // for (int i = 1; i <= taus.Nrows(); i++)
 

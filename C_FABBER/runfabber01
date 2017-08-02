@@ -3,10 +3,10 @@
 ./fabber_qbold --method=vb --noise=white --max-iterations=10 \
     --save-residuals --save-model-fit \
     --output=../../Data/Fabber_Results/ \
-    --data1=../../Data/subject_03l_ASE.nii.gz \
+    --data1=../../Data/subject_01_ASE.nii.gz \
     --model=qboldR2p \
-    --mask=../../Data/subject_03l_mask.nii.gz \
+    --mask=../../Data/subject_01_mask.nii.gz \
     --TE=0.074 \
     --tau1=-0.016 --tau2=-0.008 --tau3=0.0 --tau4=0.008 --tau5=0.016 --tau6=0.024 \
     --tau7=0.032 --tau8=0.040 --tau9=0.048 --tau10=0.056 --tau11=0.064 \
-    --inferR2p --inferR2t --inferS0
+    --inferR2p --inferDBV --inferS0
