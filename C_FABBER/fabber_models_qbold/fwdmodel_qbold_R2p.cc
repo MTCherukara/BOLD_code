@@ -219,7 +219,7 @@ void R2primeFwdModel::Evaluate(const ColumnVector &params, ColumnVector &result)
     // assign values to parameters
     if (infer_R2p)
     {
-        R2p = pow(pow(paramcpy(R2p_index()),2.0),0.5);
+        R2p = abs(paramcpy(R2p_index()));
     }
     else
     {
@@ -227,7 +227,7 @@ void R2primeFwdModel::Evaluate(const ColumnVector &params, ColumnVector &result)
     }
     if (infer_DBV)
     {
-        DBV = pow(pow(paramcpy(DBV_index()),2.0),0.5);
+        DBV = abs(paramcpy(DBV_index()));
     }
     else
     {
@@ -235,7 +235,7 @@ void R2primeFwdModel::Evaluate(const ColumnVector &params, ColumnVector &result)
     }
     if (infer_R2t)
     {
-        R2t = pow(pow(paramcpy(R2t_index()),2.0),0.5);
+        R2t = abs(paramcpy(R2t_index()));
     }
     else
     {
@@ -243,7 +243,7 @@ void R2primeFwdModel::Evaluate(const ColumnVector &params, ColumnVector &result)
     }
     if (infer_S0)
     {
-        S0 = pow(pow(paramcpy(S0_index()),2.0),0.5);
+        S0 = abs(paramcpy(S0_index()));
     }
     else
     {
