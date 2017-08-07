@@ -1,0 +1,66 @@
+This dataset will form the basis of a forthcoming publication investigating the use of streamlined-quantitative BOLD (sqBOLD) for imaging brain oxygenation in acute stroke. In the absence of a reference to this publication the dataset made available and the methods used are outlined here. Please reference this dataset if you use it in your work.
+
+Stone AJ, Harston GWJ, Carone D, Okell TW, Kennedy J, Blockley NP. Data used to investigate the application of streamlined-quantitative BOLD (sqBOLD) in acute stroke. Oxford University Research Archive 2017. doi: <Please see ORA entry for DOI>
+
+*Summary*
+
+This dataset was acquired to investigate the application of sqBOLD [1] to imaging baseline brain oxygenation in acute stroke. Data was acquired as part of an ongoing study where a prospective cohort of patients with acute ischaemic stroke were imaged on presentation with follow-up scanning performed at 2 hours, 24 hours, 1 week and 1 month where available.
+sqBOLD was used to create parameter maps of R2′ (R-2-prime, the reversible relaxation rate), DBV (deoxygenated blood volume) and [dHb] (deoxyhaemoglobin concentration). Tissue outcome ROIs (infarct core, infarct growth and contralateral tissue) were defined from diffusion weighted and structural images acquired serially in the same protocol. The data made available are the R2′, DBV and [dHb] presenting parameter maps calculated from the sqBOLD data acquired in 9 patients with the core, infarct growth and contralateral tissue outcome ROIs. Scripts to produce tables and plots of summary statistics accompany this data.
+
+*sqBOLD data*
+
+Images were acquired using a Siemens Magnetom Verio scanner at 3T. The body coil was used for transmission and the manufacturer's 32-channel head coil was used for reception. GESEPI ASE (GASE) data [2] were acquired with a field of view of 220x220 mm2, a 96x96 matrix, nine 5mm slices, TR/TE=3s/82ms. ASE images are acquired with varying amount of R2′ weighting determined by the spin echo displacement time, tau, i.e. S = S0 exp(-tau R2′) exp(-TE R2). Eleven values of tau were acquired for each GASE scan: -16, -8, 0, 8, 16, 24, 32, 40, 48, 56 and 64ms. The GESEPI magnetic field gradient correction technique required each 5mm slice to be encoded into multiple thin partitions each 1.25mm thick. Furthermore, partitions were oversampled by 100% leading to the acquisition of 8 partitions per slice. Oversampled slices were discarded during reconstruction, resulting in 36 slices being acquired for each tau value. To regain signal to noise ratio we summed the slices in blocks of four, therefore resulting in the original nine prescribed slices. A slice selective inversion recovery preparation was used to null cerebrospinal fluid (CSF) using an inversion time of 1.21s. Details of the calculation of the R2′, DBV and [dHb] parameter maps can be found in [1].
+
+*ROIs*
+
+The presenting infarct ROI was defined using a presenting apparent diffusion coefficient (ADC) parameter map calculated from a diffusion weighted imaging acquisition acquired alongside the sqBOLD data (three directions, 1.8 x 1.8 x 2.0 mm, field of view = 240 mm2, four averages, b = 0 and 1000 s/mm2, TR / TE = 9000 / 98 ms, 50 slices, 2 min 53 s). Binary masks of presenting ADC lesions were automatically generated using a previously described clustering method [3]. These automated ADC masks were inspected by a clinician to ensure their accuracy and manually corrected when necessary. The final infarct ROI was manually defined by an independent observer. This was done preferentially using the 1-week T2-FLAIR image or, if not available, the 24 hour b = 1000 s/mm2 DWI image [4].
+The following tissue outcomes were used in the analysis and were defined from the infarct ROIs in the native space of the sqBOLD parameter maps.
+        - The ischaemic core is tissue common to both the presenting infarct and final infarct.
+        - The infarct growth is tissue present in the final infarct that is not present in the presenting infarct.
+        - The contralateral tissue is defined by a composite mask of the presenting and final infarct tissue mirrored to the contralateral side of the brain.
+
+*Registration*
+
+Registration of imaging modalities within a single time point was achieved using rigid body registration (6 degrees of freedom (DOF)) [5]. Between time point registration was achieved using non-linear registration of the T1-weighted structural scans to limit potential error introduced by edema and atrophy [4]. To create contralateral ROIs, the infarct masks were mirrored in standard space following non-linear registration of the T1-weighted image to a standard atlas (MNI152)[6]. At each time point, the FLAIR-GASE spin-echo image (τ = 0 ms) was registered (6 DOF) to the T1-structural using the b = 0 s/mm2 DWI image as an intermediate registration step.
+
+*Exclusions*
+
+p01 was excluded from further analysis due to haemorrhagic transformation at the time of the presenting MRI. sqBOLD wasn't acquired in this patient at 0hrs. p02 was excluded from the analysis because the final lesion ROI could not be defined as follow-up scanning was not possible.
+
+*Analysis*
+
+Voxel values of R2′, DBV and [dHb] were extracted from the native space of the R2′, DBV and [dHb] parameter maps using the ROI definitions of ischaemic core, infarct growth and contralateral tissue.
+
+*Statistics*
+
+On presentation, differences in R2′, DBV and [dHb] in tissues with different outcomes were tested using a Kruskall-Wallis test, a non-parametric version of the classical one-way ANOVA. This non-parametric test was chosen as the distribution of [dHb] values in healthy grey matter made using this technique have been shown to be better represented by the median compared to the mean [1].
+
+*Analysis*
+
+- Analysis requires FSL and Matlab
+- Copy the analysis scripts into the "sqbold_acute_stroke" folder where the "p0*" data is
+- Run "make_rois.csh" from the terminal first followed by "make_rois_matlab.m" in Matlab
+- The rest of the analysis scripts can be run as needed in Matlab
+
+*Scripts*
+
+- make_rois.csh: masks the parameter maps and visualises the tissue outcome ROIs using fslview
+- make_rois_matlab.m: reads and formats the masked nifti files into .mats
+- patient_info.tsv: contains patient information
+- make_fig1_hist.m: produces voxel-level histograms of R2′, DBV and [dHb]
+        - load_rois_voxelwise.m: reads and formats the patient .mat files voxelwise
+        - format_line_plot.m: formats figures
+- make_fig1_boxplot.m: produces voxel-level boxplots of R2′, DBV and [dHb]
+- stats_fig1.m: runs statistical tests on voxel-level values
+- make_fig2_barchart.m: produces patient-level barcharts of R2′, DBV and [dHb]
+        - load_rois_subjectwise.m: rreads and formats the patient .mat files subjectwise
+- stats_fig2.m: runs statistical tests on patient-level values
+
+*References*
+
+[1] Stone, A. J., & Blockley, N. P. (2017). A streamlined acquisition for mapping baseline brain oxygenation using quantitative BOLD. NeuroImage, 147, 79–88. http://doi.org/10.1016/j.neuroimage.2016.11.057
+[2] Blockley, N. P., & Stone, A. J. (2016). Improving the specificity of R 2′ to the deoxyhaemoglobin content of brain tissue: Prospective correction of macroscopic magnetic field gradients. NeuroImage, 135, 253–260. http://doi.org/10.1016/j.neuroimage.2016.04.013
+[3] Harston, G. W. J., Tee, Y. K., Blockley, N., Okell, T. W., Thandeswaran, S., Shaya, G., et al. (2015). Identifying the ischaemic penumbra using pH-weighted magnetic resonance imaging. Brain, 138(Pt 1), 36–42. http://doi.org/10.1093/brain/awu374
+[4] Harston, G. W. J., Minks, D., Sheerin, F., Payne, S. J., Chappell, M., Jezzard, P., et al. (2017). Optimizing image registration and infarct definition in stroke research. Annals of Clinical and Translational Neurology, 4(3), 166–174. http://doi.org/10.1002/acn3.388
+[5] Jenkinson, M., & Smith, S. (2001). A global optimisation method for robust affine registration of brain images. Medical Image Analysis, 5(2), 143–156.
+[6] Mazziotta, J., Toga, A., Evans, A., FOX, P., Lancaster, J., Zilles, K., et al. (2001). A probabilistic atlas and reference system for the human brain: International Consortium for Brain Mapping (ICBM). Philosophical Transactions of the Royal Society of London. Series B, Biological Sciences, 356(1412), 1293–1322. http://doi.org/10.1098/rstb.2001.0915
