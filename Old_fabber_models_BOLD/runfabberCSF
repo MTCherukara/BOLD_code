@@ -1,4 +1,0 @@
-#!/bin/bash
-
-./fabber --method=vb --noise=white --allow-bad-voxels --save-model-fit --output=../Fabber_Results/ --data1=../Fabber_Results/brain_3_csf.nii.gz --model=BOLD --mask=../Fabber_Results/brain_3_mask.nii.gz --TE=0.08 --tau1=-0.028 --tau2=-0.024 --tau3=-0.020 --tau4=-0.016 --tau5=-0.012 --tau6=-0.008 --tau7=-0.004 --tau8=0.0 --tau9=0.004 --tau10=0.008 --tau11=0.012 --tau12=0.016 --tau13=0.020 --tau14=0.024 --tau15=0.028 --tau16=0.032 --tau17=0.036 --tau18=0.040 --tau19=0.044 --tau20=0.048 --tau21=0.052 --tau22=0.056 --tau23=0.060 --tau24=0.064
-

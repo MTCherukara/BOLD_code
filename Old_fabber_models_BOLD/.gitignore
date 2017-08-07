@@ -1,8 +1,0 @@
-CVS
-*.o
-*~
-*.a
-.DS_Store
-depend.mk
-fabber
-mvntool
