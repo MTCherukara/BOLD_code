@@ -19,13 +19,14 @@
 % 2017-04-04 (MTC). Various changes.
 
 clear;
-close all;
+% close all;
+tic;
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Inference Parameters
-np = 100; % number of points to perform Bayesian analysis on
 
+np = 1000; % number of points to perform Bayesian analysis on
 
 % Select which parameter(s) to infer on (1 = OEF, 2 = DBV, 3 = R2')
 p1 = 3;
@@ -43,7 +44,7 @@ params.R2p = params.dw.*params.zeta;
 
 % Parameter names and search ranges
 pnames  = { 'OEF'  ; 'zeta' ; 'R2p' };
-intervs = [ 0, 1   ; 0, 0.1 ; 1, 6  ];  
+intervs = [ 0, 1   ; 0.01, 0.1 ; 1, 6  ];  
 %            OEF      DBV      R2'
 
 % are we inferring on R2'?
@@ -136,7 +137,8 @@ if (p2 == 0)
 else % if (inftype == 1)
     % Plot 2D grid search results
     
-    imagesc(w2,w1,pos); hold on;
+    
+    imagesc(w2,w1,DW); hold on;
     c=colorbar;
     plot([tr2,tr2],[  0, 30],'w-','LineWidth',2);
     plot([  0, 30],[tr1,tr1],'w-','LineWidth',2);
@@ -153,3 +155,5 @@ else % if (inftype == 1)
 end % if (inftype == 1) // else ...
 
     
+toc;
+
