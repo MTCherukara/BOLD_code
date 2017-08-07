@@ -1,5 +1,6 @@
 % MTC_Asymmetric_Bayes.m
-% Perform Bayesian inference on ASE/BOLD data from MTC_qBOLD.m
+% Perform Bayesian inference on ASE/BOLD data from MTC_qBOLD.m using a 1D
+% or 2D grid search
 %
 % Based on MTC_Bayes_BOLD.m
 %
@@ -11,168 +12,144 @@
 %
 % CHANGELOG:
 %
+% 2017-08-07 (MTC). Added R2'/DBV inference, and made the whole thing
+%       better organised. The 1D grid search isn't working right, but it
+%       isn't particularly important at this stage.
+%
 % 2017-04-04 (MTC). Various changes.
 
 clear;
-% close all;
-tic;
-%% Load Data
-load('ASE_R2p_DBV_SNR_100.mat');
+close all;
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Inference Parameters
+np = 100; % number of points to perform Bayesian analysis on
+
+
+% Select which parameter(s) to infer on (1 = OEF, 2 = DBV, 3 = R2')
+p1 = 3;
+p2 = 2; % setting p2 to 0 will infer on only p1 (1D grid search)
+
+% Load the Data:
+load('ASE_R2p_DBV_SNR_1000.mat');
+
+% extract relevant parameters
 sigma = params.sig;   % real std of noise
 sigma_weight = 2/(sigma.^2);
-
 ns = length(S_sample); % number of data points
-np = 1000; % number of points to perform Bayesian analysis on
-
-% remove CSF component
-params.lam0 = 0;
-
 [~,t0] = min(abs(T_sample));    % index of zero-point
-% normalize S_sample, if this hasn't been done already
-% S_sample = S_sample./S_sample(t0);
+params.R2p = params.dw.*params.zeta;
 
-%% Bayesian inference on a single parameter using 1D grid search
+% Parameter names and search ranges
+pnames  = { 'OEF'  ; 'zeta' ; 'R2p' };
+intervs = [ 0, 1   ; 0, 0.1 ; 1, 6  ];  
+%            OEF      DBV      R2'
 
-% v_t = params.OEF; % true value of OEF
-% va = linspace(0,1,np); % OEF must be in interval {0,1}
-% S_model = zeros(np,ns);
-% 
-% % step through values of the parameter and calculate the model for each one
-% % of those, at all time points
-% for ii = 1:np
-%     params.OEF = va(ii);
-%     S_val = MTC_qASE_model(T_sample,params);
-%     S_model(ii,:) = S_val./S_val(t0);
-% end
-% 
-% S_samp = repmat(S_sample,np,1);
-% 
-% % compare the model against the data for each value of the parameter - this
-% % is the likelihood (which is proportional to the posterior in the case of
-% % uniform (zero) priors)
-% lik = exp(-sum((S_samp-S_model).^2,2)/sigma);
-% lik = MTC_smooth(lik,7);
-% % lik = lik/sum(lik); % normalize
-% 
-% % plot posterior (=likelihood) distribution
-% figure('WindowStyle','docked');
-% hold on; box on;
-% 
-% plot([v_t, v_t],[0, 1.1*max(lik)],'k--','LineWidth',2);
-% plot(va,lik,'-','LineWidth',4);
-% axis([min(va), max(va), 0, 1.1*max(lik)]);
-% 
-% % xlabel('Deoxygenated Blood Volume (DBV)');
-% xlabel('Oxygen Extraction Fraction (OEF)');
-% % ylabel('Posterior Distribution');
-% legend('True Value','Posterior','Location','NorthEast');
-% set(gca,'FontSize',16);
-
-%% Bayesian Inference on two parameters, using grid search
-% % 
-% % tr1 = params.OEF;  % real value of OEF = 0.5
-% % tr2 = params.R2t; % real value of zeta = 0.03;
-% % 
-% % w1 = linspace(0,1.0,np);
-% % w2 = linspace(5,15,np);
-% % 
-% % pos = zeros(np,np);
-% % 
-% % for i1 = 1:np
-% % %     disp(['Calculating iteration ',num2str(i1),' of ',num2str(np)]);
-% %     
-% %     for i2 = 1:np
-% % 
-% %             params.OEF = w1(i1);
-% %             params.R2t = w2(i2);
-% % 
-% %             S_mod = MTC_qASE_model(T_sample,params);
-% % %             S_mod = S_mod./S_mod(t0);
-% % 
-% %             pos(i1,i2) = exp(-sum((S_sample-S_mod).^2)./(sigma));
-% %     end
-% % end
-% % 
-% % % pos = pos/sum(pos(:)); % normalize posterior
-% % toc;
-% % % plot
-% % figure();
-% % imagesc(w2,w1,pos); hold on;
-% % c=colorbar;
-% % plot([tr2,tr2],[  0, 30],'w-','LineWidth',2);
-% % plot([  0, 30],[tr1,tr1],'w-','LineWidth',2);
-% % ylabel('Oxygen Extraction Fraction (OEF)');
-% % xlabel('Tissue Dephasing Rate (R_2^t)');
-% % % xlabel('Deoxygenated Blood Volume (DBV)');
-% % ylabel(c,'Posterior Probability Density');
-% % % title(['SNR = ',num2str(1/sigma)]);
-% % axis([min(w2),max(w2),min(w1),max(w1)]);
-% % set(gca,'FontSize',18,'YDir','normal');
-% % set(c,'FontSize',20)
-% % set(gcf,'WindowStyle','docked');
-
-%% Bayesian Inference on DBV and R2', using grid search
-
-tr1 = params.dw.*params.zeta;   % real value of R2' = 3.62;
-tr2 = params.zeta;              % real value of DBV = 0.03;
-
-w1 = linspace(1,6,np);         % R2' between 1 and 10 (s^-1)
-w2 = linspace(0,0.1,np);        % DBV between 0 and 0.1 (no units)    
-
-pos = zeros(np,np);
-
-for i1 = 1:np
-%     disp(['Calculating iteration ',num2str(i1),' of ',num2str(np)]);
-    
-    for i2 = 1:np
-
-            params.R2p  = w1(i1);
-            params.zeta = w2(i2);
-            
-            % calculate long-tau T_sample values here
-            Iedge = find(T_sample>(1.5*params.zeta/params.R2p),1);
-            T_long = T_sample(Iedge:end);
-            
-            S_long = MTC_qASE_model_long(T_long,params);
-            
-            
-            posl = exp(-sum((S_sample(Iedge:end)-S_long).^2)./sigma);
-            
-            % calculate zeta fit using the other T values - don't forget to
-            % uncomment this line in MTC_qASE_model.m when we're done
-            params.dw = params.R2p./params.zeta;
-            
-            T_short = T_sample(1:Iedge-1);
-%             S_short = MTC_qASE_model(T_short,params);
-%             poss = exp(-sum((S_sample(1:Iedge-1)-S_short).^2)./sigma);
-            
-            S_all = MTC_qASE_model(T_sample,params);
-            posa = exp(-sum((S_sample-S_all).^2)./sigma);
-            
-            pos(i1,i2) = ((length(T_sample).*posa) + (length(T_long).*posl))./(length(T_sample)+length(T_long));
-%             pos(i1,i2) = ((length(T_short).*poss) + (length(T_long).*posl))./length(T_sample);
-%             S_mod = MTC_qASE_model(T_sample,params);
-%             S_mod = S_mod./S_mod(t0);
-
-%             pos(i1,i2) = exp(-sum((S_sample-S_mod).^2)./(sigma));
-    end
+% are we inferring on R2'?
+if (p1 == 3 || p2 == 3)
+    noDW = 1; % this changes what happens in MTC_qASE_model.m
+else
+    noDW = 0;
 end
 
-% pos = pos/sum(pos(:)); % normalize posterior
-toc;
-% plot
-figure();
-imagesc(w2,w1,pos); hold on;
-c=colorbar;
-plot([tr2,tr2],[  0, 30],'w-','LineWidth',2);
-plot([  0, 30],[tr1,tr1],'w-','LineWidth',2);
-ylabel('Reversible Dephasing Rate (R_2'')');
-xlabel('Deoxygenated Blood Volume (DBV)');
-ylabel(c,'Posterior Probability Density');
-% title(['SNR = ',num2str(1/sigma)]);
-axis([min(w2),max(w2),min(w1),max(w1)]);
-set(gca,'FontSize',14,'YDir','normal');
-set(c,'FontSize',16)
-set(gcf,'WindowStyle','docked');
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Inference
+if ~p2
+    % Bayesian inference on a single parameter using 1D grid search
+    
+    pname = pnames{p1}; % the name of the parameter being searched over
+    
+    v_t = eval(['params.',pname]); % true value of parameter
+    va = linspace(intervs(p1,1),intervs(p1,2),np); 
+    S_model = zeros(np,ns);
 
+    % step through values of the parameter and calculate the model for each one
+    % of those, at all time points
+    for ii = 1:np
+        params = param_update(va(ii),params,pname);
+        S_val = MTC_qASE_model(T_sample,params);
+        S_model(ii,:) = S_val./S_val(t0);
+    end
+
+    S_samp = repmat(S_sample,np,1);
+
+    % compare the model against the data for each value of the parameter - this
+    % is the likelihood (which is proportional to the posterior in the case of
+    % uniform (zero) priors)
+    lik = exp(-sum((S_samp-S_model).^2,2)/sigma);
+    
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+else % if ~p2
+    % Bayesian Inference on two parameters, using grid search
+    
+    pname = {pnames{p1}; pnames{p2}};
+
+    tr1 = eval(['params.',pname{1}]); % true value of parameter 1
+    tr2 = eval(['params.',pname{2}]); % true value of parameter 1
+
+    w1 = linspace(intervs(p1,1),intervs(p1,2),np);
+    w2 = linspace(intervs(p2,1),intervs(p2,2),np);
+
+    pos = zeros(np,np);
+
+    for i1 = 1:np
+        % loop through parameter 1
+        params = param_update(w1(i1),params,pname{1});
+
+        for i2 = 1:np
+            % loop through parameter 2
+            params = param_update(w2(i2),params,pname{2});
+
+            % run the model to evaluate the signal with current params
+            S_mod = MTC_qASE_model(T_sample,params,noDW);
+
+            % calculate posterior based on known noise value
+            pos(i1,i2) = exp(-sum((S_sample-S_mod).^2)./(sigma));
+            
+        end % for i2 = 1:np
+    end % for i1 = 1:np
+
+end % if ~p2 // else ...
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Display Results
+
+% create docked figure
+figure('WindowStyle','docked');
+hold on; box on;
+set(gca,'FontSize',16);
+
+if (p2 == 0)
+    % Plot 1D grid search results
+    
+    plot([v_t, v_t],[0, 1.1*max(lik)],'k--','LineWidth',2);
+    plot(va,lik,'-','LineWidth',4);
+    axis([min(va), max(va), 0, 1.1*max(lik)]);
+
+    xlabel(pname);
+    legend(['True ',pname],'Posterior','Location','NorthEast');
+    
+else % if (inftype == 1)
+    % Plot 2D grid search results
+    
+    imagesc(w2,w1,pos); hold on;
+    c=colorbar;
+    plot([tr2,tr2],[  0, 30],'w-','LineWidth',2);
+    plot([  0, 30],[tr1,tr1],'w-','LineWidth',2);
+    
+    xlabel(pname{2});
+    ylabel(pname{1});
+    
+    ylabel(c,'Posterior Probability Density');
+    
+    axis([min(w2),max(w2),min(w1),max(w1)]);
+    set(gca,'YDir','normal');
+    set(c,'FontSize',16);
+    
+end % if (inftype == 1) // else ...
+
+    

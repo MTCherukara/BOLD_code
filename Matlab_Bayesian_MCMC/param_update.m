@@ -1,9 +1,24 @@
 function PARAMS = param_update(VALUES,PARAMS,INFER)
-    % this function updates the specific parameters being inferred on and
-    % must be modified for each MH parameter set.
+    % This function is used in Bayesian inference of simulated qBOLD (ASE)
+    % data to update the values in the PARAMS structure at each iteration
+    % of either a grid search or Metropolis Hastings algorithm.
     %
-    % For use in xMTC_metroBOLD_counter.m and similar
+    % Usage:
     %
+    %       PARAMS = param_update(VALUES,PARAMS,INFER)
+    %
+    % Input: VALUES - one or more numbers which are the values of specified
+    %                 parameters that should be updated)
+    %        PARAMS - the structure containing all the parameters used in
+    %                 simulation and model inference, this is updated and
+    %                 returned as the Output.
+    %        INFER  - EITHER a string corresponding to the name of a
+    %                   specific parameter that is to be updated, in which
+    %                   case, VALUES must be a single number.
+    %                 OR a logical vector of the same length as VALUES
+    %                   indicating which parameters should be updated
+    %
+    % For use in MTC_Asymmetric_Bayes, xMTC_metroBOLD_counter.m and similar
     %
     % 
     %       Copyright (C) University of Oxford, 2016-2017
@@ -13,8 +28,13 @@ function PARAMS = param_update(VALUES,PARAMS,INFER)
     %
     % CHANGELOG:
     %
+    % 2017-08-07 (MTC). Added compatibility with the grid-search inference
+    %       (MTC_Asymmetric_Bayes) as well as Metropolis Hastings. In this
+    %       case, the INFER input should be a string corresponding to the
+    %       PARAMS.name of a single parameter that is to be updated
+    %
     % 2017-04-04 (MTC). Various changes, including adding the ability to
-    % infer upon noise.
+    %       infer upon noise.
     %
     % 2016-06-15 (MTC). Added more parameters that can be inferred on.
     %
@@ -24,42 +44,59 @@ function PARAMS = param_update(VALUES,PARAMS,INFER)
 % variables, for reference:
 % 'OEF','\zeta','\lambda','Hct','\Deltaf','R2(t)','S(0)' ,'R_2^e'
 
-i = 1;
+if (length(VALUES) == 1)
+    % updating a single parameter (for use in the Grid Search script)
+    if strcmp(INFER,'OEF')
+        PARAMS.OEF = VALUES;
+    elseif strcmp(INFER,'zeta')
+        PARAMS.zeta = VALUES;
+    elseif strcmp(INFER,'R2p')
+        PARAMS.R2p = VALUES;
+    else
+        disp('----param_update.m: Invalid parameter specified');
+    end
+    
+else
+    % multiple values specified, updating multiple inferred-on parameters
+    % at the same time (for use in the Metropolis Hastings script)
 
-if INFER(1) == 1
-    PARAMS.OEF  = VALUES(i);
-    i = i+1;
-end
-if INFER(2) == 1
-    PARAMS.zeta = VALUES(i);
-    i = i+1;
-end
-if INFER(3) == 1
-    PARAMS.lam0 = VALUES(i);
-    i = i+1;
-end
-if INFER(4) == 1
-    PARAMS.Hct  = VALUES(i);
-    i = i+1;
-end
-if INFER(5) == 1
-    PARAMS.dF   = VALUES(i);
-    i = i+1;
-end
-if INFER(6) == 1
-    PARAMS.R2t  = VALUES(i);
-    i = i+1;
-end
-if INFER(7) == 1
-    PARAMS.S0   = VALUES(i);
-    i = i+1;
-end
-if INFER(8) == 1
-    PARAMS.R2e  = VALUES(i);
-    i = i+1;
-end
-if INFER(9) == 1
-    PARAMS.sig  = VALUES(i);
-    i = i+1;
+    i = 1;
+
+    if INFER(1) == 1
+        PARAMS.OEF  = VALUES(i);
+        i = i+1;
+    end
+    if INFER(2) == 1 
+        PARAMS.zeta = VALUES(i);
+        i = i+1;
+    end
+    if INFER(3) == 1
+        PARAMS.lam0 = VALUES(i);
+        i = i+1;
+    end
+    if INFER(4) == 1
+        PARAMS.Hct  = VALUES(i);
+        i = i+1;
+    end
+    if INFER(5) == 1
+        PARAMS.dF   = VALUES(i);
+        i = i+1;
+    end
+    if INFER(6) == 1
+        PARAMS.R2t  = VALUES(i);
+        i = i+1;
+    end
+    if INFER(7) == 1
+        PARAMS.S0   = VALUES(i);
+        i = i+1;
+    end
+    if INFER(8) == 1
+        PARAMS.R2e  = VALUES(i);
+        i = i+1;
+    end
+    if INFER(9) == 1
+        PARAMS.sig  = VALUES(i);
+        i = i+1;
+    end
 end
 
