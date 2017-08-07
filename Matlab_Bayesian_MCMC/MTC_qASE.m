@@ -12,21 +12,21 @@
 %
 % CHANGELOG:
 %
+% 2017-08-07 (MTC). Added a call to MTC_qASE_model, rather than repeating
+%       its contents here, so that the whole thing is more modular.
+%
 % 2017-04-04 (MTC). Modified the plotting parameters, removed a bunch of
-% unnecessary variables from the params struct.
+%       unnecessary variables from the params struct.
 %
 % 2016-11-08 (MTC). Changed tau range to go up to 64 ms, changed some
-% other constants, added saving out of data sampled at key points, with
-% noise added in too.
+%       other constants, added saving out of data sampled at key points,
+%       with noise added in too.
 %
 % 2016-05-27 (MTC). Changed the way the compartments are added together,
-% which was apparently causing problems (I don't know why).
-
-
+%       which was apparently causing problems (I don't know why).
 
 clear; 
 % close all;
-
 
 plot_fig = 1;       
 save_plot = 1;      % set to 1 in order to save out ASE data
@@ -55,37 +55,18 @@ params.OEF  = 0.400;        % no units  - oxygen extraction fraction
 params.Hct  = 0.340;        % no units  - fractional hematocrit
 
 
-%% Calculate values for remaining parameters
-
-% relaxation rate constant of blood
-params.R2bs = 14.9*params.Hct + 14.7 + (302.1*params.Hct + 41.8)*params.OEF^2;
-params.R2b  = 16.4*params.Hct + 4.5  + (165.2*params.Hct + 55.7)*params.OEF^2;
-
-% calculate characteristic frequency
-params.dw   = (4/3)*pi*params.gam*params.dChi*params.Hct*params.OEF*params.B0;
-
-
 %% Compute Model
 
+% define tau values that we want to simulate
 tau = (-16:4:64)/1000;      % for simulating data
 % tau = (-36:4:36)/1000;
 % tau = linspace(-0.016,0.064,1000); % for visualising ( tau(286) = 0 )
 np = length(tau);
 
-% compartment weightings
-w_tis = 1 - params.lam0 - params.zeta;
-w_csf = params.lam0;
-w_bld = params.zeta;
+% call MTC_qASE_model
+S_total = MTC_qASE_model(tau,params);
 
-% calculate compartments
-S_tis = w_tis.*MTC_ASE_tissue(tau,params);
-S_csf = w_csf.*MTC_ASE_extra(tau,params);
-S_bld = w_bld.*MTC_ASE_blood(tau,params);
-
-% add it all together:
-% S_total = params.S0.*(S_tis + S_csf + S_bld);
-S_total = params.S0.*(S_tis + S_bld);
-
+%% Add Noise
 % Add noise that is proportional to the maximum
 % Noise = max(S_total).*params.sig.*randn(1,np);
 T_sample = tau;
@@ -94,8 +75,6 @@ S_sample = S_total + max(S_total).*params.sig.*randn(1,np);
 [~,int0] = find(tau>=0,1);
 
 S_norm = S_total; % don't normalise
-% S_norm = S_total./S_total(int0);
-% S_sample = S_sample./S_total(int0);
 
 %% plot figure
 if plot_fig
