@@ -7,9 +7,9 @@ function PARAMS = param_update(VALUES,PARAMS,INFER)
     %
     %       PARAMS = param_update(VALUES,PARAMS,INFER)
     %
-    % Input: VALUES - one or more numbers which are the values of specified
+    % Input: VALUES - One or more numbers which are the values of specified
     %                 parameters that should be updated)
-    %        PARAMS - the structure containing all the parameters used in
+    %        PARAMS - The structure containing all the parameters used in
     %                 simulation and model inference, this is updated and
     %                 returned as the Output.
     %        INFER  - EITHER a string corresponding to the name of a

@@ -13,7 +13,8 @@
 % CHANGELOG:
 %
 % 2017-08-07 (MTC). Added a call to MTC_qASE_model, rather than repeating
-%       its contents here, so that the whole thing is more modular.
+%       its contents here, so that the whole thing is more modular. Removed
+%       the automatic saving of the plot, as it's kind of unnecessary
 %
 % 2017-04-04 (MTC). Modified the plotting parameters, removed a bunch of
 %       unnecessary variables from the params struct.
@@ -29,12 +30,12 @@ clear;
 % close all;
 
 plot_fig = 1;       
-save_plot = 1;      % set to 1 in order to save out ASE data
+save_data = 1;      % set to 1 in order to save out ASE data
 
 
 %% Model Parameters
 % noise
-SNR = 100;
+SNR = 1000;
 params.sig  = 1/SNR;         % -         - noise standard deviation
 % constants 
 params.B0   = 3.0;          % T         - static magnetic field
@@ -50,7 +51,7 @@ params.R2t  = 1/0.110;      % 1/s       - rate constant, tissue
 params.R2e  = 4;            % 1/s       - rate constant, extracellular
 params.dF   = 5;            % Hz        - frequency shift
 params.lam0 = 0.000;        % no units  - ISF/CSF signal contribution
-params.zeta = 0.030;        % no units  - deoxygenated blood volume
+params.zeta = 0.050;        % no units  - deoxygenated blood volume
 params.OEF  = 0.400;        % no units  - oxygen extraction fraction
 params.Hct  = 0.340;        % no units  - fractional hematocrit
 
@@ -64,7 +65,8 @@ tau = (-16:4:64)/1000;      % for simulating data
 np = length(tau);
 
 % call MTC_qASE_model
-S_total = MTC_qASE_model(tau,params);
+[S_total,params] = MTC_qASE_model(tau,params);
+
 
 %% Add Noise
 % Add noise that is proportional to the maximum
@@ -74,49 +76,41 @@ S_sample = S_total + max(S_total).*params.sig.*randn(1,np);
 
 [~,int0] = find(tau>=0,1);
 
-S_norm = S_total; % don't normalise
 
 %% plot figure
 if plot_fig
+    
+    % create a figure
     fig1 = figure('WindowStyle','docked');
     hold on; box on;
     
     % plot some lines
     plot([0 0],[-1 2],'k--','LineWidth',2);
     
-    % plot the signal compartments
-    l.s = plot(1000*tau,S_norm,'-','LineWidth',4);
-    l.t = plot(1000*tau,(1-params.zeta)*S_tis./max(S_tis),'g-','LineWidth',4);
-    l.b = plot(1000*tau,params.zeta*S_bld./max(S_bld),    '-','LineWidth',4);
+    % plot the signal
+    l.s = plot(1000*tau,S_total,'-','LineWidth',4);
     
     % labels on axes
     xlabel('Spin Echo Displacement \tau (ms)');
     ylabel('Signal');
     title('qBOLD Signal Measured Using ASE');
-    % title(['Asymmetric Spin Echo Signal, SNR = ',num2str(1/sigma)]);
     axis([1000*min(tau), 1000*max(tau), -0.1, 1.1]);
-    legend([l.s,l.t,l.b],'Total Signal','Parenchyma','Venous Blood','Location','NorthEast');
     set(gca,'FontSize',18);
-
-
-    % Save Figure
-    if save_plot
-        fig_dir = '/Users/mattcher/Documents/Project_1/Figures/';
-        fig_title1 = strcat('ASE_signal_',date,'_');
-        fig_list = dir(strcat(fig_dir,fig_title1,'*'));
-        fn = length(fig_list) + 1;
-
-%         fig_title = strcat(fig_dir,fig_title1,num2str(fn),'.png');
-%         saveas(fig1,fig_title);
-
-        dat_title = strcat('ASE_signal_data_',date,'_',num2str(fn));
-        save(dat_title,'T_sample','S_sample','params');
-    end
-else % if plot_fig
-    
-    figure('WindowStyle','docked');
-    hold on; box on;
-    plot(1000*tau,S_norm,'k-');
-    plot(1000*T_sample,S_sample,'x');
     
 end % if plot_fig
+
+% Save Figure
+if save_data
+    % Check how many datasets have been saved with the same date
+    dat_dir = '/Users/mattcher/Documents/DPhil/Code/Matlab_Bayesian_MCMC';
+    dat_title1 = strcat('ASE_signal_',date,'_');
+    dat_list = dir(strcat(dat_dir,dat_title1,'*'));
+    fn = length(dat_list) + 1;
+    
+    % Assign the correct title
+    dat_title = strcat(dat_title1,num2str(fn));
+    
+    % Save the data out
+    save(dat_title,'T_sample','S_sample','params');
+end % if save_data
+    

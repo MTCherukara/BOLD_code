@@ -1,15 +1,26 @@
-function S = MTC_qASE_model(T,PARAMS,noDW)
-    % MTC_qASE_model.m usage:
+function [S,PARAMS] = MTC_qASE_model(T,PARAMS,NODW)
+    % Calculates ASE signal from a single voxel. Usage:
     %
-    %       S = MTC_qASE_model(T,PARAMS)
+    %       [S,PARAMS] = MTC_qASE_model(T,PARAMS,noDW)
     %
-    % For use in MTC_Asymmetric_Bayes.m and derived scripts; based on
-    % MTC_qBOLD_metro.m, but using a tau-dependent ASE model
+    % Input:  T      - A vector of tau values (refocussing pulse offsets)
+    %                  in seconds.
+    %         PARAMS - The structure containing all the parameters used in
+    %                  the simulation and model inference. This can be
+    %                  optionally returned as an output, with extra values
+    %                  (such as dw) which are calculated within, returned
+    %                  as the output.
+    %         NODW   - [OPTIONAL] A boolean, to be used when inferring on
+    %                  R2', which changes the order in which things are
+    %                  calculated.
     %
-    % Calculates the signal vs. tau relationship of a single voxel, for values
-    % of tau T, using parameter struct PARAMS. Output S is the same size as T.
+    % Output: S      - A vector of signal values of same size as T.
+    %         PARAMS - [OPTIONAL] The modified parameter structure.
     %
-    % Uses method described by Yablonskiy & Haacke, 1994, and others.
+    % For use in MTC_qASE.m, MTC_Asymmetric_Bayes.m, MTC_ASE_MH.m, and
+    % other derived scripts. Based on MTC_qBOLD_metro.m (now deleted), but
+    % using a tau-dependent ASE model. Uses the method described by
+    % Yablonskiy & Haacke (1994), and He & Yablonskiy (2007). 
     %
     % 
     %       Copyright (C) University of Oxford, 2016-2017
@@ -19,8 +30,9 @@ function S = MTC_qASE_model(T,PARAMS,noDW)
     %
     % CHANGELOG:
     %
-    % 2017-08-07 (MTC). Added a control in the form of PARAMS.noDW to
-    %       change the way things are done when we're trying to infer on R2' 
+    % 2017-08-07 (MTC). Added a control in the form of PARAMS.noDW to  
+    %       change the way things are done when we're trying to infer on 
+    %       R2'. Added PARAMS as an optional output. 
     %       
     % 2017-07-10 (MTC). Commented out the PARAMS.dw recalculation in order
     %       to use this for the R2' and zeta estimation (alongside
@@ -32,12 +44,12 @@ function S = MTC_qASE_model(T,PARAMS,noDW)
     
 % UPDATE PARAMETERS:
 
-if ~exist('noDW','var')
-    noDW = 0;
+if ~exist('NODW','var')
+    NODW = 0;
 end
 
 % characteristic frequency - this will not be calculated if doing R2'-DBV inference
-if noDW
+if NODW
     % if we are inferring on R2', we want to change the order we do things
     % in slightly:
     PARAMS.dw = PARAMS.R2p ./ PARAMS.zeta;

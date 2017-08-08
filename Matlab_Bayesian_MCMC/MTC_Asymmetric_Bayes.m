@@ -19,7 +19,7 @@
 % 2017-04-04 (MTC). Various changes.
 
 clear;
-% close all;
+close all;
 tic;
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -29,11 +29,11 @@ tic;
 np = 1000; % number of points to perform Bayesian analysis on
 
 % Select which parameter(s) to infer on (1 = OEF, 2 = DBV, 3 = R2')
-p1 = 3;
+p1 = 1;
 p2 = 2; % setting p2 to 0 will infer on only p1 (1D grid search)
 
 % Load the Data:
-load('ASE_R2p_DBV_SNR_1000.mat');
+load('ASE_R2p_DBV_5_SNR_1000.mat');
 
 % extract relevant parameters
 sigma = params.sig;   % real std of noise
@@ -44,7 +44,7 @@ params.R2p = params.dw.*params.zeta;
 
 % Parameter names and search ranges
 pnames  = { 'OEF'  ; 'zeta' ; 'R2p' };
-intervs = [ 0, 1   ; 0.01, 0.1 ; 1, 6  ];  
+intervs = [ 0, 1   ; 0.01, 0.1 ; 4, 9  ];  
 %            OEF      DBV      R2'
 
 % are we inferring on R2'?
@@ -89,7 +89,7 @@ else % if ~p2
     pname = {pnames{p1}; pnames{p2}};
 
     tr1 = eval(['params.',pname{1}]); % true value of parameter 1
-    tr2 = eval(['params.',pname{2}]); % true value of parameter 1
+    tr2 = eval(['params.',pname{2}]); % true value of parameter 2
 
     w1 = linspace(intervs(p1,1),intervs(p1,2),np);
     w2 = linspace(intervs(p2,1),intervs(p2,2),np);
@@ -138,7 +138,7 @@ else % if (inftype == 1)
     % Plot 2D grid search results
     
     
-    imagesc(w2,w1,DW); hold on;
+    imagesc(w2,w1,posp); hold on;
     c=colorbar;
     plot([tr2,tr2],[  0, 30],'w-','LineWidth',2);
     plot([  0, 30],[tr1,tr1],'w-','LineWidth',2);
