@@ -46,7 +46,7 @@ p = zeros(x,y,z,2);
 for xID = 1:x
     for yID = 1:y
         for zID = 1:z
-            fprintf('xID%d ; yID%d ; zID%d \n',xID,yID,zID) 
+            % fprintf('xID%d ; yID%d ; zID%d \n',xID,yID,zID) 
             %% LSCOV: fit linear regime
             X = [ones(length(tau(1,tau_lineID)'),1) tau(1,tau_lineID)'];
             Y = squeeze(ln_Sase(xID,yID,zID,tau_lineID));
@@ -87,10 +87,10 @@ if nii_out
     save_avw(oef, 'oef', 'f', scales)
     save_avw(dhb, 'dhb', 'f', scales)
 
-    saveas(imgH_r2p, 'r2p.fig')
-    saveas(imgH_dbv, 'dbv.fig')
-    saveas(imgH_oef, 'oef.fig')
-    saveas(imgH_dhb, 'dhb.fig')
+%     saveas(imgH_r2p, 'r2p.fig')
+%     saveas(imgH_dbv, 'dbv.fig')
+%     saveas(imgH_oef, 'oef.fig')
+%     saveas(imgH_dhb, 'dhb.fig')
    
 end
 
