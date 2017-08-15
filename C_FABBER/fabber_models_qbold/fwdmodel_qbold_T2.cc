@@ -138,7 +138,7 @@ void T2qBoldFwdModel::HardcodedInitialDists(MVNDist &prior, MVNDist &posterior) 
 
     if (infer_OEF)
     {
-        prior.means(OEF_index()) = 0.5;
+        prior.means(OEF_index()) = 0.7;
         precisions(OEF_index(), OEF_index()) = 1;
     }
 
@@ -168,7 +168,7 @@ void T2qBoldFwdModel::HardcodedInitialDists(MVNDist &prior, MVNDist &posterior) 
 
     if (infer_OEF)
     {
-        posterior.means(OEF_index()) = 0.5;
+        posterior.means(OEF_index()) = 0.7;
         precisions(OEF_index(), OEF_index()) = 1;
     }
 
@@ -325,6 +325,10 @@ void T2qBoldFwdModel::Evaluate(const ColumnVector &params, ColumnVector &result)
             St = exp(-0.3*DBV*pow(dw*tau,2.0));
         }
 
+        // No IV version
+        //result(i) = S0*St;
+
+        
         // add in the T2 effect to St
         St *= exp(-R2t*TE);
 
@@ -333,6 +337,7 @@ void T2qBoldFwdModel::Evaluate(const ColumnVector &params, ColumnVector &result)
 
         // Total signal
         result(i) = S0*(((1-DBV)*St) + (DBV*Sb));
+        
 
     } // for (int i = 1; i <= taus.Nrows(); i++)
 
