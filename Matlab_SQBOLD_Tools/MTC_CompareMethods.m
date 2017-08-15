@@ -3,7 +3,7 @@
 % Compares the results of quantifying R2' and DBV from GASE data using
 % AJS's method (ase_qbold_3d.m) and the FABBER method
 %
-% Created by MT Cherukara, 17 May 2016
+% Created by MT Cherukara, 14 August 2017
 
 clear; close all;
 
