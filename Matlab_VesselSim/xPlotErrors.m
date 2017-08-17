@@ -7,12 +7,13 @@ clear; close all;
 figure(1);
 hold on; box on;
 
-load('signalResults/VSsignal_Static_OEFdist_Single');
+load('signalResults/VSsignal_OEFdist_Triple');
 errorbar(1000*t,sigm,sige,'o-','LineWidth',2);
-load('signalResults/VSsignal_Static_OEFdist_Normal');
+load('signalResults/VSsignal_OEFdist_Average');
 errorbar((1000*t),sigm,sige,'o-','LineWidth',2);
 
 ylabel('ASE Signal');
 xlabel('Spin Echo Offset \tau (ms)');
-legend('Single OEF','Normal Distribution','Location','South');
+legend('OEF = \{0.4,0.3,0.05\}','OEF = 0.24','Location','South');
+title('Three OEF Values, Static')
 set(gca,'FontSize',16);
