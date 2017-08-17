@@ -18,11 +18,11 @@ function [storedProtonPhase, p] = MTC_vesselsim(p)
     end
 	
 	% set up random number generator - not necessary when running locally
-% 	if ~isfield(p,'seed')
-% 		fid = fopen('/dev/urandom');
-% 		p.seed = fread(fid, 1, 'uint32');
-% 	end
-% 	rng(p.seed); % use a random seed to avoid problems when running on a cluster
+	if ~isfield(p,'seed')
+		fid = fopen('/dev/urandom');
+		p.seed = fread(fid, 1, 'uint32');
+	end
+	rng(p.seed); % use a random seed to avoid problems when running on a cluster
 	
 	% define parameters for simulation
 	p.HD = 10; % factor for higher density sampling near vessels
@@ -30,8 +30,11 @@ function [storedProtonPhase, p] = MTC_vesselsim(p)
 	p.universeSize = p.universeScale*min(p.R);
 	p.numSteps = round((p.TE*2)/p.dt);
 	p.ptsPerdt = round(p.deltaTE./p.dt); %pts per deltaTE
+    
+    % pre-allocate storedProtonPhase
+    storedProtonPhase = zeros(p.numSteps/p.ptsPerdt,p.N);
 	
-	for k=1:p.N         % p.N = 10000, loop through points
+	parfor k=1:p.N         % p.N = 10000, loop through points
 	
 		%set up universe
 		[vesselOrigins, vesselNormals, R, deltaChi, protonPosit, numVessels(k), vesselVolFrac(k)] = setupUniverse(p);

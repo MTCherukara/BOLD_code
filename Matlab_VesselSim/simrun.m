@@ -35,16 +35,17 @@
 %       save out the results.
 
 clear;
+tic;
 
 save_data = 1;  % set this to 1 to save storedPhase data out, or 0 not to
 
 p=gentemplate;          % create basic set of parameters
 p.N = 10000;
  
-p.R = 73.*1e-6;     % radius, in m
+p.R = [100,15,75].*1e-6;     % radius, in m
 p.D = 1e-9;     % diffusion, in m^2/s
-p.Y = 0.76;      % oxygenation fraction (1-OEF) 
-p.vesselFraction = 0.05;    % DBV
+p.Y = [0.6,0.7,0.95];      % oxygenation fraction (1-OEF) 
+p.vesselFraction = [0.02,0.01,0.02];    % DBV
 p.Hct = p.Hct.*ones(1,length(p.R));
 
 
@@ -53,7 +54,7 @@ p.deltaChi = p.deltaChi0.*p.Hct.*(1-p.Y); % calculate susceptibility difference
 p.solidWalls = 0;
 [Phase_u,p] = MTC_vesselsim(p);
 
-
+toc;
 % save out data
 if save_data
     if p.D == 0
