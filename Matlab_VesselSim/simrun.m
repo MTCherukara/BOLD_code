@@ -24,6 +24,10 @@
 %
 % CHANGELOG:
 %
+% 2017-08-17 (MTC). Removed a bunch of superfluous stuff from this script,
+%       so that the bulk of the work is done by MTC_vesselsim.m, and the
+%       analysis is done by simAnalyse.m. 
+%
 % 2017-02-23 (MTC). A bunch of changes separating out the functionality of
 %       this script into others, namely MTC_plotSignal and MTC_simAnalyse. 
 %       The function simplevesselsim.m does the bulk of the actual work,
@@ -37,10 +41,10 @@ save_data = 1;  % set this to 1 to save storedPhase data out, or 0 not to
 p=gentemplate;          % create basic set of parameters
 p.N = 1000;
  
-p.R = [100,15,75].*1e-6;     % radius, in m
-p.D = 0;     % diffusion, in m^2/s
-p.Y = [0.4,0.6,0.9];      % oxygenation fraction (1-OEF) 
-p.vesselFraction = [0.01,0.01,0.01];    % DBV
+p.R = [15,100].*1e-6;     % radius, in m
+p.D = 1e-9;     % diffusion, in m^2/s
+p.Y = [0.6,0.4];      % oxygenation fraction (1-OEF) 
+p.vesselFraction = [0.015,0.015];    % DBV
 p.Hct = p.Hct.*ones(1,length(p.R));
 
 

@@ -3,9 +3,18 @@ function [t,sig] = plotSignal(storedPhase,p,r)
     % with parameters specified in p and r. For use within simAnalyse.
     % Based on plotresults.m (NP Blockley, 2016).
     %
+    % 
+    %       Copyright (C) University of Oxford, 2017
+    %
+    % 
     % Created by MT Cherukara, February 2017
     %
     % CHANGELOG:
+    %
+    % 2017-07-17 (MTC). Changed the way intravascular signal is calculated
+    %       so that multiple values of R, Y, and Hct (i.e. multiple vessel
+    %       types) are allowed. This still needs some work, as it assumes
+    %       each vessel type is weighted equally.
     %
     % 2017-07-03 (MTC). Made it possible to plot signal on a log scale
     %
@@ -50,19 +59,43 @@ function [t,sig] = plotSignal(storedPhase,p,r)
             % add in intravascular signal
             if r.incIV
                 
-                % constants from Simon et al. 2016
-                R2  = repmat((16.4.*p.Hct+ 4.5)+(165.2.*p.Hct+55.7).*(1-p.Y).^2,length(t),1);
-                R2s = repmat((14.9.*p.Hct+14.7)+(302.1.*p.Hct+41.8).*(1-p.Y).^2,length(t),1);
+                % loop through multiple vessel sizes
+                if length(p.R) == 1
+                    % constants from Simon et al. 2016
+                    R2  = repmat((16.4.*p.Hct+ 4.5)+(165.2.*p.Hct+55.7).*(1-p.Y).^2,length(t),1);
+                    R2s = repmat((14.9.*p.Hct+14.7)+(302.1.*p.Hct+41.8).*(1-p.Y).^2,length(t),1);
                 
-                % call a bunch of separate functions for calculating
-                % intravascular signal for each sequence
-                sigIV = eval(strcat('ivsig',snames{sq},'(t,R2,R2s,p)'));
+                    % call a bunch of separate functions for calculating
+                    % intravascular signal for each sequence
+                    sigIV = eval(strcat('ivsig',snames{sq},'(t,R2,R2s,p)'));
+                else
+                    
+                    sigIV = 0;
+                    
+                    % loop through different vessel sizes
+                    for vv = 1:length(p.R)
+                        
+                        vHct = p.Hct(vv);
+                        vY   = p.Y(vv);
+                        
+                        R2  = repmat((16.4.*vHct+ 4.5)+(165.2.*vHct+55.7).*(1-vY).^2,length(t),1);
+                        R2s = repmat((14.9.*vHct+14.7)+(302.1.*vHct+41.8).*(1-vY).^2,length(t),1);
+                
+                        % call a bunch of separate functions for calculating
+                        % intravascular signal for each sequence
+                        sigIV = sigIV + eval(strcat('ivsig',snames{sq},'(t,R2,R2s,p)'));
+                    end
+                    
+                end % if length(p.R) == 1
+                
                 
             else
                 sigIV = sigEV;
             end
+            
+            vZeta = sum(p.vesselFraction);
 
-            sig = ((1-p.vesselFraction).*sigEV) + (p.vesselFraction.*sigIV);
+            sig = ((1-vZeta).*sigEV) + (vZeta.*sigIV);
             
             % normalization
             if r.normalise
