@@ -6,7 +6,7 @@
 
 clear;
 
-dataname = 'newStoredPhase/VSdata_OEFdist_Static_3vessels';
+dataname = 'newStoredPhase/VSdata_VesselDist_Triple_Static';
 
 load(dataname);
 

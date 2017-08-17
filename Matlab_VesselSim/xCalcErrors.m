@@ -15,4 +15,4 @@ end
 
 sigm = mean(allsig,2);
 sige = std(allsig,0,2);
-save('signalResults/VSsignal_OEFdist_Triple','p','sigm','sige','t');
+save('signalResults/VSsignal_VesselDist_Triple','p','sigm','sige','t');
