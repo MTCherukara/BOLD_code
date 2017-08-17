@@ -89,6 +89,10 @@ function [vesselOrigins, vesselNormals, R, deltaChi, protonPosit, numVessels, ve
     cutOff = 0;
     for k = 1:length(p.R)
     	R(cutOff+1:M,:)        = repmat(p.R(k),length(cutOff+1:M),1);
+        deltaChi(cutOff+1:M,:) = p.deltaChi0.*p.Hct(k).*(1-p.Y(k));
+        
+        
+        % need to insert the calculation of DeltaChi in this section...
         
     	volSum = (cumsum(l.*pi.*R.^2));
 		cutOff = find(volSum<(volUniverse.*sum(p.vesselFraction(1:k))),1,'last');
@@ -107,6 +111,7 @@ function [vesselOrigins, vesselNormals, R, deltaChi, protonPosit, numVessels, ve
     % should be 55um = 5.5e-5 m.
     
     R               = R(1:cutOff);
+    deltaChi        = deltaChi(1:cutOff);
     vesselOrigins   = vesselOrigins(1:cutOff,:);
     vesselNormals   = vesselNormals(1:cutOff,:);
 	vesselVolFrac   = volSum(cutOff)/volUniverse;
@@ -127,9 +132,9 @@ function [vesselOrigins, vesselNormals, R, deltaChi, protonPosit, numVessels, ve
 %     vOxygen = (p.Y - 0.1) + 0.2*rand(cutOff,1); % linear from Y-0.1 to Y+0.1
 
     % Single Value
-    vOxygen = p.Y.*ones(cutOff,1);
-    
-    deltaChi  = p.deltaChi0*p.Hct.*(1-vOxygen);
+%     vOxygen = p.Y.*ones(cutOff,1);
+%     
+%     deltaChi  = p.deltaChi0*p.Hct.*(1-vOxygen);
     
     % Radius stuff, linear distribution
 %     R = p.R - 4.5e-5 + (9e-5)*rand(cutOff,1);
