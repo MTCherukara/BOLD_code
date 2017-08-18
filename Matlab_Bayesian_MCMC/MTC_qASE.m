@@ -30,7 +30,7 @@ clear;
 % close all;
 
 plot_fig = 1;       
-save_data = 1;      % set to 1 in order to save out ASE data
+save_data = 0;      % set to 1 in order to save out ASE data
 
 
 %% Model Parameters
@@ -59,9 +59,9 @@ params.Hct  = 0.340;        % no units  - fractional hematocrit
 %% Compute Model
 
 % define tau values that we want to simulate
-tau = (-16:4:64)/1000;      % for simulating data
+% tau = (-16:8:64)/1000;      % for simulating data
 % tau = (-36:4:36)/1000;
-% tau = linspace(-0.016,0.064,1000); % for visualising ( tau(286) = 0 )
+tau = linspace(-0.016,0.064,1000); % for visualising ( tau(286) = 0 )
 np = length(tau);
 
 % call MTC_qASE_model
@@ -88,13 +88,14 @@ if plot_fig
     plot([0 0],[-1 2],'k--','LineWidth',2);
     
     % plot the signal
-    l.s = plot(1000*tau,S_total,'-','LineWidth',4);
+    S_log = log(S_total);
+    l.s = plot(1000*tau,S_log,'-','LineWidth',3);
     
     % labels on axes
     xlabel('Spin Echo Displacement \tau (ms)');
     ylabel('Signal');
     title('qBOLD Signal Measured Using ASE');
-    axis([1000*min(tau), 1000*max(tau), -0.1, 1.1]);
+    axis([1000*min(tau), 1000*max(tau), -1, -0.6]);
     set(gca,'FontSize',18);
     
 end % if plot_fig
