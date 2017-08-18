@@ -6,7 +6,7 @@
 
 clear;
 
-dataname = 'newStoredPhase/VSdata_VesselDist_Triple_Static';
+dataname = 'newStoredPhase/VSdata_VesselDist_Average_Diff';
 
 load(dataname);
 

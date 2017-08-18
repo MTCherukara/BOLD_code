@@ -5,7 +5,7 @@
 
 clear;
 
-dataname = 'signalResults/VS_Signal_17-Aug-2017_';
+dataname = 'signalResults/VS_Signal_18-Aug-2017_';
 
 for ii = 1:10
     load([dataname,num2str(ii),'_ASE.mat']);
@@ -15,4 +15,4 @@ end
 
 sigm = mean(allsig,2);
 sige = std(allsig,0,2);
-save('signalResults/VSsignal_VesselDist_Triple','p','sigm','sige','t');
+save('signalResults/VSsignal_VesselDist_Diff_Average','p','sigm','sige','t');
