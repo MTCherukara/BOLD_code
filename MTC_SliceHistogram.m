@@ -19,7 +19,7 @@
 function MTC_SliceHistogram(varargin)
 
     % Constants
-    nb = 25; % number of bins we want to use
+    nb = 50; % number of bins we want to use
 
     % Load First Slice Data
     [slice1,slicenums.a,filename,vtype] = LoadSlice;

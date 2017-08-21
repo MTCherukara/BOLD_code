@@ -199,7 +199,7 @@ function [tt,Phase] = phaseASE(storedPhase,tarray,p,r)
         
         % define tau values up to and including 0, then above 0 separately,
         % thus ensuring that 0 is included
-        tt = [ -fliplr(0:p.tau:p.TE/2), p.tau:p.tau:p.TE/2 ];
+        tt = [ -fliplr(0:p.tau:p.TE/2), p.tau:p.tau:p.TE/2 ]';
         tt = tt(2:end-1);
     end
     
