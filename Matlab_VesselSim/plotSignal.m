@@ -141,7 +141,7 @@ function [t,sig] = plotSignal(storedPhase,p,r)
        
             % random extra stuff, plot analytical ASE solution
             if r.plotAnalytic && (sq == 3)
-                [ta,sa] = analyticASE(t,p,r);
+                [ta,sa] = MTC_analyticASE(t,p,r);
                 figure(r.fnum);
                 hold on;
                 plot(1000*ta,sa,'--','LineWidth',2);
