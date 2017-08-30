@@ -503,8 +503,9 @@ function runAnalysis(~,~,h)
             leg1 = smartLegend(p1,p2,r);
             legend(leg1,'Location','South');
         elseif r.plotAnalytic
-            leg1 = smartLegend(p1,p1,r);
-            legend(leg1,'Location','South');
+%             leg1 = smartLegend(p1,p1,r);
+%             legend(leg1,'Location','South');
+            legend('Simulated','Analytic','Location','South');
         end
     
         % save the graph, if the user wants it saved

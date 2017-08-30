@@ -9,7 +9,6 @@ function [tau,signal] = MTC_analyticASE(tarray,p,r)
     % define range of tau points
     tau = linspace(tarray(1),tarray(end),1000);
     
-    
     % calculate compartment signals
     S_tis = ASE_tissue(tau,p,r);
     S_bld = ASE_blood(tau,p,r);
