@@ -34,7 +34,7 @@ function [storedProtonPhase, p] = MTC_vesselsim(p)
     % pre-allocate storedProtonPhase
     storedProtonPhase = zeros(p.numSteps/p.ptsPerdt,p.N);
 	
-	for k=1:p.N         % p.N = 10000, loop through points
+	parfor k=1:p.N         % p.N = 10000, loop through points
 	
 		%set up universe
 		[vesselOrigins, vesselNormals, R, deltaChi, protonPosit, numVessels(k), vesselVolFrac(k)] = setupUniverse(p);

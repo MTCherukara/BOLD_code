@@ -5,9 +5,9 @@
 
 clear;
 
-dataname = 'signalResults/VS_Signal_18-Aug-2017_';
+dataname = 'signalResults/VS_Signal_31-Aug-2017_';
 
-for ii = 1:10
+for ii = 1:34
     load([dataname,num2str(ii),'_ASE.mat']);
     
     allsig(:,ii) = sig;
@@ -15,4 +15,4 @@ end
 
 sigm = mean(allsig,2);
 sige = std(allsig,0,2);
-save('signalResults/VSsignal_VesselDist_Diff_Average','p','sigm','sige','t');
+save('signalResults/VSsignal_Convergence2','p','allsig','t');
