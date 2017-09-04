@@ -28,6 +28,9 @@ function PARAMS = param_update(VALUES,PARAMS,INFER)
     %
     % CHANGELOG:
     %
+    % 2017-09-04 (MTC). Added CSF compartment variables lambda, R2e and dF
+    %       so that inference on data that includes CSF can also be tried.
+    %
     % 2017-08-07 (MTC). Added compatibility with the grid-search inference
     %       (MTC_Asymmetric_Bayes) as well as Metropolis Hastings. In this
     %       case, the INFER input should be a string corresponding to the
@@ -52,6 +55,12 @@ if (length(VALUES) == 1)
         PARAMS.zeta = VALUES;
     elseif strcmp(INFER,'R2p')
         PARAMS.R2p = VALUES;
+    elseif strcmp(INFER,'lam0')
+        PARAMS.lam0 = VALUES;
+    elseif strcmp(INFER,'R2e')
+        PARAMS.R2e = VALUES;
+    elseif strcmp(INFER,'dF')
+        PARAMS.dF = VALUES;
     else
         disp('----param_update.m: Invalid parameter specified');
     end

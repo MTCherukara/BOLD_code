@@ -23,8 +23,8 @@
 
 clear; close all;
 
-% Load Data (data from 20-May-2016 uses besselj integral and isn't normalized)
-load('ASE_norm002.mat'); % various sigma = 0.02
+% Load Data 
+load('ASE_Data/ASE_CSF_5_SNR_1000.mat'); % various sigma = 0.02
 DATA = S_sample;
 
 % the r structure will contain settings which will be used in the MH
@@ -35,9 +35,9 @@ r.plot_dist = 0; % set this to 1 to plot distributions and stuff
 
 %% Decide Which Parameters to Infer On
 % if changing these, make sure to change PARAM_UPDATE!
-r.infer_on = [ 1   ,  0    ,    0    , 0   ,    0    ,   0   ,  0    ,   0   ,   0    ];
+r.infer_on = [ 1   ,  0    ,    1    , 0   ,    0    ,   0   ,  0    ,   0   ,   0    ];
 r.var_name = {'OEF','DBV'  ,'\lambda','Hct','\Deltaf','R2(t)','S(0)' ,'R_2^e','\sigma'};
-r.value =    [ 0.4 ,  0.03 ,    0.0  , 0.34,    5    ,   6   ,  1    ,   4   ,   0.01 ]; % true values
+r.value =    [ 0.4 ,  0.05 ,    0.05 , 0.34,    5    ,   6   ,  1    ,   4   ,   0.001 ]; % true values
 r.inits =    [ 0.4 ,  0.05 ,    0.1  , 0.5 ,    7    ,   5   ,  0.5  ,   5   ,   0.001]; % initial values
 r.limit =    [ 0   ,  0    ,    0    , 0.0 ,    0    ,   1   ,  0    ,   0   ,   0     ; ...
                1   ,  0.2  ,    0.5  , 1   ,   10    ,  30   ,  10   ,  20   ,   0.1  ];
@@ -74,13 +74,15 @@ r.nj = 10000;     % number of jumps after the 'burn-in'
 r.ns = 10;    % rate of sampling (1 every N_SAMP jumps)
 r.nu = 10;    % rate of updating scale parameter (once every N_UPDT jumps)
 
-qs = 0.6;       % q_sig scaling parameter = ideal acceptance rate
+qs = 1-0.234;       % q_sig scaling parameter = ideal acceptance rate
 
 % counters, these will be used to adjust the width of the Gaussian from
 % which new values are chosen
 c_acc = zeros(1,n_p);   % number of accepted jumps
 c_irj = zeros(1,n_p);   % number of jumps inside limits that were still rejected
 c_orj = zeros(1,n_p);   % number of jumps outside limits that were rejected
+t_acc = zeros(1,n_p);   % track the total number of accepted jumps
+t_rej = zeros(1,n_p);   % track the total number of rejected jumps
 
 % the range over which a function could lie, used to determine the width of
 % the Gaussian function from which new values are randomly drawn
@@ -146,7 +148,7 @@ for ii = 1:(r.nb+r.nj)
             % proportional to their ratio
             if (L0/L1) > (rand)
                 
-                c_acc(par) = c_acc(par) + 1; 
+                c_acc(par) = c_acc(par) + 1;
                 X0(par) = X1(par);
                 L0 = L1;
                 
@@ -172,6 +174,9 @@ for ii = 1:(r.nb+r.nj)
         % q_sig should start off small. What effect does qs have?
         q_sig = q_sig.*qs.*(1+c_acc+c_irj+c_orj)./(1+c_irj+c_orj);
         
+        t_acc = t_acc + c_acc;          % total acceptance counter
+        t_rej = t_rej + c_irj + c_orj;  % total rejection counter
+        
         % reset the counters every time - is this necessary?
         c_acc = c_acc.*0;
         c_irj = c_irj.*0;
@@ -193,10 +198,14 @@ for ii = 1:(r.nb+r.nj)
 % end of MH loop
 end % for ii = 1:(r.nb+r.nj) 
 
+disp(['Completed main stage (',num2str(r.nj),' jumps)']);
+
+
 % for monitoring
-acc_rate = c_acc./(c_acc+c_irj);
+acc_rate = t_acc./(t_rej+t_acc);
 L_track = L_track(1:l_c-1);
 LR = L_track(2:end)./L_track(1:end-1);
+disp(['    Mean Acceptance Rate: ',num2str(mean(acc_rate))]);
 
 
 %% Distribution Analysis

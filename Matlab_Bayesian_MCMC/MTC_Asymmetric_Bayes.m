@@ -30,10 +30,10 @@ np = 1000; % number of points to perform Bayesian analysis on
 
 % Select which parameter(s) to infer on (1 = OEF, 2 = DBV, 3 = R2')
 p1 = 1;
-p2 = 2; % setting p2 to 0 will infer on only p1 (1D grid search)
+p2 = 4; % setting p2 to 0 will infer on only p1 (1D grid search)
 
 % Load the Data:
-load('ASE_R2p_DBV_5_SNR_1000.mat');
+load('ASE_Data/ASE_CSF_5_SNR_1000.mat');
 
 % extract relevant parameters
 sigma = params.sig;   % real std of noise
@@ -43,9 +43,9 @@ ns = length(S_sample); % number of data points
 params.R2p = params.dw.*params.zeta;
 
 % Parameter names and search ranges
-pnames  = { 'OEF'  ; 'zeta' ; 'R2p' };
-intervs = [ 0, 1   ; 0.01, 0.1 ; 4, 9  ];  
-%            OEF      DBV      R2'
+pnames  = { 'OEF' ; 'zeta'   ; 'R2p' ; 'lam0'   ; 'dF' };
+intervs = [ 0,1   ; 0.01,0.1 ; 4,9   ; 0.01,0.1 ; 1,10 ];  
+%            OEF     DBV        R2'     v_CSF      dF 
 
 % are we inferring on R2'?
 if (p1 == 3 || p2 == 3)
@@ -134,11 +134,11 @@ if (p2 == 0)
     xlabel(pname);
     legend(['True ',pname],'Posterior','Location','NorthEast');
     
-else % if (inftype == 1)
+else % if (p2 == 0)
     % Plot 2D grid search results
     
     
-    imagesc(w2,w1,posp); hold on;
+    imagesc(w2,w1,pos); hold on;
     c=colorbar;
     plot([tr2,tr2],[  0, 30],'w-','LineWidth',2);
     plot([  0, 30],[tr1,tr1],'w-','LineWidth',2);

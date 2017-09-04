@@ -20,11 +20,11 @@
 % CHANGELOG:
 %
 % 2017-07-03 (MTC). Added the option to plot signal on a logarithmic scale
-% (also made changes to plotSignal.m)
+%       (also made changes to plotSignal.m)
 %
 % 2017-05-18 (MTC). Added input options so that the function can be called
-% from the command line without the need for the GUI (this will enable easy
-% repeated calls)
+%       from the command line without the need for the GUI (this will
+%       enable easy repeated calls)
 %
 % 2017-02-23 (MTC). Added GUI.
 

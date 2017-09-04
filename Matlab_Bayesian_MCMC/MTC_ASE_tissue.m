@@ -74,4 +74,5 @@ ST(c1:c2)  = exp(-(0.3*zeta*(dw.*TAU(c1:c2)).^2));
 % long positive tau regime
 ST(c2:end) = exp(zeta-(zeta*dw*TAU(c2:end)));
 
+% add T2 effect
 ST = ST.*exp(-R2t.*TE);

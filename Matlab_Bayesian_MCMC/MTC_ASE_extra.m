@@ -20,6 +20,9 @@ function SE = MTC_ASE_extra(TAU,PARAMS)
 %
 % CHANGELOG:
 %
+% 2017-09-01 (MTC). Set the signal to be based on tau, not 2*tau, as we
+%       erroneously used before
+%
 % 2017-04-04 (MTC). Various changes.
 
 % pull out constants
@@ -28,6 +31,6 @@ df  = PARAMS.dF;
 TE  = PARAMS.TE;
 
 % calculate signal
-SE = exp( -(R2e.*TE) - 4i.*pi.*df.*abs(TAU));
+SE = exp( -(R2e.*TE) - 2i.*pi.*df.*abs(TAU));
 SE = real(SE);
 
