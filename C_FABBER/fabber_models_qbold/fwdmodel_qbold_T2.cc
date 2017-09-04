@@ -333,7 +333,7 @@ void T2qBoldFwdModel::Evaluate(const ColumnVector &params, ColumnVector &result)
         St *= exp(-R2t*TE);
 
         // blood signal
-        Sb = exp(-R2b*(TE-tau)*exp(-R2bs*abs(tau)));
+        Sb = exp(-R2b*(TE-tau))*exp(-R2bs*abs(tau));
 
         // Total signal
         result(i) = S0*(((1-DBV)*St) + (DBV*Sb));

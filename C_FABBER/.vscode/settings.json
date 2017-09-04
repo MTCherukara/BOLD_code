@@ -8,7 +8,9 @@
         "ios": "cpp",
         "map": "cpp",
         "system_error": "cpp",
-        "iosfwd": "cpp"
+        "iosfwd": "cpp",
+        "cmath": "cpp",
+        "cstdlib": "cpp"
     },
     "editor.minimap.enabled": false
 }
