@@ -16,6 +16,7 @@
 #include <newmatio.h>
 #include <stdexcept> 
 #include <cmath>
+#include <complex>
 
 using namespace std;
 using namespace NEWMAT;
@@ -50,7 +51,10 @@ void R2primeFwdModel::Initialize(ArgsType &args)
     infer_R2p = args.ReadBool("inferR2p");
     infer_DBV = args.ReadBool("inferDBV");
     infer_R2t = args.ReadBool("inferR2t");
-    infer_S0 = args.ReadBool("inferS0");
+    infer_S0  = args.ReadBool("inferS0");
+    infer_R2e = args.ReadBool("inferR2e");
+    infer_dF  = args.ReadBool("inferdF");
+    infer_lam = args.ReadBool("inferlam");
 
     // read through input arguments using &args
     TE = convertTo<double>(args.ReadWithDefault("TE","0.074"));
@@ -93,6 +97,18 @@ void R2primeFwdModel::Initialize(ArgsType &args)
     {
         LOG << "Inferring on scaling parameter S0" << endl;
     }
+    if (infer_R2e)
+    {
+        LOG << "Inferring on R2 of CSF" << endl;
+    }
+    if (infer_dF)
+    {
+        LOG << "Inferring on CSF frequency shift dF" << endl;
+    }
+    if (infer_lam)
+    {
+        LOG << "Inferring on CSF volume fraction lambda" << endl;
+    }
     
 } // Initialize
 
@@ -121,6 +137,18 @@ void R2primeFwdModel::NameParams(vector<string> &names) const
     {
         names.push_back("S0");  // parameter 4 - S0 scaling factor
     }
+    if (infer_R2e)
+    {
+        names.push_back("R2e");  // parameter 5 - R2 (of CSF)
+    }
+    if (infer_dF)
+    {
+        names.push_back("dF");  // parameter 6 - frequency shift of CSF
+    }
+    if (infer_lam)
+    {
+        names.push_back("lambda");  // parameter 7 - CSF volume fraction
+    }
 
 } // NameParams
 
@@ -144,7 +172,7 @@ void R2primeFwdModel::HardcodedInitialDists(MVNDist &prior, MVNDist &posterior) 
     if (infer_DBV)
     {
         prior.means(DBV_index()) = 0.05;
-        precisions(DBV_index(), DBV_index()) = 1;
+        precisions(DBV_index(), DBV_index()) = 1.0;
     }
 
     if (infer_R2t)
@@ -157,6 +185,24 @@ void R2primeFwdModel::HardcodedInitialDists(MVNDist &prior, MVNDist &posterior) 
     {
         prior.means(S0_index()) = 100;
         precisions(S0_index(), S0_index()) = 1e-4;
+    }
+
+    if (infer_R2e)
+    {
+        prior.means(R2e_index()) = 4.0;
+        precisions(R2e_index(), R2e_index()) = 0.001;
+    }
+    
+    if (infer_dF)
+    {
+        prior.means(dF_index()) = 5.0;
+        precisions(dF_index(), dF_index()) = 0.001;
+    }
+
+    if (infer_lam)
+    {
+        prior.means(lam_index()) = 0.001;
+        precisions(lam_index(), lam_index()) = 1.0;
     }
 
     prior.SetPrecisions(precisions);
@@ -172,7 +218,7 @@ void R2primeFwdModel::HardcodedInitialDists(MVNDist &prior, MVNDist &posterior) 
     if (infer_DBV)
     {
         posterior.means(DBV_index()) = 0.05;
-        precisions(DBV_index(), DBV_index()) = 1;
+        precisions(DBV_index(), DBV_index()) = 1.0;
     }
 
     if (infer_R2t)
@@ -185,6 +231,24 @@ void R2primeFwdModel::HardcodedInitialDists(MVNDist &prior, MVNDist &posterior) 
     {
         posterior.means(S0_index()) = 100;
         precisions(S0_index(), S0_index()) = 0.001;
+    }
+
+    if (infer_R2e)
+    {
+        posterior.means(R2e_index()) = 4.0;
+        precisions(R2e_index(), R2e_index()) = 0.001;
+    }
+    
+    if (infer_dF)
+    {
+        posterior.means(dF_index()) = 5.0;
+        precisions(dF_index(), dF_index()) = 0.001;
+    }
+
+    if (infer_lam)
+    {
+        posterior.means(lam_index()) = 0.001;
+        precisions(lam_index(), lam_index()) = 1.0;
     }
 
 } // HardcodedInitialDists
@@ -203,6 +267,10 @@ void R2primeFwdModel::Evaluate(const ColumnVector &params, ColumnVector &result)
     // calculated parameters
     double St;  // tissue signal
     double Sb;  // blood signal
+    double Se;  // extracellular signal
+    complex<double> Sec; // complex version of the extracellular signal (may be unnecessary)
+
+    complex<double> i(0,1);
 
     // derived parameters
     double dw;
@@ -215,6 +283,9 @@ void R2primeFwdModel::Evaluate(const ColumnVector &params, ColumnVector &result)
     double DBV;
     double R2t;
     double S0;
+    double R2e;
+    double dF;
+    double lam;
 
     // assign values to parameters
     if (infer_R2p)
@@ -248,6 +319,30 @@ void R2primeFwdModel::Evaluate(const ColumnVector &params, ColumnVector &result)
     else
     {
         S0 = 100.0;
+    }
+    if (infer_R2e)
+    {
+        R2e = abs(paramcpy(R2e_index()));
+    }
+    else
+    {
+        R2e = 4.00;
+    }
+    if (infer_dF)
+    {
+        dF = abs(paramcpy(dF_index()));
+    }
+    else
+    {
+        dF = 5.00;
+    }
+    if (infer_lam)
+    {
+        lam = abs(paramcpy(lam_index()));
+    }
+    else
+    {
+        lam = 0.0;
     }
 
     // now evaluate the static dephasing qBOLD model for 2 compartments
@@ -284,15 +379,24 @@ void R2primeFwdModel::Evaluate(const ColumnVector &params, ColumnVector &result)
         Sb = exp(-R2b*(TE-tau))*exp(-R2bs*abs(tau));
 
         // calculate extracellular signal
+        Sec = exp(-R2e*TE)*exp(-2*i*M_PI*dF*abs(tau));
+        Se = Sec.real();
 
         // Total signal
-        result(i) = S0*(((1-DBV)*St) + (DBV*Sb));
+        result(i) = S0*(((1-DBV-lam)*St) + (DBV*Sb) + (lam*Se));
 
     } // for (int i = 1; i <= taus.Nrows(); i++)
 
     
-    // alternative, if DBV is outside the bounds
+    // alternative, if DBV or Lambda are outside the bounds
     if ( DBV > 1.0 )
+    {
+        for (int i = 1; i <= taus.Nrows(); i++)
+        {
+            result(i) = 0.0001;
+        }
+    }
+    else if ( lam > 1.0 )
     {
         for (int i = 1; i <= taus.Nrows(); i++)
         {

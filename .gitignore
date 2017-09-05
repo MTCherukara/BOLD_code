@@ -1,3 +1,6 @@
 *~
 *.o
 *.a
+runfabber*
+fabber
+*.dylib
