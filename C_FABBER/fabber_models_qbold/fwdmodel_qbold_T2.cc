@@ -134,30 +134,30 @@ void T2qBoldFwdModel::HardcodedInitialDists(MVNDist &prior, MVNDist &posterior) 
     assert(prior.means.Nrows() == NumParams());
 
     // create diagonal matrix to store precisions
-    SymmetricMatrix precisions = IdentityMatrix(NumParams()) *1e-6;
+    SymmetricMatrix precisions = IdentityMatrix(NumParams()) *1e-3;
 
     if (infer_OEF)
     {
         prior.means(OEF_index()) = 0.7;
-        precisions(OEF_index(), OEF_index()) = 1;
+        precisions(OEF_index(), OEF_index()) = 0.1;
     }
 
     if (infer_DBV)
     {
         prior.means(DBV_index()) = 0.05;
-        precisions(DBV_index(), DBV_index()) = 1;
+        precisions(DBV_index(), DBV_index()) = 0.1;
     }
 
     if (infer_R2t)
     {
         prior.means(R2t_index()) = 9;
-        precisions(R2t_index(), R2t_index()) = 1e-3;
+        precisions(R2t_index(), R2t_index()) = 0.01;
     }
 
     if (infer_S0)
     {
         prior.means(S0_index()) = 100;
-        precisions(S0_index(), S0_index()) = 1e-4;
+        precisions(S0_index(), S0_index()) = 0.0001;
     }
 
     prior.SetPrecisions(precisions);
@@ -169,25 +169,25 @@ void T2qBoldFwdModel::HardcodedInitialDists(MVNDist &prior, MVNDist &posterior) 
     if (infer_OEF)
     {
         posterior.means(OEF_index()) = 0.7;
-        precisions(OEF_index(), OEF_index()) = 1;
+        precisions(OEF_index(), OEF_index()) = 1e-3;
     }
 
     if (infer_DBV)
     {
         posterior.means(DBV_index()) = 0.05;
-        precisions(DBV_index(), DBV_index()) = 1;
+        precisions(DBV_index(), DBV_index()) = 1e-3;
     }
 
     if (infer_R2t)
     {
         posterior.means(R2t_index()) = 9.0;
-        precisions(R2t_index(), R2t_index()) = 0.1;
+        precisions(R2t_index(), R2t_index()) = 1e-3;
     }
 
     if (infer_S0)
     {
         posterior.means(S0_index()) = 100;
-        precisions(S0_index(), S0_index()) = 0.001;
+        precisions(S0_index(), S0_index()) = 1e-3;
     }
 
     posterior.SetPrecisions(precisions);

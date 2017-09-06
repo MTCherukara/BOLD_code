@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 2.7)
 # For single model you should only need to change the line below, if your files keep to the naming convention!
 set(MODELS_NAME qbold)
 
-# For multiple models you may need to add your model source code files below
+# For multiple models you ma y need to add your model source code files below
 set(MODELS_SRC fwdmodel_qbold_R2p.cc fwdmodel_qbold_T2.cc)
 
 add_library(fabber_models_${MODELS_NAME} SHARED ${MODELS_SRC})

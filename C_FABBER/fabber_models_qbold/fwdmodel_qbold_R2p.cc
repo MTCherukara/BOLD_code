@@ -63,20 +63,17 @@ void R2primeFwdModel::Initialize(ArgsType &args)
     string tau_temp;
 
     // this parses through the input args for tau1=X, tau2=X and so on, until it reaches a
-    // tau that isn't supplied in the argument, and it adds all these to the ColumnVector
-    // called tau_list
+    // tau that isn't supplied in the argument, and it adds all these to the ColumnVector taus
     while (true)
     {
-        int N = tau_list.Nrows()+1;
+        int N = taus.Nrows()+1;
         tau_temp = args.ReadWithDefault("tau"+stringify(N), "stop!");
         if (tau_temp == "stop!") break;
 
         ColumnVector tmp(1);
         tmp = convertTo<double>(tau_temp);
-        tau_list &= tmp;
+        taus &= tmp;
     }
-
-    taus = tau_list; // why is this necessary?
 
     // add information to the log
     LOG << "Inference using development model" << endl;
@@ -161,48 +158,48 @@ void R2primeFwdModel::HardcodedInitialDists(MVNDist &prior, MVNDist &posterior) 
     assert(prior.means.Nrows() == NumParams());
 
     // create diagonal matrix to store precisions
-    SymmetricMatrix precisions = IdentityMatrix(NumParams()) *1e-6;
+    SymmetricMatrix precisions = IdentityMatrix(NumParams()) * 1e-3;
 
     if (infer_R2p)
     {
         prior.means(R2p_index()) = 5.0;
-        precisions(R2p_index(), R2p_index()) = 1e-3;
+        precisions(R2p_index(), R2p_index()) = 0.01;
     }
 
     if (infer_DBV)
     {
         prior.means(DBV_index()) = 0.05;
-        precisions(DBV_index(), DBV_index()) = 1.0;
+        precisions(DBV_index(), DBV_index()) = 0.1;
     }
 
     if (infer_R2t)
     {
         prior.means(R2t_index()) = 9;
-        precisions(R2t_index(), R2t_index()) = 1e-3;
+        precisions(R2t_index(), R2t_index()) = 0.01;
     }
 
     if (infer_S0)
     {
         prior.means(S0_index()) = 100;
-        precisions(S0_index(), S0_index()) = 1e-4;
+        precisions(S0_index(), S0_index()) = 0.0001;
     }
 
     if (infer_R2e)
     {
         prior.means(R2e_index()) = 4.0;
-        precisions(R2e_index(), R2e_index()) = 0.001;
+        precisions(R2e_index(), R2e_index()) = 0.01;
     }
     
     if (infer_dF)
     {
         prior.means(dF_index()) = 5.0;
-        precisions(dF_index(), dF_index()) = 0.001;
+        precisions(dF_index(), dF_index()) = 0.01;
     }
 
     if (infer_lam)
     {
         prior.means(lam_index()) = 0.001;
-        precisions(lam_index(), lam_index()) = 1.0;
+        precisions(lam_index(), lam_index()) = 0.1;
     }
 
     prior.SetPrecisions(precisions);
@@ -212,43 +209,43 @@ void R2primeFwdModel::HardcodedInitialDists(MVNDist &prior, MVNDist &posterior) 
     if (infer_R2p)
     {
         posterior.means(R2p_index()) = 5.0;
-        precisions(R2p_index(), R2p_index()) = 0.1;
+        precisions(R2p_index(), R2p_index()) = 1e-3;
     }
 
     if (infer_DBV)
     {
         posterior.means(DBV_index()) = 0.05;
-        precisions(DBV_index(), DBV_index()) = 1.0;
+        precisions(DBV_index(), DBV_index()) = 1e-3;
     }
 
     if (infer_R2t)
     {
         posterior.means(R2t_index()) = 9.0;
-        precisions(R2t_index(), R2t_index()) = 0.1;
+        precisions(R2t_index(), R2t_index()) = 1e-3;
     }
 
     if (infer_S0)
     {
         posterior.means(S0_index()) = 100;
-        precisions(S0_index(), S0_index()) = 0.001;
+        precisions(S0_index(), S0_index()) = 1e-3;
     }
 
     if (infer_R2e)
     {
         posterior.means(R2e_index()) = 4.0;
-        precisions(R2e_index(), R2e_index()) = 0.001;
+        precisions(R2e_index(), R2e_index()) = 1e-3;
     }
     
     if (infer_dF)
     {
         posterior.means(dF_index()) = 5.0;
-        precisions(dF_index(), dF_index()) = 0.001;
+        precisions(dF_index(), dF_index()) = 1e-3;
     }
 
     if (infer_lam)
     {
         posterior.means(lam_index()) = 0.001;
-        precisions(lam_index(), lam_index()) = 1.0;
+        precisions(lam_index(), lam_index()) = 1e-3;
     }
 
 } // HardcodedInitialDists

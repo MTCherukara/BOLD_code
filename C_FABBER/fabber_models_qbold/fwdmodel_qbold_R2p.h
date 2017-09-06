@@ -35,7 +35,6 @@ public:
 protected:
 
     // Scan Parameters
-    NEWMAT::ColumnVector tau_list;
     NEWMAT::ColumnVector taus;
     double TE;
 
