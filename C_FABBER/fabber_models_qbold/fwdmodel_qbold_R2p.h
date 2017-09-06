@@ -29,7 +29,8 @@ public:
     virtual int NumParams() const 
     {
         return (infer_R2p ? 1 : 0) + (infer_DBV ? 1 : 0) + (infer_R2t ? 1 : 0) + (infer_S0 ? 1 : 0) + (infer_R2e ? 1 : 0) + (infer_dF ? 1 : 0) + (infer_lam ? 1 : 0);
-    }    virtual void HardcodedInitialDists(MVNDist &prior, MVNDist &posterior) const;
+    }    
+    virtual void HardcodedInitialDists(MVNDist &prior, MVNDist &posterior) const;
     virtual void Evaluate(const NEWMAT::ColumnVector &params, NEWMAT::ColumnVector &result) const;
 
 protected:
