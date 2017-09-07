@@ -353,14 +353,14 @@ void R2primeFwdModel::Evaluate(const ColumnVector &params, ColumnVector &result)
     {
         for (int i = 1; i <= taus.Nrows(); i++)
         {
-            result(i) = 0.0001;
+            result(i) = 1e8;
         }
     }
     else if ( lam > 1.0 )
     {
         for (int i = 1; i <= taus.Nrows(); i++)
         {
-            result(i) = 0.0001;
+            result(i) = 1e8;
         }
     }
     
