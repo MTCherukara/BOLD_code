@@ -56,14 +56,15 @@ void R2primeFwdModel::Initialize(ArgsType &args)
     infer_dF  = args.ReadBool("inferdF");
     infer_lam = args.ReadBool("inferlam");
 
-    // read through input arguments using &args
-    TE = convertTo<double>(args.ReadWithDefault("TE","0.074"));
 
-    // collect tau values
+    // temporary holders for input values
     string tau_temp;
+    string TE_temp; 
 
-    // this parses through the input args for tau1=X, tau2=X and so on, until it reaches a
-    // tau that isn't supplied in the argument, and it adds all these to the ColumnVector taus
+    // First read tau values, since these will always be specified
+
+    // this parses through the input args for tau1=X, tau2=X and so on, until it reaches a tau
+    // that isn't supplied in the argument, and it adds all these to the ColumnVector taus
     while (true)
     {
         int N = taus.Nrows()+1;
@@ -73,11 +74,39 @@ void R2primeFwdModel::Initialize(ArgsType &args)
         ColumnVector tmp(1);
         tmp = convertTo<double>(tau_temp);
         taus &= tmp;
+
     }
 
+    // Then read TE values
+
+    // see if there is a single TE specified
+    TE_temp = args.ReadWithDefault("TE","noTE");
+
+    // now loop through the number of tau values, and assign each one a TE
+    for (int i = 1; i <= taus.Nrows(); i++)
+    {
+        // see if there is an input called "TE"
+        TE_temp = args.ReadWithDefault("TE","noTE");
+
+        // if there is no "TE", read TE1, TE2, etc.
+        if (TE_temp == "noTE")
+        {
+            TE_temp = args.ReadWithDefault("TE"+stringify(i), "0.074");
+        }
+
+        ColumnVector tmp(1);
+        tmp = convertTo<double>(TE_temp);
+        TEvals &= tmp;
+
+    }
+
+
     // add information to the log
-    LOG << "Inference using development model" << endl;
-    LOG << "    Parameters: TE = " << TE << ", n taus = " << taus.Nrows() << endl;
+    LOG << "Inference using development model" << endl;    
+    for (int i = 1; i <= taus.Nrows(); i++)
+    {
+        LOG << "    TE(" << i << ") = " << TEvals(i) << ",    tau(" << i << ") = " << taus(i) << endl;
+    }    
     if (infer_R2p)
     {
         LOG << "Infering on R2p " << endl;
@@ -318,6 +347,7 @@ void R2primeFwdModel::Evaluate(const ColumnVector &params, ColumnVector &result)
     for (int i = 1; i <= taus.Nrows(); i++)
     {
         double tau = taus(i);
+        double TE = TEvals(i);
 
         if (tau < (-1.5/dw))
         {

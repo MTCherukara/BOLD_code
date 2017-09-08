@@ -37,7 +37,7 @@ protected:
 
     // Scan Parameters
     NEWMAT::ColumnVector taus;
-    double TE;
+    NEWMAT::ColumnVector TEvals;
 
     // Lookup starting indices of parameters
     int R2p_index() const
