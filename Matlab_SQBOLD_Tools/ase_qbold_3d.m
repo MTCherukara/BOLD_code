@@ -46,7 +46,7 @@ p = zeros(x,y,z,2);
 for xID = 1:x
     for yID = 1:y
         for zID = 1:z
-            % fprintf('xID%d ; yID%d ; zID%d \n',xID,yID,zID) 
+            fprintf('xID%d ; yID%d ; zID%d \n',xID,yID,zID) 
             %% LSCOV: fit linear regime
             X = [ones(length(tau(1,tau_lineID)'),1) tau(1,tau_lineID)'];
             Y = squeeze(ln_Sase(xID,yID,zID,tau_lineID));
@@ -70,14 +70,14 @@ oef = r2p./(dbv.*gamma.*(4./3).*pi.*dChi0.*Hct.*B0);
 dhb = r2p./(dbv.*gamma.*(4./3).*pi.*dChi0.*B0.*k);
 
 % Display parameter maps
-% imgH_r2p = brain_montage(r2p, range_r2p, 0, 'R_2''','R2''','JetBlack', '[s^{-1}]',[1 z]);
-% if nii_out, print('r2p.eps','-depsc2','-r300'), end
-% imgH_dbv = brain_montage(dbv, range_dbv, 0, 'DBV','DBV','JetBlack', '[%]',[1 z]);
-% if nii_out, print('dbv.eps','-depsc2','-r300'), end
-% imgH_oef = brain_montage(oef, range_oef, 0, 'OEF','OEF','JetBlack', '[%]',[1 z]);
-% if nii_out, print('oef.eps','-depsc2','-r300'), end
-% imgH_dhb = brain_montage(dhb, range_dhb, 0, 'dHb','dHb','JetBlack', '[g.dl^{-1}]',[1 z]);
-% if nii_out, print('dhb.eps','-depsc2','-r300'), end
+imgH_r2p = brain_montage(r2p, range_r2p, 0, 'R_2''','R2''','JetBlack', '[s^{-1}]',[1 z]);
+if nii_out, print('r2p.eps','-depsc2','-r300'), end
+imgH_dbv = brain_montage(dbv, range_dbv, 0, 'DBV','DBV','JetBlack', '[%]',[1 z]);
+if nii_out, print('dbv.eps','-depsc2','-r300'), end
+imgH_oef = brain_montage(oef, range_oef, 0, 'OEF','OEF','JetBlack', '[%]',[1 z]);
+if nii_out, print('oef.eps','-depsc2','-r300'), end
+imgH_dhb = brain_montage(dhb, range_dhb, 0, 'dHb','dHb','JetBlack', '[g.dl^{-1}]',[1 z]);
+if nii_out, print('dhb.eps','-depsc2','-r300'), end
 
 %% Output parameter niftis
 if nii_out
@@ -87,10 +87,10 @@ if nii_out
     save_avw(oef, 'oef', 'f', scales)
     save_avw(dhb, 'dhb', 'f', scales)
 
-%     saveas(imgH_r2p, 'r2p.fig')
-%     saveas(imgH_dbv, 'dbv.fig')
-%     saveas(imgH_oef, 'oef.fig')
-%     saveas(imgH_dhb, 'dhb.fig')
+    saveas(imgH_r2p, 'r2p.fig')
+    saveas(imgH_dbv, 'dbv.fig')
+    saveas(imgH_oef, 'oef.fig')
+    saveas(imgH_dhb, 'dhb.fig')
    
 end
 
