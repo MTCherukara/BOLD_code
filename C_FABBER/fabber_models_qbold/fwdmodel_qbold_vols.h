@@ -28,7 +28,7 @@ public:
     virtual void NameParams(vector<string> &names) const;
     virtual int NumParams() const 
     {
-        return 1 + (infer_R2p ? 1 : 0) + (infer_DBV ? 1 : 0) + (infer_lam ? 1 : 0) + (infer_vw ? 1 : 0);
+        return (infer_S0 ? 1 : 0) + (infer_R2p ? 1 : 0) + (infer_DBV ? 1 : 0) + (infer_lam ? 1 : 0) + (infer_vw ? 1 : 0);
     }    
     virtual void HardcodedInitialDists(MVNDist &prior, MVNDist &posterior) const;
     virtual void Evaluate(const NEWMAT::ColumnVector &params, NEWMAT::ColumnVector &result) const;
@@ -42,7 +42,7 @@ protected:
     // Lookup starting indices of parameters
     int S0_index() const
     {
-        return 1; // ALWAYS infer on S0
+        return (infer_S0 ? 1 : 0); // ALWAYS infer on S0
     }
 
     int R2p_index() const
@@ -66,6 +66,7 @@ protected:
     }
 
     // Which parameters will we infer on
+    bool infer_S0;
     bool infer_R2p;
     bool infer_DBV;
     bool infer_lam;

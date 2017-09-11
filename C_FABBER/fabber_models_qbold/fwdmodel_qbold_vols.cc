@@ -49,6 +49,7 @@ string qvolFwdModel::ModelVersion() const
 void qvolFwdModel::Initialize(ArgsType &args)
 {
     
+    infer_S0  = args.ReadBool("inferS0");
     infer_R2p = args.ReadBool("inferR2p");
     infer_DBV = args.ReadBool("inferDBV");
     infer_lam = args.ReadBool("inferlam");
@@ -104,9 +105,10 @@ void qvolFwdModel::Initialize(ArgsType &args)
     {
         LOG << "    TE(" << i << ") = " << TEvals(i) << "    tau(" << i << ") = " << taus(i) << endl;
     }
-
-    LOG << "Inferring on scaling parameter S0" << endl;
-
+    if (infer_S0)
+    {
+        LOG << "Inferring on scaling parameter S0" << endl;
+    }
     if (infer_R2p)
     {
         LOG << "Infering on R2' " << endl;
@@ -135,9 +137,10 @@ void qvolFwdModel::NameParams(vector<string> &names) const
 {
     names.clear();
 
-    // S0
-    names.push_back("S0"); // parameter 1 - S0
-
+    if (infer_S0)
+    {
+        names.push_back("S0");  // parameter 4 - S0 scaling factor
+    }
     if (infer_R2p)
     {
         names.push_back("R2p"); // parameter 2 - R2-prime
@@ -168,11 +171,11 @@ void qvolFwdModel::HardcodedInitialDists(MVNDist &prior, MVNDist &posterior) con
     // create diagonal matrix to store precisions
     SymmetricMatrix precisions = IdentityMatrix(NumParams()) * 1e-3;
 
-    // for S0
-    prior.means(S0_index()) = 400;
-    precisions(S0_index(), S0_index()) = 0.0001; // 1e-4
-
-
+    if (infer_S0)
+    {
+        prior.means(S0_index()) = 400;
+        precisions(S0_index(), S0_index()) = 0.0001; // 1e-4
+    }
     if (infer_R2p)
     {
         prior.means(R2p_index()) = 5.0;
@@ -236,6 +239,7 @@ void qvolFwdModel::Evaluate(const ColumnVector &params, ColumnVector &result) co
     double R2g =  9.09;     // grey matter (all at 3T)
     double R2w = 12.50;     // white matter
     double R2e =  4.00;     // CSF
+    double dF  =  5.00;     // frequency difference GM vs CSF
 
     // parameters
     double S0;
@@ -245,6 +249,14 @@ void qvolFwdModel::Evaluate(const ColumnVector &params, ColumnVector &result) co
     double vw;      // white matter volume
 
     // assign values to parameters
+    if (infer_S0)
+    {
+        S0 = abs(paramcpy(S0_index()));
+    }
+    else
+    {
+        S0 = 100.0;
+    }
     if (infer_R2p)
     {
         R2p = abs(paramcpy(R2p_index()));
@@ -281,7 +293,7 @@ void qvolFwdModel::Evaluate(const ColumnVector &params, ColumnVector &result) co
     // now evaluate the static dephasing qBOLD model for 2 compartments
     dw = R2p/DBV;
     OEF = dw/301.7433;
-    vg = 1.0 - (vm + DBV + lam);
+    vg = 1.0 - (vw + DBV + lam);
 
     R2b  = 10.076 + (111.868*pow(OEF,2.0));
     R2bs = 19.766 + (144.514*pow(OEF,2.0));
