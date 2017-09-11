@@ -1,11 +1,11 @@
-/*   fwdmodel_qbold_R2p.cc - Implements the ASE qBOLD curve fitting model
-                             measuring DBV and R2-prime
+/*   fwdmodel_qbold_vols.cc - Implements the ASE qBOLD curve fitting model
+                              based on compartment volumes
 
  Matthew Cherukara, IBME
 
  Copyright (C) 2017 University of Oxford  */
 
-#include "fwdmodel_qbold_R2p.h"
+#include "fwdmodel_qbold_vols.h"
 
 #include "fabber_core/fwdmodel.h"
 
@@ -24,20 +24,20 @@ using namespace NEWMAT;
 // ------------------------------------------------------------------------------------------
 // --------         Generic Methods             ---------------------------------------------
 // ------------------------------------------------------------------------------------------
-FactoryRegistration<FwdModelFactory, R2primeFwdModel>
-    R2primeFwdModel::registration("qboldR2p");
+FactoryRegistration<FwdModelFactory, qvolFwdModel>
+    qvolFwdModel::registration("qboldvols");
 
-FwdModel *R2primeFwdModel::NewInstance() // unchanged
+FwdModel *qvolFwdModel::NewInstance() // unchanged
 {
-    return new R2primeFwdModel();
+    return new qvolFwdModel();
 } // NewInstance
 
-string R2primeFwdModel::GetDescription() const 
+string qvolFwdModel::GetDescription() const 
 {
-    return "ASE qBOLD model R2-prime version";
+    return "ASE qBOLD model compartment volume version";
 } // GetDescription
 
-string R2primeFwdModel::ModelVersion() const
+string qvolFwdModel::ModelVersion() const
 {
     return "1.0";
 } // ModelVersion
@@ -46,16 +46,13 @@ string R2primeFwdModel::ModelVersion() const
 // ------------------------------------------------------------------------------------------
 // --------         Initialize                  ---------------------------------------------
 // ------------------------------------------------------------------------------------------
-void R2primeFwdModel::Initialize(ArgsType &args)
+void qvolFwdModel::Initialize(ArgsType &args)
 {
+    
     infer_R2p = args.ReadBool("inferR2p");
     infer_DBV = args.ReadBool("inferDBV");
-    infer_R2t = args.ReadBool("inferR2t");
-    infer_S0  = args.ReadBool("inferS0");
-    infer_R2e = args.ReadBool("inferR2e");
-    infer_dF  = args.ReadBool("inferdF");
     infer_lam = args.ReadBool("inferlam");
-
+    infer_vw  = args.ReadBool("inferVW"); 
 
     // temporary holders for input values
     string tau_temp;
@@ -106,34 +103,25 @@ void R2primeFwdModel::Initialize(ArgsType &args)
     for (int i = 1; i <= taus.Nrows(); i++)
     {
         LOG << "    TE(" << i << ") = " << TEvals(i) << "    tau(" << i << ") = " << taus(i) << endl;
-    }    
+    }
+
+    LOG << "Inferring on scaling parameter S0" << endl;
+
     if (infer_R2p)
     {
-        LOG << "Infering on R2p " << endl;
+        LOG << "Infering on R2' " << endl;
     }
     if (infer_DBV)
     {
-        LOG << "Inferring on DBV " << endl;
-    }
-    if (infer_R2t)
-    {
-        LOG << "Inferring on R2/T2 of tissue" << endl;
-    }
-    if (infer_S0)
-    {
-        LOG << "Inferring on scaling parameter S0" << endl;
-    }
-    if (infer_R2e)
-    {
-        LOG << "Inferring on R2 of CSF" << endl;
-    }
-    if (infer_dF)
-    {
-        LOG << "Inferring on CSF frequency shift dF" << endl;
+        LOG << "Inferring on deoxygenated blood volume" << endl;
     }
     if (infer_lam)
     {
         LOG << "Inferring on CSF volume fraction lambda" << endl;
+    }
+    if (infer_vw)
+    {
+        LOG << "Inferring on white matter volume fraction" << endl;
     }
     
 } // Initialize
@@ -143,37 +131,28 @@ void R2primeFwdModel::Initialize(ArgsType &args)
 // --------         NameParameters              ---------------------------------------------
 // ------------------------------------------------------------------------------------------
 
-void R2primeFwdModel::NameParams(vector<string> &names) const
+void qvolFwdModel::NameParams(vector<string> &names) const
 {
     names.clear();
 
+    // S0
+    names.push_back("S0"); // parameter 1 - S0
+
     if (infer_R2p)
     {
-        names.push_back("R2p"); // parameter 1 - R2 prime
+        names.push_back("R2p"); // parameter 2 - R2-prime
     }
     if (infer_DBV)
     {
-        names.push_back("DBV"); // parameter 2 - DBV
-    }
-    if (infer_R2t)
-    {
-        names.push_back("R2t");  // parameter 3 - R2 (of tissue)
-    }
-    if (infer_S0)
-    {
-        names.push_back("S0");  // parameter 4 - S0 scaling factor
-    }
-    if (infer_R2e)
-    {
-        names.push_back("R2e");  // parameter 5 - R2 (of CSF)
-    }
-    if (infer_dF)
-    {
-        names.push_back("dF");  // parameter 6 - frequency shift of CSF
+        names.push_back("DBV");  // parameter 3 - DBV
     }
     if (infer_lam)
     {
-        names.push_back("lambda");  // parameter 7 - CSF volume fraction
+        names.push_back("lam");  // parameter 4 - lambda (CSF vol)
+    }
+    if (infer_vw)
+    {
+        names.push_back("VW");  // parameter 5 - vol white matter
     }
 
 } // NameParams
@@ -181,13 +160,18 @@ void R2primeFwdModel::NameParams(vector<string> &names) const
 // ------------------------------------------------------------------------------------------
 // --------         HardcodedInitialDists       ---------------------------------------------
 // ------------------------------------------------------------------------------------------
-void R2primeFwdModel::HardcodedInitialDists(MVNDist &prior, MVNDist &posterior) const
+void qvolFwdModel::HardcodedInitialDists(MVNDist &prior, MVNDist &posterior) const
 {
     // make sure we have the right number of means specified
     assert(prior.means.Nrows() == NumParams());
 
     // create diagonal matrix to store precisions
     SymmetricMatrix precisions = IdentityMatrix(NumParams()) * 1e-3;
+
+    // for S0
+    prior.means(S0_index()) = 400;
+    precisions(S0_index(), S0_index()) = 0.0001; // 1e-4
+
 
     if (infer_R2p)
     {
@@ -201,51 +185,28 @@ void R2primeFwdModel::HardcodedInitialDists(MVNDist &prior, MVNDist &posterior) 
         precisions(DBV_index(), DBV_index()) = 0.1; // 1e-1
     }
 
-    if (infer_R2t)
-    {
-        prior.means(R2t_index()) = 9;
-        precisions(R2t_index(), R2t_index()) = 0.01; // 1e-2
-    }
-
-    if (infer_S0)
-    {
-        prior.means(S0_index()) = 400;
-        precisions(S0_index(), S0_index()) = 0.0001; // 1e-4
-    }
-
-    if (infer_R2e)
-    {
-        prior.means(R2e_index()) = 4.0;
-        precisions(R2e_index(), R2e_index()) = 0.01; // 1e-2
-    }
-    
-    if (infer_dF)
-    {
-        prior.means(dF_index()) = 5.0;
-        precisions(dF_index(), dF_index()) = 0.01; // 1e-2
-    }
-
     if (infer_lam)
     {
         prior.means(lam_index()) = 0.001;
         precisions(lam_index(), lam_index()) = 0.1; // 1-e1
     }
 
+    if (infer_vw)
+    {
+        prior.means(lam_index()) = 0.1;
+        precisions(lam_index(), lam_index()) = 0.1; // 1-e1
+    }
+
     prior.SetPrecisions(precisions);
 
     posterior = prior; // we don't need to change the initial guess (at least, not at this stage)
-    
-    // this whole section seems unnecessary - changing the initial posterior appears to have no
-    // effect on the final outcome, which is good, because we'd expect the algorithm to converge
-    // onto the correct result regardless of where it started from. I'm still not sure, however,
-    // where our priors are truly uninformative. 
 
 } // HardcodedInitialDists
 
 // ------------------------------------------------------------------------------------------
 // --------         Evaluate                    ---------------------------------------------
 // ------------------------------------------------------------------------------------------
-void R2primeFwdModel::Evaluate(const ColumnVector &params, ColumnVector &result) const
+void qvolFwdModel::Evaluate(const ColumnVector &params, ColumnVector &result) const
 {
     // Check we have been given the right number of parameters
     assert(params.Nrows() == NumParams());
@@ -254,7 +215,10 @@ void R2primeFwdModel::Evaluate(const ColumnVector &params, ColumnVector &result)
     ColumnVector paramcpy = params;
 
     // calculated parameters
-    double St;  // tissue signal
+    double St;  // tissue signal, which will divide into: 
+    double Sg;  // grey matter signal
+    double Sw;  // white matter signal
+
     double Sb;  // blood signal
     double Se;  // extracellular signal
     complex<double> Sec; // complex version of the extracellular signal (may be unnecessary)
@@ -266,15 +230,19 @@ void R2primeFwdModel::Evaluate(const ColumnVector &params, ColumnVector &result)
     double R2b;
     double R2bs;
     double OEF;
+    double vg;      // grey matter (everything else) volume
+
+    // fixed parameters
+    double R2g =  9.09;     // grey matter (all at 3T)
+    double R2w = 12.50;     // white matter
+    double R2e =  4.00;     // CSF
 
     // parameters
+    double S0;
     double R2p;
     double DBV;
-    double R2t;
-    double S0;
-    double R2e;
-    double dF;
     double lam;
+    double vw;      // white matter volume
 
     // assign values to parameters
     if (infer_R2p)
@@ -293,38 +261,6 @@ void R2primeFwdModel::Evaluate(const ColumnVector &params, ColumnVector &result)
     {
         DBV = 0.03;
     }
-    if (infer_R2t)
-    {
-        R2t = abs(paramcpy(R2t_index()));
-    }
-    else
-    {
-        R2t = 9.09;
-    }
-    if (infer_S0)
-    {
-        S0 = abs(paramcpy(S0_index()));
-    }
-    else
-    {
-        S0 = 100.0;
-    }
-    if (infer_R2e)
-    {
-        R2e = abs(paramcpy(R2e_index()));
-    }
-    else
-    {
-        R2e = 4.00;
-    }
-    if (infer_dF)
-    {
-        dF = abs(paramcpy(dF_index()));
-    }
-    else
-    {
-        dF = 5.00;
-    }
     if (infer_lam)
     {
         lam = abs(paramcpy(lam_index()));
@@ -333,10 +269,19 @@ void R2primeFwdModel::Evaluate(const ColumnVector &params, ColumnVector &result)
     {
         lam = 0.0;
     }
+    if (infer_vw)
+    {
+        vw = abs(paramcpy(vw_index()));
+    }
+    else
+    {
+        vw = 0.1;
+    }
 
     // now evaluate the static dephasing qBOLD model for 2 compartments
     dw = R2p/DBV;
     OEF = dw/301.7433;
+    vg = 1.0 - (vm + DBV + lam);
 
     R2b  = 10.076 + (111.868*pow(OEF,2.0));
     R2bs = 19.766 + (144.514*pow(OEF,2.0));
@@ -362,8 +307,9 @@ void R2primeFwdModel::Evaluate(const ColumnVector &params, ColumnVector &result)
             St = exp(-0.3*DBV*pow(dw*tau,2.0));
         }
 
-        // add in the T2 effect to St
-        St *= exp(-R2t*TE);
+        // calculate tissue signals in grey and white matter
+        Sg = St*exp(-R2g*TE);
+        Sw = St*exp(-R2w*TE);
 
         // calculate blood signal
         Sb = exp(-R2b*(TE-tau))*exp(-R2bs*abs(tau));
@@ -373,12 +319,12 @@ void R2primeFwdModel::Evaluate(const ColumnVector &params, ColumnVector &result)
         Se = Sec.real();
 
         // Total signal
-        result(i) = S0*(((1-DBV-lam)*St) + (DBV*Sb) + (lam*Se));
+        result(i) = S0*((vg*Sg) + (vw*Sw) + (DBV*Sb) + (lam*Se));
 
     } // for (int i = 1; i <= taus.Nrows(); i++)
 
     
-    // alternative, if DBV or Lambda are outside the bounds
+    // alternative, if DBV or Lambda or VW are outside the bounds
     if ( DBV > 1.0 )
     {
         for (int i = 1; i <= taus.Nrows(); i++)
@@ -387,6 +333,13 @@ void R2primeFwdModel::Evaluate(const ColumnVector &params, ColumnVector &result)
         }
     }
     else if ( lam > 1.0 )
+    {
+        for (int i = 1; i <= taus.Nrows(); i++)
+        {
+            result(i) = 1e8;
+        }
+    }
+    else if ( vw > 1.0 )
     {
         for (int i = 1; i <= taus.Nrows(); i++)
         {
