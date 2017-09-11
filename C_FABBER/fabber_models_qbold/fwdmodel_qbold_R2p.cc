@@ -379,18 +379,18 @@ void R2primeFwdModel::Evaluate(const ColumnVector &params, ColumnVector &result)
 
     
     // alternative, if DBV or Lambda are outside the bounds
-    if ( DBV > 1.0 )
+    if ( DBV > 2.0 )
     {
         for (int i = 1; i <= taus.Nrows(); i++)
         {
-            result(i) = 1e8;
+            result(i) = 0.0;
         }
     }
-    else if ( lam > 1.0 )
+    else if ( lam > 2.0 )
     {
         for (int i = 1; i <= taus.Nrows(); i++)
         {
-            result(i) = 1e8;
+            result(i) = 0.0;
         }
     }
     
