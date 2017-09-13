@@ -379,7 +379,7 @@ void R2primeFwdModel::Evaluate(const ColumnVector &params, ColumnVector &result)
 
     
     // alternative, if values are outside reasonable bounds
-    if ( DBV > 2.0 || lam > 2.0 )
+    if ( DBV > 1.0 || lam > 1.0 )
     {
         for (int ii = 1; ii <= taus.Nrows(); ii++)
         {
