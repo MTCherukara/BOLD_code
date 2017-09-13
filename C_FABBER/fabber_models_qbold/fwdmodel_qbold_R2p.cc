@@ -103,9 +103,9 @@ void R2primeFwdModel::Initialize(ArgsType &args)
 
     // add information to the log
     LOG << "Inference using development model" << endl;    
-    for (int i = 1; i <= taus.Nrows(); i++)
+    for (int ii = 1; ii <= taus.Nrows(); ii++)
     {
-        LOG << "    TE(" << i << ") = " << TEvals(i) << "    tau(" << i << ") = " << taus(i) << endl;
+        LOG << "    TE(" << ii << ") = " << TEvals(ii) << "    tau(" << ii << ") = " << taus(ii) << endl;
     }    
     if (infer_R2p)
     {
@@ -344,10 +344,10 @@ void R2primeFwdModel::Evaluate(const ColumnVector &params, ColumnVector &result)
     // loop through taus
     result.ReSize(taus.Nrows());
 
-    for (int i = 1; i <= taus.Nrows(); i++)
+    for (int ii = 1; ii <= taus.Nrows(); ii++)
     {
-        double tau = taus(i);
-        double TE = TEvals(i);
+        double tau = taus(ii);
+        double TE = TEvals(ii);
 
         if (tau < (-1.5/dw))
         {
@@ -369,31 +369,24 @@ void R2primeFwdModel::Evaluate(const ColumnVector &params, ColumnVector &result)
         Sb = exp(-R2b*(TE-tau))*exp(-R2bs*abs(tau));
 
         // calculate extracellular signal
-        Sec = exp(-R2e*TE)*exp(-2*i*M_PI*dF*abs(tau));
+        Sec = exp(-R2e*TE)*exp(-2.0*i*M_PI*dF*abs(tau));
         Se = Sec.real();
 
         // Total signal
-        result(i) = S0*(((1-DBV-lam)*St) + (DBV*Sb) + (lam*Se));
+        result(ii) = S0*(((1-DBV-lam)*St) + (DBV*Sb) + (lam*Se));
 
     } // for (int i = 1; i <= taus.Nrows(); i++)
 
     
-    // alternative, if DBV or Lambda are outside the bounds
-    if ( DBV > 2.0 )
+    // alternative, if values are outside reasonable bounds
+    if ( DBV > 2.0 || lam > 2.0 )
     {
-        for (int i = 1; i <= taus.Nrows(); i++)
+        for (int ii = 1; ii <= taus.Nrows(); ii++)
         {
-            result(i) = 0.0;
+            result(ii) = 0.0;
         }
     }
-    else if ( lam > 2.0 )
-    {
-        for (int i = 1; i <= taus.Nrows(); i++)
-        {
-            result(i) = 0.0;
-        }
-    }
-    
+
 
     return;
 

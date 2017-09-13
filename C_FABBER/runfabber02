@@ -1,7 +1,7 @@
 #!/bin/bash
 
 ./fabber_qbold --method=spatialvb --noise=white --max-iterations=10 --allow-bad-voxels \
-    --param-spatial-priors=MMMMM \
+    --param-spatial-priors=MMMM \
     --save-residuals --save-model-fit \
     --output=../../Data/Fabber_Results/ \
     --data1=../../Data/subject_01_ASE.nii.gz \
