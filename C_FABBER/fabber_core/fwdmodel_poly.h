@@ -38,11 +38,11 @@ public:
     std::string ModelVersion() const;
 
     void Initialize(FabberRunData &args);
-    int NumParams() const;
-    void NameParams(std::vector<std::string> &names) const;
+    void EvaluateModel(const NEWMAT::ColumnVector &params, NEWMAT::ColumnVector &result,
+        const std::string &key = "") const;
 
-    void HardcodedInitialDists(MVNDist &prior, MVNDist &posterior) const;
-    void Evaluate(const NEWMAT::ColumnVector &params, NEWMAT::ColumnVector &result) const;
+protected:
+    virtual void GetParameterDefaults(std::vector<Parameter> &params) const;
 
 private:
     int m_degree;

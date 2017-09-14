@@ -9,6 +9,7 @@
 #include "noisemodel.h"
 
 #include "rundata.h"
+#include "tools.h"
 
 #include <miscmaths/miscmaths.h>
 
@@ -33,7 +34,6 @@ void NoiseModel::Initialize(FabberRunData &rundata)
 {
     m_log = rundata.GetLogger();
 }
-
 // ARD stuff
 double NoiseModel::SetupARD(vector<int> ardindices, const MVNDist &theta, MVNDist &thetaPrior) const
 {
@@ -47,13 +47,15 @@ double NoiseModel::SetupARD(vector<int> ardindices, const MVNDist &theta, MVNDis
 
         for (size_t i = 0; i < ardindices.size(); i++)
         {
-            PriorPrec(ardindices[i], ardindices[i]) = 1e-12; //set prior to be initally non-informative
+            PriorPrec(ardindices[i], ardindices[i])
+                = 1e-12; // set prior to be initally non-informative
             thetaPrior.means(ardindices[i]) = 0;
 
-            //set the Free energy contribution from ARD term
-            double b = 2 / (theta.means(ardindices[i]) * theta.means(ardindices[i]) + PostCov(ardindices[i],
-                                                                                          ardindices[i]));
-            Fard += -1.5 * (log(b) + digamma(0.5)) - 0.5 - gammaln(0.5) - 0.5 * log(b); //taking c as 0.5 - which it will be!
+            // set the Free energy contribution from ARD term
+            double b = 2 / (theta.means(ardindices[i]) * theta.means(ardindices[i])
+                               + PostCov(ardindices[i], ardindices[i]));
+            Fard += -1.5 * (log(b) + digamma(0.5)) - 0.5 - gammaln(0.5)
+                - 0.5 * log(b); // taking c as 0.5 - which it will be!
         }
 
         thetaPrior.SetPrecisions(PriorPrec);
@@ -62,7 +64,8 @@ double NoiseModel::SetupARD(vector<int> ardindices, const MVNDist &theta, MVNDis
     return Fard;
 }
 
-double NoiseModel::UpdateARD(vector<int> ardindices, const MVNDist &theta, MVNDist &thetaPrior) const
+double NoiseModel::UpdateARD(
+    vector<int> ardindices, const MVNDist &theta, MVNDist &thetaPrior) const
 {
     double Fard = 0;
 
@@ -75,31 +78,19 @@ double NoiseModel::UpdateARD(vector<int> ardindices, const MVNDist &theta, MVNDi
 
         for (size_t i = 0; i < ardindices.size(); i++)
         {
-            PriorCov(ardindices[i], ardindices[i]) = theta.means(ardindices[i]) * theta.means(ardindices[i]) + PostCov(
-                                                                                                                   ardindices[i], ardindices[i]);
+            PriorCov(ardindices[i], ardindices[i])
+                = theta.means(ardindices[i]) * theta.means(ardindices[i])
+                + PostCov(ardindices[i], ardindices[i]);
 
-            //set the Free energy contribution from ARD term
-            double b = 2 / (theta.means(ardindices[i]) * theta.means(ardindices[i]) + PostCov(ardindices[i],
-                                                                                          ardindices[i]));
-            Fard += -1.5 * (log(b) + digamma(0.5)) - 0.5 - gammaln(0.5) - 0.5 * log(b); //taking c as 0.5 - which it will be!
+            // set the Free energy contribution from ARD term
+            double b = 2 / (theta.means(ardindices[i]) * theta.means(ardindices[i])
+                               + PostCov(ardindices[i], ardindices[i]));
+            Fard += -1.5 * (log(b) + digamma(0.5)) - 0.5 - gammaln(0.5)
+                - 0.5 * log(b); // taking c as 0.5 - which it will be!
         }
 
         thetaPrior.SetCovariance(PriorCov);
     }
 
     return Fard;
-}
-
-// Calculate log-gamma from a Taylor expansion; good to one part in 2e-10.
-double gammaln(double x)
-{
-    ColumnVector series(7);
-    series << 2.5066282746310005 << 76.18009172947146 << -86.50532032941677 << 24.01409824083091 << -1.231739572450155
-           << 0.1208650973866179e-2 << -0.5395239384953e-5;
-
-    double total = 1.000000000190015;
-    for (int i = 2; i <= series.Nrows(); i++)
-        total += series(i) / (x + i - 1);
-
-    return log(series(1) * total / x) + (x + 0.5) * log(x + 5.5) - x - 5.5;
 }

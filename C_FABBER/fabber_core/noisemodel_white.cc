@@ -11,6 +11,7 @@
 #include "easylog.h"
 #include "noisemodel.h"
 #include "rundata.h"
+#include "tools.h"
 
 #include <miscmaths/miscmaths.h>
 #include <newmat.h>
@@ -26,7 +27,6 @@ NoiseModel *WhiteNoiseModel::NewInstance()
 {
     return new WhiteNoiseModel();
 }
-
 WhiteParams::WhiteParams(int N)
     : nPhis(N)
     , phis(N)
@@ -43,7 +43,6 @@ WhiteParams *WhiteParams::Clone() const
 {
     return new WhiteParams(*this);
 }
-
 const WhiteParams &WhiteParams::operator=(const NoiseParams &in)
 {
     const WhiteParams &from = dynamic_cast<const WhiteParams &>(in);
@@ -120,12 +119,10 @@ int WhiteNoiseModel::NumParams()
 {
     return Qis.size();
 }
-
 WhiteParams *WhiteNoiseModel::NewParams() const
 {
     return new WhiteParams(Qis.size());
 }
-
 void WhiteNoiseModel::HardcodedInitialDists(NoiseParams &priorIn, NoiseParams &posteriorIn) const
 {
     WhiteParams &prior = dynamic_cast<WhiteParams &>(priorIn);
@@ -155,8 +152,12 @@ void WhiteNoiseModel::HardcodedInitialDists(NoiseParams &priorIn, NoiseParams &p
             // use input nosie std dev to determine the prior (and inital values) for phi
             // this is for the case where N is small, so it make sense to use a large(ish) c_prior
             // since C ~ N (data points) and we struggle to estimate noise when N is small.
-            posterior.phis[i - 1].c = prior.phis[i - 1].c = 0.5;                                             //assumes that a given std deviation is equivelent to N=1 measurements
-            posterior.phis[i - 1].b = prior.phis[i - 1].b = 1 / (phiprior * phiprior * prior.phis[i - 1].c); //NB phiprior is a std dev for the noise that is read in
+            posterior.phis[i - 1].c = prior.phis[i - 1].c
+                = 0.5; // assumes that a given std deviation is equivelent to N=1 measurements
+            posterior.phis[i - 1].b = prior.phis[i - 1].b
+                = 1 / (phiprior * phiprior
+                          * prior.phis[i - 1]
+                                .c); // NB phiprior is a std dev for the noise that is read in
         }
     }
 }
@@ -229,8 +230,8 @@ void WhiteNoiseModel::MakeQis(int dataLen) const
             throw FabberInternalError("At least one Phi was unused! This is probably a bad thing.");
 }
 
-void WhiteNoiseModel::UpdateNoise(NoiseParams &noise, const NoiseParams &noisePrior, const MVNDist &theta,
-    const LinearFwdModel &linear, const ColumnVector &data) const
+void WhiteNoiseModel::UpdateNoise(NoiseParams &noise, const NoiseParams &noisePrior,
+    const MVNDist &theta, const LinearFwdModel &linear, const ColumnVector &data) const
 {
     WhiteParams &posterior = dynamic_cast<WhiteParams &>(noise);
     const WhiteParams &prior = dynamic_cast<const WhiteParams &>(noisePrior);
@@ -270,13 +271,15 @@ void WhiteNoiseModel::UpdateNoise(NoiseParams &noise, const NoiseParams &noisePr
         {
             // Ignore this update and force phi to a specified value.
             // b*c = noise precision = lockedNoiseStdev^-2
-            posterior.phis[i - 1].b = 1 / posterior.phis[i - 1].c / lockedNoiseStdev / lockedNoiseStdev;
+            posterior.phis[i - 1].b
+                = 1 / posterior.phis[i - 1].c / lockedNoiseStdev / lockedNoiseStdev;
         }
     }
 }
 
-void WhiteNoiseModel::UpdateTheta(const NoiseParams &noiseIn, MVNDist &theta, const MVNDist &thetaPrior,
-    const LinearFwdModel &linear, const ColumnVector &data, MVNDist *thetaWithoutPrior, float LMalpha) const
+void WhiteNoiseModel::UpdateTheta(const NoiseParams &noiseIn, MVNDist &theta,
+    const MVNDist &thetaPrior, const LinearFwdModel &linear, const ColumnVector &data,
+    MVNDist *thetaWithoutPrior, float LMalpha) const
 {
     const WhiteParams &noise = dynamic_cast<const WhiteParams &>(noiseIn);
 
@@ -302,6 +305,7 @@ void WhiteNoiseModel::UpdateTheta(const NoiseParams &noiseIn, MVNDist &theta, co
     //
     // use << instead of = because this is considered a lossy assignment
     // (since NEWMAT isn't smart enough to know J'*X*J is always symmetric)
+
     SymmetricMatrix Ltmp;
     Ltmp << J.t() * X * J;
     theta.SetPrecisions(thetaPrior.GetPrecisions() + Ltmp);
@@ -310,8 +314,8 @@ void WhiteNoiseModel::UpdateTheta(const NoiseParams &noiseIn, MVNDist &theta, co
     LogAndSign chk = theta.GetPrecisions().LogDeterminant();
     if (chk.Sign() <= 0)
     {
-        LOG << "WhiteNoiseModel:: In UpdateTheta, theta precisions aren't positive-definite: " << chk.Sign() << ", "
-            << chk.LogValue() << endl;
+        LOG << "WhiteNoiseModel:: In UpdateTheta, theta precisions aren't positive-definite: "
+            << chk.Sign() << ", " << chk.LogValue() << endl;
     }
 
     // Update m (model means)
@@ -323,7 +327,8 @@ void WhiteNoiseModel::UpdateTheta(const NoiseParams &noiseIn, MVNDist &theta, co
         // Normal update (NB the LM update reduces to this when alpha=0 strictly)
         // This is Eq (20) in Chappel et al (2009). Note that covariance of theta
         // is inverse of precisions.
-        theta.means = theta.GetCovariance() * (mTmp + thetaPrior.GetPrecisions() * thetaPrior.means);
+        theta.means
+            = theta.GetCovariance() * (mTmp + thetaPrior.GetPrecisions() * thetaPrior.means);
     }
     else
     {
@@ -336,7 +341,8 @@ void WhiteNoiseModel::UpdateTheta(const NoiseParams &noiseIn, MVNDist &theta, co
         precdiag << prec;
 
         // a different (but equivalent) form for the LM update
-        Delta = J.t() * X * (data - gml) + thetaPrior.GetPrecisions() * thetaPrior.means - thetaPrior.GetPrecisions() * ml;
+        Delta = J.t() * X * (data - gml) + thetaPrior.GetPrecisions() * thetaPrior.means
+            - thetaPrior.GetPrecisions() * ml;
         try
         {
             theta.means = ml + (prec + LMalpha * precdiag).i() * Delta;
@@ -346,7 +352,7 @@ void WhiteNoiseModel::UpdateTheta(const NoiseParams &noiseIn, MVNDist &theta, co
             WARN_ONCE("WhiteNoiseMode: matrix was singular in LM update");
         }
         // LM update - old method
-        //theta.means = (prec + LMalpha*precdiag).i()
+        // theta.means = (prec + LMalpha*precdiag).i()
         // * ( mTmp + thetaPrior.GetPrecisions() * thetaPrior.means );
     }
 
@@ -360,7 +366,8 @@ void WhiteNoiseModel::UpdateTheta(const NoiseParams &noiseIn, MVNDist &theta, co
 }
 
 double WhiteNoiseModel::CalcFreeEnergy(const NoiseParams &noiseIn, const NoiseParams &noisePriorIn,
-    const MVNDist &theta, const MVNDist &thetaPrior, const LinearFwdModel &linear, const ColumnVector &data) const
+    const MVNDist &theta, const MVNDist &thetaPrior, const LinearFwdModel &linear,
+    const ColumnVector &data) const
 {
     const int nPhis = Qis.size();
     const WhiteParams &noise = dynamic_cast<const WhiteParams &>(noiseIn);
@@ -375,15 +382,17 @@ double WhiteNoiseModel::CalcFreeEnergy(const NoiseParams &noiseIn, const NoisePa
     int nTimes = data.Nrows(); //*NB assume that each row is an individual time point
     int nTheta = theta.means.Nrows();
 
-    // The following is based on noisemodel_ar::CalcFreeEnergy, modified to remove ar parts - MAC 11-7-2007
+    // The following is based on noisemodel_ar::CalcFreeEnergy, modified to remove ar parts - MAC
+    // 11-7-2007
     // Some modifications have been made for consistency with (MAC)varbayes2.m - these are noted
 
     // calcualte individual aprts of the free energy
-    double expectedLogThetaDist = //bits arising from the factorised posterior for theta
-        +0.5 * theta.GetPrecisions().LogDeterminant().LogValue() - 0.5 * nTheta * (log(2 * M_PI) + 1);
+    double expectedLogThetaDist = // bits arising from the factorised posterior for theta
+        +0.5 * theta.GetPrecisions().LogDeterminant().LogValue()
+        - 0.5 * nTheta * (log(2 * M_PI) + 1);
 
-    double expectedLogPhiDist = 0;                //bits arising fromt he factorised posterior for phi
-    vector<double> expectedLogPosteriorParts(10); //bits arising from the likelihood
+    double expectedLogPhiDist = 0; // bits arising fromt he factorised posterior for phi
+    vector<double> expectedLogPosteriorParts(10); // bits arising from the likelihood
     for (int i = 0; i < 10; i++)
         expectedLogPosteriorParts[i] = 0;
 
@@ -396,18 +405,25 @@ double WhiteNoiseModel::CalcFreeEnergy(const NoiseParams &noiseIn, const NoisePa
 
         expectedLogPhiDist += -gammaln(ci) - ci * log(si) - ci + (ci - 1) * (digamma(ci) + log(si));
 
-        expectedLogPosteriorParts[0] += (digamma(ci) + log(si)) * ((Qis[i].Trace()) * 0.5 + ciPrior - 1); // nTimes using phi_{i+1} = Qis[i].Trace()
+        expectedLogPosteriorParts[0] += (digamma(ci) + log(si))
+            * ((Qis[i].Trace()) * 0.5 + ciPrior - 1); // nTimes using phi_{i+1} = Qis[i].Trace()
 
-        expectedLogPosteriorParts[9] += -gammaln(ciPrior) - ciPrior * log(siPrior) - si * ci / siPrior;
+        expectedLogPosteriorParts[9]
+            += -gammaln(ciPrior) - ciPrior * log(siPrior) - si * ci / siPrior;
     }
 
     expectedLogPosteriorParts[1] = 0; //*NB not required
 
-    expectedLogPosteriorParts[2] = -0.5 * (k.t() * k).AsScalar() - 0.5 * (J.t() * J * Linv).Trace(); //*NB remove Qsum
+    expectedLogPosteriorParts[2]
+        = -0.5 * (k.t() * k).AsScalar() - 0.5 * (J.t() * J * Linv).Trace(); //*NB remove Qsum
 
-    expectedLogPosteriorParts[3] = +0.5 * thetaPrior.GetPrecisions().LogDeterminant().LogValue() - 0.5 * nTimes * log(2 * M_PI) - 0.5 * nTheta * log(2 * M_PI);
+    expectedLogPosteriorParts[3] = +0.5 * thetaPrior.GetPrecisions().LogDeterminant().LogValue()
+        - 0.5 * nTimes * log(2 * M_PI) - 0.5 * nTheta * log(2 * M_PI);
 
-    expectedLogPosteriorParts[4] = -0.5 * ((theta.means - thetaPrior.means).t() * thetaPrior.GetPrecisions() * (theta.means - thetaPrior.means)).AsScalar();
+    expectedLogPosteriorParts[4] = -0.5
+        * ((theta.means - thetaPrior.means).t() * thetaPrior.GetPrecisions()
+              * (theta.means - thetaPrior.means))
+              .AsScalar();
 
     expectedLogPosteriorParts[5] = -0.5 * (Linv * thetaPrior.GetPrecisions()).Trace();
 
@@ -428,7 +444,7 @@ double WhiteNoiseModel::CalcFreeEnergy(const NoiseParams &noiseIn, const NoisePa
     {
         LOG_ERR("WhiteNoiseModel::expectedLogThetaDist == " << expectedLogThetaDist << endl);
         LOG_ERR("eWhiteNoiseModel::xpectedLogPhiDist == " << expectedLogPhiDist << endl);
-        //LOG_ERR("expectedLogPosteriorParts == " << expectedLogPosteriorParts << endl);
+        // LOG_ERR("expectedLogPosteriorParts == " << expectedLogPosteriorParts << endl);
         throw FabberInternalError("WhiteNoiseModel::Non-finite free energy!");
     }
 

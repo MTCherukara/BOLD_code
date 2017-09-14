@@ -5,10 +5,10 @@
 
 #include <newmat.h>
 
-#include <string>
 #include <map>
-#include <utility>
 #include <math.h>
+#include <string>
+#include <utility>
 
 using namespace std;
 using namespace NEWMAT;
@@ -19,7 +19,7 @@ using namespace NEWMAT;
 // Euclidian distance
 static double dist_euclid(double dx, double dy, double dz)
 {
-    return sqrt(dx*dx + dy*dy + dz*dz);
+    return sqrt(dx * dx + dy * dy + dz * dz);
 }
 
 // Manhattan distance
@@ -27,11 +27,10 @@ static double dist_manh(double dx, double dy, double dz)
 {
     return fabs(dx) + fabs(dy) + fabs(dz);
 }
-
 // Almost-squared Euclidian distance
 static double dist_sqeuclid(double dx, double dy, double dz)
 {
-    return pow(dx*dx + dy*dy + dz*dz, 0.995);
+    return pow(dx * dx + dy * dy + dz * dz, 0.995);
 }
 
 /**
@@ -41,13 +40,13 @@ static double dist_sqeuclid(double dx, double dy, double dz)
  * if it's aniostropic or you're using the smoothness values directly.
  *
  * @param voxelCoords List of voxel co-ordinates as a matrix: column = voxel
- * @param distanceMeasure How to measure distance: 
+ * @param distanceMeasure How to measure distance:
  *   dist1 = Euclidian distance,
  *   dist2 = squared Euclidian distance,
  *   mdist = Manhattan distance (|dx| + |dy|)
  */
-void CovarianceCache::CalcDistances(const NEWMAT::Matrix &voxelCoords,
-    const string &distanceMeasure)
+void CovarianceCache::CalcDistances(
+    const NEWMAT::Matrix &voxelCoords, const string &distanceMeasure)
 {
     const int nVoxels = voxelCoords.Ncols();
 
@@ -64,7 +63,8 @@ void CovarianceCache::CalcDistances(const NEWMAT::Matrix &voxelCoords,
 
     if (nVoxels > 7500)
     {
-        LOG << "SpatialVariationalBayes::CalcDistances Over " << int(2.5 * nVoxels * nVoxels * 8 / 1e9)
+        LOG << "SpatialVariationalBayes::CalcDistances Over "
+            << int(2.5 * nVoxels * nVoxels * 8 / 1e9)
             << " GB of memory will be used just to calculate "
             << "the distance matrix.  Hope you're not trying to invert this "
                "sucker!\n"
@@ -99,10 +99,18 @@ void CovarianceCache::CalcDistances(const NEWMAT::Matrix &voxelCoords,
     {
         for (int b = 1; b <= a; b++)
         {
-            if (distanceMeasure == "dist1") m_distances(a, b) = dist_euclid(relativePos[0](a, b), relativePos[1](a, b), relativePos[2](a, b));
-            else if (distanceMeasure == "dist2") m_distances(a, b) = dist_sqeuclid(relativePos[0](a, b), relativePos[1](a, b), relativePos[2](a, b));
-            else if (distanceMeasure == "mdist") m_distances(a, b) = dist_manh(relativePos[0](a, b), relativePos[1](a, b), relativePos[2](a, b));
-            else throw InvalidOptionValue("distance-measure", distanceMeasure, "Unrecognized distance measure");
+            if (distanceMeasure == "dist1")
+                m_distances(a, b)
+                    = dist_euclid(relativePos[0](a, b), relativePos[1](a, b), relativePos[2](a, b));
+            else if (distanceMeasure == "dist2")
+                m_distances(a, b) = dist_sqeuclid(
+                    relativePos[0](a, b), relativePos[1](a, b), relativePos[2](a, b));
+            else if (distanceMeasure == "mdist")
+                m_distances(a, b)
+                    = dist_manh(relativePos[0](a, b), relativePos[1](a, b), relativePos[2](a, b));
+            else
+                throw InvalidOptionValue(
+                    "distance-measure", distanceMeasure, "Unrecognized distance measure");
         }
     }
 }
@@ -111,7 +119,6 @@ const NEWMAT::SymmetricMatrix &CovarianceCache::GetDistances() const
 {
     return m_distances;
 }
-
 const ReturnMatrix CovarianceCache::GetC(double delta) const
 {
     const int Nvoxels = m_distances.Nrows();
@@ -137,17 +144,15 @@ const ReturnMatrix CovarianceCache::GetC(double delta) const
     return C;
 }
 
-bool CovarianceCache::GetCachedInRange(double *guess,
-    double lower,
-    double upper,
-    bool allowEndpoints) const
+bool CovarianceCache::GetCachedInRange(
+    double *guess, double lower, double upper, bool allowEndpoints) const
 {
     assert(guess != NULL);
     const double initialGuess = *guess;
     if (!(lower < initialGuess && initialGuess < upper))
     {
-        LOG << "SpatialVariationalBayes::Uh-oh... lower = " << lower << ", initialGuess = " << initialGuess
-            << ", upper = " << upper << endl;
+        LOG << "SpatialVariationalBayes::Uh-oh... lower = " << lower
+            << ", initialGuess = " << initialGuess << ", upper = " << upper << endl;
     }
     assert(lower < initialGuess && initialGuess < upper);
 
@@ -204,9 +209,7 @@ const SymmetricMatrix &CovarianceCache::GetCinv(double delta) const
 #endif
 }
 
-const SymmetricMatrix &CovarianceCache::GetCiCodistCi(
-    double delta,
-    double *CiCodistTrace) const
+const SymmetricMatrix &CovarianceCache::GetCiCodistCi(double delta, double *CiCodistTrace) const
 {
     if (CiCodistCi_cache[delta].first.Nrows() == 0)
     {
@@ -214,15 +217,15 @@ const SymmetricMatrix &CovarianceCache::GetCiCodistCi(
         CiCodistCi_cache.clear();
 #endif
         GetCinv(delta); // for sensible messages, make sure cache hits
-        
+
         Matrix CiCodist = GetCinv(delta) * SP(GetC(delta), m_distances);
         CiCodistCi_cache[delta].second = CiCodist.Trace();
         Matrix CiCodistCi_tmp = CiCodist * GetCinv(delta);
         CiCodistCi_cache[delta].first << CiCodistCi_tmp; // Force symmetric
 
         { // check something
-            double maxAbsErr = (CiCodistCi_cache[delta].first - CiCodistCi_tmp)
-                                   .MaximumAbsoluteValue();
+            double maxAbsErr
+                = (CiCodistCi_cache[delta].first - CiCodistCi_tmp).MaximumAbsoluteValue();
             if (maxAbsErr > CiCodistCi_tmp.MaximumAbsoluteValue() * 1e-5)
             // If that test fails, you're probably in trouble.
             // Reducing it to e.g. 1e-5 (to make dist2 work)
@@ -232,9 +235,8 @@ const SymmetricMatrix &CovarianceCache::GetCiCodistCi(
             // Reduced it to 1e-5 to get mdist to work, again...
             //   =>
             {
-                LOG << "CovarianceCache::GetCiCodistCi matrix not symmetric!\nError = "
-                    << maxAbsErr << ", maxabsvalue = "
-                    << CiCodistCi_tmp.MaximumAbsoluteValue() << endl;
+                LOG << "CovarianceCache::GetCiCodistCi matrix not symmetric!\nError = " << maxAbsErr
+                    << ", maxabsvalue = " << CiCodistCi_tmp.MaximumAbsoluteValue() << endl;
                 assert(false);
             }
         }

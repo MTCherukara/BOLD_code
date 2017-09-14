@@ -1,106 +1,138 @@
-/*  inference_vb.h - VB inference technique class declarations
+/*  inference_spatialvb.h - implementation of VB with spatial priors
 
- Adrian Groves and Michael Chappell, FMRIB Image Analysis Group & IBME QuBIc Group
+ Adrian Groves & Michael Chappell, FMRIB Image Analysis Group & IBME QuBIc Group
 
  Copyright (C) 2007-2015 University of Oxford  */
 
 /*  CCOPYRIGHT */
 
-#pragma once
 #include "convergence.h"
 #include "inference.h"
+#include "run_context.h"
 
-class PriorType
+#include <string>
+#include <vector>
+
+class Vb : public InferenceTechnique
 {
 public:
-    PriorType();
-    PriorType(unsigned int idx, std::vector<std::string> param_names, FabberRunData &data);
-    std::string m_param_name;
-    unsigned int m_idx;
-    char m_type;
-    double m_prec;
-    std::string m_filename;
-    NEWMAT::RowVector m_image;
-
-    void SetPrior(MVNDist *dist, int voxel);
-
-private:
-    static std::string GetTypesString(FabberRunData &rundata, unsigned int num_params);
-};
-
-std::ostream &operator<<(std::ostream &out, const PriorType &value);
-
-class VariationalBayesInferenceTechnique : public InferenceTechnique
-{
-public:
-    /**
-	 * Create a new instance of VariationalBayesInferenceTechnique
-	 */
     static InferenceTechnique *NewInstance();
 
-    virtual void GetOptions(std::vector<OptionSpec> &opts) const;
-    virtual std::string GetDescription() const;
-    virtual string GetVersion() const;
-
-    VariationalBayesInferenceTechnique()
+    Vb()
         : m_nvoxels(0)
         , m_noise_params(0)
-        , m_conv(NULL)
         , m_needF(false)
         , m_printF(false)
-        , continueFwdOnly(false)
-        , initialFwdPrior(NULL)
-        , initialFwdPosterior(NULL)
-        , initialNoisePrior(NULL)
-        , initialNoisePosterior(NULL)
         , m_origdata(NULL)
         , m_coords(NULL)
         , m_suppdata(NULL)
-        , Nmcstep(0)
+        , m_num_mcsteps(0)
+        , m_spatial_dims(-1)
+        , m_locked_linear(false)
     {
     }
 
-    virtual void Initialize(FwdModel *model, FabberRunData &args);
-    virtual void DoCalculations(FabberRunData &data);
-    virtual void SaveResults(FabberRunData &data) const;
+    virtual void GetOptions(vector<OptionSpec> &opts) const;
+    virtual std::string GetDescription() const;
+    virtual string GetVersion() const;
 
-    virtual ~VariationalBayesInferenceTechnique();
+    virtual void Initialize(FwdModel *fwd_model, FabberRunData &args);
+    virtual void DoCalculations(FabberRunData &data);
+
+    virtual void SaveResults(FabberRunData &rundata) const;
 
 protected:
-    void InitializeMVNFromParam(FabberRunData &args, MVNDist *dist, string param_key);
+    /**
+     * Initialize noise prior or posterior distribution from a file stored in the
+     * rundata under the given parameter key
+     */
     void InitializeNoiseFromParam(FabberRunData &args, NoiseParams *dist, string param_key);
-    void MakeInitialDistributions(FabberRunData &args);
-    void GetPriorTypes(FabberRunData &args);
-    void LoadImagePriors(FabberRunData &allData);
+
+    /**
+     * Pass the model the data, coords and suppdata for a voxel.
+     *
+     * FIXME this is not very nice and should not be necessary. Need to
+     * audit what models are using this info and find alternatives, e.g.
+     * reading suppdata in Initialize instead
+     */
     void PassModelData(int voxel);
+
+    /**
+     * Do calculations loop in voxelwise mode (i.e. all iterations for
+     * one voxel, then all iterations for the next voxel, etc)
+     */
+    virtual void DoCalculationsVoxelwise(FabberRunData &data);
+
+    /**
+     * Do calculations loop in spatial mode (i.e. one iteration of all
+     * voxels, then next iteration of all voxels, etc)
+     */
+    virtual void DoCalculationsSpatial(FabberRunData &data);
+
+    /**
+     * Calculate free energy if required, and display if required
+     */
+    double CalculateF(int v, std::string label, double Fprior);
+
+    /**
+     * Output detailed debugging information for a voxel
+     */
+    void DebugVoxel(int v, const string &where);
+
+    /**
+     * Setup per-voxel data for Spatial VB
+     *
+     * Spatial VB needs each voxel's prior/posterior and other
+     * data stored as it affects neighbouring voxels. This sets
+     * up the vectors which store these things which are just
+     * created on the fly for normal VB and throw away after each
+     * voxel is done.
+     */
+    void SetupPerVoxelDists(FabberRunData &allData);
+
+    /**
+    * Check voxels are listed in order
+    *
+    * Order must be increasing in z value, or if same
+    * increasing in y value, and if y and z are same
+    * increasing in x value.
+    *
+    * This is basically column-major (Fortran) ordering - used as default by NEWIMAGE.
+    */
+    void CheckCoordMatrixCorrectlyOrdered(const NEWMAT::Matrix &voxelCoords);
+
+    /**
+     * Calculate first and second nearest neighbours of each voxel
+    */
+    void CalcNeighbours(const NEWMAT::Matrix &voxelCoords);
+
+    /**
+     * Ignore this voxel in future updates.
+     *
+     * No calculation of priors or posteriors will occur for this voxel
+     * and it will be removed from the lists of neighbours for other voxels.
+     * The effect should be as if it were masked
+     */
+    void IgnoreVoxel(int v);
 
     /** Number of voxels in data */
     int m_nvoxels;
 
     /**
-	 * Noise model in use. This is created by the inference
-	 * method deleted on destruction
-	 */
-    std::auto_ptr<NoiseModel> noise;
-
-    /**
-	 * Number of noise parameters.
-	 */
-    int m_noise_params;
-
-    /**
-     * Convergence detector in use
+     * Noise model in use. This is created by the inference
+     * method deleted on destruction
      */
-    ConvergenceDetector *m_conv;
+    std::auto_ptr<NoiseModel> m_noise;
+    /**
+     * Number of noise parameters.
+     */
+    int m_noise_params;
 
     /** True if convergence detector requires the free energy */
     bool m_needF;
 
     /** True if we need to print the free energy at each iteration */
     bool m_printF;
-
-    /** Prior types used for each model parameter */
-    std::vector<PriorType> m_prior_types;
 
     // These are used for resuming a previous calculation
     /** If not empty, load initial MVN from this file */
@@ -114,21 +146,45 @@ protected:
     /** Free energy for each voxel */
     std::vector<double> resultFs;
 
-    // Default priors and posteriors - not per voxel. Set up in Initialize
-    // The fwd prior can be overridden by a per-voxel image prior
-    // The fwd and noise posteriors can be overridden by a per-voxel MVN dist (restart run)
-    std::auto_ptr<MVNDist> initialFwdPrior;
-    MVNDist *initialFwdPosterior;
-    NoiseParams *initialNoisePrior;
-    NoiseParams *initialNoisePosterior;
-
+    /** Voxelwise input data */
     const NEWMAT::Matrix *m_origdata;
+
+    /** Voxelwise co-ordinates */
     const NEWMAT::Matrix *m_coords;
+
+    /** Voxelwise supplementary data */
     const NEWMAT::Matrix *m_suppdata;
 
-    /** Used by Adrian's spatial priors research */
-    std::vector<MVNDist *> resultMVNsWithoutPrior;
-
     /** Number of motion correction steps to run */
-    int Nmcstep;
+    int m_num_mcsteps;
+
+    /** Stores current run state (parameters, MVNs, linearization centres etc */
+    RunContext *m_ctx;
+
+    /** Linearized wrapper around the forward model */
+    std::vector<LinearizedFwdModel> m_lin_model;
+
+    /** Convergence detector for each voxel */
+    std::vector<ConvergenceDetector *> m_conv;
+
+    /** Voxels to ignore, indexed from 1 as per NEWMAT */
+    std::vector<int> m_ignore_voxels;
+
+    /**
+     * Number of spatial dimensions
+     *
+     * 0 = no spatial smoothing
+     * 1 = Probably not sensible!
+     * 2 = Smoothing in slices only
+     * 3 = Smoothing by volume
+     */
+    int m_spatial_dims;
+
+    /**
+     * Fix the linearization centres of the linearized forward model.
+     *
+     * This reduces the inference to a purely linear problem. The fixed
+     * centres are generally loaded from an MVN file
+     */
+    bool m_locked_linear;
 };

@@ -1,17 +1,11 @@
-# include ${FSLCONFDIR}/default.mk
-include ${FSLDIR}/config/apple-darwin12-gcc4.2/systemvars.mk
-include ${FSLDIR}/config/apple-darwin12-gcc4.2/externallibs.mk
-include ${FSLDIR}/config/common/vars.mk
-include ${FSLDIR}/config/common/rules.mk 
+include ${FSLCONFDIR}/default.mk
 
 PROJNAME = fabber_core
 
 USRINCFLAGS = -I${INC_NEWMAT} -I${INC_PROB} -I${INC_BOOST}
 USRLDFLAGS = -L${LIB_NEWMAT} -L${LIB_PROB} -L/lib64
-# replaced -L/lib64 with -L/usr/include/c++/4.2.1 
 
 LIBS = -lutils -lnewimage -lmiscmaths -lprob -lnewmat -lfslio -lniftiio -lznz -lz -ldl
-
 
 #
 # Executables
@@ -26,10 +20,10 @@ SCRIPTS = fabber_var
 BASICOBJS = tools.o rundata.o dist_mvn.o easylog.o fabber_capi.o version.o dist_gamma.o rundata_array.o
 
 # Core objects - things that implement the framework for inference
-COREOBJS =  noisemodel.o fwdmodel.o inference.o fwdmodel_linear.o fwdmodel_poly.o convergence.o motioncorr.o 
+COREOBJS =  noisemodel.o fwdmodel.o inference.o fwdmodel_linear.o fwdmodel_poly.o convergence.o motioncorr.o priors.o transforms.o
 
 # Infernce methods
-INFERENCEOBJS = inference_vb.o inference_nlls.o inference_spatialvb.o inference_spatialvb_exp.o covariance_cache.o
+INFERENCEOBJS = inference_vb.o inference_nlls.o covariance_cache.o
 
 # Noise models
 NOISEOBJS = noisemodel_white.o noisemodel_ar.o

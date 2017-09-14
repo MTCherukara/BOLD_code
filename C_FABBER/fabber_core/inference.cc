@@ -12,6 +12,7 @@
 #include <newmat.h>
 
 #include <fstream>
+#include <iomanip>
 #include <math.h>
 
 using namespace std;
@@ -36,14 +37,10 @@ InferenceTechnique *InferenceTechnique::NewFromName(const string &name)
 
 void InferenceTechnique::UsageFromName(const string &name, std::ostream &stream)
 {
-    stream << "Usage information for method: " << name << endl
-           << endl;
+    stream << "Usage information for method: " << name << endl << endl;
 
     std::auto_ptr<InferenceTechnique> method(NewFromName(name));
-    stream << method->GetDescription() << endl
-           << endl
-           << "Options: " << endl
-           << endl;
+    stream << method->GetDescription() << endl << endl << "Options: " << endl << endl;
     vector<OptionSpec> options;
     method->GetOptions(options);
     if (options.size() > 0)
@@ -65,8 +62,15 @@ InferenceTechnique::InferenceTechnique()
 void InferenceTechnique::Initialize(FwdModel *fwd_model, FabberRunData &rundata)
 {
     m_log = rundata.GetLogger();
+    m_debug = rundata.GetBool("debug");
+    if (m_debug)
+        LOG << setprecision(17);
+
     m_model = fwd_model;
-    m_num_params = m_model->NumParams();
+    vector<Parameter> params;
+    m_model->GetParameters(rundata, params);
+
+    m_num_params = params.size();
     LOG << "InferenceTechnique::Model has " << m_num_params << " parameters" << endl;
 
     // Allow calculation to continue even with bad voxels
@@ -77,18 +81,21 @@ void InferenceTechnique::Initialize(FwdModel *fwd_model, FabberRunData &rundata)
     m_halt_bad_voxel = !rundata.GetBool("allow-bad-voxels");
     if (m_halt_bad_voxel)
     {
-        LOG << "InferenceTechnique::Note: numerical errors in voxels will cause the program to halt.\n"
-            << "InferenceTechnique::Use --allow-bad-voxels (with caution!) to keep on calculating.\n";
+        LOG << "InferenceTechnique::Note: numerical errors in voxels will cause the program to "
+               "halt.\n"
+            << "InferenceTechnique::Use --allow-bad-voxels (with caution!) to keep on "
+               "calculating.\n";
     }
     else
     {
         LOG << "InferenceTechnique::Using --allow-bad-voxels: numerical errors in a voxel will\n"
             << "InferenceTechnique::simply stop the calculation of that voxel.\n"
             << "InferenceTechnique::Check log for 'Going on to the next voxel' messages.\n"
-            << "InferenceTechnique::Note that you should get very few (if any) exceptions like this;"
+            << "InferenceTechnique::Note that you should get very few (if any) exceptions like "
+               "this;"
             << "InferenceTechnique::they are probably due to bugs or a numerically unstable model.";
     }
-} // void InferenceTechnique::Initialize(FwdModel *fwd_model, FabberRunData &rundata)
+}
 
 void InferenceTechnique::SaveResults(FabberRunData &rundata) const
 {
@@ -102,12 +109,12 @@ void InferenceTechnique::SaveResults(FabberRunData &rundata) const
     }
 
     // Create individual files for each parameter's mean and Z-stat
-    vector<string> paramNames;
-    m_model->NameParams(paramNames);
+    vector<Parameter> params;
+    m_model->GetParameters(rundata, params);
     if (rundata.GetBool("save-mean") | rundata.GetBool("save-std") | rundata.GetBool("save-zstat"))
     {
         LOG << "InferenceTechnique::Writing means..." << endl;
-        for (unsigned i = 1; i <= paramNames.size(); i++)
+        for (unsigned i = 1; i <= params.size(); i++)
         {
             Matrix paramMean, paramZstat, paramStd;
             paramMean.ReSize(1, nVoxels);
@@ -116,54 +123,79 @@ void InferenceTechnique::SaveResults(FabberRunData &rundata) const
 
             for (int vox = 1; vox <= nVoxels; vox++)
             {
-                paramMean(1, vox) = resultMVNs[vox - 1]->means(i);
-                double std = sqrt(resultMVNs[vox - 1]->GetCovariance()(i, i));
+                MVNDist result = *resultMVNs[vox - 1];
+                m_model->ToModel(result);
+                paramMean(1, vox) = result.means(i);
+                double std = sqrt(result.GetCovariance()(i, i));
                 paramZstat(1, vox) = paramMean(1, vox) / std;
                 paramStd(1, vox) = std;
             }
 
             if (rundata.GetBool("save-mean"))
-                rundata.SaveVoxelData("mean_" + paramNames.at(i - 1), paramMean);
+                rundata.SaveVoxelData("mean_" + params.at(i - 1).name, paramMean);
             if (rundata.GetBool("save-zstat"))
-                rundata.SaveVoxelData("zstat_" + paramNames.at(i - 1), paramZstat);
+                rundata.SaveVoxelData("zstat_" + params.at(i - 1).name, paramZstat);
             if (rundata.GetBool("save-std"))
-                rundata.SaveVoxelData("std_" + paramNames.at(i - 1), paramStd);
+                rundata.SaveVoxelData("std_" + params.at(i - 1).name, paramStd);
         }
     }
 
     // Produce the model fit and residual volume series
     bool saveModelFit = rundata.GetBool("save-model-fit");
     bool saveResiduals = rundata.GetBool("save-residuals");
-    if (saveModelFit || saveResiduals)
+    vector<string> outputs;
+    outputs.push_back("");
+    m_model->GetOutputs(outputs);
+    if (saveModelFit || saveResiduals || (outputs.size() > 1))
     {
-        LOG << "InferenceTechnique::Writing model fit/residuals..." << endl;
+        LOG << "InferenceTechnique::Writing model time series data (fit, residuals and "
+               "model-specific output)"
+            << endl;
 
-        Matrix modelFit, residuals, datamtx, coords;
-        datamtx = rundata.GetMainVoxelData(); // it is just possible that the model needs the data in its calculations
+        Matrix result, residuals, datamtx, coords, suppdata;
+        datamtx = rundata.GetMainVoxelData(); // it is just possible that the model needs the data
+                                              // in its calculations
         coords = rundata.GetVoxelCoords();
-        modelFit.ReSize(datamtx.Nrows(), nVoxels);
+        suppdata = rundata.GetVoxelSuppData();
+        result.ReSize(datamtx.Nrows(), nVoxels);
         ColumnVector tmp;
-        for (int vox = 1; vox <= nVoxels; vox++)
+        for (vector<string>::iterator iter = outputs.begin(); iter != outputs.end(); ++iter)
         {
-            // pass in stuff that the model might need
-            ColumnVector y = datamtx.Column(vox);
-            ColumnVector vcoords = coords.Column(vox);
-            m_model->pass_in_data(y);
-            m_model->pass_in_coords(vcoords);
+            for (int vox = 1; vox <= nVoxels; vox++)
+            {
+                // pass in stuff that the model might need
+                ColumnVector y = datamtx.Column(vox);
+                ColumnVector vcoords = coords.Column(vox);
+                if (suppdata.Ncols() > 0)
+                {
+                    m_model->PassData(y, vcoords, suppdata.Column(vox));
+                }
+                else
+                {
+                    m_model->PassData(y, vcoords);
+                }
 
-            // do the evaluation
-            m_model->Evaluate(resultMVNs.at(vox - 1)->means.Rows(1, m_num_params), tmp);
-            modelFit.Column(vox) = tmp;
-        }
-
-        if (saveResiduals)
-        {
-            residuals = datamtx - modelFit;
-            rundata.SaveVoxelData("residuals", residuals);
-        }
-        if (saveModelFit)
-        {
-            rundata.SaveVoxelData("modelfit", modelFit);
+                // do the evaluation
+                m_model->EvaluateFabber(
+                    resultMVNs.at(vox - 1)->means.Rows(1, m_num_params), tmp, *iter);
+                result.Column(vox) = tmp;
+            }
+            if (*iter == "")
+            {
+                if (saveResiduals)
+                {
+                    residuals = datamtx - result;
+                    rundata.SaveVoxelData("residuals", residuals);
+                }
+                if (saveModelFit)
+                {
+                    rundata.SaveVoxelData("modelfit", result);
+                }
+            }
+            else if (rundata.GetBool("save-model-extras"))
+            {
+                rundata.SaveVoxelData(*iter, result);
+            }
         }
     }
 
@@ -194,9 +226,10 @@ void InferenceTechnique::SaveResults(FabberRunData &rundata) const
 #endif
 
     LOG << "InferenceTechnique::Done writing results." << endl;
-} // void InferenceTechnique::SaveResults(FabberRunData &rundata) const
+}
 
-void InferenceTechnique::InitMVNFromFile(string continueFromFile, FabberRunData &rundata, string paramFilename = "")
+void InferenceTechnique::InitMVNFromFile(
+    string continueFromFile, FabberRunData &rundata, string paramFilename = "")
 {
     // Loads in a MVN to set it as inital values for inference
     // can cope with the special scenario in which extra parameters have been added to the inference
@@ -227,7 +260,7 @@ void InferenceTechnique::InitMVNFromFile(string continueFromFile, FabberRunData 
             paramNames.push_back(currparam);
             LOG << currparam << endl;
         }
-        paramNames.pop_back(); //remove final empty line assocaited with eof
+        paramNames.pop_back(); // remove final empty line assocaited with eof
 
         // get the parameters in the model
         vector<string> ModelparamNames;
@@ -238,7 +271,7 @@ void InferenceTechnique::InitMVNFromFile(string continueFromFile, FabberRunData 
             LOG << ModelparamNames[p] << endl;
         }
 
-        //load in the MVN
+        // load in the MVN
         vector<MVNDist *> MVNfile;
         MVNDist::Load(MVNfile, "continue-from-mvn", rundata, m_log);
 
@@ -258,7 +291,8 @@ void InferenceTechnique::InitMVNFromFile(string continueFromFile, FabberRunData 
         vector<bool> usefile(m_num_params, false);
         // If true, location of parameter in file (starting at 0)
         vector<int> oldloc(m_num_params, 0);
-        // Vector of bools, one for each parameter in the file. True to flag matched to a file parameter
+        // Vector of bools, one for each parameter in the file. True to flag matched to a file
+        // parameter
         vector<bool> hasmatched(m_num_params, false);
         for (int p = 0; p < m_num_params; p++)
         {
@@ -279,7 +313,7 @@ void InferenceTechnique::InitMVNFromFile(string continueFromFile, FabberRunData 
             }
         }
 
-        //Make a note of any parameters in the file that were not matched to params in the model
+        // Make a note of any parameters in the file that were not matched to params in the model
         for (unsigned int q = 0; q < paramNames.size(); q++)
         {
             if (!hasmatched[q])
@@ -307,7 +341,8 @@ void InferenceTechnique::InitMVNFromFile(string continueFromFile, FabberRunData 
         {
             // Get the file data
             MVNDist fwddist = MVNfile[v]->GetSubmatrix(1, n_file_params);
-            MVNDist noisedist = MVNfile[v]->GetSubmatrix(n_file_params + 1, n_file_params + n_file_noiseparams);
+            MVNDist noisedist
+                = MVNfile[v]->GetSubmatrix(n_file_params + 1, n_file_params + n_file_noiseparams);
 
             for (unsigned int p = 0; p < ModelparamNames.size(); p++)
             {
@@ -320,7 +355,7 @@ void InferenceTechnique::InitMVNFromFile(string continueFromFile, FabberRunData 
             MVNDist newfwd(m_num_params);
             newfwd.means = newmeans;
 
-            //deal with the covariances
+            // deal with the covariances
             SymmetricMatrix filecov = fwddist.GetCovariance();
             for (unsigned int p = 0; p < ModelparamNames.size(); p++)
             {

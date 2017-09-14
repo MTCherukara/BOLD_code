@@ -1,14 +1,13 @@
 /* setup.cc - FABBER default configuration setup class declarations.
 
- Mike Jackson, The University of Edinburgh & Michael Chappell, FMRIB Analysis Group & IBME QuBIc group
+ Mike Jackson, The University of Edinburgh & Michael Chappell, FMRIB Analysis Group & IBME QuBIc
+ group
 
  Copyright (C) 2015 University of Oxford  */
 
 #include "setup.h"
 
 #include "inference.h"
-#include "inference_spatialvb.h"
-#include "inference_spatialvb_exp.h"
 #include "inference_vb.h"
 #ifndef NO_NLLS
 #include "inference_nlls.h"
@@ -27,9 +26,8 @@
 void FabberSetup::SetupDefaultInferenceTechniques()
 {
     InferenceTechniqueFactory *factory = InferenceTechniqueFactory::GetInstance();
-    factory->Add("vb", &VariationalBayesInferenceTechnique::NewInstance);
-    factory->Add("spatialvb", &SpatialVariationalBayes::NewInstance);
-    factory->Add("spatialvb_exp", &SpatialVariationalBayesExp::NewInstance);
+    factory->Add("vb", &Vb::NewInstance);
+    factory->Add("spatialvb", &Vb::NewInstance);
 #ifndef NO_NLLS
     factory->Add("nlls", &NLLSInferenceTechnique::NewInstance);
 #endif

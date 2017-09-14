@@ -26,27 +26,28 @@ using NEWMAT::Matrix;
 
 static void DumpVolumeInfo(const volume4D<float> &info, ostream &out)
 {
-    out << "FabberRunDataNewimage::Dimensions: x=" << info.xsize() << ", y=" << info.ysize() << ", z=" << info.zsize()
-        << ", vols=" << info.tsize() << endl;
-    out << "FabberRunDataNewimage::Voxel size: x=" << info.xdim() << "mm, y=" << info.ydim() << "mm, z=" << info.zdim()
-        << "mm, TR=" << info.tdim() << " sec\n";
-    out << "FabberRunDataNewimage::Intents: " << info.intent_code() << ", " << info.intent_param(1) << ", "
-        << info.intent_param(2) << ", " << info.intent_param(3) << endl;
+    out << "FabberRunDataNewimage::Dimensions: x=" << info.xsize() << ", y=" << info.ysize()
+        << ", z=" << info.zsize() << ", vols=" << info.tsize() << endl;
+    out << "FabberRunDataNewimage::Voxel size: x=" << info.xdim() << "mm, y=" << info.ydim()
+        << "mm, z=" << info.zdim() << "mm, TR=" << info.tdim() << " sec\n";
+    out << "FabberRunDataNewimage::Intents: " << info.intent_code() << ", " << info.intent_param(1)
+        << ", " << info.intent_param(2) << ", " << info.intent_param(3) << endl;
 }
 
 static void DumpVolumeInfo(const volume<float> &info, ostream &out)
 {
-    out << "FabberRunDataNewimage::Dimensions: x=" << info.xsize() << ", y=" << info.ysize() << ", z=" << info.zsize()
-        << ", vols=1" << endl;
-    out << "FabberRunDataNewimage::Voxel size: x=" << info.xdim() << "mm, y=" << info.ydim() << "mm, z=" << info.zdim()
-        << "mm, TR=1"
+    out << "FabberRunDataNewimage::Dimensions: x=" << info.xsize() << ", y=" << info.ysize()
+        << ", z=" << info.zsize() << ", vols=1" << endl;
+    out << "FabberRunDataNewimage::Voxel size: x=" << info.xdim() << "mm, y=" << info.ydim()
+        << "mm, z=" << info.zdim() << "mm, TR=1"
         << " sec\n";
-    out << "FabberRunDataNewimage::Intents: " << info.intent_code() << ", " << info.intent_param(1) << ", "
-        << info.intent_param(2) << ", " << info.intent_param(3) << endl;
+    out << "FabberRunDataNewimage::Intents: " << info.intent_code() << ", " << info.intent_param(1)
+        << ", " << info.intent_param(2) << ", " << info.intent_param(3) << endl;
 }
 
 FabberRunDataNewimage::FabberRunDataNewimage(bool compat_options)
     : FabberRunData(compat_options)
+    , m_mask(1, 1, 1)
     , m_have_mask(false)
 {
 }
@@ -67,9 +68,7 @@ void FabberRunDataNewimage::SetExtentFromData()
         m_mask.binarise(1e-16, m_mask.max() + 1, exclusive);
         DumpVolumeInfo(m_mask, LOG);
         SetCoordsFromExtent(m_mask.xsize(), m_mask.ysize(), m_mask.zsize());
-
-    } // if (m_have_mask)
-
+    }
     else
     {
         // Make sure the coords are loaded from the main data even if we don't
@@ -83,10 +82,8 @@ void FabberRunDataNewimage::SetExtentFromData()
         volume<float> main_vol;
         read_volume(main_vol, data_fname);
         SetCoordsFromExtent(main_vol.xsize(), main_vol.ysize(), main_vol.zsize());
-
-    } // if (m_have_mask) ... else 
-
-} // void FabberRunDataNewimage::SetExtentFromData()
+    }
+}
 
 const Matrix &FabberRunDataNewimage::LoadVoxelData(const std::string &filename)
 {
@@ -139,10 +136,10 @@ const Matrix &FabberRunDataNewimage::LoadVoxelData(const std::string &filename)
     }
 
     return m_voxel_data[filename];
+}
 
-} // const Matrix &FabberRunDataNewimage::LoadVoxelData(const std::string &filename)
-
-void FabberRunDataNewimage::SaveVoxelData(const std::string &filename, NEWMAT::Matrix &data, VoxelDataType data_type)
+void FabberRunDataNewimage::SaveVoxelData(
+    const std::string &filename, NEWMAT::Matrix &data, VoxelDataType data_type)
 {
     LOG << "FabberRunDataNewimage::Saving to nifti: " << filename << endl;
     int nifti_intent_code;
@@ -169,11 +166,13 @@ void FabberRunDataNewimage::SaveVoxelData(const std::string &filename, NEWMAT::M
     output.set_intent(nifti_intent_code, 0, 0, 0);
     output.setDisplayMaximumMinimum(output.max(), output.min());
 
-    if (filename[0] == '/') {
+    if (filename[0] == '/')
+    {
         // Absolute path
         save_volume4D(output, filename);
     }
-    else {
+    else
+    {
         // Relative path
         string filepath = GetOutputDir() + "/" + filename;
         save_volume4D(output, filepath);
@@ -208,4 +207,4 @@ void FabberRunDataNewimage::SetCoordsFromExtent(int nx, int ny, int nz)
     {
         SetVoxelCoords(coordvol.matrix());
     }
-} // void FabberRunDataNewimage::SaveVoxelData(const std::string &filename, NEWMAT::Matrix &data, VoxelDataType data_type)
+}

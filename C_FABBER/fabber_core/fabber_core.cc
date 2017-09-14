@@ -30,7 +30,7 @@ using namespace std;
  */
 static void Version()
 {
-    cout << "Fabber " << fabber_release_version() <<  " Source ref: " << fabber_source_version() << ", " << fabber_source_date() << endl;
+    cout << "Fabber " << fabber_version() << " : " << fabber_source_date() << endl;
 }
 
 /**
@@ -55,7 +55,6 @@ static void Usage()
         cout << options[i] << endl;
     }
 }
-
 
 #ifdef _WIN32
 static int setenv(const char *name, const char *value, int overwrite)
@@ -115,14 +114,21 @@ int execute(int argc, char **argv)
             }
 
             return 0;
-        } // if (params->GetBool("help") || argc == 1)
-
+        }
         if (params->GetBool("version"))
         {
-            Version();
+            string model_name = params->GetStringDefault("model", "");
+            if (model_name != "")
+            {
+                std::auto_ptr<FwdModel> model(FwdModel::NewFromName(model_name));
+                cout << model->ModelVersion() << endl;
+            }
+            else
+            {
+                Version();
+            }
             return 0;
-        } // if (params->GetBool("version"))
-
+        }
         else if (params->GetBool("listmodels"))
         {
             vector<string> models = FwdModel::GetKnown();
@@ -133,8 +139,7 @@ int execute(int argc, char **argv)
             }
 
             return 0;
-        } // if (params->GetBool("listmodels"))
-
+        }
         else if (params->GetBool("listmethods"))
         {
             vector<string> infers = InferenceTechnique::GetKnown();
@@ -145,32 +150,31 @@ int execute(int argc, char **argv)
             }
 
             return 0;
-        } // if (params->GetBool("listmethods"))
-
+        }
 
         // Make sure command line tool creates a parameter names file
         params->SetBool("dump-param-names");
+        // Link to latest run
+        params->SetBool("link-to-latest");
 
         cout << "----------------------" << endl;
-        cout << "Welcome to FABBER v" << fabber_release_version() << endl;
+        cout << "Welcome to FABBER " << fabber_version() << endl;
         cout << "----------------------" << endl;
-        cout << "Source ref: " << fabber_source_version() << ", " << fabber_source_date() << endl;
+        cout << "Last commit: " << fabber_source_date() << endl;
 
         log.StartLog(params->GetOutputDir());
         cout << "Logfile started: " << log.GetOutputDirectory() << "/logfile" << endl;
 
         params->SetExtentFromData();
         PercentProgressCheck percent;
-        params->Run(&percent); // this line seems important
+        params->Run(&percent);
 
         log.ReissueWarnings();
 
         // Only Gzip the logfile if we exit normally
         gzLog = params->GetBool("gzip-log");
         ret = 0;
-
-    } // try
-
+    }
     catch (const exception &e)
     {
         log.ReissueWarnings();
@@ -193,7 +197,8 @@ int execute(int argc, char **argv)
     if (log.LogStarted())
     {
         cout << endl
-             << "Final logfile: " << log.GetOutputDirectory() << (gzLog ? "/logfile.gz" : "/logfile") << endl;
+             << "Final logfile: " << log.GetOutputDirectory()
+             << (gzLog ? "/logfile.gz" : "/logfile") << endl;
         log.StopLog(gzLog);
     }
     else

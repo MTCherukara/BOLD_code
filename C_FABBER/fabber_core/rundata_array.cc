@@ -65,7 +65,7 @@ void FabberRunDataArray::SetExtent(int nx, int ny, int nz, const int *mask)
     SetVoxelCoords(coords);
 }
 
-void FabberRunDataArray::GetVoxelData(string key, float *data)
+void FabberRunDataArray::GetVoxelDataArray(string key, float *data)
 {
     assert(data);
     Matrix mdata = FabberRunData::GetVoxelData(key);
@@ -97,14 +97,14 @@ void FabberRunDataArray::GetVoxelData(string key, float *data)
     }
 }
 
-void FabberRunDataArray::SetVoxelData(string key, int data_size, const float *data)
+void FabberRunDataArray::SetVoxelDataArray(string key, int data_size, const float *data)
 {
     assert(data);
     const float *dataPtr = data;
     int num_voxels = m_extent[0] * m_extent[1] * m_extent[2];
     Matrix matrixData(data_size, num_voxels);
 
-    int v;
+    int v = 0;
     for (int t = 0; t < data_size; t++)
     {
         v = 0;

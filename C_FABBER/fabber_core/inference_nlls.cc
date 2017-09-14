@@ -12,6 +12,7 @@
 
 #include "easylog.h"
 #include "fwdmodel.h"
+#include "priors.h"
 #include "rundata.h"
 #include "version.h"
 
@@ -26,7 +27,8 @@ using namespace NEWMAT;
 
 static int NUM_OPTIONS = 1;
 static OptionSpec OPTIONS[] = {
-    { "vb-init", OPT_BOOL, "Whether NLLS is being run in isolation or as a pre-step for VB", OPT_NONREQ, "" },
+    { "vb-init", OPT_BOOL, "Whether NLLS is being run in isolation or as a pre-step for VB",
+        OPT_NONREQ, "" },
     { "lm", OPT_BOOL, "Whether to use LM convergence (default is L)", OPT_NONREQ, "" },
 };
 
@@ -46,14 +48,12 @@ std::string NLLSInferenceTechnique::GetDescription() const
 
 string NLLSInferenceTechnique::GetVersion() const
 {
-    return fabber_release_version();
+    return fabber_version();
 }
-
 InferenceTechnique *NLLSInferenceTechnique::NewInstance()
 {
     return new NLLSInferenceTechnique();
 }
-
 void NLLSInferenceTechnique::Initialize(FwdModel *fwd_model, FabberRunData &args)
 {
     InferenceTechnique::Initialize(fwd_model, args);
@@ -68,7 +68,8 @@ void NLLSInferenceTechnique::Initialize(FwdModel *fwd_model, FabberRunData &args
     MVNDist *junk = new MVNDist(m_model->NumParams());
     m_model->HardcodedInitialDists(*junk, *loadPosterior);
 
-    // Option to load a 'posterior' which will allow the setting of intial parameter estimates for NLLS
+    // Option to load a 'posterior' which will allow the setting of intial parameter estimates for
+    // NLLS
     string filePosterior = args.GetStringDefault("fwd-inital-posterior", "modeldefault");
     if (filePosterior != "modeldefault")
     {
@@ -93,11 +94,9 @@ void NLLSInferenceTechnique::DoCalculations(FabberRunData &allData)
 
     // pass in some (dummy) data/coords here just in case the model relies upon it
     // use the first voxel values as our dummies
-
     if (Nvoxels > 0)
     {
-        m_model->pass_in_data(data.Column(1));
-        m_model->pass_in_coords(coords.Column(1));
+        m_model->PassData(data.Column(1), coords.Column(1));
     }
 
     // Check how many samples in time series - should
@@ -113,8 +112,7 @@ void NLLSInferenceTechnique::DoCalculations(FabberRunData &allData)
         ColumnVector vcoords = coords.Column(voxel);
 
         // Some models might want more information about the data
-        m_model->pass_in_data(y);
-        m_model->pass_in_coords(vcoords);
+        m_model->PassData(y, vcoords);
 
         LinearizedFwdModel linear(m_model);
 
@@ -194,8 +192,7 @@ void NLLSInferenceTechnique::DoCalculations(FabberRunData &allData)
         }
         catch (Exception &e)
         {
-            LOG << "NLLSInferenceTechnique::NEWMAT Exception in this voxel:\n"
-                << e.what() << endl;
+            LOG << "NLLSInferenceTechnique::NEWMAT Exception in this voxel:\n" << e.what() << endl;
 
             if (m_halt_bad_voxel)
                 throw;
@@ -224,7 +221,7 @@ double NLLSCF::cf(const ColumnVector &p) const
     // p = parameters
     // data_pred = data predicted by model
     ColumnVector data_pred;
-    m_model->Evaluate(p, data_pred);
+    m_model->EvaluateFabber(p, data_pred, "");
 
     // m_data = actual data. Find sum of squares of differences
     // between this and the model data using a scalar product.
@@ -241,20 +238,17 @@ ReturnMatrix NLLSCF::grad(const ColumnVector &p) const
     m_linear.ReCentre(p);
     const Matrix &J = m_linear.Jacobian();
 
-#if 0 // FIXME Old code?
-	//this is g(w) i.e. model evaluated at current parameters?
-	//const ColumnVector gm = linear.Offset();
-#endif
     // Evaluate the model given the parameters
     ColumnVector data_pred;
-    m_model->Evaluate(p, data_pred);
+    m_model->EvaluateFabber(p, data_pred, "");
 
     gradv = -2 * J.t() * (m_data - data_pred);
     gradv.Release();
     return (gradv);
 }
 
-boost::shared_ptr<BFMatrix> NLLSCF::hess(const ColumnVector &p, boost::shared_ptr<BFMatrix> iptr) const
+boost::shared_ptr<BFMatrix> NLLSCF::hess(
+    const ColumnVector &p, boost::shared_ptr<BFMatrix> iptr) const
 {
     boost::shared_ptr<BFMatrix> hessm;
 
@@ -270,7 +264,7 @@ boost::shared_ptr<BFMatrix> NLLSCF::hess(const ColumnVector &p, boost::shared_pt
     // need to recenter the linearised model to the current parameter values
     m_linear.ReCentre(p);
     const Matrix &J = m_linear.Jacobian();
-    Matrix hesstemp = 2 * J.t() * J; //Make the G-N approximation to the hessian
+    Matrix hesstemp = 2 * J.t() * J; // Make the G-N approximation to the hessian
 
     //(*hessm) = J.t()*J;
 

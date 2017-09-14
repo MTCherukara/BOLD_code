@@ -15,7 +15,8 @@
 #include <string>
 
 /**
- * Abstract base class for method of testing whether the free energy maximisation algorithm has converged.
+ * Abstract base class for method of testing whether the free energy maximisation algorithm has
+ * converged.
  */
 class ConvergenceDetector : public Loggable
 {
@@ -27,75 +28,68 @@ public:
     virtual ~ConvergenceDetector()
     {
     }
-
     /**
-	 * Initialize from run parameters
-	 */
+     * Initialize from run parameters
+     */
     virtual void Initialize(FabberRunData &params);
 
     /**
-	 * The key method. Called before iteration with the current free energy
-	 *
-	 * Returns true if converged, false otherwise
-	 */
+     * The key method. Called before iteration with the current free energy
+     *
+     * Returns true if converged, false otherwise
+     */
     virtual bool Test(double F) = 0;
 
     /**
-	 * Reset as if algorithm was starting from scratch
-	 */
+     * Reset as if algorithm was starting from scratch
+     */
     virtual void Reset(double F = -99e99) = 0;
 
     /**
-	 * Whether detector uses the free energy
-	 */
+     * Whether detector uses the free energy
+     */
     virtual bool UseF() const
     {
         return false;
     }
-
     /**
-	 * Do we need to save the last set of parameters?
-	 *
-	 * @return true if we do, i.e. if the last value
-	 *              of F tested was the best so far.
-	 */
+     * Do we need to save the last set of parameters?
+     *
+     * @return true if we do, i.e. if the last value
+     *              of F tested was the best so far.
+     */
     virtual bool NeedSave()
     {
         return false;
     }
-
     /**
-	 * Do we need to revert to the previously saved set of parameters?
-	 */
+     * Do we need to revert to the previously saved set of parameters?
+     */
     virtual bool NeedRevert()
     {
         return false;
     }
-
     /**
-	 * Used by the LM detector - all others return zero
-	 */
+     * Used by the LM detector - all others return zero
+     */
     virtual float LMalpha()
     {
         return 0.0;
     }
-
     /**
-	 * Reason convergence reached
-	 *
-	 * If Test returns true, this should
-	 * contain a human readable string giving the reason
-	 */
+     * Reason convergence reached
+     *
+     * If Test returns true, this should
+     * contain a human readable string giving the reason
+     */
     std::string GetReason()
     {
         return m_reason;
     }
-
     /**
-	 * Send information on current progress to output stream
-	 */
-    virtual void
-    Dump(std::ostream &out, const std::string &indent = "") const = 0;
+     * Send information on current progress to output stream
+     */
+    virtual void Dump(std::ostream &out, const std::string &indent = "") const = 0;
 
 protected:
     std::string m_reason;
@@ -112,14 +106,13 @@ public:
     {
         return new CountingConvergenceDetector();
     }
-
     virtual void Initialize(FabberRunData &params);
 
     virtual bool Test(double);
 
     /**
-	 * Set the number of iterations back to zero
-	 */
+     * Set the number of iterations back to zero
+     */
     virtual void Reset(double F = -99e99);
 
     virtual void Dump(std::ostream &out, const std::string &indent = "") const;
@@ -140,40 +133,36 @@ public:
     {
         return new FchangeConvergenceDetector();
     }
-
     virtual void Initialize(FabberRunData &params);
 
     /**
-	 * @return true if F differs from previous value by less than
-	 * the configured value
-	 */
+     * @return true if F differs from previous value by less than
+     * the configured value
+     */
     virtual bool Test(double F);
 
     /**
-	 * Sets number of iterations to zero and the previous free energy to
-	 * an unrealistically large number
-	 */
+     * Sets number of iterations to zero and the previous free energy to
+     * an unrealistically large number
+     */
     virtual void Reset(double F = -99e99);
 
     /**
-	 * Uses the free energy
-	 * @return true
-	 */
+     * Uses the free energy
+     * @return true
+     */
     virtual bool UseF() const
     {
         return true;
     }
-
     virtual bool NeedSave()
     {
         return m_save;
     }
-
     virtual bool NeedRevert()
     {
         return m_revert;
     }
-
     virtual void Dump(std::ostream &out, const std::string &indent = "") const;
 
 protected:
@@ -195,18 +184,17 @@ public:
     {
         return new FreduceConvergenceDetector();
     }
-
     /**
-	 * Parameters:
-	 *   max-iterations Maximum number of iterations
-	 *   fchange Change if F smaller than this amount means convergence
-	 */
+     * Parameters:
+     *   max-iterations Maximum number of iterations
+     *   fchange Change if F smaller than this amount means convergence
+     */
     virtual void Initialize(FabberRunData &params);
 
     /**
-	 * @return true if difference to previous is less than
-	 * configured value, or F is less than previous value
-	 */
+     * @return true if difference to previous is less than
+     * configured value, or F is less than previous value
+     */
     virtual bool Test(double F);
 
     virtual void Dump(std::ostream &out, const std::string &indent = "") const;
@@ -242,7 +230,6 @@ public:
     {
         return m_save;
     }
-
     virtual void Dump(std::ostream &out, const std::string &indent = "") const;
 
 protected:
@@ -266,25 +253,24 @@ public:
     {
         return new LMConvergenceDetector();
     }
-
     virtual void Initialize(FabberRunData &params);
 
     /**
-	 * Convergence is reached if maximum number
-	 * of iterations is reached, if the change in F to
-	 * the previous step is smaller than Fchange or if
-	 * a series of decreases are found.
-	 *
-	 * When a decrease in F is found, the detector goes
-	 * into LM mode, and each decrease is counted.
-	 * If an increase is found, one decrease is wiped out.
-	 * If the number of decreases returns to zero, the
-	 * detector leaves LM mode and continues. If the
-	 * number of decreases reaches a maximum, the
-	 * detector converges.
-	 *
-	 * @return true if convergence reached
-	 */
+     * Convergence is reached if maximum number
+     * of iterations is reached, if the change in F to
+     * the previous step is smaller than Fchange or if
+     * a series of decreases are found.
+     *
+     * When a decrease in F is found, the detector goes
+     * into LM mode, and each decrease is counted.
+     * If an increase is found, one decrease is wiped out.
+     * If the number of decreases returns to zero, the
+     * detector leaves LM mode and continues. If the
+     * number of decreases reaches a maximum, the
+     * detector converges.
+     *
+     * @return true if convergence reached
+     */
     virtual bool Test(double F);
     virtual void Dump(std::ostream &out, const std::string &indent = "") const;
     virtual void Reset(double F = -99e99);
@@ -293,17 +279,14 @@ public:
     {
         return true;
     }
-
     bool NeedSave()
     {
         return m_save;
     }
-
     bool NeedRevert()
     {
         return m_revert;
     }
-
     float LMalpha()
     {
         return m_alpha;

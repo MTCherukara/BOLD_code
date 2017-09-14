@@ -93,10 +93,10 @@ std::ostream &operator<<(std::ostream &out, const OptionType value)
 
 std::ostream &operator<<(std::ostream &out, const OptionSpec &value)
 {
-    return out << "--" << value.name << " [" << value.type << "," << (value.optional ? "NOT REQUIRED" : "REQUIRED")
-               << "," << ((value.def == "") ? "NO DEFAULT" : "DEFAULT=" + value.def) << "]" << endl
-               << "        "
-               << value.description << endl;
+    return out << "--" << value.name << " [" << value.type << ","
+               << (value.optional ? "NOT REQUIRED" : "REQUIRED") << ","
+               << ((value.def == "") ? "NO DEFAULT" : "DEFAULT=" + value.def) << "]" << endl
+               << "        " << value.description << endl;
 }
 
 void PercentProgressCheck::Progress(int voxel, int nVoxels)
@@ -121,14 +121,14 @@ void PercentProgressCheck::Progress(int voxel, int nVoxels)
 }
 
 static OptionSpec OPTIONS[] = {
-    { "help", OPT_BOOL,
-        "Print this usage method. If given with --method or --model, display relevant method/model usage information",
+    { "help", OPT_BOOL, "Print this usage method. If given with --method or --model, display "
+                        "relevant method/model usage information",
         OPT_NONREQ, "" },
     { "listmethods", OPT_BOOL, "List all known inference methods", OPT_NONREQ, "" },
     { "listmodels", OPT_BOOL, "List all known forward models", OPT_NONREQ, "" },
     { "output", OPT_STR, "Directory for output files (including logfile)", OPT_REQ, "" },
-    { "overwrite", OPT_BOOL,
-        "If set will overwrite existing output. If not set, new output directories will be created by appending '+' to the directory name ",
+    { "overwrite", OPT_BOOL, "If set will overwrite existing output. If not set, new output "
+                             "directories will be created by appending '+' to the directory name ",
         OPT_NONREQ, "" },
     { "link-to-latest", OPT_BOOL,
         "Try to create a link to the most recent output directory with the prefix _latest",
@@ -140,15 +140,23 @@ static OptionSpec OPTIONS[] = {
         OPT_NONREQ, "" },
     { "data", OPT_TIMESERIES, "Specify a single input data file", OPT_REQ, "" },
     { "data<n>", OPT_TIMESERIES, "Specify multiple data files for n=1, 2, 3...", OPT_NONREQ, "" },
-    { "data-order", OPT_STR,
-        "If multiple data files are specified, how they will be handled: concatenate = one after the other,  interleave = first record from each file, then  second, etc.",
+    { "data-order", OPT_STR, "If multiple data files are specified, how they will be handled: "
+                             "concatenate = one after the other,  interleave = first record from "
+                             "each file, then  second, etc.",
         OPT_NONREQ, "interleave" },
-    { "mask", OPT_IMAGE, "Mask file. Inference will only be performed where mask value > 0", OPT_NONREQ, "" },
-    { "suppdata", OPT_TIMESERIES, "'Supplemental' timeseries data, required for some models", OPT_NONREQ, "" },
+    { "mask", OPT_IMAGE, "Mask file. Inference will only be performed where mask value > 0",
+        OPT_NONREQ, "" },
+    { "suppdata", OPT_TIMESERIES, "'Supplemental' timeseries data, required for some models",
+        OPT_NONREQ, "" },
     { "dump-param-names", OPT_BOOL,
-        "Write the file paramnames.txt containing the names of the model parameters", OPT_NONREQ, "" },
+        "Write the file paramnames.txt containing the names of the model parameters", OPT_NONREQ,
+        "" },
     { "save-model-fit", OPT_BOOL, "Output the model prediction as a 4d volume", OPT_NONREQ, "" },
-    { "save-residuals", OPT_BOOL, "Output the residuals (difference between the data and the model prediction)", OPT_NONREQ, "" },
+    { "save-residuals", OPT_BOOL,
+        "Output the residuals (difference between the data and the model prediction)", OPT_NONREQ,
+        "" },
+    { "save-model-extras", OPT_BOOL, "Output any additional model-specific timeseries data",
+        OPT_NONREQ, "" },
     { "save-mvn", OPT_BOOL, "Output the final MVN distributions.", OPT_NONREQ, "" },
     { "save-mean", OPT_BOOL, "Output the parameter means.", OPT_NONREQ, "" },
     { "save-std", OPT_BOOL, "Output the parameter standard deviations.", OPT_NONREQ, "" },
@@ -156,6 +164,7 @@ static OptionSpec OPTIONS[] = {
     { "save-noise-mean", OPT_BOOL, "Output the noise means.", OPT_NONREQ, "" },
     { "save-noise-std", OPT_BOOL, "Output the noise standard deviations. ", OPT_NONREQ, "" },
     { "save-free-energy", OPT_BOOL, "Output the free energy, if calculated. ", OPT_NONREQ, "" },
+    { "debug", OPT_BOOL, "Output large amounts of debug information. ONLY USE WITH VERY SMALL NUMBERS OF VOXELS", OPT_NONREQ, "" },
     { "" },
 };
 
@@ -179,7 +188,8 @@ void FabberRunData::init(bool compat_options)
 
     if (compat_options)
     {
-        // For backwards compatibility with previous version of Fabber, save these data items by default
+        // For backwards compatibility with previous version of Fabber, save these data items by
+        // default
         SetBool("save-mean");
         SetBool("save-std");
         SetBool("save-zstat");
@@ -193,7 +203,6 @@ void FabberRunData::init(bool compat_options)
 FabberRunData::~FabberRunData()
 {
 }
-
 void FabberRunData::LogParams()
 {
     map<string, string>::iterator iter;
@@ -211,8 +220,7 @@ void FabberRunData::Run(ProgressCheck *progress)
     }
 
     m_progress = progress;
-    LOG << "FabberRunData::FABBER release v" << fabber_release_version() << endl;
-    LOG << "FabberRunData::Revision " << fabber_source_version() << endl;
+    LOG << "FabberRunData::FABBER release v" << fabber_version() << endl;
     LOG << "FabberRunData::Last commit: " << fabber_source_date() << endl;
 
     time_t startTime;
@@ -221,7 +229,7 @@ void FabberRunData::Run(ProgressCheck *progress)
 
     LogParams();
 
-    //Set the forward model
+    // Set the forward model
     std::auto_ptr<FwdModel> fwd_model(FwdModel::NewFromName(GetString("model")));
 
     // For backwards compatibility - model may not have called superclass initialize
@@ -229,7 +237,9 @@ void FabberRunData::Run(ProgressCheck *progress)
 
     fwd_model->Initialize(*this);
 
-    assert(fwd_model->NumParams() > 0);
+    std::vector<Parameter> params;
+    fwd_model->GetParameters(*this, params);
+    assert(params.size() > 0);
     LOG << "FabberRunData::Forward Model version " << fwd_model->ModelVersion() << endl;
 
     // Write the paramnames.txt file if required
@@ -245,13 +255,13 @@ void FabberRunData::Run(ProgressCheck *progress)
         paramFile.close();
     }
 
-    //Set the inference technique (and pass in the model)
+    // Set the inference technique (and pass in the model)
     std::auto_ptr<InferenceTechnique> infer(InferenceTechnique::NewFromName(GetString("method")));
     infer->Initialize(fwd_model.get(), *this);
 
     // Arguments should all have been used by now, so complain if there's anything left.
     // FIXME ineffective at present
-    //CheckEmpty();
+    // CheckEmpty();
 
     // Calculations
     int nvoxels = GetVoxelCoords().Ncols();
@@ -269,8 +279,7 @@ void FabberRunData::Run(ProgressCheck *progress)
     LOG << "FabberRunData::Start time: " << ctime(&startTime); // Bizarrely, ctime() ends with a \n.
     LOG << "FabberRunData::End time: " << ctime(&endTime);
     LOG << "FabberRunData::Duration: " << endTime - startTime << " seconds." << endl;
-    
-} // void FabberRunData::Run(ProgressCheck *progress)
+}
 
 static string trim(string const &str)
 {
@@ -342,7 +351,8 @@ void FabberRunData::ParseOldStyleParamFile(const string &filename)
         }
         else
         {
-            throw FabberRunDataError("Invalid data '" + param + "' found in file '" + filename + "'");
+            throw FabberRunDataError(
+                "Invalid data '" + param + "' found in file '" + filename + "'");
         }
     }
 }
@@ -406,12 +416,10 @@ void FabberRunData::Set(const string &key, const string &value)
 {
     m_params[key] = value;
 }
-
 void FabberRunData::Set(const string &key, double value)
 {
     m_params[key] = stringify(value);
 }
-
 void FabberRunData::SetBool(const string &key, bool value)
 {
     if (value)
@@ -424,12 +432,14 @@ void FabberRunData::Unset(const std::string &key)
 {
     m_params.erase(key);
 }
-
+bool FabberRunData::HaveKey(const string &key)
+{
+    return m_params.count(key) > 0;
+}
 string FabberRunData::GetString(const string &key)
 {
     return Read(key, key);
 }
-
 string FabberRunData::GetStringDefault(const string &key, const string &def) const
 {
     if (m_params.count(key) == 0)
@@ -437,9 +447,23 @@ string FabberRunData::GetStringDefault(const string &key, const string &def) con
     return m_params.find(key)->second;
 }
 
-bool FabberRunData::HaveKey(const string &key)
+std::vector<std::string> FabberRunData::GetStringList(const std::string &prefix)
 {
-    return m_params.count(key) > 0;
+    std::vector<std::string> ret;
+    if (HaveKey(prefix))
+    {
+        ret.push_back(GetString(prefix));
+    }
+    else
+    {
+        int n = 1;
+        while (HaveKey(prefix + stringify(n)))
+        {
+            ret.push_back(GetString(prefix + stringify(n)));
+            n++;
+        }
+    }
+    return ret;
 }
 
 bool FabberRunData::GetBool(const string &key)
@@ -460,30 +484,16 @@ int FabberRunData::GetInt(const string &key, int min, int max)
     string val = GetString(key);
     try
     {
-        int i = convertTo<int>(val);
-        if (i < min) throw InvalidOptionValue(key, val, "Minimum " + stringify(min));
-        if (i > max) throw InvalidOptionValue(key, val, "Maximum " + stringify(max));
+        int i = convertTo<int>(val, key);
+        if (i < min)
+            throw InvalidOptionValue(key, val, "Minimum " + stringify(min));
+        if (i > max)
+            throw InvalidOptionValue(key, val, "Maximum " + stringify(max));
         return i;
     }
     catch (invalid_argument &)
     {
         throw InvalidOptionValue(key, val, "Must be an integer");
-    }
-}
-
-double FabberRunData::GetDouble(const string &key, double min, double max)
-{
-    string val = GetString(key);
-    try
-    {
-        double d = convertTo<double>(val);
-        if (d < min) throw InvalidOptionValue(key, val, "Minimum " + stringify(min));
-        if (d > max) throw InvalidOptionValue(key, val, "Maximum " + stringify(max));
-        return d;
-    }
-    catch (invalid_argument &)
-    {
-        throw InvalidOptionValue(key, val, "Must be an number");
     }
 }
 
@@ -495,12 +505,68 @@ int FabberRunData::GetIntDefault(const string &key, int def, int min, int max)
         return GetInt(key, min, max);
 }
 
+std::vector<int> FabberRunData::GetIntList(const std::string &prefix, int min, int max)
+{
+    std::vector<int> ret;
+    if (HaveKey(prefix))
+    {
+        ret.push_back(GetInt(prefix, min, max));
+    }
+    else
+    {
+        int n = 1;
+        while (HaveKey(prefix + stringify(n)))
+        {
+            ret.push_back(GetInt(prefix + stringify(n), min, max));
+            n++;
+        }
+    }
+    return ret;
+}
+
+double FabberRunData::GetDouble(const string &key, double min, double max)
+{
+    string val = GetString(key);
+    try
+    {
+        double d = convertTo<double>(val, key);
+        if (d < min)
+            throw InvalidOptionValue(key, val, "Minimum " + stringify(min));
+        if (d > max)
+            throw InvalidOptionValue(key, val, "Maximum " + stringify(max));
+        return d;
+    }
+    catch (invalid_argument &)
+    {
+        throw InvalidOptionValue(key, val, "Must be an number");
+    }
+}
+
 double FabberRunData::GetDoubleDefault(const string &key, double def, double min, double max)
 {
     if (m_params.count(key) == 0)
         return def;
     else
         return GetDouble(key, min, max);
+}
+
+std::vector<double> FabberRunData::GetDoubleList(const std::string &prefix, double min, double max)
+{
+    std::vector<double> ret;
+    if (HaveKey(prefix))
+    {
+        ret.push_back(GetDouble(prefix, min, max));
+    }
+    else
+    {
+        int n = 1;
+        while (HaveKey(prefix + stringify(n)))
+        {
+            ret.push_back(GetDouble(prefix + stringify(n), min, max));
+            n++;
+        }
+    }
+    return ret;
 }
 
 string FabberRunData::Read(const string &key, const string &msg)
@@ -521,7 +587,6 @@ std::string FabberRunData::Read(const std::string &key)
 {
     return GetString(key);
 }
-
 std::string FabberRunData::ReadWithDefault(const std::string &key, const std::string &def)
 {
     return GetStringDefault(key, def);
@@ -531,7 +596,6 @@ bool FabberRunData::ReadBool(const std::string &key)
 {
     return GetBool(key);
 }
-
 string FabberRunData::GetOutputDir()
 {
     if (m_outdir != "")
@@ -553,7 +617,8 @@ string FabberRunData::GetOutputDir()
         if (count >= 50) // I'm using a lot for some things
         {
             throw FabberInternalError(
-                ("Cannot create output directory (bad path, or too many + signs?): " + m_outdir).c_str());
+                ("Cannot create output directory (bad path, or too many + signs?): " + m_outdir)
+                    .c_str());
         }
 
         // Clear errno so it can be inspected later; result is only meaningful if mkdir fails.
@@ -581,7 +646,8 @@ string FabberRunData::GetOutputDir()
             {
                 // Other error -- might be a problem!
                 throw FabberInternalError(
-                    ("Unexpected problem creating output directory in overwrite mode: " + m_outdir).c_str());
+                    ("Unexpected problem creating output directory in overwrite mode: " + m_outdir)
+                        .c_str());
             }
         }
         m_outdir += "+";
@@ -591,12 +657,16 @@ string FabberRunData::GetOutputDir()
 #ifdef _WIN32
 #else
     // Might be useful for jobs running on the queue:
-    system(("uname -a > " + m_outdir + "/uname.txt").c_str());
+    int ret = system(("uname -a > " + m_outdir + "/uname.txt").c_str());
+    if (ret != 0)
+        LOG << "FabberRunData::uname failed - uname.txt not created" << endl;
 
     if (GetBool("link-to-latest"))
     {
         // try to make a link to the latest version. If this fails, it doesn't really matter.
-        system(("ln -sfn '" + m_outdir + "' '" + basename + "_latest'").c_str());
+        int ret = system(("ln -sfn '" + m_outdir + "' '" + basename + "_latest'").c_str());
+        if (ret != 0)
+            LOG << "FabberRunData::link-to-latest failed" << endl;
     }
 #endif
 
@@ -605,7 +675,8 @@ string FabberRunData::GetOutputDir()
 
 ostream &operator<<(ostream &out, const FabberRunData &opts)
 {
-    for (map<string, string>::const_iterator i = opts.m_params.begin(); i != opts.m_params.end(); ++i)
+    for (map<string, string>::const_iterator i = opts.m_params.begin(); i != opts.m_params.end();
+         ++i)
     {
         if (i->second == "")
             out << "--" << i->first << endl;
@@ -641,7 +712,8 @@ const NEWMAT::Matrix &FabberRunData::GetMainVoxelData()
 
 const NEWMAT::Matrix &FabberRunData::GetVoxelSuppData()
 {
-    // FIXME Currently Fabber models assume that suppdata will return an empty matrix if none present.
+    // FIXME Currently Fabber models assume that suppdata will return an empty matrix if none
+    // present.
     try
     {
         return GetVoxelData("suppdata");
@@ -662,7 +734,6 @@ const NEWMAT::Matrix &FabberRunData::GetVoxelCoords()
 {
     return GetVoxelData("coords");
 }
-
 const NEWMAT::Matrix &FabberRunData::GetVoxelData(const std::string &key)
 {
     // Attempt to load data if not already present. Will
@@ -741,7 +812,8 @@ const Matrix &FabberRunData::GetMainVoxelDataMultiple()
                 if (dataSets[j].Nrows() != nTimes)
                 {
                     // Data sets need same number of time points if they are to be interleaved
-                    throw InvalidOptionValue("data-order", "interleave", "Data sets must all have the same number of time points");
+                    throw InvalidOptionValue("data-order", "interleave",
+                        "Data sets must all have the same number of time points");
                 }
                 m_mainDataMultiple.Row(nSets * i + j + 1) = dataSets.at(j).Row(i + 1);
             }
@@ -768,8 +840,8 @@ const Matrix &FabberRunData::GetMainVoxelDataMultiple()
         throw InvalidOptionValue("data-order", order, "Value not recognized");
     }
 
-    LOG << "FabberRunData::Done loading data, size = " << m_mainDataMultiple.Nrows() << " timepoints by "
-        << m_mainDataMultiple.Ncols() << " voxels" << endl;
+    LOG << "FabberRunData::Done loading data, size = " << m_mainDataMultiple.Nrows()
+        << " timepoints by " << m_mainDataMultiple.Ncols() << " voxels" << endl;
     return m_mainDataMultiple;
 }
 
@@ -791,7 +863,8 @@ void FabberRunData::SetVoxelData(string key, const NEWMAT::Matrix &data)
     m_voxel_data[key] = data;
 }
 
-void FabberRunData::SaveVoxelData(const std::string &filename, NEWMAT::Matrix &data, VoxelDataType data_type)
+void FabberRunData::SaveVoxelData(
+    const std::string &filename, NEWMAT::Matrix &data, VoxelDataType data_type)
 {
     LOG << "FabberRunData::Saving to memory: " << filename << endl;
     // FIXME what should we do with data_type?
@@ -804,7 +877,8 @@ void FabberRunData::SetVoxelCoords(const NEWMAT::Matrix &coords)
     // numbers of dimensions but would require extensive refactoring
     if (coords.Ncols() > 0 && coords.Nrows() != 3)
     {
-        throw InvalidOptionValue("Coordinates dimensions", stringify(coords.Nrows()), "Co-ordinates must be 3 dimensional");
+        throw InvalidOptionValue("Coordinates dimensions", stringify(coords.Nrows()),
+            "Co-ordinates must be 3 dimensional");
     }
 
     SetVoxelData("coords", coords);
@@ -839,7 +913,8 @@ void FabberRunData::SetExtent(int nx, int ny, int nz, float sx, float sy, float 
 {
     if ((nx < 0) || (ny < 0) || (nz < 0) || (sx <= 0) || (sy <= 0) || (sz <= 0))
     {
-        throw InvalidOptionValue("extent", "negative values", "Extent and voxel sizes must be positive");
+        throw InvalidOptionValue(
+            "extent", "negative values", "Extent and voxel sizes must be positive");
     }
 
     m_extent.resize(3);
@@ -852,6 +927,191 @@ void FabberRunData::SetExtent(int nx, int ny, int nz, float sx, float sy, float 
     m_dims[2] = sz;
 }
 
+// Binary search for data(index) == num
+// Assumes data is sorted ascending!!
+// Either returns an index such that data(index) == num
+//   or -1 if num is not present in data.
+static inline int binarySearch(const ColumnVector &data, int num)
+{
+    int first = 1, last = data.Nrows();
+
+    while (first <= last)
+    {
+        int test = (first + last) / 2;
+
+        if (data(test) < num)
+        {
+            first = test + 1;
+        }
+        else if (data(test) > num)
+        {
+            last = test - 1;
+        }
+        else if (data(test) == num)
+        {
+            return test;
+        }
+        else
+        {
+            assert(false); // logic error!  data wasn't sorted?
+        }
+    }
+    return -1;
+}
+
+vector<vector<int> > &FabberRunData::GetNeighbours(int n_dims)
+{
+    if (m_neighbours.size() > 0)
+        return m_neighbours;
+
+    const Matrix &coords = GetVoxelCoords();
+    const int nvoxels = coords.Ncols();
+    if (nvoxels == 0)
+        return m_neighbours;
+
+    // Voxels must be ordered by increasing z, y and x values respectively
+    // otherwise binary search for voxel by offset will not work
+    // CheckCoordMatrixCorrectlyOrdered(coords);
+
+    // Create a column vector with one entry per voxel.
+    ColumnVector offsets(nvoxels);
+
+    // Populate offsets with the offset into the
+    // matrix of each voxel. We assume that co-ordinates
+    // could be zero but not negative
+    int xsize = coords.Row(1).Maximum() + 1;
+    int ysize = coords.Row(2).Maximum() + 1;
+    for (int v = 1; v <= nvoxels; v++)
+    {
+        int x = coords(1, v);
+        int y = coords(2, v);
+        int z = coords(3, v);
+        int offset = z * xsize * ysize + y * xsize + x;
+        offsets(v) = offset;
+    }
+
+    // Delta is a list of offsets to find nearest
+    // neighbours in x y and z direction (not diagonally)
+    // Of course applying these offsets naively would not
+    // always work, e.g. offset of -1 in the x direction
+    // will not be a nearest neighbour for the first voxel
+    // so need to check for this in subsequent code
+    vector<int> delta;
+    delta.push_back(1);              // next row
+    delta.push_back(-1);             // prev row
+    delta.push_back(xsize);          // next column
+    delta.push_back(-xsize);         // prev column
+    delta.push_back(xsize * ysize);  // next slice
+    delta.push_back(-xsize * ysize); // prev slice
+
+    // Don't look for neighbours in all dimensions.
+    // For example if n_dims=2, max_delta=3 so we
+    // only look for neighbours in rows and columns
+    //
+    // However note we still need the full list of 3D deltas for later
+    int max_delta = n_dims * 2 - 1;
+
+    // Neighbours is a vector of vectors, so each voxel
+    // will have an entry which is a vector of its neighbours
+    m_neighbours.resize(nvoxels);
+
+    // Go through each voxel. Note that offsets is indexed from 1 not 0
+    // however the offsets themselves (potentially) start at 0.
+    for (int vid = 1; vid <= nvoxels; vid++)
+    {
+        // Get the voxel offset into the matrix
+        int pos = int(offsets(vid));
+
+        // Now search for neighbours
+        for (int n = 0; n <= max_delta; n++)
+        {
+            // is there a voxel at this neighbour position?
+            // indexed from 1; id == -1 if not found.
+            int id = binarySearch(offsets, pos + delta[n]);
+
+            // No such voxel: continue
+            if (id < 0)
+                continue;
+
+            // Check for wrap-around
+
+            // Don't check for wrap around on final co-ord
+            // PREVIOUSLY		if (delta.size() >= n + 2)
+            // Changed (fixed)? because if n_dims != 3 we still need
+            // to check for wrap around in y-coordinate FIXME check
+            if (n < 4)
+            {
+                bool ignore = false;
+                if (delta[n] > 0)
+                {
+                    int test = delta[n + 2];
+                    if (test > 0)
+                        ignore = (pos % test) >= test - delta[n];
+                }
+                else
+                {
+                    int test = -delta[n + 2];
+                    if (test > 0)
+                        ignore = (pos % test) < -delta[n];
+                }
+                if (ignore)
+                {
+                    continue;
+                }
+            }
+
+            // If we get this far, add it to the list
+            m_neighbours.at(vid - 1).push_back(id);
+        }
+    }
+    return m_neighbours;
+}
+
+vector<vector<int> > &FabberRunData::GetSecondNeighbours(int n_dims)
+{
+    if (m_neighbours2.size() > 0)
+        return m_neighbours2;
+
+    GetNeighbours(n_dims);
+    const int nvoxels = m_neighbours.size();
+    if (nvoxels == 0)
+        return m_neighbours2;
+
+    // Similar algorithm but looking for Neighbours-of-neighbours, excluding self,
+    // but including duplicates if there are two routes to get there
+    // (diagonally connected)
+    m_neighbours2.resize(nvoxels);
+    for (int vid = 1; vid <= nvoxels; vid++)
+    {
+        // Go through the list of neighbours for each voxel.
+        for (unsigned n1 = 0; n1 < m_neighbours.at(vid - 1).size(); n1++)
+        {
+            // n1id is the voxel index (not the offset) of the neighbour
+            int n1id = m_neighbours[vid - 1].at(n1);
+            int checkNofN = 0;
+            // Go through each of it's neighbours. Add each, apart from original voxel
+            for (unsigned n2 = 0; n2 < m_neighbours.at(n1id - 1).size(); n2++)
+            {
+                int n2id = m_neighbours[n1id - 1].at(n2);
+                if (n2id != vid)
+                {
+                    m_neighbours2[vid - 1].push_back(n2id);
+                }
+                else
+                    checkNofN++;
+            }
+
+            if (checkNofN != 1)
+            {
+                throw FabberInternalError("Each of this voxel's neighbours must have "
+                                          "this voxel as a neighbour");
+            }
+        }
+    }
+
+    return m_neighbours2;
+}
+
 void FabberRunData::CheckSize(std::string key, const NEWMAT::Matrix &mat)
 {
     if (m_voxel_data.size() > 0)
@@ -859,8 +1119,8 @@ void FabberRunData::CheckSize(std::string key, const NEWMAT::Matrix &mat)
         int nvoxels = m_voxel_data.begin()->second.Ncols();
         if (mat.Ncols() != nvoxels)
         {
-            throw InvalidOptionValue("Voxels in " + key, stringify(mat.Ncols()), "Incorrect size - should contain " + stringify(nvoxels));
+            throw InvalidOptionValue("Voxels in " + key, stringify(mat.Ncols()),
+                "Incorrect size - should contain " + stringify(nvoxels));
         }
     }
 }
-

@@ -17,7 +17,7 @@ scriptdir=`dirname $0`
 rm -rf $scriptdir/../build_$TYPE
 mkdir $scriptdir/../build_$TYPE
 cd $scriptdir/../build_$TYPE
-cmake .. -DCMAKE_BUILD_TYPE=$TYPE -DCMAKE_C_COMPILER=/usr/bin/gcc -DCMAKE_CXX_COMPILER=/usr/bin/g++
+cmake .. -DCMAKE_BUILD_TYPE=$TYPE
 make
 
 cd $ORIGDIR
