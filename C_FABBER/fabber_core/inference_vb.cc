@@ -22,6 +22,9 @@
 
 using MISCMATHS::sign;
 
+// ------------------------------------------------------------------------------------------------
+// --------         Input Option Text           ---------------------------------------------------
+// ------------------------------------------------------------------------------------------------
 static OptionSpec OPTIONS[] = {
     { "noise", OPT_STR, "Noise model to use (white or ar1)", OPT_REQ, "" },
     { "convergence", OPT_STR, "Name of method for detecting convergence", OPT_NONREQ, "maxits" },
@@ -68,6 +71,9 @@ static OptionSpec OPTIONS[] = {
     { "" },
 };
 
+// ------------------------------------------------------------------------------------------------
+// --------         Nonsense                    ---------------------------------------------------
+// ------------------------------------------------------------------------------------------------
 void Vb::GetOptions(vector<OptionSpec> &opts) const
 {
     InferenceTechnique::GetOptions(opts);
@@ -77,7 +83,6 @@ void Vb::GetOptions(vector<OptionSpec> &opts) const
         opts.push_back(OPTIONS[i]);
     }
 }
-
 string Vb::GetDescription() const
 {
     return "Variational Bayes inference technique";
@@ -86,10 +91,18 @@ string Vb::GetVersion() const
 {
     return fabber_version();
 }
+
+// ------------------------------------------------------------------------------------------------
+// --------         Constructor                 ---------------------------------------------------
+// ------------------------------------------------------------------------------------------------
 InferenceTechnique *Vb::NewInstance()
 {
     return new Vb();
 }
+
+// ------------------------------------------------------------------------------------------------
+// --------         Initialize                  ---------------------------------------------------
+// ------------------------------------------------------------------------------------------------
 void Vb::Initialize(FwdModel *fwd_model, FabberRunData &rundata)
 {
     InferenceTechnique::Initialize(fwd_model, rundata);
@@ -126,8 +139,13 @@ void Vb::Initialize(FwdModel *fwd_model, FabberRunData &rundata)
 
     // Locked linearizations, if requested
     m_locked_linear = rundata.GetStringDefault("locked-linear-from-mvn", "") != "";
-}
 
+} // Vb::Initialize
+
+
+// ------------------------------------------------------------------------------------------------
+// --------         Initialize Noise            ---------------------------------------------------
+// ------------------------------------------------------------------------------------------------
 void Vb::InitializeNoiseFromParam(FabberRunData &rundata, NoiseParams *dist, string param_key)
 {
     string filename = rundata.GetStringDefault(param_key, "modeldefault");
@@ -140,6 +158,10 @@ void Vb::InitializeNoiseFromParam(FabberRunData &rundata, NoiseParams *dist, str
     }
 }
 
+
+// ------------------------------------------------------------------------------------------------
+// --------         Setup Per-Voxel Distributions                    ------------------------------
+// ------------------------------------------------------------------------------------------------
 void Vb::SetupPerVoxelDists(FabberRunData &rundata)
 {
     // Initialized in voxel loop below (from file or default as required)
@@ -231,8 +253,12 @@ void Vb::SetupPerVoxelDists(FabberRunData &rundata)
         m_noise->Precalculate(
             *m_ctx->noise_post[v - 1], *m_ctx->noise_prior[v - 1], m_origdata->Column(v));
     }
-}
+} // Vb::SetupPerVoxelDists
 
+
+// ------------------------------------------------------------------------------------------------
+// --------         Pass Model Data             ---------------------------------------------------
+// ------------------------------------------------------------------------------------------------
 void Vb::PassModelData(int v)
 {
     // Pass in data, coords and supplemental data for this voxel
@@ -247,8 +273,11 @@ void Vb::PassModelData(int v)
     {
         m_model->PassData(y, vcoords);
     }
-}
+} // Vb::PassModelData
 
+// ------------------------------------------------------------------------------------------------
+// --------         Ignore V                    ---------------------------------------------------
+// ------------------------------------------------------------------------------------------------
 void Vb::IgnoreVoxel(int v)
 {
     LOG << "Vb::IgnoreVoxel This voxel will be ignored in further updates" << endl;
@@ -280,11 +309,11 @@ void Vb::IgnoreVoxel(int v)
 
         n2.erase(std::remove(n2.begin(), n2.end(), v), n2.end());
     }
-}
+} // Vb::IgnoreVoxel
 
-/**
- * Calculate free energy. Note that this is currently unused in spatial VB
- */
+// ------------------------------------------------------------------------------------------------
+// --------         Calculate Free Energy       ---------------------------------------------------
+// ------------------------------------------------------------------------------------------------
 double Vb::CalculateF(int v, string label, double Fprior)
 {
     double F = 1234.5678;
@@ -301,8 +330,11 @@ double Vb::CalculateF(int v, string label, double Fprior)
         }
     }
     return F;
-}
+} // Vb::CalculateF
 
+// ------------------------------------------------------------------------------------------------
+// --------         Debug                    ---------------------------------------------------
+// ------------------------------------------------------------------------------------------------
 void Vb::DebugVoxel(int v, const string &where)
 {
     LOG << where << " - voxel " << v << " of " << m_nvoxels << endl;
@@ -315,6 +347,10 @@ void Vb::DebugVoxel(int v, const string &where)
     LOG << "Jacobian: " << m_lin_model[v - 1].Jacobian();
 }
 
+
+// ------------------------------------------------------------------------------------------------
+// --------         Do Calculations             ---------------------------------------------------
+// ------------------------------------------------------------------------------------------------
 void Vb::DoCalculations(FabberRunData &rundata)
 {
     // extract data (and the coords) from rundata for the (first) VB run
@@ -366,8 +402,12 @@ void Vb::DoCalculations(FabberRunData &rundata)
         delete m_ctx->noise_post[v - 1];
         delete m_ctx->noise_prior[v - 1];
     }
-}
+} // Vb::DoCalculations
 
+
+// ------------------------------------------------------------------------------------------------
+// --------         Voxelwise Calculations         ------------------------------------------------
+// ------------------------------------------------------------------------------------------------
 void Vb::DoCalculationsVoxelwise(FabberRunData &rundata)
 {
     vector<Parameter> params;
@@ -496,8 +536,12 @@ void Vb::DoCalculationsVoxelwise(FabberRunData &rundata)
                 resultFs.at(v - 1) = F;
         }
     }
-}
+} // Vb::DoCalculationsVoxelwise
 
+
+// ------------------------------------------------------------------------------------------------
+// --------         Spatial Calculations               --------------------------------------------
+// ------------------------------------------------------------------------------------------------
 void Vb::DoCalculationsSpatial(FabberRunData &rundata)
 {
     // Pass in some (dummy) data/coords here just in case the model relies upon it
@@ -633,8 +677,12 @@ void Vb::DoCalculationsSpatial(FabberRunData &rundata)
         resultMVNs[v - 1]
             = new MVNDist(m_ctx->fwd_post[v - 1], m_ctx->noise_post[v - 1]->OutputAsMVN());
     }
-}
+} // Vb::DoCalculationsSpatial
 
+
+// ------------------------------------------------------------------------------------------------
+// --------         Check Stuff                 ---------------------------------------------------
+// ------------------------------------------------------------------------------------------------
 void Vb::CheckCoordMatrixCorrectlyOrdered(const Matrix &coords)
 {
     // Only 3D
@@ -659,8 +707,11 @@ void Vb::CheckCoordMatrixCorrectlyOrdered(const Matrix &coords)
                 "Coordinate matrix must be in correct order to use adjacency-based priors.");
         }
     }
-}
+} // Vb::CheckCoordMatrixCorrectlyOrdered
 
+// ------------------------------------------------------------------------------------------------
+// --------         Binary Search               ---------------------------------------------------
+// ------------------------------------------------------------------------------------------------
 // Binary search for data(index) == num
 // Assumes data is sorted ascending!!
 // Either returns an index such that data(index) == num
@@ -693,9 +744,10 @@ static inline int binarySearch(const ColumnVector &data, int num)
     return -1;
 }
 
-/**
- * Calculate nearest and second-nearest neighbours for the voxels
- */
+
+// ------------------------------------------------------------------------------------------------
+// --------         Calculate Neighbours          -------------------------------------------------
+// ------------------------------------------------------------------------------------------------
 void Vb::CalcNeighbours(const Matrix &coords)
 {
     const int nVoxels = coords.Ncols();
@@ -830,8 +882,12 @@ void Vb::CalcNeighbours(const Matrix &coords)
             }
         }
     }
-}
+} // Vb::CalcNeighbours
 
+
+// ------------------------------------------------------------------------------------------------
+// --------         Save Results                ---------------------------------------------------
+// ------------------------------------------------------------------------------------------------
 void Vb::SaveResults(FabberRunData &rundata) const
 {
     InferenceTechnique::SaveResults(rundata);
@@ -882,4 +938,4 @@ void Vb::SaveResults(FabberRunData &rundata) const
         LOG << "Vb::Free energy wasn't recorded, so no freeEnergy data saved" << endl;
     }
     LOG << "Vb::Done writing results." << endl;
-}
+} // Vb::SaveResults
