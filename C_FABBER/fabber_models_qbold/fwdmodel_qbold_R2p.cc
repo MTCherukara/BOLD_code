@@ -109,7 +109,7 @@ void R2primeFwdModel::Initialize(ArgsType &args)
     }    
     if (infer_R2p)
     {
-        LOG << "Infering on R2p " << endl;
+        LOG << "Inferring on R2p " << endl;
     }
     if (infer_DBV)
     {
@@ -192,7 +192,7 @@ void R2primeFwdModel::HardcodedInitialDists(MVNDist &prior, MVNDist &posterior) 
     if (infer_R2p)
     {
         prior.means(R2p_index()) = 5.0;
-        precisions(R2p_index(), R2p_index()) = 0.01; // 1e-2
+        precisions(R2p_index(), R2p_index()) = 0.1; // 1e-2
     }
 
     if (infer_DBV)
@@ -228,7 +228,7 @@ void R2primeFwdModel::HardcodedInitialDists(MVNDist &prior, MVNDist &posterior) 
     if (infer_lam)
     {
         prior.means(lam_index()) = 0.001;
-        precisions(lam_index(), lam_index()) = 0.1; // 1-e1
+        precisions(lam_index(), lam_index()) = 10; // 1-e1
     }
 
     prior.SetPrecisions(precisions);
@@ -379,7 +379,7 @@ void R2primeFwdModel::Evaluate(const ColumnVector &params, ColumnVector &result)
 
     
     // alternative, if values are outside reasonable bounds
-    if ( DBV > 1.0 || lam > 1.0 )
+    if ( DBV > 1.0 || lam > 1.0 || (DBV+lam) > 1.1 )
     {
         for (int ii = 1; ii <= taus.Nrows(); ii++)
         {
