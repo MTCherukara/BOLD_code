@@ -14,7 +14,7 @@ rdir=~/Documents/DPhil/Data/Fabber_Results
 if [[ $# -eq 0 ]] ; then
     dname="+"
 else
-    dname=$(ls ${rdir} | grep "$1")
+    dname=$(ls ${rdir} | grep "_$1_")
 fi
 
 # check if a set of fabber results of that number exists
@@ -23,8 +23,9 @@ if [[ -d "${rdir}/${dname}" ]] ; then
 
     # for the DBV file, first take the absolute value
     #                   then threshold all values above 1 to 1
-    #                   then multiply by 301, and save to temporary file
-    fslmaths ${rdir}/${dname}/mean_DBV.nii.gz -abs -sub 1 -uthr 0 -add 1 -mul 301.74 temp_DBV.nii.gz
+    #                   then threshold all values below 0.01 to 0.01 (avoids singular problems)
+    #                   then multiply by 301.74, and save to temporary file
+    fslmaths ${rdir}/${dname}/mean_DBV.nii.gz -abs -sub 1 -uthr 0 -add 0.99 -thr 0 -add 0.01 -mul 301.74 temp_DBV.nii.gz
 
     # for the R2p file, first take the absolute value
     #                   then divide by the temporary DBV file, and save to OEF

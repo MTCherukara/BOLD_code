@@ -10,7 +10,8 @@
         "system_error": "cpp",
         "iosfwd": "cpp",
         "cmath": "cpp",
-        "cstdlib": "cpp"
+        "cstdlib": "cpp",
+        "*.fab": "fab"
     },
     "editor.minimap.enabled": false
 }

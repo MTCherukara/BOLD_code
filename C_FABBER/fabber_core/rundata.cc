@@ -661,13 +661,15 @@ string FabberRunData::GetOutputDir()
     if (ret != 0)
         LOG << "FabberRunData::uname failed - uname.txt not created" << endl;
 
+    // This "link-to-latest" bit commented out, because it's annoying... MTC 2017-10-04
+    /*
     if (GetBool("link-to-latest"))
     {
         // try to make a link to the latest version. If this fails, it doesn't really matter.
         int ret = system(("ln -sfn '" + m_outdir + "' '" + basename + "_latest'").c_str());
         if (ret != 0)
             LOG << "FabberRunData::link-to-latest failed" << endl;
-    }
+    } */
 #endif
 
     return m_outdir;
