@@ -1,4 +1,4 @@
-% MTC_SliceHistogram.m
+% SliceHistogram.m
 %
 % Plots 'Histograms' of MRI voxel intensities for slices. Based on 
 % MTC_CompareMethods.m
@@ -11,12 +11,15 @@
 %
 % CHANGELOG:
 %
+% 2017-10-04 (MTC). Changed filename for consistency with the other scripts
+%       in Matlab_AnalysisTools. Removed the LoadSlice function to a
+%       separate file. 
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%     (main) MTC_SliceHistogram       %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%     (main) SliceHistogram           %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-function MTC_SliceHistogram(varargin)
+function SliceHistogram(varargin)
 
     % Constants
     nb = 50; % number of bins we want to use
@@ -46,42 +49,6 @@ function MTC_SliceHistogram(varargin)
     PlotHist(hdata,hcentres,slicenums,vtype);
     
 return; % MTC_SliceHistogram
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%     LoadSlice                       %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-function [slicedata,slicenum,filename,vtype] = LoadSlice(filename)
-    % Loads the data from a specific slice (or slices) into a matrix and
-    % returns it, along with some other information
-    
-    % Check whether a name has been specified, if not, have the user pick
-    if ~exist('filename','var')
-        [niname, nidir] = uigetfile('*.nii.gz','Select NIFTY Data File to Load...');
-        filename = [nidir,niname]; 
-    end
-    
-    % Determine the type of variable we are looking at
-    if strfind(lower(niname),'oef')
-        vtype = 'OEF';
-    elseif strfind(lower(niname),'dbv')
-        vtype = 'DBV';
-    else
-        vtype = 'other';
-    end
-    
-    % Load the selected NIFTY into dataset
-    [dataset,dims,~,~,~] = read_avw(filename);
-    
-    % Record the number of slices
-    nsl = dims(3);
-    
-    % Have the user select a slice (or set of slices) to plot
-    slc = inputdlg(['Enter a number between 1 and ',num2str(nsl)],'Choose a Slice',1);
-    
-    slicenum  = slc{1};
-    slicedata = squeeze(dataset(:,:,str2num(slicenum)));
-    
-return; % LoadSlice 
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

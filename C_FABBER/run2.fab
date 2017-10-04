@@ -5,7 +5,7 @@ data=../../Data/subject_03l_ASE.nii.gz
 mask=../../Data/subject_03l_mask.nii.gz
 
 # Run Options
-output=../../Data/Fabber_Results/
+output=../../Data/Fabber_Results/fabber_1_temp
 save-residuals
 save-model-fit
 
