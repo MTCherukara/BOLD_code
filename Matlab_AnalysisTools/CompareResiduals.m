@@ -23,7 +23,7 @@ function CompareResiduals
 nv = dims(4); % number of volumes
 
 % have the user insert the tau range
-tinput = inputdlg({'Tau start (ms):','Tau end (ms):'},'Taus (ms)',1,{'0','1'});
+tinput = inputdlg({'Tau start (ms):','Tau end (ms):'},'Taus (ms)',1,{'-16','64'});
 taus1 = linspace(str2double(tinput{1}),str2double(tinput{2}),nv);
 
 mrsd1 = zeros(nv,1);
@@ -48,7 +48,7 @@ switch choice
         nv = dims(4); % number of volumes
 
         % have the user insert the tau range
-        tinput = inputdlg({'Tau start (ms):','Tau end (ms):'},'Taus (ms)',1,{'0','1'});
+        tinput = inputdlg({'Tau start (ms):','Tau end (ms):'},'Taus (ms)',1,{'-16','64'});
         taus2 = linspace(str2double(tinput{1}),str2double(tinput{2}),nv);
 
         mrsd2 = zeros(nv,1);
@@ -77,7 +77,7 @@ switch choice
         nv = dims(4); % number of volumes
 
         % have the user insert the tau range
-        tinput = inputdlg({'Tau start (ms):','Tau end (ms):'},'Taus (ms)',1,{'0','1'});
+        tinput = inputdlg({'Tau start (ms):','Tau end (ms):'},'Taus (ms)',1,{'-16','64'});
         taus3 = linspace(str2double(tinput{1}),str2double(tinput{2}),nv);
 
         mrsd3 = zeros(nv,1);

@@ -1,7 +1,7 @@
 # fabber run 5 - subject 5, TE = 82 only, to test how important having negative taus is
 
 # Input Data
-data=../../Data/subject_05/subject_05_ASE_sh.nii.gz
+data=../../Data/subject_05/subject_05_ASE_noIR_TE_82.nii.gz
 mask=../../Data/subject_05/subject_05_ASE_mask.nii.gz
 
 # Run Options
@@ -15,7 +15,7 @@ noise=white
 max-iterations=10
 
 # Spatial VB Information (remove all of this if method!=spatialvb)
-param-spatial-priors=NNNNI
+param-spatial-priors=MMMMI
 allow-bad-voxels
 image-prior5=../../Data/subject_05/subject_05_lowres_csf2.nii.gz
 
@@ -39,3 +39,5 @@ tau6=0.024
 tau7=0.032
 tau8=0.040
 tau9=0.048
+tau10=0.056
+tau11=0.064
