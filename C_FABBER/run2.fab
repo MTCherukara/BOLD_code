@@ -1,22 +1,22 @@
 # fabber run 2 - patient data (subject 3P)
 
 # Input Data
-data=../../Data/subject_03l_ASE.nii.gz
+data=../../Data/subject_03l_ASE_sh.nii.gz
 mask=../../Data/subject_03l_mask.nii.gz
 
 # Run Options
-output=../../Data/Fabber_Results/fabber_1_temp
+output=../../Data/Fabber_Results/
 save-residuals
 save-model-fit
 
 # Method Information
-method=spatialvb
+method=vb
 noise=white
 max-iterations=10
 
 # Spatial VB Information (remove all of this if method!=spatialvb)
-param-spatial-priors=NNNN
-allow-bad-voxels
+# param-spatial-priors=NNNN
+# allow-bad-voxels
 
 # Inference Model 
 model=qboldR2p
@@ -37,5 +37,3 @@ tau6=0.024
 tau7=0.032
 tau8=0.040
 tau9=0.048
-tau10=0.056
-tau11=0.064
