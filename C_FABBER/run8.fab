@@ -15,9 +15,9 @@ noise=white
 max-iterations=10
 
 # Spatial VB Information (remove all of this if method!=spatialvb)
-param-spatial-priors=NNNNI
+param-spatial-priors=MMMMI
 allow-bad-voxels
-image-prior5=../../Data/subject_05/subject_05_lowres_csf.nii.gz
+image-prior5=../../Data/subject_05/sub5_csf_2_200.nii.gz
 
 # Inference Model 
 model=qboldR2p
