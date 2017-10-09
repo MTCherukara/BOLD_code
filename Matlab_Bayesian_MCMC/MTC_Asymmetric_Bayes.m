@@ -30,7 +30,8 @@ tic;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Inference Parameters
 
-np = 100; % number of points to perform Bayesian analysis on
+np = 1000; % number of points to perform Bayesian analysis on
+nz = 50; % number of points in the third dimension
 
 % Select which parameter(s) to infer on (1 = OEF, 2 = DBV, 3 = R2', 4 = CSF, 5 = dF)
 pars = [1,2,4];
@@ -136,21 +137,22 @@ elseif length(pars) == 3
     
     vals(1,:) = linspace(intervs(p1,1),intervs(p1,2),np);
     vals(2,:) = linspace(intervs(p2,1),intervs(p2,2),np);
-    vals(3,:) = linspace(intervs(p3,1),intervs(p3,2),np);
+    valz = linspace(intervs(p3,1),intervs(p3,2),nz); % third (smaller) dimension
     
-    pos = zeros(np,np,np);
+    pos = zeros(nz,np,np);
     
-    for i1 = 1:np
+    for i1 = 1:nz
         % loop through parameter 1
-        params = param_update(vals(1,i1),params,pname{1});
+        params = param_update(valz(1,i1),params,pname{3});
+        disp(['Iterating ',num2str(i1),' of ',num2str(nz)]);
 
         for i2 = 1:np
             % loop through parameter 2
-            params = param_update(vals(2,i2),params,pname{2});
+            params = param_update(vals(1,i2),params,pname{1});
 
             for i3 = 1:np
                 % loop through parameter 3
-                params = param_update(vals(3,i3),params,pname{3});
+                params = param_update(vals(2,i3),params,pname{2});
 
                 % run the model to evaluate the signal with current params
                 S_mod = MTC_qASE_model(T_sample,params,noDW);
@@ -164,7 +166,7 @@ elseif length(pars) == 3
     
     % When doing a 3D grid search, we're always going to want to save the
     % results (just in case!)
-    save('Grid3D_temp_001','pos','params','T_sample','S_sample','trv','vals');
+    save('Grid3D_temp_001','pos','params','T_sample','S_sample','trv','vals','vals');
 
 end % length(pars) == 1 ... elseif ... elseif ...
 

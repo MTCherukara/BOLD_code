@@ -4,63 +4,66 @@
 %
 % Created 6 October 2017
 
-clear; close all;
-
+function xPlotGrid3D
+    % Main Function
+    
 % Load in Grid Search Data
-load('~/Documents/DPhil/Data/GridSearches/CSF_Grids/Grid3D_100_OEF_DBV_CSF.mat');
+load('~/Documents/DPhil/Data/GridSearches/CSF_Grids/Grid_50_OEF_1000.mat');
 
-if ~exist('vals','var')
-    vals = [w1;w2;w3];
-end
+np = max(size(pos));
+nz = min(size(pos));
 
-% For each variable, work out which point is closest to its true value
-[~,mindex(1)] = min(abs(vals(1,:) - trv(1)));
-[~,mindex(2)] = min(abs(vals(2,:) - trv(2)));
-[~,mindex(3)] = min(abs(vals(3,:) - trv(3)));
+val1 = linspace(0,1,nz);
 
-% Have the user choose a Parameter to fix (the other two will be plotted)
-fp = input('Choose a parameter to fix, 1, 2, or 3: ');
+fig1 = MakeFig;
 
-% Have the user choose a 'slice' in that parameter
-disp(['Your chosen parameter''s true value is at slice ',num2str(mindex(fp)),'.']);
-s1 = input('Choose a slice to plot: ');
+% loop through 50 slices in the shortest dimension
+for ii = 2:(nz-1)
+    
+    pslice = squeeze(pos(ii,:,:));
+    
+    PlotGrid(fig1,vals,pslice,trv(2:3),{'DBV';'CSF'});
+    title(['OEF = ',num2str(val1(ii))]);
+%     pause(0.2);
+    print(['temp_plots/Grid_OEF_slice_',num2str(ii)],'-dpng');
+    
+end % for ii = 1:nz
+    
 
-% Cut down the other variables into 2D arrays based on the user's choice
-if fp == 1
-    pos2 = squeeze(pos(s1,:,:));
-    val2 = vals(2:3,:);
-    trv2 = trv(2:3);
-    pn2  = {'DBV';'CSF'};
-elseif fp == 2
-    pos2 = squeeze(pos(:,s1,:));
-    val2 = vals(1:2:3,:);
-    trv2 = trv(1:2:3);
-    pn2  = {'OEF';'CSF'};
-else % fp == 3
-    pos2 = squeeze(pos(:,:,s1));
-    val2 = vals(1:2,:);
-    trv2 = trv(1:2);
-    pn2  = {'OEF';'DBV'};
-end
+return; % function xPlotGrid3D
 
-% Now plot a 2D grid search thing as normal:
+function fg = MakeFig
+    % Makes a figure window (and docks it), and returns the handle
+    
+    fg = figure;
+    set(fg,'WindowStyle','docked');
+    hold on; box on;
+    set(gca,'FontSize',16);
+    
+return; % function fg = MakeFig
 
-% create docked figure
-figure('WindowStyle','docked');
-hold on; box on;
-set(gca,'FontSize',16);
+function PlotGrid(fg,vals,grd,truevals,pnames)
+    % Plots an imagesc of GRD on figure FG, with axes VALS, optionally 
+    % adding a cross at TRUEVALS and axis labels PNAMES
+    
+    figure(fg); 
+    
+    imagesc(vals(2,:),vals(1,:),grd,[0 1]); hold on;
+    
+    if exist('truevals','var')
+        plot([truevals(2),truevals(2)],[  0, 30],'w-','LineWidth',2);
+        plot([  0, 30],[truevals(1),truevals(1)],'w-','LineWidth',2);
+    end
 
-imagesc(val2(2,:),val2(1,:),pos2); hold on;
-c=colorbar;
-plot([trv2(2),trv2(2)],[  0, 30],'w-','LineWidth',2);
-plot([  0, 30],[trv2(1),trv2(1)],'w-','LineWidth',2);
+    % Label the other axes based on parameter choice
+    if exist('pnames','var');
+        xlabel(pnames{2});
+        ylabel(pnames{1});
+    end
 
-% Label the other axes based on parameter choice
-xlabel(pn2{2});
-ylabel(pn2{1});
 
-ylabel(c,'Posterior Probability Density');
+    axis([vals(2,1),vals(2,end),vals(1,1),vals(1,end)]);
+    set(gca,'YDir','normal');
+    
+return; %  function PlotGrid(fg,vals,grd,truevals,pnames)
 
-axis([val2(2,1),val2(2,end),val2(1,1),val2(1,end)]);
-set(gca,'YDir','normal');
-set(c,'FontSize',16);
