@@ -140,14 +140,14 @@ elseif length(pars) == 3
     trv(3) = eval(['params.',pname{3}]); % true value of parameter 3
     
     vals(1,:) = linspace(intervs(p1,1),intervs(p1,2),np);
-    vals(2,:) = linspace(intervs(p3,1),intervs(p3,2),np);
-    valz = linspace(intervs(p2,1),intervs(p2,2),nz); % third (smaller) dimension
+    vals(2,:) = linspace(intervs(p2,1),intervs(p2,2),np);
+    valz = linspace(intervs(p3,1),intervs(p3,2),nz); % third (smaller) dimension
     
     pos = zeros(nz,np,np);
     
     for i1 = 1:nz
         % loop through parameter 1
-        params = param_update(valz(1,i1),params,pname{2});
+        params = param_update(valz(1,i1),params,pname{3});
         disp(['Iterating ',num2str(i1),' of ',num2str(nz)]);
 
         for i2 = 1:np
@@ -156,7 +156,7 @@ elseif length(pars) == 3
 
             for i3 = 1:np
                 % loop through parameter 3
-                params = param_update(vals(2,i3),params,pname{3});
+                params = param_update(vals(2,i3),params,pname{2});
 
                 % run the model to evaluate the signal with current params
                 S_mod = MTC_qASE_model(T_sample,TE_sample,params,noDW);
