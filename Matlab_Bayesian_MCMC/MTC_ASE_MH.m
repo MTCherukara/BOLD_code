@@ -10,13 +10,15 @@
 %
 % CHANGELOG:
 %
+% 2017-10-10 (MTC). Added the TE input to MTC_qASE_model function calls.
+%
 % 2017-03-31 (MTC). Clean-up, and revert back to histogram plotting.
 %
 % 2016-06-14 (MTC). Changed the way graphs are plotted so that they use a
-% normal distribution rather than a horrible looking histogram. Added a
-% test feature using the resulting normal distribution to display on the
-% graphs whether a given parameter was found to be within one standard
-% deviation of its true value.
+%       normal distribution rather than a horrible looking histogram. Added
+%       a test feature using the resulting normal distribution to display
+%       on the graphs whether a given parameter was found to be within one
+%       standard deviation of its true value.
 %
 % 2016-06-13 (MTC). Various changes.
 
@@ -92,7 +94,7 @@ p_range = LIMITS(2,:) - LIMITS(1,:);
 params = param_update(X0,params,r.infer_on);
 
 % evaluate the function at it starting points
-S_mod = MTC_qASE_model(T_sample,params);  
+S_mod = MTC_qASE_model(T_sample,params.TE,params);  
 
 % norm, for comparison
 L0 = norm(DATA-S_mod);
@@ -134,7 +136,7 @@ for ii = 1:(r.nb+r.nj)
             params = param_update(X1,params,r.infer_on); % update all parameters to X1
             
             % evaluate function at point (X1) in paramter-space
-            S_mod = MTC_qASE_model(T_sample,params); % REMEMBER TO CHANGE BOTH OF THESE
+            S_mod = MTC_qASE_model(T_sample,params.TE,params); % REMEMBER TO CHANGE BOTH OF THESE
             
             % SS difference between the data and the function evaluated at
             % this point (X1) in parameter-space

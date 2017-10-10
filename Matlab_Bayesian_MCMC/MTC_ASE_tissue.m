@@ -1,7 +1,7 @@
-function ST = MTC_ASE_tissue(TAU,PARAMS)
+function ST = MTC_ASE_tissue(TAU,TE,PARAMS)
 % MTC_ASE_tissue usage:
 %
-%        ST = MTC_ASE_tissue(TAU,PARAMS)
+%        ST = MTC_ASE_tissue(TAU,TE,PARAMS)
 % 
 % For use in MTC_qBOLD.m and related scripts.
 %
@@ -10,9 +10,11 @@ function ST = MTC_ASE_tissue(TAU,PARAMS)
 %
 % Calculate the MRI signal contribution from brain tissue. Takes a vector
 % of offset values TAU (which is the amount of offset of the refocusing RF
-% pulse from TE/2, in seconds), and a struct PARAMS containing the
-% necessary constants. Returns a vector ST, of the same length as TAU,
-% containing the measured MRI signal strength for each TAU.
+% pulse from TE/2, in seconds), and a value of TE (either as a single
+% value, or a vector with the same length as TAU), and a struct PARAMS
+% containing the necessary constants. Returns a vector ST, of the same 
+% length as TAU, containing the measured MRI signal strength for each TAU
+% and TE combination.
 %
 % 
 %       Copyright (C) University of Oxford, 2016-2017
@@ -21,6 +23,9 @@ function ST = MTC_ASE_tissue(TAU,PARAMS)
 % Created by MT Cherukara, 17 May 2016
 %
 % CHANGELOG:
+%
+% 2017-10-10 (MTC). Added the option to specify a range of TE values
+% outside the PARAMS structure.
 %
 % 2017-06-26 (MTC). Corrected the asymptotic solutions, and switched to
 % using tau correctly.
@@ -34,11 +39,15 @@ function ST = MTC_ASE_tissue(TAU,PARAMS)
 % 2016-05-19 (MTC). Added integral function (BesselJ).
 
 % pull out constants
-TE   = PARAMS.TE;
 dw   = PARAMS.dw;
 zeta = PARAMS.zeta;
 R2t  = PARAMS.R2t;
 R2tp = zeta.*dw;
+
+% check whether one TE, or a vector, is supplied
+if length(TE) ~= length(TAU)
+    TE(2:length(TAU)) = TE(1);
+end
 
 
 %% New Version

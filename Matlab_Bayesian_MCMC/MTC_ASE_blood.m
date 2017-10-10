@@ -1,7 +1,7 @@
-function SB = MTC_ASE_blood(TAU,PARAMS)
+function SB = MTC_ASE_blood(TAU,TE,PARAMS)
 % MTC_ASE_blood usage:
 %
-%        SB = MTC_ASE_blood(TAU,PARAMS)
+%        SB = MTC_ASE_blood(TAU,TE,PARAMS)
 % 
 % For use in MTC_qBOLD.m and related scripts.
 %
@@ -23,16 +23,21 @@ function SB = MTC_ASE_blood(TAU,PARAMS)
 %
 % CHANGELOG:
 %
+% 2017-10-10 (MTC). Added TE input (see MTC_qASE_model.m)
+%
 % 2017-04-04 (MTC). Various changes.
 
 % pull out constants
 R2b  = PARAMS.R2b;
 R2bs = PARAMS.R2bs;
-TE   = PARAMS.TE;
+
+% check whether one TE, or a vector, is supplied
+if length(TE) ~= length(TAU)
+    TE(2:length(TAU)) = TE(1);
+end
 
 % calculate model
 TAU = abs(TAU);
 
 R2bp = R2bs-R2b;
-SB = exp(-TE*R2b).*exp(-TAU*R2bp);
-% SB = exp( -(R2b.*(TE-2*TAU)) - 2.*R2bs.*TAU);
+SB = exp(-TE.*R2b).*exp(-TAU.*R2bp);

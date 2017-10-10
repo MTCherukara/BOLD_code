@@ -51,7 +51,7 @@ params.R2t  = 1/0.110;      % 1/s       - rate constant, tissue
 params.R2e  = 4;            % 1/s       - rate constant, extracellular
 params.dF   = 5;            % Hz        - frequency shift
 params.lam0 = 0.050;        % no units  - ISF/CSF signal contribution
-params.zeta = 0.050;        % no units  - deoxygenated blood volume
+params.zeta = 0.030;        % no units  - deoxygenated blood volume
 params.OEF  = 0.400;        % no units  - oxygen extraction fraction
 params.Hct  = 0.340;        % no units  - fractional hematocrit
 
@@ -59,13 +59,18 @@ params.Hct  = 0.340;        % no units  - fractional hematocrit
 %% Compute Model
 
 % define tau values that we want to simulate
-tau = (-16:8:64)/1000;      % for simulating data
+% tau = (-16:8:64)/1000;      % for simulating data
+
 % tau = (-36:4:36)/1000;
 % tau = linspace(-0.016,0.064,1000); % for visualising ( tau(286) = 0 )
+
+tau = [-16:8:48, 0, 0]./1000;
+TE = [74*ones(1,9), 100, 200]./1000;
+
 np = length(tau);
 
 % call MTC_qASE_model
-[S_total,params] = MTC_qASE_model(tau,params);
+[S_total,params] = MTC_qASE_model(tau,TE,params);
 
 
 %% Add Noise
@@ -111,7 +116,13 @@ if save_data
     % Assign the correct title
     dat_title = strcat(dat_title1,num2str(fn));
     
+    if length(TE) ~= length(tau)
+        TE_sample(1:length(tau)) = params.TE;
+    else
+        TE_sample = TE;
+    end
+    
     % Save the data out
-    save(dat_title,'T_sample','S_sample','params');
+    save(dat_title,'T_sample','S_sample','TE_sample','params');
 end % if save_data
     

@@ -1,10 +1,12 @@
-function [S,PARAMS] = MTC_qASE_model(T,PARAMS,NODW)
+function [S,PARAMS] = MTC_qASE_model(TAU,TE,PARAMS,NODW)
     % Calculates ASE signal from a single voxel. Usage:
     %
-    %       [S,PARAMS] = MTC_qASE_model(T,PARAMS,noDW)
+    %       [S,PARAMS] = MTC_qASE_model(TAU,TE,PARAMS,NODW)
     %
-    % Input:  T      - A vector of tau values (refocussing pulse offsets)
+    % Input:  TAU    - A vector of tau values (refocussing pulse offsets)
     %                  in seconds.
+    %         TE     - A single value, or a vector of equal length to TAU,
+    %                  of echo time values in seconds.
     %         PARAMS - The structure containing all the parameters used in
     %                  the simulation and model inference. This can be
     %                  optionally returned as an output, with extra values
@@ -29,6 +31,12 @@ function [S,PARAMS] = MTC_qASE_model(T,PARAMS,NODW)
     % Created by MT Cherukara, 16 May 2016
     %
     % CHANGELOG:
+    %
+    % 2017-10-10 (MTC). Added the option to supply a vector of TE values
+    %       outside the PARAMS struct, and made changes to the called model
+    %       functions MTC_ASE_tissue.m, MTC_ASE_extra.m, MTC_ASE_blood.m,
+    %       in order to allow for inference on data with any arbitrary set
+    %       of TE-TAU pairs.
     %
     % 2017-08-07 (MTC). Added a control in the form of PARAMS.noDW to  
     %       change the way things are done when we're trying to infer on 
@@ -72,9 +80,9 @@ w_bld = PARAMS.zeta;
 % CALCULATE MODEL:
 
 % comparments
-S_tis = w_tis.*MTC_ASE_tissue(T,PARAMS);
-S_csf = w_csf.*MTC_ASE_extra(T,PARAMS);
-S_bld = w_bld.*MTC_ASE_blood(T,PARAMS);
+S_tis = w_tis.*MTC_ASE_tissue(TAU,TE,PARAMS);
+S_csf = w_csf.*MTC_ASE_extra(TAU,TE,PARAMS);
+S_bld = w_bld.*MTC_ASE_blood(TAU,TE,PARAMS);
 
 % add it all together:
 S = PARAMS.S0.*(S_tis + S_csf + S_bld);

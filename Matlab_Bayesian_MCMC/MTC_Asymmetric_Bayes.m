@@ -37,7 +37,7 @@ nz = 50; % number of points in the third dimension
 pars = [1,2,4];
 
 % Load the Data:
-load('ASE_Data/ASE_CSF_5_SNR_1000.mat');
+load('ASE_Data/ASE_multiTE_SNR_1000.mat');
 
 % extract relevant parameters
 sigma = params.sig;   % real std of noise
@@ -45,6 +45,10 @@ sigma_weight = 2/(sigma.^2);
 ns = length(S_sample); % number of data points
 [~,t0] = min(abs(T_sample));    % index of zero-point
 params.R2p = params.dw.*params.zeta;
+
+if ~exist('TE_sample','var')
+    TE_sample = params.TE;
+end
 
 % Parameter names and search ranges
 pnames  = { 'OEF' ; 'zeta'   ; 'R2p' ; 'lam0'    ; 'dF' };
@@ -75,7 +79,7 @@ if length(pars) == 1
     % of those, at all time points
     for ii = 1:np
         params = param_update(vals(ii),params,pname);
-        S_val = MTC_qASE_model(T_sample,params);
+        S_val = MTC_qASE_model(T_sample,TE_sample,params);
         S_mod(ii,:) = S_val./S_val(t0);
     end
 
@@ -113,7 +117,7 @@ elseif length(pars) == 2
             params = param_update(vals(2,i2),params,pname{2});
 
             % run the model to evaluate the signal with current params
-            S_mod = MTC_qASE_model(T_sample,params,noDW);
+            S_mod = MTC_qASE_model(T_sample,TE_sample,params,noDW);
 
             % calculate posterior based on known noise value
             pos(i1,i2) = exp(-sum((S_sample-S_mod).^2)./(sigma));
@@ -136,14 +140,14 @@ elseif length(pars) == 3
     trv(3) = eval(['params.',pname{3}]); % true value of parameter 3
     
     vals(1,:) = linspace(intervs(p1,1),intervs(p1,2),np);
-    vals(2,:) = linspace(intervs(p2,1),intervs(p2,2),np);
-    valz = linspace(intervs(p3,1),intervs(p3,2),nz); % third (smaller) dimension
+    vals(2,:) = linspace(intervs(p3,1),intervs(p3,2),np);
+    valz = linspace(intervs(p2,1),intervs(p2,2),nz); % third (smaller) dimension
     
     pos = zeros(nz,np,np);
     
     for i1 = 1:nz
         % loop through parameter 1
-        params = param_update(valz(1,i1),params,pname{3});
+        params = param_update(valz(1,i1),params,pname{2});
         disp(['Iterating ',num2str(i1),' of ',num2str(nz)]);
 
         for i2 = 1:np
@@ -152,10 +156,10 @@ elseif length(pars) == 3
 
             for i3 = 1:np
                 % loop through parameter 3
-                params = param_update(vals(2,i3),params,pname{2});
+                params = param_update(vals(2,i3),params,pname{3});
 
                 % run the model to evaluate the signal with current params
-                S_mod = MTC_qASE_model(T_sample,params,noDW);
+                S_mod = MTC_qASE_model(T_sample,TE_sample,params,noDW);
 
                 % calculate posterior based on known noise value
                 pos(i1,i2,i3) = exp(-sum((S_sample-S_mod).^2)./(sigma));
