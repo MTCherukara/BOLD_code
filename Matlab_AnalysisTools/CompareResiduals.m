@@ -34,6 +34,9 @@ for ii = 1:nv
     mrsd1(ii) = mean(vl(:));
 end
 
+disp(['Mean Residual across 1st dataset: ',num2str(mean(mrsd1)),...
+      ' (Total: ',num2str(sum(mrsd1)),')']);
+
 choice = questdlg('Would you like ot select a second dataset for comparison?',...
                   'Second Dataset',...
                   'Yes','No','No');
@@ -58,6 +61,10 @@ switch choice
             vl = abs(squeeze(resids(:,:,:,ii)));
             mrsd2(ii) = mean(vl(:));
         end
+        
+        disp(['Mean Residual across 2nd dataset: ',num2str(mean(mrsd2)),...
+              ' (Total: ',num2str(sum(mrsd2)),')']);
+
     case 'No'
         taus2 = [];
         mrsd2 = [];
@@ -87,6 +94,10 @@ switch choice
             vl = abs(squeeze(resids(:,:,:,ii)));
             mrsd3(ii) = mean(vl(:));
         end
+        
+        disp(['Mean Residual across 3rd dataset: ',num2str(mean(mrsd3)),...
+              ' (Total: ',num2str(sum(mrsd3)),')']);
+
     case 'No'
         taus3 = [];
         mrsd3 = [];
