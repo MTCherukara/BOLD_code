@@ -37,7 +37,7 @@ nz = 50; % number of points in the third dimension
 pars = [1,2,4];
 
 % Load the Data:
-load('ASE_Data/ASE_multiTE_SNR_1000.mat');
+load('ASE_Data/ASE_3TE_SNR_1000.mat');
 
 % extract relevant parameters
 sigma = params.sig;   % real std of noise
@@ -170,7 +170,7 @@ elseif length(pars) == 3
     
     % When doing a 3D grid search, we're always going to want to save the
     % results (just in case!)
-    save('Grid3D_temp_001','pos','params','T_sample','S_sample','trv','vals','vals');
+    save('Grid3D_temp_001','pos','params','T_sample','TE_sample','S_sample','trv','vals','vals');
 
 end % length(pars) == 1 ... elseif ... elseif ...
 

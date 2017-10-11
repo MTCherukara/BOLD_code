@@ -35,7 +35,7 @@ save_data = 1;      % set to 1 in order to save out ASE data
 
 %% Model Parameters
 % noise
-SNR = 100;
+SNR = 1000;
 params.sig  = 1/SNR;         % -         - noise standard deviation
 % constants 
 params.B0   = 3.0;          % T         - static magnetic field
@@ -51,7 +51,7 @@ params.R2t  = 1/0.110;      % 1/s       - rate constant, tissue
 params.R2e  = 4;            % 1/s       - rate constant, extracellular
 params.dF   = 5;            % Hz        - frequency shift
 params.lam0 = 0.050;        % no units  - ISF/CSF signal contribution
-params.zeta = 0.030;        % no units  - deoxygenated blood volume
+params.zeta = 0.050;        % no units  - deoxygenated blood volume
 params.OEF  = 0.400;        % no units  - oxygen extraction fraction
 params.Hct  = 0.340;        % no units  - fractional hematocrit
 
@@ -65,7 +65,7 @@ params.Hct  = 0.340;        % no units  - fractional hematocrit
 % tau = linspace(-0.016,0.064,1000); % for visualising ( tau(286) = 0 )
 
 tau = [-16:8:48, 0, 0]./1000;
-TE = [74*ones(1,9), 100, 200]./1000;
+TE = [74*ones(1,9), 136, 200]./1000;
 
 np = length(tau);
 
