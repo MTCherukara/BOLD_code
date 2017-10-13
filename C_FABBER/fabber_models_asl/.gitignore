@@ -1,0 +1,10 @@
+CVS
+*.o
+*~
+*.a
+.DS_Store
+depend.mk
+fabber
+mvntool
+fabber_asl
+build
