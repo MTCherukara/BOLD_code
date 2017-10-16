@@ -31,13 +31,13 @@ tic;
 %% Inference Parameters
 
 np = 1000; % number of points to perform Bayesian analysis on
-nz = 50; % number of points in the third dimension
+nz = 41; % number of points in the third dimension
 
 % Select which parameter(s) to infer on (1 = OEF, 2 = DBV, 3 = R2', 4 = CSF, 5 = dF)
 pars = [1,2,4];
 
 % Load the Data:
-load('ASE_Data/ASE_3TE_SNR_1000.mat');
+load('ASE_Data/ASE_manyTE_SNR_1000.mat');
 
 % extract relevant parameters
 sigma = params.sig;   % real std of noise
@@ -139,24 +139,24 @@ elseif length(pars) == 3
     trv(2) = eval(['params.',pname{2}]); % true value of parameter 2
     trv(3) = eval(['params.',pname{3}]); % true value of parameter 3
     
-    vals(1,:) = linspace(intervs(p1,1),intervs(p1,2),np);
-    vals(2,:) = linspace(intervs(p2,1),intervs(p2,2),np);
-    valz = linspace(intervs(p3,1),intervs(p3,2),nz); % third (smaller) dimension
+    vals(1,:) = linspace(intervs(p2,1),intervs(p2,2),np);
+    vals(2,:) = linspace(intervs(p3,1),intervs(p3,2),np);
+    valz = linspace(intervs(p1,1),intervs(p1,2),nz); % third (smaller) dimension
     
     pos = zeros(nz,np,np);
     
     for i1 = 1:nz
         % loop through parameter 1
-        params = param_update(valz(1,i1),params,pname{3});
+        params = param_update(valz(1,i1),params,pname{1});
         disp(['Iterating ',num2str(i1),' of ',num2str(nz)]);
 
         for i2 = 1:np
             % loop through parameter 2
-            params = param_update(vals(1,i2),params,pname{1});
+            params = param_update(vals(1,i2),params,pname{2});
 
             for i3 = 1:np
                 % loop through parameter 3
-                params = param_update(vals(2,i3),params,pname{2});
+                params = param_update(vals(2,i3),params,pname{3});
 
                 % run the model to evaluate the signal with current params
                 S_mod = MTC_qASE_model(T_sample,TE_sample,params,noDW);

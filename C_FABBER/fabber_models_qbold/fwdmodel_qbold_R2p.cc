@@ -228,7 +228,7 @@ void R2primeFwdModel::HardcodedInitialDists(MVNDist &prior, MVNDist &posterior) 
     if (infer_lam)
     {
         prior.means(lam_index()) = 0.001;
-        precisions(lam_index(), lam_index()) = 0.001; // 1-e1
+        precisions(lam_index(), lam_index()) = 1; // 1-e1
     }
 
     prior.SetPrecisions(precisions);

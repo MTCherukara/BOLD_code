@@ -17,9 +17,9 @@ noise=white
 max-iterations=10
 
 # Spatial VB Information (remove all of this if method!=spatialvb)
-param-spatial-priors=NNNNA
+param-spatial-priors=NNNNNI
 allow-bad-voxels
-#image-prior5=../../Data/subject_05/ASE_200_csf.nii.gz
+image-prior6=../../Data/subject_05/ASE_200_csf.nii.gz
 
 # Inference Model 
 model=qboldR2p
@@ -27,6 +27,7 @@ inferR2p
 inferR2t
 inferDBV
 inferS0
+inferR2e
 inferlam
 
 # Scan Parameters (maybe I'll think of a better way of doing this...)

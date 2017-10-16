@@ -15,7 +15,7 @@ noise=white
 max-iterations=10
 
 # Spatial VB Information (remove all of this if method!=spatialvb)
-param-spatial-priors=NNNNA
+param-spatial-priors=MMMMA
 allow-bad-voxels
 
 # Inference Model 

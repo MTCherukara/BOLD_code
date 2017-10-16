@@ -61,11 +61,11 @@ params.Hct  = 0.340;        % no units  - fractional hematocrit
 % define tau values that we want to simulate
 % tau = (-16:8:64)/1000;      % for simulating data
 
-% tau = (-36:4:36)/1000;
+% tau = (-8:2:8)/1000;
 % tau = linspace(-0.016,0.064,1000); % for visualising ( tau(286) = 0 )
 
-tau = [-16:8:48, 0, 0]./1000;
-TE = [74*ones(1,9), 136, 200]./1000;
+tau = [-16, -8,  0,  8, 16, 32, 48, 64,  0,   0,   0,   0]./1000;
+TE  = [ 80, 80, 80, 80, 80, 80, 80, 80, 40, 120, 200, 280]./1000;
 
 np = length(tau);
 
@@ -90,17 +90,17 @@ if plot_fig
     hold on; box on;
     
     % plot some lines
-    plot([0 0],[-1 2],'k--','LineWidth',2);
+%     plot([0 0],[-1 2],'k--','LineWidth',2);
     
     % plot the signal
-    S_log = log(S_total);
+    S_log = (S_total);
     l.s = plot(1000*tau,S_log,'-','LineWidth',3);
     
     % labels on axes
     xlabel('Spin Echo Displacement \tau (ms)');
     ylabel('Signal');
     title('qBOLD Signal Measured Using ASE');
-    axis([1000*min(tau), 1000*max(tau), -1, -0.6]);
+%     axis([1000*min(tau), 1000*max(tau), -1, -0.6]);
     set(gca,'FontSize',18);
     
 end % if plot_fig

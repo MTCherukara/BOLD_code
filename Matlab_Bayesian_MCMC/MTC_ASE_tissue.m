@@ -24,17 +24,23 @@ function ST = MTC_ASE_tissue(TAU,TE,PARAMS)
 %
 % CHANGELOG:
 %
+% 2017-10-16 (MTC). Changed to calculating the signal for each tau value
+%       individually, rather than all-together, in such a way that assumes
+%       that the tau values are strictly increasing. This will probably be
+%       slower, but should avoid any problems when only one regime of
+%       values is specified.
+%
 % 2017-10-10 (MTC). Added the option to specify a range of TE values
-% outside the PARAMS structure.
+%       outside the PARAMS structure.
 %
 % 2017-06-26 (MTC). Corrected the asymptotic solutions, and switched to
-% using tau correctly.
+%       using tau correctly.
 %
 % 2017-04-04 (MTC). Reverted back to using the asymptotic solutions of the
-% qBOLD model.
+%       qBOLD model.
 %
 % 2016-06-21 (MTC). Added a new version with constant terms sorted out
-% better.
+%       better.
 %
 % 2016-05-19 (MTC). Added integral function (BesselJ).
 
@@ -66,22 +72,45 @@ end
 % ST = exp(-zeta.*fint./3) .* exp(-TE.*R2t);
 
 %% Third Version (constants)
+% % 
+% % % define the regime changes in the case where tau is negative
+% % c1 = find(abs(TAU)<(1.5./dw),1);
+% % c2 = find(TAU>(1.5./dw),1);
+% % 
+% % % pre-allocate
+% % ST = zeros(1,length(TAU));
+% % 
+% % % long negative tau regime
+% % ST(1:c1-1) = exp(zeta+(zeta*dw*TAU(1:c1-1)));
+% % 
+% % % non-linear short tau regime
+% % ST(c1:c2)  = exp(-(0.3*zeta*(dw.*TAU(c1:c2)).^2));
+% % 
+% % % long positive tau regime
+% % ST(c2:end) = exp(zeta-(zeta*dw*TAU(c2:end)));
+% % 
+% % % add T2 effect
+% % ST = ST.*exp(-R2t.*TE);
 
-% define the regime changes in the case where tau is negative
-c1 = find(abs(TAU)<(1.5./dw),1);
-c2 = find(TAU>(1.5./dw),1);
+%% Fourth Version (tau-by-tau)
+
+% define the regime boundary
+bd = 1.5./dw; 
 
 % pre-allocate
-ST = zeros(1,length(TAU));
+ST = zeros(1,length(TAU)); 
 
-% long negative tau regime
-ST(1:c1-1) = exp(zeta+(zeta*dw*TAU(1:c1-1)));
-
-% non-linear short tau regime
-ST(c1:c2)  = exp(-(0.3*zeta*(dw.*TAU(c1:c2)).^2));
-
-% long positive tau regime
-ST(c2:end) = exp(zeta-(zeta*dw*TAU(c2:end)));
+% loop through tau values
+for ii = 1:length(TAU)
+    
+    if abs(TAU(ii)) < bd
+        % short tau regime
+        ST(ii) = exp(-(0.3*zeta*(dw.*TAU(ii)).^2));
+    else
+        % long tau regime
+        ST(ii) = exp(zeta-(zeta*dw*abs(TAU(ii))));
+    end
+end
 
 % add T2 effect
 ST = ST.*exp(-R2t.*TE);
