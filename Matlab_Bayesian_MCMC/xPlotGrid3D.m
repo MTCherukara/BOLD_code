@@ -8,12 +8,12 @@ function xPlotGrid3D
     % Main Function
     
 % Load in Grid Search Data
-load('~/Documents/DPhil/Data/GridSearches/CSF_Grids/Grid_TE_40_DBV.mat');
+load('~/Documents/DPhil/Data/GridSearches/CSF_Grids/Grid_TE_40_OEF.mat');
 
 np = max(size(pos));
-nz = min(size(pos));
+nz = min(size(pos)); 
 
-val1 = linspace(0.01,0.1,nz);
+val1 = linspace(0,1,nz);
 
 fig1 = MakeFig;
 
@@ -22,8 +22,8 @@ for ii = 2:(nz-1)
     
     pslice = squeeze(pos(ii,:,:));
     
-    PlotGrid(fig1,vals,pslice,trv(1:2),{'OEF';'CSF'});
-    title(['DBV = ',num2str(val1(ii))]);
+    PlotGrid(fig1,vals,pslice,trv(2:3),{'DBV';'CSF'});
+    title(['OEF = ',num2str(val1(ii))]);
 %     pause(0.2);
     print(['temp_plots/Grid_DBV_slice_',num2str(ii)],'-dpng');
     
