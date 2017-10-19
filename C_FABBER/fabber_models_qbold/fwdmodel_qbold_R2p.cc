@@ -198,7 +198,7 @@ void R2primeFwdModel::HardcodedInitialDists(MVNDist &prior, MVNDist &posterior) 
     if (infer_DBV)
     {
         prior.means(DBV_index()) = 0.05;
-        precisions(DBV_index(), DBV_index()) = 0.1; // 1e-1
+        precisions(DBV_index(), DBV_index()) = 1; // 1e-1
     }
 
     if (infer_R2t)
