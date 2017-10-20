@@ -28,7 +28,7 @@ public:
     virtual void NameParams(vector<string> &names) const;
     virtual int NumParams() const 
     {
-        return 2 + (biexpon ? 2 : 0);
+        return 2 + ( infer_theta ? ( infer_r2 ? 2 : 0 ) : 0 );
     }    
     virtual void HardcodedInitialDists(MVNDist &prior, MVNDist &posterior) const;
     virtual void Evaluate(const NEWMAT::ColumnVector &params, NEWMAT::ColumnVector &result) const;
@@ -39,25 +39,26 @@ protected:
     NEWMAT::ColumnVector TEs;
 
     // Lookup starting indices of parameters
-    int R2A_index() const
+    int S0_index() const
     {
         return 1;
     }
-    int S0_index() const
+    int th_index() const
     {
-        return 2;
+        return ( infer_theta ? 2 : 0 );
+    }
+    int R2A_index() const
+    {
+        return ( infer_r2 ? ( infer_theta ? 3 : 2 ) : 0 );
     }
     int R2B_index() const
     {
-        return ( biexpon ? 3 : 0 );
-    }
-    int th_index() const
-    {
-        return (biexpon ? 4 : 0 );
+        return ( infer_r2 ? ( infer_theta ? 4 : 0 ) : 0 );
     }
 
     // see whether we want a bi-expoinential model
-    bool biexpon;
+    bool infer_theta;
+    bool infer_r2;
 
 private:
     static FactoryRegistration<FwdModelFactory, SpinEchoFwdModel> registration;

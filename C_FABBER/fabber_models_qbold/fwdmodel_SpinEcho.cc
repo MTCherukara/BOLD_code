@@ -38,7 +38,7 @@ string SpinEchoFwdModel::GetDescription() const
 
 string SpinEchoFwdModel::ModelVersion() const
 {
-    return "1.1";
+    return "1.2";
 } // ModelVersion
 
 
@@ -48,8 +48,9 @@ string SpinEchoFwdModel::ModelVersion() const
 void SpinEchoFwdModel::Initialize(ArgsType &args)
 {
     // see whether we want a bi-exponential model or not
-    biexpon = args.ReadBool("biexpon");
-
+    infer_theta = args.ReadBool("infer_theta");
+    infer_r2 = args.ReadBool("infer_r2");
+    
     string TE_temp; 
 
     // First read tau values, since these will always be specified
@@ -70,7 +71,7 @@ void SpinEchoFwdModel::Initialize(ArgsType &args)
 
     // add information to the log
     LOG << "Inference using development model" << endl;    
-    if (biexpon)
+    if (infer_theta)
     {
         LOG << "Inferring a bi-exponential model" << endl;
     }
@@ -90,12 +91,25 @@ void SpinEchoFwdModel::NameParams(vector<string> &names) const
 {
     names.clear();
 
-    names.push_back("R2A"); // parameter 1 - R2A
-    names.push_back("S0");  // parameter 2 - S0 scaling factor
-    if (biexpon)
+    // parameter 1 - S0 scaling factor - we ALWAYS infer this
+    names.push_back("S0");  // parameter 1 - S0 scaling factor - ALWAYS
+    
+    if (infer_theta)
     {
-        names.push_back("R2B");
-        names.push_back("theta");
+        // parameter 2 - mixing ratio - only for bi-exponential 
+        names.push_back("theta"); 
+
+        if (infer_r2)
+        {
+            // parameters 3 and 4 - R2 of the two compartments
+            names.push_back("R2A");
+            names.push_back("R2B");
+        }
+    }
+    else if (infer_r2)
+    {
+        // parameter 2 - mono-exponential decay rate
+        names.push_back("R2"); 
     }
 
 } // NameParams
@@ -111,21 +125,31 @@ void SpinEchoFwdModel::HardcodedInitialDists(MVNDist &prior, MVNDist &posterior)
     // create diagonal matrix to store precisions
     SymmetricMatrix precisions = IdentityMatrix(NumParams()) * 1e-3;
 
-    // R2
-    prior.means(R2A_index()) = 9.0;
-    precisions(R2A_index(), R2A_index()) = 0.001; // 1e-2
-
-    // S0
+    // parameter 1 - S0 scaling factor - we ALWAYS infer this
     prior.means(S0_index()) = 500;
     precisions(S0_index(), S0_index()) = 0.00001; // 1e-4
 
-    if (biexpon)
+    if (infer_theta)
     {
-        prior.means(R2B_index()) = 20.0;
-        precisions(R2B_index(), R2B_index()) = 0.001; // 1e-2
-        
+        // parameter 2 - mixing ratio - only for bi-exponential 
         prior.means(th_index()) = 0.5;
         precisions(th_index(), th_index()) = 0.1; // 1e-1
+
+        if (infer_r2)
+        {
+            // parameters 3 and 4 - R2 of the two compartments
+            prior.means(R2A_index()) = 1/0.08;
+            precisions(R2A_index(), R2A_index()) = 0.001; // 1e-2
+            prior.means(R2B_index()) = 1/0.16;
+            precisions(R2B_index(), R2B_index()) = 0.001; // 1e-2
+        }
+
+    }
+    else if (infer_r2)
+    {
+        // parameter 2 - mono-exponential decay rate
+        prior.means(R2A_index()) = 1/0.08;
+        precisions(R2A_index(), R2A_index()) = 0.001; // 1e-2
     }
     
     prior.SetPrecisions(precisions);
@@ -146,25 +170,42 @@ void SpinEchoFwdModel::Evaluate(const ColumnVector &params, ColumnVector &result
     ColumnVector paramcpy = params;
 
     // parameters
-    double R2A;
     double S0;
-    double R2B;
     double tht;
+    double R2A;
+    double R2B;
 
     // assign values to parameters
-    R2A = paramcpy(R2A_index());
     S0 = paramcpy(S0_index());
 
-    // pull out bi-exponential parameters if required
-    if (biexpon)
+    if (infer_theta)
     {
-        R2B = paramcpy(R2B_index());
         tht = abs(paramcpy(th_index()));
+        
+        if (infer_r2)
+        {
+            R2A = paramcpy(R2A_index());
+            R2B = paramcpy(R2B_index());
+        }
+        else
+        {
+            R2A = 1/0.08; // R2 of grey matter
+            R2B = 1/0.16; // R2 of CSF
+        }
     }
     else
     {
-        R2B = 1.0;
-        tht = 0.0;
+        tht = 0.0; // only one compartment
+        R2B = 1.0; // this bit won't matter if there's only one compartment
+
+        if (infer_r2)
+        {
+            R2A = paramcpy(R2A_index());
+        }
+        else
+        {
+            R2A = 1/0.08; // R2 of grey matter
+        }
     }
 
     // now evaluate standard T2 decay
@@ -182,7 +223,7 @@ void SpinEchoFwdModel::Evaluate(const ColumnVector &params, ColumnVector &result
 
     // make sure that the weighting parameter theta is between 0 and 1
     
-    if (biexpon)
+    if (infer_theta)
     {
         if ( tht > 1.0 )
         {
