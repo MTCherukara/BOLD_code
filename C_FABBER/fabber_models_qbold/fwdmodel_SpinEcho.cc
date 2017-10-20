@@ -126,30 +126,29 @@ void SpinEchoFwdModel::HardcodedInitialDists(MVNDist &prior, MVNDist &posterior)
     SymmetricMatrix precisions = IdentityMatrix(NumParams()) * 1e-3;
 
     // parameter 1 - S0 scaling factor - we ALWAYS infer this
-    prior.means(S0_index()) = 500;
-    precisions(S0_index(), S0_index()) = 0.00001; // 1e-4
+    prior.means(S0_index()) = 1000;
+    precisions(S0_index(), S0_index()) = 1e-8; // 1e-4
 
     if (infer_theta)
     {
         // parameter 2 - mixing ratio - only for bi-exponential 
         prior.means(th_index()) = 0.5;
-        precisions(th_index(), th_index()) = 0.1; // 1e-1
+        precisions(th_index(), th_index()) = 1e-2; // 1e-1
 
         if (infer_r2)
         {
             // parameters 3 and 4 - R2 of the two compartments
             prior.means(R2A_index()) = 1/0.08;
-            precisions(R2A_index(), R2A_index()) = 0.001; // 1e-2
+            precisions(R2A_index(), R2A_index()) = 1e-3; // 1e-2
             prior.means(R2B_index()) = 1/0.16;
-            precisions(R2B_index(), R2B_index()) = 0.001; // 1e-2
+            precisions(R2B_index(), R2B_index()) = 1e-3; // 1e-2
         }
-
     }
     else if (infer_r2)
     {
         // parameter 2 - mono-exponential decay rate
         prior.means(R2A_index()) = 1/0.08;
-        precisions(R2A_index(), R2A_index()) = 0.001; // 1e-2
+        precisions(R2A_index(), R2A_index()) = 1e-3; // 1e-2
     }
     
     prior.SetPrecisions(precisions);
@@ -225,7 +224,7 @@ void SpinEchoFwdModel::Evaluate(const ColumnVector &params, ColumnVector &result
     
     if (infer_theta)
     {
-        if ( tht > 1.0 )
+        if ( tht > 1.0 || tht < 0.0 )
         {
             for (int ii = 1; ii <= TEs.Nrows(); ii++)
             {
