@@ -1,8 +1,8 @@
 # fabber run 2 - patient data (subject 3P)
 
 # Input Data
-data=../../Data/subject_03l_ASE_sh.nii.gz
-mask=../../Data/subject_03l_mask.nii.gz
+data=../../Data/subject_03p_ASE.nii.gz
+mask=../../Data/subject_03p_mask.nii.gz
 
 # Run Options
 output=../../Data/Fabber_Results/
@@ -15,7 +15,7 @@ noise=white
 max-iterations=10
 
 # Spatial VB Information (remove all of this if method!=spatialvb)
-param-spatial-priors=MMMMA
+param-spatial-priors=MMMM
 allow-bad-voxels
 
 # Inference Model 
@@ -24,7 +24,6 @@ inferR2p
 inferR2t
 inferDBV
 inferS0
-inferlam
 
 # Scan Parameters (maybe I'll think of a better way of doing this...)
 TE=0.074
@@ -38,3 +37,5 @@ tau6=0.024
 tau7=0.032
 tau8=0.040
 tau9=0.048
+tau10=0.056
+tau11=0.064
