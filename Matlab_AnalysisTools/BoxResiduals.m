@@ -44,13 +44,13 @@ while anotherOne
     % see if the user wants to add another dataset
     choice = questdlg('Would you like to select another dataset for comparison?',...
                   'Another Dataset',...
-                  'Another One!','No','No');
+                  'Another One!','Plot It','Plot It');
               
     % switch and case and so on
     switch choice
         case 'Another One!'
             anotherOne = 1;
-        case 'No'
+        case 'Plot It'
             anotherOne = 0;
     end % switch choice
     
@@ -73,10 +73,9 @@ ww = max( wsk(:,2) + 1.5*(wsk(:,2)-wsk(:,1)) );
 % make the box-plot
 figure('WindowStyle','Docked');
 hold on; box on;
-boxplot(allresids,grpresids,'Symbol','','Width',0.75);
-xlabel('Data-set');
+boxplot(allresids,grpresids,'Width',0.75);
 ylabel('Subject-wise residual');
-ylim([0,1.1*ww]);
+ylim([-0.1,1.1]*ww);
 set(gca,'FontSize',16);
 
 
