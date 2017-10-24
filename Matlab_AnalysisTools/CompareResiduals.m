@@ -37,7 +37,7 @@ end
 disp(['Mean Residual across 1st dataset: ',num2str(mean(mrsd1)),...
       ' (Total: ',num2str(sum(mrsd1)),')']);
 
-choice = questdlg('Would you like ot select a second dataset for comparison?',...
+choice = questdlg('Would you like to select a second dataset for comparison?',...
                   'Second Dataset',...
                   'Yes','No','No');
               
@@ -117,6 +117,3 @@ end
 xlabel('Spin echo offset \tau (ms)');
 ylabel('Volume-wise residual');
 set(gca,'FontSize',16);
-
-
-
