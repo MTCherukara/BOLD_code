@@ -222,13 +222,13 @@ void R2primeFwdModel::HardcodedInitialDists(MVNDist &prior, MVNDist &posterior) 
     if (infer_dF)
     {
         prior.means(dF_index()) = 5.0;
-        precisions(dF_index(), dF_index()) = 0.01; // 1e-2
+        precisions(dF_index(), dF_index()) = 1.0; // 1e-2
     }
 
     if (infer_lam)
     {
         prior.means(lam_index()) = 0.001;
-        precisions(lam_index(), lam_index()) = 1; // 1-e1
+        precisions(lam_index(), lam_index()) = 1.0; // 1-e1
     }
 
     prior.SetPrecisions(precisions);
