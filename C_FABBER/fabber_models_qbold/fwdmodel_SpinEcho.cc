@@ -133,7 +133,7 @@ void SpinEchoFwdModel::HardcodedInitialDists(MVNDist &prior, MVNDist &posterior)
     {
         // parameter 2 - mixing ratio - only for bi-exponential 
         prior.means(th_index()) = 0.5;
-        precisions(th_index(), th_index()) = 1e-2; // 1e-1
+        precisions(th_index(), th_index()) = 10; // 1e-1
 
         if (infer_r2)
         {

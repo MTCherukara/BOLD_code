@@ -15,13 +15,15 @@ noise=white
 max-iterations=10
 
 # Spatial VB Information (remove all of this if method!=spatialvb)
-param-spatial-priors=MMMM
+param-spatial-priors=MIMM
 allow-bad-voxels
+image-prior2=../../Data/MR_699/MR_699_theta_scaled.nii.gz
+
 
 # Inference Model 
 model=spinEcho
-infer_r2
 infer_theta
+infer_r2
 
 # Scan Parameters (maybe I'll think of a better way of doing this...)
 TE1=0.066

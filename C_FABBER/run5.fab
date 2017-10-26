@@ -17,7 +17,7 @@ max-iterations=10
 # Spatial VB Information (remove all of this if method!=spatialvb)
 param-spatial-priors=MMMMI
 allow-bad-voxels
-image-prior5=../../Data/MR_699/MR_699_CSF_T1w.nii.gz
+image-prior5=../../Data/MR_699/MR_699_theta_scaled.nii.gz
 
 # Inference Model 
 model=qboldR2p
