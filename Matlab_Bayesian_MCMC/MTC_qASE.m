@@ -29,8 +29,8 @@
 clear; 
 % close all;
 
-plot_fig = 0;       
-save_data = 1;      % set to 1 in order to save out ASE data
+plot_fig = 1;       
+save_data = 0;      % set to 1 in order to save out ASE data
 
 
 %% Model Parameters
@@ -43,15 +43,15 @@ params.dChi = 2.64e-7;      % parts     - susceptibility difference
 params.gam  = 2.67513e8;    % rad/s/T   - gyromagnetic ratio
 
 % scan parameters 
-params.TE   = 0.074;        % s         - echo time
+params.TE   = 0.100;        % s         - echo time
 
 % model fitting parameters
 params.S0   = 1;            % a. units  - signal
 params.R2t  = 1/0.110;      % 1/s       - rate constant, tissue
-params.R2e  = 4;            % 1/s       - rate constant, extracellular
-params.dF   = 5;            % Hz        - frequency shift
+params.R2e  = 2;            % 1/s       - rate constant, extracellular
+params.dF   = 6;            % Hz        - frequency shift
 params.lam0 = 0.050;        % no units  - ISF/CSF signal contribution
-params.zeta = 0.050;        % no units  - deoxygenated blood volume
+params.zeta = 0.030;        % no units  - deoxygenated blood volume
 params.OEF  = 0.400;        % no units  - oxygen extraction fraction
 params.Hct  = 0.340;        % no units  - fractional hematocrit
 
@@ -64,9 +64,8 @@ params.Hct  = 0.340;        % no units  - fractional hematocrit
 % tau = (-8:2:8)/1000;
 % tau = linspace(-0.016,0.064,1000); % for visualising ( tau(286) = 0 )
 
-tau = [-16, -8,  0,  8, 16, 32, 48, 64,  0,   0,   0,   0]./1000;
-TE  = [ 80, 80, 80, 80, 80, 80, 80, 80, 40, 120, 200, 280]./1000;
-
+tau = linspace(-0.016,0.088,1000);
+TE  = 0.100;
 np = length(tau);
 
 % call MTC_qASE_model
@@ -86,20 +85,22 @@ S_sample = S_total + max(S_total).*params.sig.*randn(1,np);
 if plot_fig
     
     % create a figure
-    fig1 = figure('WindowStyle','docked');
+    figure(1);
+%     fig1 = figure('WindowStyle','docked');
     hold on; box on;
     
     % plot some lines
 %     plot([0 0],[-1 2],'k--','LineWidth',2);
     
     % plot the signal
-    S_log = (S_total);
+    S_log = (S_total)./max(S_total);
     l.s = plot(1000*tau,S_log,'-','LineWidth',3);
     
     % labels on axes
     xlabel('Spin Echo Displacement \tau (ms)');
     ylabel('Signal');
     title('qBOLD Signal Measured Using ASE');
+    ylim([0.7,1]);
 %     axis([1000*min(tau), 1000*max(tau), -1, -0.6]);
     set(gca,'FontSize',18);
     

@@ -1,6 +1,8 @@
 % function AverageGESEPI
 % Load a NIFTI file of GESEPI data and average out the slices
 
+clear;
+
 % have the user choose a file
 [frname, frdir] = uigetfile('*','Select raw GESEPI data file...');
 
@@ -14,13 +16,13 @@ assert(mod(nsc,4)==0,'Number of slices must be a multiple of 4!');
 nsl = nsc/4;
 
 % pre-allocate new array
-gesepi_out = zeros(dims(1),dims(2),nsl);
+gesepi_out = zeros(dims(1),dims(2),nsl,dims(4));
 
 % loop through slices 
 for ii = 1:nsl
     
-    slab = volraw(:,:,(ii*4)-3:ii*4);
-    gesepi_out(:,:,ii) = mean(slab,3);
+    slab = volraw(:,:,(ii*4)-3:ii*4,:);
+    gesepi_out(:,:,ii,:) = mean(slab,3);
     
 end
 

@@ -133,14 +133,14 @@ void SpinEchoFwdModel::HardcodedInitialDists(MVNDist &prior, MVNDist &posterior)
     {
         // parameter 2 - mixing ratio - only for bi-exponential 
         prior.means(th_index()) = 0.5;
-        precisions(th_index(), th_index()) = 10; // 1e-1
+        precisions(th_index(), th_index()) = 1; // 1e-1
 
         if (infer_r2)
         {
             // parameters 3 and 4 - R2 of the two compartments
             prior.means(R2A_index()) = 1/0.08;
             precisions(R2A_index(), R2A_index()) = 1e-3; // 1e-2
-            prior.means(R2B_index()) = 1/0.16;
+            prior.means(R2B_index()) = 1/0.5;
             precisions(R2B_index(), R2B_index()) = 1e-3; // 1e-2
         }
     }
@@ -189,7 +189,7 @@ void SpinEchoFwdModel::Evaluate(const ColumnVector &params, ColumnVector &result
         else
         {
             R2A = 1/0.08; // R2 of grey matter
-            R2B = 1/0.16; // R2 of CSF
+            R2B = 1/0.5; // R2 of CSF
         }
     }
     else

@@ -1,8 +1,8 @@
-# fabber run 8
+# fabber run 8, single TE
 
 # Input Data
-data=../../Data/subject_05/subject_05_ASE_noIR_2.nii.gz
-mask=../../Data/subject_05/subject_05_ASE_mask.nii.gz
+data=../../Data/MR_700/MR_700_ASE_noFLAIR_TE_82.nii.gz
+mask=../../Data/MR_700/MR_700_ASE_mask.nii.gz
 
 # Run Options
 output=../../Data/Fabber_Results/
@@ -17,7 +17,7 @@ max-iterations=10
 # Spatial VB Information (remove all of this if method!=spatialvb)
 param-spatial-priors=MMMMI
 allow-bad-voxels
-image-prior5=../../Data/subject_05/sub5_T2w_CSF_native.nii.gz
+image-prior5=../../Data/MR_700/MR_700_CSF_T1w.nii.gz
 
 # Inference Model 
 model=qboldR2p
@@ -28,54 +28,16 @@ inferS0
 inferlam
 
 # Scan Parameters (maybe I'll think of a better way of doing this...)
-TE1=0.066
-TE2=0.066
-TE3=0.066
-TE4=0.066
-TE5=0.066
-TE6=0.066
-TE7=0.066
-TE8=0.066
-TE9=0.066
-TE10=0.066
-TE11=0.066
-TE12=0.066
-TE13=0.066
-TE14=0.066
-TE15=0.082
-TE16=0.082
-TE17=0.082
-TE18=0.082
-TE19=0.082
-TE20=0.082
-TE21=0.082
-TE22=0.082
-TE23=0.082
-TE24=0.082
-TE25=0.082
+TE=0.082
 
-tau1=0.000
-tau2=0.004
-tau3=0.008
-tau4=0.012
+tau1=-0.016
+tau2=-0.008
+tau3=0.0
+tau4=0.008
 tau5=0.016
-tau6=0.020
-tau7=0.024
-tau8=0.028
-tau9=0.032
-tau10=0.036
-tau11=0.040
-tau12=0.044
-tau13=0.048
-tau14=0.052
-tau15=-0.016
-tau16=-0.008
-tau17=0.0
-tau18=0.008
-tau19=0.016
-tau20=0.024
-tau21=0.032
-tau22=0.040
-tau23=0.048
-tau24=0.056
-tau25=0.064
+tau6=0.024
+tau7=0.032
+tau8=0.040
+tau9=0.048
+tau10=0.056
+tau11=0.064

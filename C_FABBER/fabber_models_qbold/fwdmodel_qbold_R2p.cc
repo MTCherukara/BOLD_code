@@ -215,7 +215,7 @@ void R2primeFwdModel::HardcodedInitialDists(MVNDist &prior, MVNDist &posterior) 
 
     if (infer_R2e)
     {
-        prior.means(R2e_index()) = 4.0;
+        prior.means(R2e_index()) = 2.0;
         precisions(R2e_index(), R2e_index()) = 0.01; // 1e-2
     }
     
@@ -228,7 +228,7 @@ void R2primeFwdModel::HardcodedInitialDists(MVNDist &prior, MVNDist &posterior) 
     if (infer_lam)
     {
         prior.means(lam_index()) = 0.001;
-        precisions(lam_index(), lam_index()) = 10.0; // 1-e1
+        precisions(lam_index(), lam_index()) = 0.1; // 1-e1
     }
 
     prior.SetPrecisions(precisions);
@@ -279,7 +279,7 @@ void R2primeFwdModel::Evaluate(const ColumnVector &params, ColumnVector &result)
     // assign values to parameters
     if (infer_R2p)
     {
-        R2p = abs(paramcpy(R2p_index()));
+        R2p = (paramcpy(R2p_index()));
     }
     else
     {
@@ -303,7 +303,7 @@ void R2primeFwdModel::Evaluate(const ColumnVector &params, ColumnVector &result)
     }
     if (infer_S0)
     {
-        S0 = abs(paramcpy(S0_index()));
+        S0 = (paramcpy(S0_index()));
     }
     else
     {
@@ -311,7 +311,7 @@ void R2primeFwdModel::Evaluate(const ColumnVector &params, ColumnVector &result)
     }
     if (infer_R2e)
     {
-        R2e = abs(paramcpy(R2e_index()));
+        R2e = (paramcpy(R2e_index()));
     }
     else
     {
@@ -319,7 +319,7 @@ void R2primeFwdModel::Evaluate(const ColumnVector &params, ColumnVector &result)
     }
     if (infer_dF)
     {
-        dF = abs(paramcpy(dF_index()));
+        dF = (paramcpy(dF_index()));
     }
     else
     {
