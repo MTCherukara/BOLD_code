@@ -1,8 +1,8 @@
 # fabber run 3 - Bi-exponential spin-echo data
 
 # Input Data
-data=../../Data/MR_700/MR_700_2DSE.nii.gz
-mask=../../Data/MR_700/MR_700_ASE_mask.nii.gz
+data=../../Data/MR_699/MR_699_2DSE.nii.gz
+mask=../../Data/MR_699/MR_699_mask.nii.gz
 
 # Run Options
 output=../../Data/Fabber_Results/
