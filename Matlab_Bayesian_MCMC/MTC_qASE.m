@@ -48,9 +48,9 @@ params.TE   = 0.100;        % s         - echo time
 % model fitting parameters
 params.S0   = 1;            % a. units  - signal
 params.R2t  = 1/0.110;      % 1/s       - rate constant, tissue
-params.R2e  = 2;            % 1/s       - rate constant, extracellular
+params.R2e  = 4;            % 1/s       - rate constant, extracellular
 params.dF   = 6;            % Hz        - frequency shift
-params.lam0 = 0.050;        % no units  - ISF/CSF signal contribution
+params.lam0 = 0.030;        % no units  - ISF/CSF signal contribution
 params.zeta = 0.030;        % no units  - deoxygenated blood volume
 params.OEF  = 0.400;        % no units  - oxygen extraction fraction
 params.Hct  = 0.340;        % no units  - fractional hematocrit
@@ -86,6 +86,7 @@ if plot_fig
     
     % create a figure
     figure(1);
+    set(gcf,'WindowStyle','docked');
 %     fig1 = figure('WindowStyle','docked');
     hold on; box on;
     
