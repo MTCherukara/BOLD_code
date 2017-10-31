@@ -198,7 +198,7 @@ void R2primeFwdModel::HardcodedInitialDists(MVNDist &prior, MVNDist &posterior) 
     if (infer_DBV)
     {
         prior.means(DBV_index()) = 0.05;
-        precisions(DBV_index(), DBV_index()) = 0.1; // 1e-1
+        precisions(DBV_index(), DBV_index()) = 1.0; // 1e-1
     }
 
     if (infer_R2t)
@@ -228,7 +228,7 @@ void R2primeFwdModel::HardcodedInitialDists(MVNDist &prior, MVNDist &posterior) 
     if (infer_lam)
     {
         prior.means(lam_index()) = 0.001;
-        precisions(lam_index(), lam_index()) = 0.1; // 1-e1
+        precisions(lam_index(), lam_index()) = 1e6; // 1-e1
     }
 
     prior.SetPrecisions(precisions);
@@ -379,7 +379,7 @@ void R2primeFwdModel::Evaluate(const ColumnVector &params, ColumnVector &result)
 
     
     // alternative, if values are outside reasonable bounds
-    if ( DBV > 1.0 || lam > 1.0 || (DBV+lam) > 1.1 )
+    if ( DBV > 0.5 || lam > 1.0 || (DBV+lam) > 1.1 )
     {
         for (int ii = 1; ii <= taus.Nrows(); ii++)
         {
