@@ -192,43 +192,43 @@ void R2primeFwdModel::HardcodedInitialDists(MVNDist &prior, MVNDist &posterior) 
     if (infer_R2p)
     {
         prior.means(R2p_index()) = 6.0;
-        precisions(R2p_index(), R2p_index()) = 0.001; // 1e-2
+        precisions(R2p_index(), R2p_index()) = 1e-2; // 1e-2
     }
 
     if (infer_DBV)
     {
         prior.means(DBV_index()) = 0.05;
-        precisions(DBV_index(), DBV_index()) = 1.0; // 1e-1
+        precisions(DBV_index(), DBV_index()) = 1e1; // 1e-1
     }
 
     if (infer_R2t)
     {
-        prior.means(R2t_index()) = 9;
-        precisions(R2t_index(), R2t_index()) = 0.01; // 1e-2
+        prior.means(R2t_index()) = 9.0;
+        precisions(R2t_index(), R2t_index()) = 1e-1; // 1e-2
     }
 
     if (infer_S0)
     {
-        prior.means(S0_index()) = 1000;
-        precisions(S0_index(), S0_index()) = 0.00001; // 1e-5
+        prior.means(S0_index()) = 1000.0;
+        precisions(S0_index(), S0_index()) = 1e-5; // 1e-5
     }
 
     if (infer_R2e)
     {
-        prior.means(R2e_index()) = 2.0;
-        precisions(R2e_index(), R2e_index()) = 0.01; // 1e-2
+        prior.means(R2e_index()) = 4.0;
+        precisions(R2e_index(), R2e_index()) = 1e-2; // 1e-2
     }
     
     if (infer_dF)
     {
         prior.means(dF_index()) = 5.0;
-        precisions(dF_index(), dF_index()) = 1.0; // 1e-2
+        precisions(dF_index(), dF_index()) = 1e-2; // 1e-2
     }
 
     if (infer_lam)
     {
         prior.means(lam_index()) = 0.001;
-        precisions(lam_index(), lam_index()) = 1e6; // 1-e1
+        precisions(lam_index(), lam_index()) = 1e1; // 1e-1
     }
 
     prior.SetPrecisions(precisions);
@@ -287,7 +287,7 @@ void R2primeFwdModel::Evaluate(const ColumnVector &params, ColumnVector &result)
     }
     if (infer_DBV)
     {
-        DBV = abs(paramcpy(DBV_index()));
+        DBV = (paramcpy(DBV_index()));
     }
     else
     {
@@ -295,7 +295,7 @@ void R2primeFwdModel::Evaluate(const ColumnVector &params, ColumnVector &result)
     }
     if (infer_R2t)
     {
-        R2t = abs(paramcpy(R2t_index()));
+        R2t = (paramcpy(R2t_index()));
     }
     else
     {
@@ -323,7 +323,7 @@ void R2primeFwdModel::Evaluate(const ColumnVector &params, ColumnVector &result)
     }
     else
     {
-        dF = 5.00;
+        dF = 6.00;
     }
     if (infer_lam)
     {
@@ -370,7 +370,7 @@ void R2primeFwdModel::Evaluate(const ColumnVector &params, ColumnVector &result)
 
         // calculate extracellular signal
         Sec = exp(-R2e*TE)*exp(-2.0*i*M_PI*dF*abs(tau));
-        Se = Sec.real();
+        Se = abs(Sec);
 
         // Total signal
         result(ii) = S0*(((1-DBV-lam)*St) + (DBV*Sb) + (lam*Se));
@@ -379,7 +379,7 @@ void R2primeFwdModel::Evaluate(const ColumnVector &params, ColumnVector &result)
 
     
     // alternative, if values are outside reasonable bounds
-    if ( DBV > 0.5 || lam > 1.0 || (DBV+lam) > 1.1 )
+    if ( DBV > 0.5 || lam > 1.0 )
     {
         for (int ii = 1; ii <= taus.Nrows(); ii++)
         {

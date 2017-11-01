@@ -39,5 +39,5 @@ end
 
 % calculate signal
 SE = exp( -(R2e.*TE) - 2i.*pi.*df.*abs(TAU));
-SE = real(SE);
+SE = abs(SE);
 

@@ -1,0 +1,115 @@
+1 November 2017
+
+Trying to get a working set of priors (and other parameters) in fwdmodel_qbold_R2p
+
+Using subject MR_700 "MR_700_ASE_noIR.nii.gz", and a csf mask: "MR_700_mask_CSF_50.nii.gz"
+
+Using run5.fab, spatialvb, MMMMM priors
+
+
+HardcodedInitialDists:
+
+Parameter       Prior Mean      Prior Precision
+R2p             6.0             1e-2
+DBV             0.05            1e1
+R2t             9.0             1e-1
+S0              1000.0          1e-5
+lam             0.001           1e1
+
+Evaluate:
+
+R2p         True Value
+DBV         Absolute Value, Limited to 0.5
+R2t         True Value
+S0          True Value
+lam         Absolute Value, Limited to 1.0
+
+############################################################################################
+############################################################################################
+
+Log:
+
+1.  AS ABOVE
+
+    Ran correctly.  DBV elevated, but almost all between 0 and 0.2
+                    R2p low, but all positive
+                    R2t looks great, very smooth
+                    S0  looks great
+                    lam elevated around edges of brain (as expected), less than 0.1 in GM
+
+    Saved as "fabber_86_csfmask_50_svb"
+
+    Can we reduce the prior precisions and achieve the same result?
+
+2.  Set Precision(R2t) = 1e-2 (from 1e-1)
+
+    Failed after 3 iterations.
+
+    RESET
+
+3.  Set Precision(lam) = 1e0 (from 1e1)
+
+    Failed after 6 iterations.
+    
+    RESET
+
+4.  Attempt to infer on R2e as well, PriorMean(R2e) = 2.0, Precision(R2e) = 1e-2.
+
+    Ran correctly.  R2e is between 4 and 6 throughout (as we want)
+                    lam is as expected (see 1)
+                    R2p still a little low, but smooth
+                    DBV also a little high
+
+    Saved as "fabber_87_csfmask_50_svb_6p"
+
+    Can we tighten up R2p and DBV?
+
+5.  Set PriorMean(R2e) = 4.0 (from 2.0, closer to true value)
+    Set Precision(R2p) = 1-e1 (from 1e-2)
+
+    Ran correctly.  R2p is significantly worse (very low in certain regions)
+                    DBV equally problematic
+
+    RESET Precision(R2p)
+
+6.  Remove abs() from DBV and lam
+
+    Ran correctly.  DBV is still high, R2p is still a little low
+                    Leads to significant underestimate of OEF (10-20% throughout)
+                    lam goes negative in a lot of GM (this should not be)
+
+    Can we use an IF correction to prevent lam and DBV from taking negative values?
+
+7.  Added (DBV > 0.0) and (lam > 0.0) limits 
+
+    Ran correctly.  No significant change.
+
+    REMOVED conditions (because why have more?)
+
+8.  Switch to Absolute value of Extracellular component (rather than real)  
+
+    Failed after 7 iterations 
+
+9.  Relaxed Precision(lam) to 1e0 (from 1e1)
+
+    Failed after 3 iterations
+
+10. Set dF to 6.0
+
+    Failed after 7 iterations
+
+11. Set Precision(lam) to 1e2 (from 1e1) 
+
+    Ran correctly.  Lam all below 0
+
+12. Reintroduced the negative lam/DBV conditions 
+
+    Failed immediately.
+
+13. Reintroduced abs(lam) instead of the conditions
+
+    Ran correctly.  lam uniform (should be higher on the edges)
+
+14. Reduced Precision(lam) to 1e1. 
+
+    Ran correctly.  lam is messed up tho.

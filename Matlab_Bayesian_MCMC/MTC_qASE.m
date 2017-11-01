@@ -29,8 +29,8 @@
 clear; 
 % close all;
 
-plot_fig = 0;       
-save_data = 1;      % set to 1 in order to save out ASE data
+plot_fig = 1;       
+save_data = 0;      % set to 1 in order to save out ASE data
 
 
 %% Model Parameters
@@ -59,13 +59,12 @@ params.Hct  = 0.340;        % no units  - fractional hematocrit
 %% Compute Model
 
 % define tau values that we want to simulate
-tau = (-16:8:64)/1000;      % for simulating data
+% tau = (-16:8:64)/1000;      % for simulating data
 % tau = [-16:4:16,24:8:64]./1000;
 
 % tau = (-8:2:8)/1000;
-% tau = linspace(-0.016,0.064,1000); % for visualising ( tau(286) = 0 )
+tau = linspace(-0.016,0.064,1000); % for visualising ( tau(286) = 0 )
 
-% tau = linspace(-0.016,0.064,1000);
 TE  = params.TE;
 np = length(tau);
 
