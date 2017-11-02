@@ -100,16 +100,37 @@ Log:
 
 11. Set Precision(lam) to 1e2 (from 1e1) 
 
-    Ran correctly.  Lam all below 0
+    Ran correctly.  Lam all below 0, and too high (-15%)
+                    R2e all negative
 
-12. Reintroduced the negative lam/DBV conditions 
+12. Set Precision(R2e) to 1e-1 (from 1e-2)
 
-    Failed immediately.
+    Ran correctly.  Didn't help
 
-13. Reintroduced abs(lam) instead of the conditions
+13. Reintroduce abs(R2e), and set precision back to 1e-2
 
-    Ran correctly.  lam uniform (should be higher on the edges)
+    Ran correctly.  Still got the same problem with lambda
+    
+    Why was lambda precision so high when we're not using a spatial prior?
 
-14. Reduced Precision(lam) to 1e1. 
+14. Set Precision(lam) to 1e-1
 
-    Ran correctly.  lam is messed up tho.
+    Failed immediately
+
+15. Set Precision(lam) to 1e1, and PriorMean(lam) to 0.01 (from 0.001)
+
+    Failed after 4 iterations
+
+16. Changed the way the condition thing worked, so that it makes "result" negative, rather than 0
+
+    Ran correctly.  lam negative still
+
+17. Reset Precision(lam) to 1e0, and PriorMean(lam) to 0.001, and Precision(DBV) to 1e0
+
+    Failed after 4 iterations
+
+18. Set Precisions(DBV,lam) back to 1e1, Set Precision(R2e) to 1e-1
+
+19. What if we just go back to having the abs in for all small parameters?
+
+        Good enough.

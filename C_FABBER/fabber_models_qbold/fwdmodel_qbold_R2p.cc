@@ -198,13 +198,13 @@ void R2primeFwdModel::HardcodedInitialDists(MVNDist &prior, MVNDist &posterior) 
     if (infer_DBV)
     {
         prior.means(DBV_index()) = 0.05;
-        precisions(DBV_index(), DBV_index()) = 1e1; // 1e-1
+        precisions(DBV_index(), DBV_index()) = 1e-1; // 1e-1
     }
 
     if (infer_R2t)
     {
         prior.means(R2t_index()) = 9.0;
-        precisions(R2t_index(), R2t_index()) = 1e-1; // 1e-2
+        precisions(R2t_index(), R2t_index()) = 1e-2; // 1e-2
     }
 
     if (infer_S0)
@@ -228,7 +228,7 @@ void R2primeFwdModel::HardcodedInitialDists(MVNDist &prior, MVNDist &posterior) 
     if (infer_lam)
     {
         prior.means(lam_index()) = 0.001;
-        precisions(lam_index(), lam_index()) = 1e1; // 1e-1
+        precisions(lam_index(), lam_index()) = 1e2; // 1e-1
     }
 
     prior.SetPrecisions(precisions);
@@ -279,7 +279,7 @@ void R2primeFwdModel::Evaluate(const ColumnVector &params, ColumnVector &result)
     // assign values to parameters
     if (infer_R2p)
     {
-        R2p = (paramcpy(R2p_index()));
+        R2p = abs(paramcpy(R2p_index()));
     }
     else
     {
@@ -287,7 +287,7 @@ void R2primeFwdModel::Evaluate(const ColumnVector &params, ColumnVector &result)
     }
     if (infer_DBV)
     {
-        DBV = (paramcpy(DBV_index()));
+        DBV = abs(paramcpy(DBV_index()));
     }
     else
     {
@@ -295,7 +295,7 @@ void R2primeFwdModel::Evaluate(const ColumnVector &params, ColumnVector &result)
     }
     if (infer_R2t)
     {
-        R2t = (paramcpy(R2t_index()));
+        R2t = abs(paramcpy(R2t_index()));
     }
     else
     {
@@ -311,7 +311,7 @@ void R2primeFwdModel::Evaluate(const ColumnVector &params, ColumnVector &result)
     }
     if (infer_R2e)
     {
-        R2e = (paramcpy(R2e_index()));
+        R2e = abs(paramcpy(R2e_index()));
     }
     else
     {
@@ -319,7 +319,7 @@ void R2primeFwdModel::Evaluate(const ColumnVector &params, ColumnVector &result)
     }
     if (infer_dF)
     {
-        dF = (paramcpy(dF_index()));
+        dF = abs(paramcpy(dF_index()));
     }
     else
     {
@@ -383,7 +383,7 @@ void R2primeFwdModel::Evaluate(const ColumnVector &params, ColumnVector &result)
     {
         for (int ii = 1; ii <= taus.Nrows(); ii++)
         {
-            result(ii) = 0.0;
+            result(ii) = 10000*result(ii);
         }
     }
 

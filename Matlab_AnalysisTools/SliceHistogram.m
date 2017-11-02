@@ -22,7 +22,7 @@
 function SliceHistogram(varargin)
 
     % Constants
-    nb = 50; % number of bins we want to use
+    nb = 30; % number of bins we want to use
 
     % Load First Slice Data
     [slice1,slicenums.a,filename,vtype] = LoadSlice;
@@ -72,7 +72,7 @@ function [histdata,HC] = CalculateHist(data1,data2,nbins,vartype)
     if twosets
         v2 = abs(data2(:));
         v2(v2 <= 0) = [];
-        max2 = quantile(v2,0.995);
+        max2 = quantile(v2,0.95);
     end
     
 	% set an upper boundary, based on the type of variable specified
@@ -81,7 +81,7 @@ function [histdata,HC] = CalculateHist(data1,data2,nbins,vartype)
     elseif strcmp(vartype,'DBV')
         max1 = 0.3;
     else
-        max1 = max(max2,quantile(v1,0.995));
+        max1 = max(max2,quantile(v1,0.95));
     end
     % Define histogram points
     HE = linspace(0,max1,nbins+1);      % edges
@@ -112,15 +112,15 @@ function PlotHist(HD,HC,slabels,vartype)
     end
     
     % Choose limits for axes
-    maxY = 1.1.*max(HD(:));
+    maxY = 1.1.*max(max(HD(:,2:end)));
     maxX = HC(end);
     
     % Plot histograms
     figure('WindowStyle','Docked');
     hold on; box on;
-    plot(HC,HD(1,:),'b','LineWidth',3);
+    plot(HC(2:end),HD(1,2:end),'b','LineWidth',3);
     if twosets
-        plot(HC,HD(2,:),'r','LineWidth',3);
+        plot(HC(2:end),HD(2,2:end),'r--','LineWidth',3);
         
         % Legend, based on the numbers of the slices chosen
         if exist('slabels','var')
@@ -134,7 +134,10 @@ function PlotHist(HD,HC,slabels,vartype)
         end
         
     end
-    xlabel(vartype);
+    xlabel('R2 prime');
+    ylabel('Voxel Count');
+    yticks([]);
+    
     axis([0, maxX, 0, maxY]);
     set(gca,'FontSize',16);
 

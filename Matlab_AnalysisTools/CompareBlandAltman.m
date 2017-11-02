@@ -13,7 +13,7 @@ function CompareBlandAltman(varargin)
 %
 % CHANGELOG:
 
-close all;
+% close all;
 
 % read user inputs
 p = inputParser;
@@ -25,11 +25,15 @@ addParameter(p,'slice',6);
 
 parse(p,varargin{:});
 
+% parameters
+nbin = 25;      % histogram bins
+
+
 % temporary
 fd1 = '/Users/mattcher/Documents/DPhil/Data/MR_700/';
 fd2 = fd1;
-fn1 = 'MR_700_CSF_T2w.nii.gz';
-fn2 = 'MR_700_CSF_T2fit.nii.gz';
+fn1 = 'CSF_T1w_warp.nii.gz';
+fn2 = 'CSF_T2native.nii.gz';
 
 % have the user select some files
 if ~exist('fn1','var')
@@ -64,9 +68,15 @@ mutualdata = data(all(data,2),:);
 
 % Scatter Plot
 if p.Results.plot_scatt
+    
+    % remove points with very low PVE
+    hpve = mutualdata > 0.01;
+    scatdata = mutualdata(all(hpve,2),:);
+    
+    % plot
     figure('WindowStyle','Docked');
     hold on; box on;
-    scatter(mutualdata(:,1),mutualdata(:,2));
+    scatter(scatdata(:,1),scatdata(:,2),'k.');
     xlabel('Method 1 PV Estimate');
     ylabel('Method 2 PV Estimate');
     set(gca,'FontSize',16);
@@ -79,6 +89,22 @@ if p.Results.plot_bland
     X = (mutualdata(:,1) + mutualdata(:,2))./2;
     Y = (mutualdata(:,1) - mutualdata(:,2));
     
+    XY = sortrows([X,abs(Y)],1);
+    MY = movmean(XY(:,2),50);
+    
+    bn = linspace(0,1,nbin);
+    bi = ones(1,nbin+2);
+    ba = zeros(1,nbin);
+    
+    for ii = 2:nbin
+        ti = find(XY(:,1) > bn(ii),1);
+        if length(ti) == 1
+            bi(ii) = ti;
+            ba(ii) = mean(XY(bi(ii-1):bi(ii),2));
+        end
+        
+    end
+    
 %     X = log(mutualdata(:,1) .* mutualdata(:,2))./2;
 %     Y = log(mutualdata(:,1)./mutualdata(:,2));
     
@@ -86,6 +112,8 @@ if p.Results.plot_bland
     figure('WindowStyle','Docked');
     hold on; box on;
     scatter(X,Y);
+    plot(bn, ba,'r-','LineWidth',2);
+    plot(bn,-ba,'r-','LineWidth',2);
     axis([0 1 -1 1]);
     xlabel('ECF Partial Volume Estimate');
     ylabel('Estimate Difference');
@@ -96,7 +124,6 @@ end
 if p.Results.plot_histo
     
     % calculate histograms
-    nbin = 50;
     [n1,e1] = histcounts(mutualdata(:,1),nbin);
     [n2,e2] = histcounts(mutualdata(:,2),nbin);
 
@@ -106,9 +133,10 @@ if p.Results.plot_histo
 
     % plot
     figure('WindowStyle','Docked');
+%     figure(1);
     hold on; box on;
-    plot(c1,n1,'LineWidth',2);
-    plot(c2,n2,'LineWidth',2);
+    plot(c1,n1,'-','LineWidth',3);
+    plot(c2,n2,':','LineWidth',3);
     xlabel('Voxel Intensity');
     ylabel('Voxel Count');
     set(gca,'FontSize',16);

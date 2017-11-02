@@ -28,6 +28,8 @@ if strfind(lower(niname),'oef')
     vtype = 'OEF';
 elseif strfind(lower(niname),'dbv')
     vtype = 'DBV';
+elseif strfind(lower(niname),'R2p')
+    vtype = 'R2 prime';
 else
     vtype = 'other';
 end
