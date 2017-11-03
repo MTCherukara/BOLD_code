@@ -111,7 +111,7 @@ end % if plot_fig
 % Save Figure
 if save_data
     % Check how many datasets have been saved with the same date
-    dat_dir = '/Users/mattcher/Documents/DPhil/Code/Matlab_Bayesian_MCMC';
+    dat_dir = '/Users/mattcher/Documents/DPhil/Code/Matlab_Bayesian_MCMC/';
     dat_title1 = strcat('ASE_signal_',date,'_');
     dat_list = dir(strcat(dat_dir,dat_title1,'*'));
     fn = length(dat_list) + 1;

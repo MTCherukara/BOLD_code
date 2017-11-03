@@ -28,9 +28,11 @@ function SliceHistogram(varargin)
     [slice1,slicenums.a,filename,vtype] = LoadSlice;
     
     % Ask the user about a second slice for comparison
-    choice = questdlg('Would you like to select a second slice for comparison?',...
-                      'Comparison Slice',...
-                      'From Same File','From Different File','No','No');
+%     choice = questdlg('Would you like to select a second slice for comparison?',...
+%                       'Comparison Slice',...
+%                       'From Same File','From Different File','No','No');
+
+    choice = 'No';
                   
     % Handle the user's response
     switch choice
@@ -73,6 +75,8 @@ function [histdata,HC] = CalculateHist(data1,data2,nbins,vartype)
         v2 = abs(data2(:));
         v2(v2 <= 0) = [];
         max2 = quantile(v2,0.95);
+    else
+        max2 = 0;
     end
     
 	% set an upper boundary, based on the type of variable specified
@@ -133,7 +137,19 @@ function PlotHist(HD,HC,slabels,vartype)
             legend('Slice 1','Slice 2','Location','NorthEast');
         end
         
-    end
+    else % if twosets
+        
+        % Save the histogram data
+        dat_dir = '/Users/mattcher/Documents/DPhil/Code/Matlab_AnalysisTools/';
+        dat_list = dir(strcat(dat_dir,'HistData_*'));
+        fn = length(dat_list) + 1;
+        
+        % Assign the correct title
+        dat_title = strcat('HistData_',num2str(fn));
+        save(dat_title,'HC','HD');
+        
+    end % if twosets ... else ... 
+    
     xlabel('R2 prime');
     ylabel('Voxel Count');
     yticks([]);
