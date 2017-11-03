@@ -77,6 +77,9 @@ function [histdata,HC] = CalculateHist(data1,data2,nbins,vartype)
         max2 = quantile(v2,0.95);
     else
         max2 = 0;
+        disp(['Mean = ',num2str(mean(v1))]);
+        disp(['Median = ',num2str(median(v1))]);
+        disp(['Std = ',num2str(std(v1))]);
     end
     
 	% set an upper boundary, based on the type of variable specified

@@ -40,8 +40,13 @@ end
 % Record the number of slices
 nsl = dims(3);
 
-% Have the user select a slice (or set of slices) to plot
-slc = inputdlg(['Enter a number between 1 and ',num2str(nsl)],'Choose a Slice',1);
+% % Have the user select a slice (or set of slices) to plot
+% slc = inputdlg(['Enter a number between 1 and ',num2str(nsl)],'Choose a Slice',1);
+% 
+% slicenum  = slc{1};
+% 
+% slicedata = squeeze(dataset(:,:,str2num(slicenum)));
 
-slicenum  = slc{1};
-slicedata = squeeze(dataset(:,:,str2num(slicenum)));
+% for now
+slicenum = 5:8;
+slicedata = squeeze(dataset(:,:,5:8));

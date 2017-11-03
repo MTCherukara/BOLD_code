@@ -134,3 +134,8 @@ Log:
 19. What if we just go back to having the abs in for all small parameters?
 
         Good enough.
+
+
+
+
+        
