@@ -140,16 +140,16 @@ function PlotHist(HD,HC,slabels,vartype)
             legend('Slice 1','Slice 2','Location','NorthEast');
         end
         
-    else % if twosets
-        
-        % Save the histogram data
-        dat_dir = '/Users/mattcher/Documents/DPhil/Code/Matlab_AnalysisTools/';
-        dat_list = dir(strcat(dat_dir,'HistData_*'));
-        fn = length(dat_list) + 1;
-        
-        % Assign the correct title
-        dat_title = strcat('HistData_',num2str(fn));
-        save(dat_title,'HC','HD');
+%     else % if twosets
+%         
+%         % Save the histogram data
+%         dat_dir = '/Users/mattcher/Documents/DPhil/Code/Matlab_AnalysisTools/';
+%         dat_list = dir(strcat(dat_dir,'HistData_*'));
+%         fn = length(dat_list) + 1;
+%         
+%         % Assign the correct title
+%         dat_title = strcat('HistData_',num2str(fn));
+%         save(dat_title,'HC','HD');
         
     end % if twosets ... else ... 
     

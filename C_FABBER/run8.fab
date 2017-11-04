@@ -1,8 +1,8 @@
 # fabber run 8, single TE
 
 # Input Data
-data=../../Data/subject_05/subject_05_ASE_noIR_82.nii.gz
-mask=../../Data/subject_05/subject_05_mask_CSF_50.nii.gz
+data=../../Data/MR_700/MR_700_ASE_noFLAIR_TE_82.nii.gz
+mask=../../Data/MR_700/MR_700_mask_CSF_50.nii.gz
 
 # Run Options
 output=../../Data/Fabber_Results/
@@ -15,17 +15,15 @@ noise=white
 max-iterations=10
 
 # Spatial VB Information (remove all of this if method!=spatialvb)
-param-spatial-priors=MMMMMI
+param-spatial-priors=MMMI
 allow-bad-voxels
-image-prior6=../../Data/subject_05/CSF_T2fit.nii.gz
+image-prior4=../../Data/MR_700/CSF_T2fit.nii.gz
 
 # Inference Model 
 model=qboldR2p
 inferR2p
-inferR2t
 inferDBV
 inferS0
-inferR2e
 inferlam
 
 # Scan Parameters (maybe I'll think of a better way of doing this...)

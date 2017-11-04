@@ -30,10 +30,10 @@ nbin = 25;      % histogram bins
 
 
 % temporary
-fd1 = '/Users/mattcher/Documents/DPhil/Data/MR_700/';
+fd1 = '/Users/mattcher/Documents/DPhil/Data/MR_699/';
 fd2 = fd1;
-fn1 = 'CSF_T1w_warp.nii.gz';
-fn2 = 'CSF_T2native.nii.gz';
+fn1 = 'CSF_T1w.nii.gz';
+fn2 = 'CSF_T2fit.nii.gz';
 
 % have the user select some files
 if ~exist('fn1','var')
@@ -63,8 +63,10 @@ end
 data = [data1(:),data2(:)];
 
 % find only the points where both sets have non-zero values
-mutualdata = data(all(data,2),:); 
-% disp(['Number of valid data points: ',num2str(size(mutualdata,1))]);
+mutualdata = data(all(data > 0.2,2),:); 
+disp(['Number of overlapping voxels: ',num2str(size(mutualdata,1))]);
+disp(['Total voxels: ',num2str(size(data,1))]);
+disp(['  Ratio: ',num2str(size(mutualdata,1)./size(data,1))]);
 
 % Scatter Plot
 if p.Results.plot_scatt

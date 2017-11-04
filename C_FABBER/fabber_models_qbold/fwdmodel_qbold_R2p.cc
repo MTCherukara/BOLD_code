@@ -315,7 +315,7 @@ void R2primeFwdModel::Evaluate(const ColumnVector &params, ColumnVector &result)
     }
     else
     {
-        R2e = 4.00;
+        R2e = 2.00;
     }
     if (infer_dF)
     {
