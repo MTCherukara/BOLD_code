@@ -1,8 +1,8 @@
 # fabber run 5 - subject 700 
 
 # Input Data
-data=../../Data/subject_05/subject_05_ASE_noFLAIR.nii.gz
-mask=../../Data/subject_05/subject_05_mask_CSF_50.nii.gz
+data=../../Data/MR_710/MR_710_ASE_all_noIR.nii.gz
+mask=../../Data/MR_710/mask_CSF_50.nii.gz
 
 # Run Options
 output=../../Data/Fabber_Results/
@@ -17,7 +17,7 @@ max-iterations=10
 # Spatial VB Information (remove all of this if method!=spatialvb)
 param-spatial-priors=MMMMMI
 allow-bad-voxels
-image-prior6=../../Data/subject_05/CSF_T2fit.nii.gz
+image-prior6=../../Data/MR_710/CSF_T2fit.nii.gz
 
 # Inference Model 
 model=qboldR2p
@@ -65,8 +65,6 @@ TE33=0.098
 TE34=0.098
 TE35=0.098
 TE36=0.098
-TE37=0.098
-TE38=0.098
 
 tau1=0.000
 tau2=0.004
@@ -93,16 +91,14 @@ tau22=0.040
 tau23=0.048
 tau24=0.056
 tau25=0.064
-tau26=-0.032
-tau27=-0.024
-tau28=-0.016
-tau29=-0.008
-tau30=0.0
-tau31=0.008
-tau32=0.016
-tau33=0.024
-tau34=0.032
-tau35=0.040
-tau36=0.048
-tau37=0.056
-tau38=0.064
+tau26=-0.016
+tau27=-0.008
+tau28=0.0
+tau29=0.008
+tau30=0.016
+tau31=0.024
+tau32=0.032
+tau33=0.040
+tau34=0.048
+tau35=0.056
+tau36=0.064

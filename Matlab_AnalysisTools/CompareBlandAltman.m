@@ -30,7 +30,7 @@ nbin = 25;      % histogram bins
 
 
 % temporary
-fd1 = '/Users/mattcher/Documents/DPhil/Data/MR_699/';
+fd1 = '/Users/mattcher/Documents/DPhil/Data/MR_710/';
 fd2 = fd1;
 fn1 = 'CSF_T1w.nii.gz';
 fn2 = 'CSF_T2fit.nii.gz';
@@ -62,11 +62,15 @@ end
 % vectorize
 data = [data1(:),data2(:)];
 
-% find only the points where both sets have non-zero values
-mutualdata = data(all(data > 0.2,2),:); 
+% find the points where eiter set has values > 0.1
+eitherdata = data(any(data > 0.1,2),:);
+
+% find only the points where both sets have values > 0.1
+mutualdata = data(all(data > 0.1,2),:); 
+
 disp(['Number of overlapping voxels: ',num2str(size(mutualdata,1))]);
-disp(['Total voxels: ',num2str(size(data,1))]);
-disp(['  Ratio: ',num2str(size(mutualdata,1)./size(data,1))]);
+disp(['Total voxels: ',num2str(size(eitherdata,1))]);
+disp(['  Ratio: ',num2str(size(mutualdata,1)./size(eitherdata,1))]);
 
 % Scatter Plot
 if p.Results.plot_scatt
