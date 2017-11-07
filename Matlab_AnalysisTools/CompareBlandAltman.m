@@ -30,9 +30,9 @@ nbin = 25;      % histogram bins
 
 
 % temporary
-fd1 = '/Users/mattcher/Documents/DPhil/Data/MR_710/';
+fd1 = '/Users/mattcher/Documents/DPhil/Data/subject_05/';
 fd2 = fd1;
-fn1 = 'CSF_T1w.nii.gz';
+fn1 = 'CSF_T1warp.nii.gz';
 fn2 = 'CSF_T2fit.nii.gz';
 
 % have the user select some files
