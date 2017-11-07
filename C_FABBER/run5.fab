@@ -2,7 +2,7 @@
 
 # Input Data
 data=../../Data/MR_710/MR_710_ASE_all_noIR.nii.gz
-mask=../../Data/MR_710/mask_CSF_50.nii.gz
+mask=../../Data/MR_710/mask_gm_50.nii.gz
 
 # Run Options
 output=../../Data/Fabber_Results/

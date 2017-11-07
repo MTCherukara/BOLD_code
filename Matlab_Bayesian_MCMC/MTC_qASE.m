@@ -43,13 +43,13 @@ params.dChi = 2.64e-7;      % parts     - susceptibility difference
 params.gam  = 2.67513e8;    % rad/s/T   - gyromagnetic ratio
 
 % scan parameters 
-params.TE   = 0.082;        % s         - echo time
+params.TE   = 0.250;        % s         - echo time
 
 % model fitting parameters
 params.S0   = 1;            % a. units  - signal
 params.R2t  = 1/0.110;      % 1/s       - rate constant, tissue
 params.R2e  = 4;            % 1/s       - rate constant, extracellular
-params.dF   = 6;            % Hz        - frequency shift
+params.dF   = 5;            % Hz        - frequency shift
 params.lam0 = 0.000;        % no units  - ISF/CSF signal contribution
 params.zeta = 0.030;        % no units  - deoxygenated blood volume
 params.OEF  = 0.400;        % no units  - oxygen extraction fraction
@@ -63,7 +63,7 @@ params.Hct  = 0.340;        % no units  - fractional hematocrit
 % tau = [-16:4:16,24:8:64]./1000;
 
 % tau = (-8:2:8)/1000;
-tau = linspace(-0.016,0.064,1000); % for visualising ( tau(286) = 0 )
+tau = linspace(-0.016,0.200,1000); % for visualising ( tau(286) = 0 )
 
 TE  = params.TE;
 np = length(tau);
@@ -102,7 +102,7 @@ if plot_fig
     xlabel('Spin Echo Displacement \tau (ms)');
     ylabel('Signal');
     title('qBOLD Signal Measured Using ASE');
-    ylim([0.7,1]);
+%     ylim([0.7,1]);
 %     axis([1000*min(tau), 1000*max(tau), -1, -0.6]);
     set(gca,'FontSize',18);
     
