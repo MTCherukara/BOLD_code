@@ -3,7 +3,7 @@
 % plot a biexponential decay function
 R2t = 1/0.11;
 R2e = 1/0.25;
-theta = 0.5;
+theta = 0.3;
 
 TE = linspace(0,0.250,1000);
 
@@ -19,9 +19,9 @@ plot(1000*TE,P1,'--','LineWidth',3);
 plot(1000*TE,P2,':', 'LineWidth',3);
 plot(1000*TE,Pb,'-', 'LineWidth',3);
 
-set(gca,'FontSize',18);
+set(gca,'FontSize',14);
 
 xlabel('Echo Time TE (ms)');
 ylabel('Signal');
 
-legend('Tissue Compartment','ECF Compartment','Combined Signal');
+legend('Tissue Compartment','CSF Compartment','Combined Signal');

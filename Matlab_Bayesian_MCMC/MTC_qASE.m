@@ -50,7 +50,7 @@ params.S0   = 1;            % a. units  - signal
 params.R2t  = 1/0.110;      % 1/s       - rate constant, tissue
 params.R2e  = 4;            % 1/s       - rate constant, extracellular
 params.dF   = 5;            % Hz        - frequency shift
-params.lam0 = 0.000;        % no units  - ISF/CSF signal contribution
+params.lam0 = 0.00;        % no units  - ISF/CSF signal contribution
 params.zeta = 0.030;        % no units  - deoxygenated blood volume
 params.OEF  = 0.400;        % no units  - oxygen extraction fraction
 params.Hct  = 0.340;        % no units  - fractional hematocrit
@@ -85,7 +85,7 @@ S_sample = S_total + max(S_total).*params.sig.*randn(1,np);
 if plot_fig
     
     % create a figure
-    figure(1);
+    figure(2);
     set(gcf,'WindowStyle','docked');
 %     fig1 = figure('WindowStyle','docked');
     hold on; box on;
@@ -96,7 +96,7 @@ if plot_fig
     % plot the signal
     S_log = (S_total)./max(S_total);
 %     S_log = S_sample./max(S_total);
-    l.s = plot(1000*tau,S_log,'-','LineWidth',3);
+    l.s = plot(1000*tau,S_log,'--','LineWidth',3);
     
     % labels on axes
     xlabel('Spin Echo Displacement \tau (ms)');

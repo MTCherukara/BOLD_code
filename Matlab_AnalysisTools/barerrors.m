@@ -21,7 +21,8 @@ nb = size(data,2); % number of bars per group
 figure('WindowStyle','Docked');
 hold on; box on;
 bar(data);
-set(gca,'FontSize',16);
+set(gca,'FontSize',14);
+xlabel('Subjects');
 xticks(1:ng);
 
 % Figure out where the centres of each bar are
@@ -32,7 +33,7 @@ if mod(nb,2) == 1
     coffs = -((nb-1)/2)/(nb+1.5):1/(nb+1.5):((nb-1)/2)/(nb+1.5);
 else
     % this is completely wrong!
-    coffs = linspace(-0.4,0.4,nb);
+    coffs = linspace(-0.275,0.275,nb);
 end
 
 cents = cents + repmat(coffs,ng,1);
