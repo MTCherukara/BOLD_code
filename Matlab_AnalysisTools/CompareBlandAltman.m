@@ -30,10 +30,10 @@ nbin = 25;      % histogram bins
 
 
 % temporary
-fd1 = '/Users/mattcher/Documents/DPhil/Data/subject_05/';
-fd2 = fd1;
-fn1 = 'CSF_T1warp.nii.gz';
-fn2 = 'CSF_T2fit.nii.gz';
+% fd1 = '/Users/mattcher/Documents/DPhil/Data/subject_05/';
+% fd2 = fd1;
+% fn1 = 'CSF_T1warp.nii.gz';
+% fn2 = 'CSF_T2fit.nii.gz';
 
 % have the user select some files
 if ~exist('fn1','var')
@@ -63,10 +63,10 @@ end
 data = [data1(:),data2(:)];
 
 % find the points where eiter set has values > 0.1
-eitherdata = data(any(data > 0.1,2),:);
+eitherdata = data(any(data > 0.01,2),:);
 
 % find only the points where both sets have values > 0.1
-mutualdata = data(all(data > 0.1,2),:); 
+mutualdata = data(all(data > 0.01,2),:); 
 
 disp(['Number of overlapping voxels: ',num2str(size(mutualdata,1))]);
 disp(['Total voxels: ',num2str(size(eitherdata,1))]);

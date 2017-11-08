@@ -1,0 +1,54 @@
+# fabber run 9, multiTE
+
+# Input Data
+data=../../Data/MR_710/noFLAIR_3TE.nii.gz
+mask=../../Data/MR_710/MR_710_mask_CSF_50.nii.gz
+
+# Run Options
+output=../../Data/Fabber_Results/
+save-residuals
+save-model-fit
+
+# Method Information
+method=vb
+noise=white
+max-iterations=10
+
+# Spatial VB Information (remove all of this if method!=spatialvb)
+#param-spatial-priors=NNNNNI
+#allow-bad-voxels
+#image-prior6=../../Data/MR_700/CSF_T2fit.nii.gz
+
+# Inference Model 
+model=qboldR2p
+inferR2p
+inferDBV
+inferS0
+inferR2t
+inferlam
+inferR2e
+
+# Scan Parameters (maybe I'll think of a better way of doing this...)
+TE1=0.066
+TE2=0.066
+TE3=0.066
+TE4=0.066
+TE5=0.082
+TE6=0.082
+TE7=0.082
+TE8=0.082
+TE9=0.098
+TE10=0.098
+TE11=0.098
+
+tau1=0.0
+tau2=0.004
+tau3=0.012
+tau4=0.048
+tau5=-0.016
+tau6=0.0
+tau7=0.024
+tau8=0.064
+tau9=-0.008
+tau10=0.0
+tau11=0.040

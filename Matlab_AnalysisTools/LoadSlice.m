@@ -21,6 +21,8 @@ function [slicedata,slicenum,filename,vtype] = LoadSlice(filename)
 if ~exist('filename','var')
     [niname, nidir] = uigetfile('*.nii.gz','Select NIFTY Data File to Load...');
     filename = [nidir,niname];
+else
+    niname = 'blank';
 end
 
 % Determine the type of variable we are looking at
