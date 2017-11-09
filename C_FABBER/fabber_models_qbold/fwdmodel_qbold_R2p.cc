@@ -283,7 +283,7 @@ void R2primeFwdModel::Evaluate(const ColumnVector &params, ColumnVector &result)
     }
     else
     {
-        R2p = 5.0;
+        R2p = 4.0;
     }
     if (infer_DBV)
     {
@@ -299,7 +299,7 @@ void R2primeFwdModel::Evaluate(const ColumnVector &params, ColumnVector &result)
     }
     else
     {
-        R2t = 9.09;
+        R2t = 12.5;
     }
     if (infer_S0)
     {
