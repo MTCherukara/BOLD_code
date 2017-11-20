@@ -91,7 +91,7 @@ void R2primeFwdModel::Initialize(ArgsType &args)
         // if there is no "TE", read TE1, TE2, etc.
         if (TE_temp == "noTE")
         {
-            TE_temp = args.ReadWithDefault("TE"+stringify(i), "0.074");
+            TE_temp = args.ReadWithDefault("TE"+stringify(i), "0.082");
         }
 
         ColumnVector tmp(1);
@@ -203,7 +203,7 @@ void R2primeFwdModel::HardcodedInitialDists(MVNDist &prior, MVNDist &posterior) 
 
     if (infer_R2t)
     {
-        prior.means(R2t_index()) = 9.0;
+        prior.means(R2t_index()) = 12.5;
         precisions(R2t_index(), R2t_index()) = 1e-2; // 1e-2
     }
 
@@ -215,7 +215,7 @@ void R2primeFwdModel::HardcodedInitialDists(MVNDist &prior, MVNDist &posterior) 
 
     if (infer_R2e)
     {
-        prior.means(R2e_index()) = 4.0;
+        prior.means(R2e_index()) = 2.0;
         precisions(R2e_index(), R2e_index()) = 1e-2; // 1e-2
     }
     

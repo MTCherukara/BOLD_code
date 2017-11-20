@@ -1,8 +1,8 @@
 # fabber run 1
 
 # Input Data
-data=../../Data/subject_01_ASE.nii.gz
-mask=../../Data/subject_01_mask.nii.gz
+data=../../Data/subject_03l_ASE.nii.gz
+mask=../../Data/subject_03l_mask.nii.gz
 
 # Run Options
 output=../../Data/Fabber_Results/
@@ -17,7 +17,6 @@ max-iterations=10
 # Inference Model 
 model=qboldR2p
 inferR2p
-inferR2t
 inferDBV
 inferS0
 

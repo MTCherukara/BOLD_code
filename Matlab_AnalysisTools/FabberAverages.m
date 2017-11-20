@@ -3,14 +3,14 @@
 clear; clc;
 
 % select a fabber run
-fabber = '34';
+fabber = '158';
 resdir = '/Users/mattcher/Documents/DPhil/Data/Fabber_Results/';
 fdname = dir([resdir,'fabber_',fabber,'_*']);
 fabdir = strcat(resdir,fdname.name,'/');
 
 % Load data
-DBVslice = LoadSlice([fabdir,'gm_DBV.nii.gz']);
-R2pslice = LoadSlice([fabdir,'gm_R2p.nii.gz']);
+DBVslice = LoadSlice([fabdir,'rLC_DBV.nii.gz']);
+R2pslice = LoadSlice([fabdir,'rLC_R2p.nii.gz']);
 DBV_std  = LoadSlice([fabdir,'std_DBV.nii.gz']);
 R2p_std  = LoadSlice([fabdir,'std_R2p.nii.gz']);
 
