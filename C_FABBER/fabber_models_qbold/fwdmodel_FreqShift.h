@@ -28,7 +28,7 @@ public:
     virtual void NameParams(vector<string> &names) const;
     virtual int NumParams() const 
     {
-        return 2 + ( infer_theta ? ( infer_r2 ? 2 : 0 ) : 0 );
+        return 3;
     }    
     virtual void HardcodedInitialDists(MVNDist &prior, MVNDist &posterior) const;
     virtual void Evaluate(const NEWMAT::ColumnVector &params, NEWMAT::ColumnVector &result) const;
@@ -37,28 +37,25 @@ protected:
 
     // Scan Parameters
     NEWMAT::ColumnVector taus;
+    double TE;
+    double TI;
 
-    // Parameters are: S0(FLAIR), S0(noFLAIR), VCSF, DF
+    // Parameters are: Magnetization M0, VCSF, DF
     // Lookup starting indices of parameters - 
-    int SF_index() const
+    int M0_index() const
     {
-        // S0(FLAIR)
+        // Magnetization M0
         return 1;
-    }
-    int SN_index() const
-    {
-        // S0(no-FLAIR)
-        return 2;
     }
     int VC_index() const
     {
         // V^CSF
-        return 3;
+        return 2;
     }
     int DF_index() const
     {
         // Delta F
-        return 4;
+        return 3;
     }
 
     // don't need any boolean options (for now)

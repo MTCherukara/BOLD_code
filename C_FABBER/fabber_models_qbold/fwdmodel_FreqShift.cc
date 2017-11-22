@@ -63,6 +63,10 @@ void FreqShiftFwdModel::Initialize(ArgsType &args)
 
     }
 
+    // get scan information
+    TE = convertTo<double>(args.ReadWithDefault("TE", "0.082"));
+    TI = convertTo<double>(args.ReadWithDefault("TI", "1.210"));
+
     // add information to the log
     LOG << "Inference using development model" << endl;     
     
@@ -77,10 +81,9 @@ void FreqShiftFwdModel::NameParams(vector<string> &names) const
 {
     names.clear();
 
-    names.pushback("SF");   // parameter 1 - S0(FLAIR)
-    names.pushback("SN");   // parameter 2 - S0(no-FLAIR)
-    names.pushback("VC");   // parameter 3 - V^CSF
-    names.pushback("DF");   // parameter 4 - Delta F
+    names.push_back("M0");   // parameter 1 - Magnetization M0
+    names.push_back("VC");   // parameter 3 - V^CSF
+    names.push_back("DF");   // parameter 4 - Delta F
 
 } // NameParams
 
@@ -95,21 +98,17 @@ void FreqShiftFwdModel::HardcodedInitialDists(MVNDist &prior, MVNDist &posterior
     // create diagonal matrix to store precisions
     SymmetricMatrix precisions = IdentityMatrix(NumParams()) * 1e-6;
     
-    // parameter 1 - S0(FLAIR)
-    prior.means(SF_index()) = 1000;
-    precisions(SF_index(), SF_index()) = 1e-6; // 1e-6
-
-    // parameter 2 - S0(no-FLAIR)
-    prior.means(SF_index()) = 1000;
-    precisions(SF_index(), SF_index()) = 1e-6; // 1e-6
+    // parameter 1 - Magnetization M0 
+    prior.means(M0_index()) = 1000;
+    precisions(M0_index(), M0_index()) = 1e-6; // 1e-6
 
     // parameter 3 - V^CSF
-    prior.means(SF_index()) = 0.01;
-    precisions(SF_index(), SF_index()) = 1e-1; // 1e-1
+    prior.means(VC_index()) = 0.01;
+    precisions(VC_index(), VC_index()) = 1e-1; // 1e-1
 
     // parameter 4 - Delta F
-    prior.means(SF_index()) = 5;
-    precisions(SF_index(), SF_index()) = 1e-3; // 1e-3
+    prior.means(DF_index()) = 5;
+    precisions(DF_index(), DF_index()) = 1e-3; // 1e-3
 
     prior.SetPrecisions(precisions);
 
@@ -129,46 +128,31 @@ void FreqShiftFwdModel::Evaluate(const ColumnVector &params, ColumnVector &resul
     ColumnVector paramcpy = params;
 
     // inferred parameters
-    double SF;
-    double SN;
+    double M0;
     double VC;
     double DF;
 
     // fixed-value parameters
+    double R1t = 1/1.019;
+    double R1e = 1/3.817;
     double R2t = 12.5;
     double R2e = 2.0;
 
     // assign values to parameters
-    SF = paramcpy(SF_index());
-    SN = paramcpy(SN_index());
+    M0 = paramcpy(M0_index());
     VC = paramcpy(VC_index());
     DF = paramcpy(DF_index());
 
     // now evaluate information
-
-    // loop through two taus
     result.ReSize(2*taus.Nrows());
 
-    // FLAIR results
-    for (int i = 1; i <= taus.Nrows(); i++)
+    // loop through FLAIR data
+    for (int ii = 1; ii <= taus.Nrows(); ii++)
     {
-        double tau = taus(i);
+        double tau = taus(ii);
 
-        result(i) = S0 * ( ((1-tht)*exp(-R2A*TE)) + (tht*exp(-R2B*TE)));
+        // R2 component
 
-    } 
-
-    // make sure that the weighting parameter theta is between 0 and 1
-    
-    if (infer_theta)
-    {
-        if ( tht > 1.0 || tht < 0.0 )
-        {
-            for (int ii = 1; ii <= TEs.Nrows(); ii++)
-            {
-                result(ii) = 0.0;
-            }
-        }
     }
 
     return;

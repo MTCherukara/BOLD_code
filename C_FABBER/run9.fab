@@ -1,8 +1,8 @@
 # fabber run 9, multiTE
 
 # Input Data
-data=../../Data/MR_710/noFLAIR_3TE.nii.gz
-mask=../../Data/MR_710/MR_710_mask_CSF_50.nii.gz
+data=../../Data/MR_700/noFLAIR_3TE.nii.gz
+mask=../../Data/MR_700/MR_700_mask_CSF_50.nii.gz
 
 # Run Options
 output=../../Data/Fabber_Results/
