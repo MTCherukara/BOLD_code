@@ -16,6 +16,7 @@
 #include <newmatio.h>
 #include <stdexcept> 
 #include <cmath>
+#include <complex>
 
 using namespace std;
 using namespace NEWMAT;
@@ -101,7 +102,7 @@ void FreqShiftFwdModel::HardcodedInitialDists(MVNDist &prior, MVNDist &posterior
     SymmetricMatrix precisions = IdentityMatrix(NumParams()) * 1e-6;
     
     // parameter 1 - Magnetization M0 
-    prior.means(M0_index()) = 1000.0;
+    prior.means(M0_index()) = 1500.0;
     precisions(M0_index(), M0_index()) = 1e-6; // 1e-6
 
     // parameter 2 - V^CSF
@@ -109,12 +110,12 @@ void FreqShiftFwdModel::HardcodedInitialDists(MVNDist &prior, MVNDist &posterior
     precisions(VC_index(), VC_index()) = 1e-1; // 1e-1
 
     // parameter 3 - Delta F
-    prior.means(DF_index()) = 5.0;
-    precisions(DF_index(), DF_index()) = 1e-3; // 1e-3
+    prior.means(DF_index()) = 7.0;
+    precisions(DF_index(), DF_index()) = 1e-1; // 1e-2
 
     // parameter 4 - R2-prime (Tissue)
-    prior.means(R2p_index()) = 6.0;
-    precisions(R2p_index(), R2p_index()) = 1e-2; // 1e-2
+    prior.means(R2p_index()) = 3.0;
+    precisions(R2p_index(), R2p_index()) = 1e-1; // 1e-2
 
     prior.SetPrecisions(precisions);
 
@@ -129,7 +130,7 @@ void FreqShiftFwdModel::Evaluate(const ColumnVector &params, ColumnVector &resul
 {
     // Check we have been given the right number of parameters
     assert(params.Nrows() == NumParams());
-    result.ReSize(data.Nrows()); // is this line necessary?
+    // result.ReSize(data.Nrows()); // is this line necessary?
 
     ColumnVector paramcpy = params;
 
@@ -149,8 +150,10 @@ void FreqShiftFwdModel::Evaluate(const ColumnVector &params, ColumnVector &resul
     double Rsb = 48.89;
     double DBV = 0.03;
 
+    complex<double> i(0,1);
+
     // assign values to parameters
-    M0 = abs(paramcpy(M0_index()));
+    M0 = (paramcpy(M0_index()));
     VC = abs(paramcpy(VC_index()));
     DF = abs(paramcpy(DF_index()));
     R2p = abs(paramcpy(R2p_index()));
@@ -177,10 +180,10 @@ void FreqShiftFwdModel::Evaluate(const ColumnVector &params, ColumnVector &resul
 
         // CSF Component
         Sec = ( 1 - ( (2 - exp(-(TR-TI)/T1e) ) * exp(-TI/T1e))) * (exp(-R2e*TE)) * (exp(-2.0*i*M_PI*DF*tau));
-        Se = abs(Sec);
+        Se = real(Sec);
 
         // Total
-        result(ii) = M0 * ( (1-(DBV+VC))*St ) * (DBV*Sb) * (VC*Se);
+        result(ii) = M0 * (( (1-(DBV+VC))*St ) + (DBV*Sb) + (VC*Se));
 
     }
 
@@ -193,7 +196,7 @@ void FreqShiftFwdModel::Evaluate(const ColumnVector &params, ColumnVector &resul
         double Se;      // CSF
         complex<double> Sec; // complex version of CSF signal
 
-        double tau = taus(taus.Nrows()+jj);
+        double tau = taus(jj-taus.Nrows());
 
         // Tissue Component
         St = ( 1 - (exp(-TR/T1t)) ) * (exp(-R2t*TE)) * (exp(DBV - (R2p*tau)));
@@ -203,10 +206,10 @@ void FreqShiftFwdModel::Evaluate(const ColumnVector &params, ColumnVector &resul
 
         // CSF Component
         Sec = ( 1 - (exp(-TR/T1e)) ) * (exp(-R2e*TE)) * (exp(-2.0*i*M_PI*DF*tau));
-        Se = abs(Sec);
+        Se = real(Sec);
 
         // Total
-        result(jj) = M0 * ( (1-(DBV+VC))*St ) * (DBV*Sb) * (VC*Se);
+        result(jj) = M0 * (( (1-(DBV+VC))*St ) + (DBV*Sb) + (VC*Se));
         
     }
 

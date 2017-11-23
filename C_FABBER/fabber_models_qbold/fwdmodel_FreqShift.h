@@ -39,6 +39,7 @@ protected:
     NEWMAT::ColumnVector taus;
     double TE;
     double TI;
+    double TR;
 
     // Parameters are: Magnetization M0, VCSF, DF
     // Lookup starting indices of parameters - 
