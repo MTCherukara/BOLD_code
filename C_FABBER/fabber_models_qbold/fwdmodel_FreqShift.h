@@ -28,7 +28,7 @@ public:
     virtual void NameParams(vector<string> &names) const;
     virtual int NumParams() const 
     {
-        return 3;
+        return 4;
     }    
     virtual void HardcodedInitialDists(MVNDist &prior, MVNDist &posterior) const;
     virtual void Evaluate(const NEWMAT::ColumnVector &params, NEWMAT::ColumnVector &result) const;
@@ -56,6 +56,11 @@ protected:
     {
         // Delta F
         return 3;
+    }
+    int R2p_index() const
+    {
+        // R2-prime tissue
+        return 4;
     }
 
     // don't need any boolean options (for now)

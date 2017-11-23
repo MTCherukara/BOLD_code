@@ -11,7 +11,8 @@
         "iosfwd": "cpp",
         "cmath": "cpp",
         "cstdlib": "cpp",
-        "*.fab": "fab"
+        "*.fab": "fab",
+        "complex": "cpp"
     },
     "editor.minimap.enabled": false
 }
