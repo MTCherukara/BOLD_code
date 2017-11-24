@@ -3,16 +3,16 @@
 clear; clc;
 
 % select a fabber run
-fabber = '169';
+fabber = '168';
 resdir = '/Users/mattcher/Documents/DPhil/Data/Fabber_Results/';
 fdname = dir([resdir,'fabber_',fabber,'_*']);
 fabdir = strcat(resdir,fdname.name,'/');
 
 % Load data
-DBVslice = LoadSlice([fabdir,'gm_VC.nii.gz']);
-R2pslice = LoadSlice([fabdir,'gm_DF.nii.gz']);
-DBV_std  = LoadSlice([fabdir,'std_VC.nii.gz']);
-R2p_std  = LoadSlice([fabdir,'std_DF.nii.gz']);
+DBVslice = LoadSlice([fabdir,'wm_DF.nii.gz']);
+R2pslice = LoadSlice([fabdir,'wm_R2p.nii.gz']);
+DBV_std  = LoadSlice([fabdir,'std_DF.nii.gz']);
+R2p_std  = LoadSlice([fabdir,'std_R2p.nii.gz']);
 
 % remove zeros, etc
 DBVslice = abs(DBVslice(:));
@@ -35,13 +35,13 @@ cr = (er(2:end)+er(1:end-1))./2;
 
 % Display Results
 disp(['  Results for ',fdname.name]);
-disp(['Mean VC: ',num2str(100*mean(DBVslice))]);
-disp(['Median VC: ',num2str(100*median(DBVslice))]);
+disp(['Mean DF: ',num2str(mean(DBVslice))]);
+disp(['Median DF: ',num2str(median(DBVslice))]);
 % disp(['DBV Median Error: ',num2str(100*median(DBV_std))]);
 % disp(['DBV Mode Error: ',num2str(100*cd(md))]);
 disp('   ');
-disp(['Mean DF: ',num2str(mean(R2pslice))]);
-disp(['Median DF: ',num2str(median(R2pslice))]);
+disp(['Mean R2'': ',num2str(mean(R2pslice))]);
+disp(['Median R2'': ',num2str(median(R2pslice))]);
 % disp(['R2'' Median Error: ',num2str(median(R2p_std))]);
 % disp(['R2'' Mode Error: ',num2str(cr(mr))]);
 
