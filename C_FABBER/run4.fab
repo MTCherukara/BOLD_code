@@ -15,11 +15,14 @@ noise=white
 max-iterations=10
 
 # Spatial VB Information (remove all of this if method!=spatialvb)
-#param-spatial-priors=NNNN
+#param-spatial-priors=MMMM
 #allow-bad-voxels
 
 # Inference Model 
 model=freqShift
+inferVC
+inferDF
+inferR2p
 
 # Scan Parameters (maybe I'll think of a better way of doing this...)
 TE=0.082

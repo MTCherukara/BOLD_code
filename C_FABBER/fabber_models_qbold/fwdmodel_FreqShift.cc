@@ -48,7 +48,11 @@ string FreqShiftFwdModel::ModelVersion() const
 // ------------------------------------------------------------------------------------------
 void FreqShiftFwdModel::Initialize(ArgsType &args)
 {
-    // no boolean arguments here
+    // read boolean arguments
+    infer_VC = args.ReadBool("inferVC");
+    infer_DF = args.ReadBool("inferDF");
+    infer_R2p = args.ReadBool("inferR2p");
+    infer_DBV = args.ReadBool("inferDBV");
     
     string tau_temp; 
 
@@ -71,6 +75,23 @@ void FreqShiftFwdModel::Initialize(ArgsType &args)
 
     // add information to the log
     LOG << "Inference using development model" << endl;     
+    LOG << "Inferring on Magnetization M0" << endl;
+    if (infer_R2p)
+    {
+        LOG << "Inferring on Reversible Transverse Dephasing R2'" << endl;
+    }
+    if (infer_DBV)
+    {
+        LOG << "Inferring on DBV" << endl;
+    }
+    if (infer_VC)
+    {
+        LOG << "Inferring on CSF Volume" << endl;
+    }
+    if (infer_DF)
+    {
+        LOG << "Inferring on CSF Frequency Shift" << endl;
+    }
     
 } // Initialize
 
@@ -84,9 +105,23 @@ void FreqShiftFwdModel::NameParams(vector<string> &names) const
     names.clear();
 
     names.push_back("M0");   // parameter 1 - Magnetization M0
-    names.push_back("VC");   // parameter 2 - V^CSF
-    names.push_back("DF");   // parameter 3 - Delta F
-    names.push_back("R2p");  // parameter 4 - R2-prime (tissue)
+    if (infer_VC)
+    {
+        names.push_back("VC");   // parameter 2 - V^CSF
+    }
+    if (infer_DF)
+    {
+        names.push_back("DF");   // parameter 3 - Delta F
+    }
+    if (infer_R2p)
+    {
+        names.push_back("R2p");  // parameter 4 - R2-prime (tissue)
+    }
+    if (infer_DBV)
+    {
+        names.push_back("DBV");  // parameter 5 - DBV
+    }
+    
 
 } // NameParams
 
@@ -106,16 +141,32 @@ void FreqShiftFwdModel::HardcodedInitialDists(MVNDist &prior, MVNDist &posterior
     precisions(M0_index(), M0_index()) = 1e-6; // 1e-6
 
     // parameter 2 - V^CSF
-    prior.means(VC_index()) = 0.01;
-    precisions(VC_index(), VC_index()) = 1e-1; // 1e-1
+    if (infer_VC)
+    {
+        prior.means(VC_index()) = 0.01;
+        precisions(VC_index(), VC_index()) = 1e-1; // 1e-1
+    }
 
     // parameter 3 - Delta F
-    prior.means(DF_index()) = 7.0;
-    precisions(DF_index(), DF_index()) = 1e-1; // 1e-2
+    if (infer_DF)
+    {
+        prior.means(DF_index()) = 7.0;
+        precisions(DF_index(), DF_index()) = 1e-2; // 1e-2
+    }
 
     // parameter 4 - R2-prime (Tissue)
-    prior.means(R2p_index()) = 3.0;
-    precisions(R2p_index(), R2p_index()) = 1e-1; // 1e-2
+    if (infer_R2p)
+    {
+        prior.means(R2p_index()) = 3.0;
+        precisions(R2p_index(), R2p_index()) = 1e-2; // 1e-2
+    }
+    
+    // parameter 5 - DBV
+    if (infer_DBV)
+    {
+        prior.means(DBV_index()) = 0.03;
+        precisions(DBV_index(), DBV_index()) = 1e0; // 1e-1
+    }
 
     prior.SetPrecisions(precisions);
 
@@ -139,6 +190,7 @@ void FreqShiftFwdModel::Evaluate(const ColumnVector &params, ColumnVector &resul
     double VC;
     double DF;
     double R2p; 
+    double DBV; 
 
     // fixed-value parameters
     double T1t = 1.019;
@@ -148,16 +200,43 @@ void FreqShiftFwdModel::Evaluate(const ColumnVector &params, ColumnVector &resul
     double R2e = 2.0;
     double R2b = 27.97;
     double Rsb = 48.89;
-    double DBV = 0.03;
 
     complex<double> i(0,1);
 
     // assign values to parameters
     M0 = (paramcpy(M0_index()));
-    VC = abs(paramcpy(VC_index()));
-    DF = abs(paramcpy(DF_index()));
-    R2p = abs(paramcpy(R2p_index()));
-
+    if (infer_VC)
+    {
+        VC = abs(paramcpy(VC_index()));
+    }
+    else
+    {
+        VC = 0.01;
+    }
+    if (infer_DF)
+    {
+        DF = abs(paramcpy(DF_index()));
+    }
+    else
+    {
+        DF = 7.0;
+    }
+    if (infer_R2p)
+    {
+        R2p = abs(paramcpy(R2p_index()));
+    } 
+    else
+    {
+        R2p = 3.0;
+    }
+    if (infer_DBV)
+    {
+        DBV = abs(paramcpy(DBV_index()));
+    }
+    else
+    {
+        DBV = 0.03; 
+    }
     // now evaluate information
     result.ReSize(2*taus.Nrows());
 

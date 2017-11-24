@@ -28,7 +28,7 @@ public:
     virtual void NameParams(vector<string> &names) const;
     virtual int NumParams() const 
     {
-        return 4;
+        return 1 + (infer_VC ? 1 : 0) + (infer_DF ? 1 : 0) + (infer_R2p ? 1 : 0) + (infer_DBV ? 1 : 0);
     }    
     virtual void HardcodedInitialDists(MVNDist &prior, MVNDist &posterior) const;
     virtual void Evaluate(const NEWMAT::ColumnVector &params, NEWMAT::ColumnVector &result) const;
@@ -51,20 +51,29 @@ protected:
     int VC_index() const
     {
         // V^CSF
-        return 2;
+        return M0_index() + (infer_VC ? 1 : 0);
     }
     int DF_index() const
     {
         // Delta F
-        return 3;
+        return VC_index() + (infer_DF ? 1 : 0);
     }
     int R2p_index() const
     {
         // R2-prime tissue
-        return 4;
+        return DF_index() + (infer_R2p ? 1 : 0);
+    }
+    int DBV_index() const
+    {
+        // DBV
+        return R2p_index() + (infer_DBV ? 1 : 0);
     }
 
-    // don't need any boolean options (for now)
+    // For choosing which parameters to infer on
+    bool infer_VC;
+    bool infer_DF;
+    bool infer_DBV;
+    bool infer_R2p;
 
 private:
     static FactoryRegistration<FwdModelFactory, FreqShiftFwdModel> registration;
