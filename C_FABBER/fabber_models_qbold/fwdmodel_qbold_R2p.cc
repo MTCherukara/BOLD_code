@@ -203,7 +203,7 @@ void R2primeFwdModel::HardcodedInitialDists(MVNDist &prior, MVNDist &posterior) 
 
     if (infer_R2t)
     {
-        prior.means(R2t_index()) = 12.5;
+        prior.means(R2t_index()) = 11.5;
         precisions(R2t_index(), R2t_index()) = 1e-2; // 1e-2
     }
 
@@ -299,7 +299,7 @@ void R2primeFwdModel::Evaluate(const ColumnVector &params, ColumnVector &result)
     }
     else
     {
-        R2t = 12.5;
+        R2t = 11.5;
     }
     if (infer_S0)
     {

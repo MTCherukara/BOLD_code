@@ -1,7 +1,7 @@
 function F = FabberBar(Data,ParamName,VarNames,SubNames)
 % FabberBar.m usage:
 %
-%       F = FabberBar(Data,VarName)
+%       F = FabberBar(Data,ParamName,VarNames,SubNames)
 % 
 % Plot a barchart of FABBER results DATA (a Subjects x Variants matrix), 
 % with optional name PARAMNAME (string) and optional Variants categories

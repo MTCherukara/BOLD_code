@@ -86,24 +86,37 @@ OEF = 100*R2p./(3.01*DBV);
 %         19.5,  19.0,  18.5 ];
 
 
+%% Motion Correction and Spatial Smoothing
+%       FLAIR, NF,    T1w,   T2w,   T2fit
+DBV = [ 5.77,  6.48,  6.92,  8.74,  6.73; ... % uncorrected
+        5.71,  6.15,  6.53,  8.00,  6.19 ];
+    
+%       FLAIR, NF,    T1w,   T2w,   T2fit
+R2p = [ 2.91,  3.45,  3.56,  3.53,  3.26; ...
+        2.77,  3.24,  3.19,  3.21,  3.05 ];
+    
+%       FLAIR, NF,    T1w,   T2w,   T2fit
+OEF = [ 16.69, 17.67, 17.06, 13.39, 16.09; ...
+        14.92, 17.46, 16.19, 13.31, 16.31 ];
+
 %% Plotting
 % Plot details
-noerrors = zeros(2,3);
-datapoints = [1,2,5,6,7];
+datapoints = [1,2,3,4,5];
 % legtext = {'Grey-Matter Average','Ischaemic ROI','Contra-Ischaemic ROI'};
-% legtext = {'with FLAIR','no FLAIR Uncorrected','no FLAIR R1 Correction','no FLAIR R2 Correction','no FLAIR Biexp. Correction'};
-legtext = {'with FLAIR','1 TE, Uncorrected','1 TE, Biexp. Correction','Multi-TE Uncorrected','Multi-TE Biexp. Correction'};
-subnames = {'Presentation';'24h Post Onset'};
+legtext = {'with FLAIR','no FLAIR Uncorrected','no FLAIR R1 Correction','no FLAIR R2 Correction','no FLAIR Biexp. Correction'};
+% legtext = {'with FLAIR','1 TE, Uncorrected','1 TE, Biexp. Correction','Multi-TE Uncorrected','Multi-TE Biexp. Correction'};
+% subnames = {'Presentation';'24h Post Onset'};
+subnames = {'No Pre-Processing';'Motion Corrected, Smoothed'};
 
 % Plot R2p
-FabberBar(R2p(:,datapoints),'R2''',legtext);
+FabberBar(R2p(:,datapoints)','R2''',subnames,legtext);
 
 % Plot DBV
-FabberBar(DBV(:,datapoints),'DBV',legtext);
+FabberBar(DBV(:,datapoints)','DBV',subnames,legtext);
 
 % Plot OEF
 if exist('OEF','var')
-    FabberBar(OEF(:,datapoints),'OEF',legtext);
+    FabberBar(OEF(:,datapoints)','OEF',subnames,legtext);
 end
 % 
 % % Plot R2p
