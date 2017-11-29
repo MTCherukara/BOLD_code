@@ -193,12 +193,12 @@ void FreqShiftFwdModel::Evaluate(const ColumnVector &params, ColumnVector &resul
     double DBV; 
 
     // fixed-value parameters
-    // double T1t = 1.019;     // Grey matter T1 (Lu et al., 2005)
-    double T1t = 0.586;     // White matter T1 (Lu et al., 2005)
+    double T1t = 1.019;     // Grey matter T1 (Lu et al., 2005)
+    // double T1t = 0.586;     // White matter T1 (Lu et al., 2005)
     double T1e = 3.817;     // CSF T1 (Lu et al., 2005)  
     double T1b = 1.584;     // Blood T1 (Lu et al., 2004)
-    // double R2t = 11.5;      // Grey matter T2=87ms (He & Yablonskiy, 2007)
-    double R2t = 13.0;      // White matter T2=77ms (He & Yablonskiy, 2007)
+    double R2t = 11.5;      // Grey matter T2=87ms (He & Yablonskiy, 2007)
+    // double R2t = 13.0;      // White matter T2=77ms (He & Yablonskiy, 2007)
     double R2e = 2.0;       // CSF T2 (own value)
     double R2b = 27.97;     //    Calculated based on OEF=0.4, Hct=0.4, using formula from 
     double Rsb = 48.89;     //    Zhao et al., 2007 (cited in Simon et al., 2016)

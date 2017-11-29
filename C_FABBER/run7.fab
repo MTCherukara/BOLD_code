@@ -1,8 +1,8 @@
 # fabber run 7
 
 # Input Data
-data=../../Data/subject_05/subject_05_SE.nii.gz
-mask=../../Data/subject_05/subject_05_ASE_mask.nii.gz
+data=../../Data/subject_05/MR_500_SE.nii.gz
+mask=../../Data/subject_05/MR_500_mask.nii.gz
 
 # Run Options
 output=../../Data/Fabber_Results/

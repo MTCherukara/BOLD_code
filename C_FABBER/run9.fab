@@ -1,8 +1,8 @@
 # fabber run 9, multiTE
 
 # Input Data
-data=../../Data/MR_700/noFLAIR_3TE.nii.gz
-mask=../../Data/MR_700/MR_700_mask_CSF_50.nii.gz
+data=../../Data/subject_03/MR_700_ASE_NF_multi.nii.gz
+mask=../../Data/subject_03/mask_CSF_50.nii.gz
 
 # Run Options
 output=../../Data/Fabber_Results/
@@ -17,7 +17,7 @@ max-iterations=10
 # Spatial VB Information (remove all of this if method!=spatialvb)
 #param-spatial-priors=NNNNNI
 #allow-bad-voxels
-#image-prior6=../../Data/MR_700/CSF_T2fit.nii.gz
+#image-prior6=../../Data/subject_03/CSF_T2fit.nii.gz
 
 # Inference Model 
 model=qboldR2p

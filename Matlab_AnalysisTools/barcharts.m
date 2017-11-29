@@ -31,19 +31,19 @@ clear;
     
 
 %% Abstract 
-%       FLAIR  Uncorr T1w    T2w    T2fit  3TE u  3TE f
-DBV = [ 5.40,  8.10,  9.09,  9.74,  8.44,  6.02,  6.28; ...
-        6.61,  8.91,  12.7,  18.0,  12.6, 15.08, 15.53; ...
-        5.45,  5.80,  6.74,  8.14,  5.46,  5.31,  5.39; ...
-        5.50,  7.07,  8.91,  11.9,  8.44,  9.10,  9.25 ];
-    
-%       FLAIR  Uncorr T1w    T2w    T2fit
-R2p = [ 2.57,  4.72,  3.22,  4.14,  2.14,  2.93,  3.27; ...
-        2.61,  5.71,  4.40,  4.66,  1.67,  4.36,  5.18; ...
-        2.29,  3.42,  2.67,  3.82,  2.59,  3.12,  3.43; ...
-        2.51,  3.79,  3.81,  5.34,  1.81,  3.69,  4.30 ];
-    
-OEF = 100*R2p./(3.01*DBV);
+% %       FLAIR  Uncorr T1w    T2w    T2fit  3TE u  3TE f
+% DBV = [ 5.40,  8.10,  9.09,  9.74,  8.44,  6.02,  6.28; ...
+%         6.61,  8.91,  12.7,  18.0,  12.6, 15.08, 15.53; ...
+%         5.45,  5.80,  6.74,  8.14,  5.46,  5.31,  5.39; ...
+%         5.50,  7.07,  8.91,  11.9,  8.44,  9.10,  9.25 ];
+%     
+% %       FLAIR  Uncorr T1w    T2w    T2fit
+% R2p = [ 2.57,  4.72,  3.22,  4.14,  2.14,  2.93,  3.27; ...
+%         2.61,  5.71,  4.40,  4.66,  1.67,  4.36,  5.18; ...
+%         2.29,  3.42,  2.67,  3.82,  2.59,  3.12,  3.43; ...
+%         2.51,  3.79,  3.81,  5.34,  1.81,  3.69,  4.30 ];
+%     
+% OEF = 100*R2p./(3.01*DBV);
     
 % %       FLAIR  Uncorr T1w    T2w    T2fit
 % erR = [  0.6,   0.9,   0.7,   0.6,   0.8; ...
@@ -118,41 +118,4 @@ FabberBar(DBV(:,datapoints)','DBV',subnames,legtext);
 if exist('OEF','var')
     FabberBar(OEF(:,datapoints)','OEF',subnames,legtext);
 end
-% 
-% % Plot R2p
-% figure('WindowStyle','Docked');
-% hold on; box on;
-% bar(R2p(:,datapoints));
-% set(gca,'FontSize',18);
-% % xlabel('Subjects');
-% xticks(1:2);
-% xticklabels({'Presentation';'24h Post Onset'});
-% ylim([0 6.4]); 
-% ylabel('Inferred R_2''');
-% legend(legtext{datapoints},'Location','NorthEast');
-% 
-% 
-% % Plot DBV
-% figure('WindowStyle','Docked');
-% hold on; box on;
-% bar(DBV(:,datapoints));
-% set(gca,'FontSize',18);
-% % xlabel('Subjects');
-% xticks(1:2);
-% xticklabels({'Presentation';'24h Post Onset'});
-% ylim([0 10.8]);
-% ylabel('Inferred DBV (%)');
-% legend(legtext{datapoints});
-% 
-% 
-% % Plot OEF
-% figure('WindowStyle','Docked');
-% hold on; box on;
-% bar(OEF(:,datapoints));
-% set(gca,'FontSize',18);
-% % xlabel('Subjects');
-% xticks(1:2);
-% xticklabels({'Presentation';'24h Post Onset'});
-% ylim([0 27]);
-% ylabel('Computed OEF (%)');
-% legend(legtext{datapoints});
+

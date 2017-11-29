@@ -1,8 +1,8 @@
 # fabber run 1
 
 # Input Data
-data=../../Data/subject_03l_ASE.nii.gz
-mask=../../Data/subject_03l_mask.nii.gz
+data=../../Data/patient_01/subject_03l_ASE.nii.gz
+mask=../../Data/patient_01/subject_03l_mask.nii.gz
 
 # Run Options
 output=../../Data/Fabber_Results/

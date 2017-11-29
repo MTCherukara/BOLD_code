@@ -1,8 +1,8 @@
 # fabber run 4, Frequency Shift
 
 # Input Data
-data=../../Data/MR_700/MR_700_ASE_TE_82_FLAIR_noFLAIR.nii.gz
-mask=../../Data/MR_700/MR_700_mask.nii.gz
+data=../../Data/subject_04/MR_699_ASE_82_FNF.nii.gz
+mask=../../Data/subject_04/MR_699_mask.nii.gz
 
 # Run Options
 output=../../Data/Fabber_Results/
@@ -15,7 +15,7 @@ noise=white
 max-iterations=10
 
 # Spatial VB Information (remove all of this if method!=spatialvb)
-#param-spatial-priors=MMMM
+#param-spatial-priors=MMM
 #allow-bad-voxels
 
 # Inference Model 
@@ -23,6 +23,7 @@ model=freqShift
 inferVC
 inferDF
 inferR2p
+inferDBV
 
 # Scan Parameters (maybe I'll think of a better way of doing this...)
 TE=0.082

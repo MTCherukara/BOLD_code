@@ -3,18 +3,18 @@
 clear; clc;
 
 % select a fabber run
-fabber = '185';
+fabber = '184';
 resdir = '/Users/mattcher/Documents/DPhil/Data/Fabber_Results/';
 fdname = dir([resdir,'fabber_',fabber,'_*']);
 fabdir = strcat(resdir,fdname.name,'/');
 
 % Load a mask
-maskslice = LoadSlice('/Users/mattcher/Documents/DPhil/Data/MR_700/mask_gm_50.nii.gz');
+maskslice = LoadSlice('/Users/mattcher/Documents/DPhil/Data/subject_03/mask_gm_50.nii.gz');
 
 % Load data
-DBVslice = LoadSlice([fabdir,'mean_DBV.nii.gz']);
+DBVslice = LoadSlice([fabdir,'mean_DF.nii.gz']);
 R2pslice = LoadSlice([fabdir,'mean_R2p.nii.gz']);
-DBV_std  = LoadSlice([fabdir,'std_DBV.nii.gz']);
+DBV_std  = LoadSlice([fabdir,'std_DF.nii.gz']);
 R2p_std  = LoadSlice([fabdir,'std_R2p.nii.gz']);
 
 % Mask
@@ -42,8 +42,8 @@ cr = (er(2:end)+er(1:end-1))./2;
 
 % Display Results
 disp(['  Results for ',fdname.name]);
-disp(['Mean DBV  : ',num2str(100*mean(DBVslice))]);
-disp(['Median DBV: ',num2str(100*median(DBVslice))]);
+disp(['Mean DF  : ',num2str(mean(DBVslice))]);
+disp(['Median DF: ',num2str(median(DBVslice))]);
 % disp(['DBV Median Error: ',num2str(100*median(DBV_std))]);
 % disp(['DBV Mode Error: ',num2str(100*cd(md))]);
 disp('   ');
@@ -52,8 +52,8 @@ disp(['Median R2'': ',num2str(median(R2pslice))]);
 % disp(['R2'' Median Error: ',num2str(median(R2p_std))]);
 % disp(['R2'' Mode Error: ',num2str(cr(mr))]);
 
-disp('   ');
-disp(['Mean OEF  : ',num2str(100*mean(R2pslice)/(301.74*mean(DBVslice)))]);
-disp(['Median OEF: ',num2str(100*median(R2pslice)/(301.74*median(DBVslice)))]);
+% disp('   ');
+% disp(['Mean OEF  : ',num2str(100*mean(R2pslice)/(301.74*mean(DBVslice)))]);
+% disp(['Median OEF: ',num2str(100*median(R2pslice)/(301.74*median(DBVslice)))]);
 
 

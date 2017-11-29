@@ -3,8 +3,8 @@
 #                ::HardcodedInitialDists to something better)
 
 # Input Data
-data=../../Data/subject_05/subject_05_ASE_noIR.nii.gz
-mask=../../Data/subject_05/subject_05_ASE_mask.nii.gz
+data=../../Data/subject_05/MR_500_ASE_NF_all.nii.gz
+mask=../../Data/subject_05/MR_500_mask.nii.gz
 
 # Run Options
 output=../../Data/Fabber_Results/
@@ -19,7 +19,7 @@ max-iterations=10
 # Spatial VB Information (remove all of this if method!=spatialvb)
 param-spatial-priors=MMMMMMI
 allow-bad-voxels
-image-prior7=../../Data/subject_05/sub5_T1w_CSF.nii.gz
+image-prior7=../../Data/subject_05/CSF_T1w.nii.gz
 
 # Inference Model 
 model=qboldR2p
