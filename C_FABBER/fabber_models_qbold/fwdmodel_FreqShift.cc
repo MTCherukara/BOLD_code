@@ -199,7 +199,8 @@ void FreqShiftFwdModel::Evaluate(const ColumnVector &params, ColumnVector &resul
     double T1b = 1.584;     // Blood T1 (Lu et al., 2004)
     double R2t = 11.5;      // Grey matter T2=87ms (He & Yablonskiy, 2007)
     // double R2t = 13.0;      // White matter T2=77ms (He & Yablonskiy, 2007)
-    double R2e = 2.0;       // CSF T2 (own value)
+    // double R2e = 0.65;      // CSF T2=1573ms (Qin, 2011) 
+    double R2e = 4.00;      // CSF T2=250ms (He & Yablonskiy, 2007)
     double R2b = 27.97;     //    Calculated based on OEF=0.4, Hct=0.4, using formula from 
     double Rsb = 48.89;     //    Zhao et al., 2007 (cited in Simon et al., 2016)
 

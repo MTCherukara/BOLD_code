@@ -1,8 +1,8 @@
 # fabber run 3 - Bi-exponential spin-echo data
 
 # Input Data
-data=../../Data/subject_06/MR_710_2DSE.nii.gz
-mask=../../Data/subject_06/MR_710_ASE_mask.nii.gz
+data=../../Data/subject_04/MR_699_SE.nii.gz
+mask=../../Data/subject_04/MR_699_mask.nii.gz
 
 # Run Options
 output=../../Data/Fabber_Results/
@@ -23,6 +23,7 @@ max-iterations=10
 # Inference Model 
 model=spinEcho
 infer_theta
+infer_r2
 
 # Scan Parameters (maybe I'll think of a better way of doing this...)
 TE1=0.066

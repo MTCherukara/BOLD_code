@@ -1,10 +1,10 @@
-function [slicedata,slicenum,filename,vtype] = LoadSlice(filename)
+function [slicedata,slicenum,filename,vtype] = LoadSlice(filename,slicenum)
 % LoadSlice usage:
 %
-%       [slicedata,slicenum,filename,vtype] = LoadSlice(filename)
+%       [slicedata,slicenum,filename,vtype] = LoadSlice(filename,slicenum)
 %
-% Loads the data from a specific slice (or slices) of a NIFTY file into a
-% matrix and returns it, along with some other potentially useful
+% Loads the data from a specific slice (or slices) SLICENUM of a NIFTY file
+% into a matrix and returns it, along with some other potentially useful
 % information.
 %
 %
@@ -23,6 +23,10 @@ if ~exist('filename','var')
     filename = [nidir,niname];
 else
     niname = 'blank';
+end
+
+if ~exist('slicenum','var')
+    slicenum = 5:8;
 end
 
 % Determine the type of variable we are looking at
@@ -50,5 +54,4 @@ nsl = dims(3);
 % slicedata = squeeze(dataset(:,:,str2num(slicenum)));
 
 % for now
-slicenum = 5:8;
-slicedata = squeeze(dataset(:,:,5:8));
+slicedata = squeeze(dataset(:,:,slicenum));

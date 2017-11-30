@@ -23,7 +23,6 @@ model=freqShift
 inferVC
 inferDF
 inferR2p
-inferDBV
 
 # Scan Parameters (maybe I'll think of a better way of doing this...)
 TE=0.082
