@@ -11,7 +11,7 @@ fabdir = strcat(resdir,fdname.name,'/');
 slicenum = 3:8;
 
 % Load a mask
-maskslice = LoadSlice('/Users/mattcher/Documents/DPhil/Data/subject_06/mask_notWM_50.nii.gz',slicenum);
+maskslice = LoadSlice('/Users/mattcher/Documents/DPhil/Data/subject_04/mask_notWM_50.nii.gz',slicenum);
 
 % Load data
 % DBVslice = LoadSlice([fabdir,'mean_DBV.nii.gz'],slicenum);
