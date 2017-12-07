@@ -1,8 +1,8 @@
 # fabber run 8, single TE
 
 # Input Data
-data=../../Data/subject_04/MR_699_ASE_FLAIR_82_cs.nii.gz
-mask=../../Data/subject_04/mask_CSF_50.nii.gz
+data=../../Data/amici_qbold/sub099_ase_mc.nii.gz
+mask=../../Data/amici_qbold/sub099_mask.nii.gz
 
 # Run Options
 output=../../Data/Fabber_Results/
@@ -10,13 +10,13 @@ save-residuals
 save-model-fit
 
 # Method Information
-method=vb
+method=spatialvb
 noise=white
 max-iterations=10
 
 # Spatial VB Information (remove all of this if method!=spatialvb)
-#param-spatial-priors=NNNI
-#allow-bad-voxels
+param-spatial-priors=MMM
+allow-bad-voxels
 #image-prior4=../../Data/subject_04/CSF_T2w.nii.gz
 
 # Inference Model 

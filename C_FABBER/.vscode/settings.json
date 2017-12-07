@@ -14,5 +14,6 @@
         "*.fab": "fab",
         "complex": "cpp"
     },
-    "editor.minimap.enabled": false
+    "editor.minimap.enabled": false,
+    "python.pythonPath": "/Users/mattcher/anaconda3/bin/python3"
 }
