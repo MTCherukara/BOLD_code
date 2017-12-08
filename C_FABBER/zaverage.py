@@ -7,11 +7,11 @@ Matthew Cherukara, 2017, Oxford."""
 # Imports
 import sys
 import subprocess
+import ast
 
 # Functions
-def make_temp_dir():
+def make_temp_dir(output_dir="killme.zaverage"):
     """Create the temporary output directory"""
-    output_dir = "killme.zaverage"
     subprocess.check_call(["mkdir", output_dir])
     return output_dir
 
@@ -33,29 +33,15 @@ def name_slice(dirname, slicenum):
     """Return a string containing the name of a single-slice nifti"""
     return ''.join([dirname, "/data_slice_", str(slicenum).zfill(4)])
 
-def read_header(niiname, txtname="tmp_hdr.txt"):
-    """Read a nifti header file NIINAME and write its contents to a text file TXTNAME"""
-    # Call FSLHD
-    hdr_pipe = subprocess.Popen(["fslhd", "-x", niiname], stdout=subprocess.PIPE)
-    hdr_str = hdr_pipe.stdout.read().decode()
-    
-    # Split the string
-    hdr_arr = filter(None, hdr_str.split("\n"))
-
-    # Write it out element by element
-    with open(txtname, "a") as txt_file:
-        for hdr_entry in hdr_arr:
-            print(hdr_entry, file=txt_file)
-
 def edit_header(niiname, field, value):
     """Edit nifti header NIINAME such that FIELD has a new VALUE""" 
     # First read the header
-    read_header(niiname, "killme.hdr.txt")
+    hdr_pipe = subprocess.Popen(["fslhd", "-x", niiname], stdout=subprocess.PIPE)
+    hdr_str = hdr_pipe.stdout.read().decode()
 
-    # Then read the contents of the header into an array
-    with open("killme.hdr.txt","r") as txt_hdr:
-        hdr_arr = txt_hdr.readlines()
-    
+    # Split the string
+    hdr_arr = filter(None, hdr_str.split("\n"))
+
     # Open a new text file to write to line by line
     with open("killme.newhdr.txt","a") as new_hdr:
 
@@ -80,13 +66,19 @@ def edit_header(niiname, field, value):
     p.communicate()
 
     # Delete the temporary header text files
-    subprocess.check_call(["rm","killme.hdr.txt","killme.newhdr.txt"])
+    subprocess.check_call(["rm","killme.newhdr.txt"])
 
-def average_slices(dirname, numslices):
+def average_slices(dirname, newname, numslices):
     """Averages sets of 4 slices, up to numslices slices (e.g. 10)"""
 
+    # create a list for the names of all the averages
+    merge_cmd = ["fslmerge", "-z", newname]
+
+    print("   Averaging slices...")
     # Loop through new slices
-    for ss in range(0, 1):
+    for ss in range(0, numslices):
+        # Print progress
+        print("      Processing slice",str(ss+1),"of",str(numslices))
 
         # Name 4 slices
         slice_1 = name_slice(dirname, (4*ss))
@@ -104,14 +96,25 @@ def average_slices(dirname, numslices):
         subprocess.check_call(["fslmaths", slice_1, "-add", slice_2, "-add", \
                                slice_3, "-add", slice_4, "-div", str(4), slice_av])
 
+        # Correct slice thickness dz
+        edit_header(slice_av, "dz", "7.5")
+
+        # Add the name of this slice to the list
+        merge_cmd.append(slice_av)
+
     # Merge new slices together
+    print("   Merging...")
+    """
+    p = subprocess.Popen(["fslmerge", "-z", newname, av_names[0], av_names[1]])
+    p.communicate()
 
-    # Correct the slice spacing dz
+    for ss in range(2,numslices):
+        p = subprocess.Popen(["fslmerge", "-z", newname, newname, av_names[ss]])
+        p.communicate()
+    """
+    subprocess.check_call(merge_cmd)
 
-    # Delete everything that was left over
-        
 
-    return 1
 
 # Main Function
 if __name__ == "__main__":
@@ -124,23 +127,23 @@ if __name__ == "__main__":
     # Store the relevant filenames as Constants
     FILE_IN_NAME = sys.argv[1]
     FILE_OUT_NAME = sys.argv[2]
+    print("\nAveraging GESEPI slabs in",FILE_IN_NAME)
 
-    # Testing of read_header function
-    edit_header(FILE_IN_NAME,"dz","7.5")
-
-    """
     # Set up temporary directory
     TEMPDIR = make_temp_dir()
 
     # Split the image into slices
+    print("   Splitting the data...")
     split_data(TEMPDIR, FILE_IN_NAME)
 
     # Count the number of slices
     NZ = int(count_slices(FILE_IN_NAME))
 
     # Averaging
-    average_slices(TEMPDIR, int(NZ/4))
+    average_slices(TEMPDIR, FILE_OUT_NAME, int(NZ/4))
 
     # Delete the directory
-    #remove_temp_dir(TEMPDIR)
-    """
+    print("Cleaning up...")
+    remove_temp_dir(TEMPDIR)
+    print("...Done!")
+    
