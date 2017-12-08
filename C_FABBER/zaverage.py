@@ -71,7 +71,7 @@ def edit_header(niiname, field, value):
 def average_slices(dirname, newname, numslices):
     """Averages sets of 4 slices, up to numslices slices (e.g. 10)"""
 
-    # create a list for the names of all the averages
+    # create a list for the names of all the averages to be merged
     merge_cmd = ["fslmerge", "-z", newname]
 
     print("   Averaging slices...")
@@ -104,17 +104,8 @@ def average_slices(dirname, newname, numslices):
 
     # Merge new slices together
     print("   Merging...")
-    """
-    p = subprocess.Popen(["fslmerge", "-z", newname, av_names[0], av_names[1]])
-    p.communicate()
-
-    for ss in range(2,numslices):
-        p = subprocess.Popen(["fslmerge", "-z", newname, newname, av_names[ss]])
-        p.communicate()
-    """
     subprocess.check_call(merge_cmd)
-
-
+    
 
 # Main Function
 if __name__ == "__main__":
