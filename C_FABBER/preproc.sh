@@ -29,7 +29,7 @@ else
         # Extract spin-echo
         mkdir ${TDIR}
         fslsplit "${fin}_mc" "${TDIR}/vol_" -t 
-        mv "${TDIR}/vol_0006.nii.gz" "${fin}_SE.nii.gz"
+        mv "${TDIR}/vol_0007.nii.gz" "${fin}_SE.nii.gz"
 
         echo "  Masking..."
         # Calculate brain mask from SE

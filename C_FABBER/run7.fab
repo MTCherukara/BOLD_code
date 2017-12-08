@@ -1,8 +1,7 @@
-# fabber run 7
-
+# fabber run 7, validation sqbold data
 # Input Data
-data=../../Data/subject_05/MR_500_SE.nii.gz
-mask=../../Data/subject_05/MR_500_mask.nii.gz
+data=../../Data/validation_sqbold/vs6/sub06_ASE_FLAIR_av_mc.nii.gz
+mask=../../Data/validation_sqbold/vs6/mask_ncsf_40.nii.gz
 
 # Run Options
 output=../../Data/Fabber_Results/
@@ -14,12 +13,58 @@ method=vb
 noise=white
 max-iterations=10
 
+# Spatial VB Information (remove all of this if method!=spatialvb)
+#param-spatial-priors=MMM
+#allow-bad-voxels
+#image-prior4=../../Data/subject_04/CSF_T2w.nii.gz
+
 # Inference Model 
-model=spinEcho
-infer_theta
+model=qboldR2p
+inferR2p
+inferDBV
+inferS0
+single_compartment
+#inferlam
 
 # Scan Parameters (maybe I'll think of a better way of doing this...)
-TE1=0.066
-TE2=0.082
-TE3=0.098
-TE4=0.200
+TE=0.074
+
+#tau1=0.0
+#tau2=0.016
+#tau3=0.020
+#tau4=0.024
+#tau5=0.028
+#tau6=0.032
+#tau7=0.036
+#tau8=0.040
+#tau9=0.044
+#tau10=0.048
+#tau11=0.052
+#tau12=0.056
+#tau13=0.060
+#tau14=0.064
+
+tau1=-0.028
+tau2=-0.024
+tau3=-0.020
+tau4=-0.016
+tau5=-0.012
+tau6=-0.008
+tau7=-0.004
+tau8=0.0
+tau9=0.004
+tau10=0.008
+tau11=0.012
+tau12=0.016
+tau13=0.020
+tau14=0.024
+tau15=0.028
+tau16=0.032
+tau17=0.036
+tau18=0.040
+tau19=0.044
+tau20=0.048
+tau21=0.052
+tau22=0.056
+tau23=0.060
+tau24=0.064

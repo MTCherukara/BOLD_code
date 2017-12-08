@@ -83,6 +83,7 @@ protected:
     bool infer_R2e;
     bool infer_dF;
     bool infer_lam;
+    bool single_comp;
 
 private:
     static FactoryRegistration<FwdModelFactory, R2primeFwdModel> registration;

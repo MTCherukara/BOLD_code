@@ -1,8 +1,8 @@
 # fabber run 8, single TE
 
 # Input Data
-data=../../Data/amici_qbold/sub099_ase_mc.nii.gz
-mask=../../Data/amici_qbold/sub099_mask.nii.gz
+data=../../Data/validation_sqbold/vs2/sub02_ASE_FLAIR_av_mc.nii.gz
+mask=../../Data/validation_sqbold/vs2/mask_ncsf_40.nii.gz
 
 # Run Options
 output=../../Data/Fabber_Results/
@@ -10,7 +10,7 @@ save-residuals
 save-model-fit
 
 # Method Information
-method=spatialvb
+method=vb
 noise=white
 max-iterations=10
 

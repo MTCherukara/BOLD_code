@@ -55,6 +55,7 @@ void R2primeFwdModel::Initialize(ArgsType &args)
     infer_R2e = args.ReadBool("inferR2e");
     infer_dF  = args.ReadBool("inferdF");
     infer_lam = args.ReadBool("inferlam");
+    single_comp = args.ReadBool("single_compartment");
 
 
     // temporary holders for input values
@@ -373,7 +374,14 @@ void R2primeFwdModel::Evaluate(const ColumnVector &params, ColumnVector &result)
         Se = abs(Sec);
 
         // Total signal
-        result(ii) = S0*(((1-DBV-lam)*St) + (DBV*Sb) + (lam*Se));
+        if (single_comp)
+        {
+            result(ii) = S0*St;
+        }
+        else
+        {
+            result(ii) = S0*(((1-DBV-lam)*St) + (DBV*Sb) + (lam*Se));
+        }
 
     } // for (int i = 1; i <= taus.Nrows(); i++)
 
