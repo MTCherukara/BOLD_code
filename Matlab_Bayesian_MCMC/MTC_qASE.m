@@ -94,9 +94,11 @@ if plot_fig
 %     plot([0 0],[-1 2],'k--','LineWidth',2);
     
     % plot the signal
-    S_log = (S_total)./max(S_total);
+    S_log = log(S_total);
+%     S_log = (S_total)./max(S_total);
 %     S_log = S_sample./max(S_total);
-    l.s = plot(1000*tau,S_log,'--','LineWidth',3);
+    l.s = plot(1000*tau,S_log,'-','LineWidth',3);
+    xlim([-20,80]);
     
     % labels on axes
     xlabel('Spin Echo Displacement \tau (ms)');

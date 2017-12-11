@@ -86,36 +86,60 @@ clear;
 %         19.5,  19.0,  18.5 ];
 
 
+%% sqBOLD Validation dataset
+
+%       sqB    1C     2C     11tau  sqB-11
+DBV = [ 3.68,  5.99,  4.52,  4.24,  3.50; ...
+        4.84,  8.08,  6.55,  5.99,  4.20; ...
+        3.38,  6.51,  4.70,  4.09,  3.06; ...
+        3.96,  9.17,  4.56,  5.09,  4.28; ...
+        4.07, 13.56,  5.11,  5.86,  3.89; ...
+        4.04,  7.72,  5.68,  5.52,  4.24; ...
+        3.72,  8.60,  4.71,  4.16,  3.43 ];
+    
+%       sqB    1C     2C     11tau  sqB-11
+R2p = [ 2.81,  3.67,  2.90,  2.90,  2.76; ...
+        3.08,  4.02,  3.19,  3.06,  2.85; ...
+        2.24,  3.40,  2.46,  2.42,  2.17; ...
+        2.53,  4.00,  2.72,  2.87,  2.64; ...
+        2.52,  4.59,  2.63,  2.60,  2.47; ...
+        2.89,  3.98,  3.05,  3.07,  2.98; ...
+        2.26,  3.88,  2.37,  2.21,  2.12 ];
+
+OEF = 100*R2p./(3.02*DBV);
+
+
 %% Motion Correction and Spatial Smoothing
-%       FLAIR, NF,    T1w,   T2w,   T2fit
-DBV = [ 5.77,  6.48,  6.92,  8.74,  6.73; ... % uncorrected
-        5.71,  6.15,  6.53,  8.00,  6.19 ];
-    
-%       FLAIR, NF,    T1w,   T2w,   T2fit
-R2p = [ 2.91,  3.45,  3.56,  3.53,  3.26; ...
-        2.77,  3.24,  3.19,  3.21,  3.05 ];
-    
-%       FLAIR, NF,    T1w,   T2w,   T2fit
-OEF = [ 16.69, 17.67, 17.06, 13.39, 16.09; ...
-        14.92, 17.46, 16.19, 13.31, 16.31 ];
+% %       FLAIR, NF,    T1w,   T2w,   T2fit
+% DBV = [ 5.77,  6.48,  6.92,  8.74,  6.73; ... % uncorrected
+%         5.71,  6.15,  6.53,  8.00,  6.19 ];
+%     
+% %       FLAIR, NF,    T1w,   T2w,   T2fit
+% R2p = [ 2.91,  3.45,  3.56,  3.53,  3.26; ...
+%         2.77,  3.24,  3.19,  3.21,  3.05 ];
+%     
+% %       FLAIR, NF,    T1w,   T2w,   T2fit
+% OEF = [ 16.69, 17.67, 17.06, 13.39, 16.09; ...
+%         14.92, 17.46, 16.19, 13.31, 16.31 ];
 
 %% Plotting
 % Plot details
-datapoints = [1,2,3,4,5];
+datapoints = [1,5,2,3,4];
 % legtext = {'Grey-Matter Average','Ischaemic ROI','Contra-Ischaemic ROI'};
-legtext = {'with FLAIR','no FLAIR Uncorrected','no FLAIR R1 Correction','no FLAIR R2 Correction','no FLAIR Biexp. Correction'};
+% legtext = {'with FLAIR','no FLAIR Uncorrected','no FLAIR R1 Correction','no FLAIR R2 Correction','no FLAIR Biexp. Correction'};
 % legtext = {'with FLAIR','1 TE, Uncorrected','1 TE, Biexp. Correction','Multi-TE Uncorrected','Multi-TE Biexp. Correction'};
+legtext = {'Linear sqBOLD','1-Compartment VB','2-Compartment VB','Shorter Acq. VB','Shorter Acq. Linear'};
 % subnames = {'Presentation';'24h Post Onset'};
-subnames = {'No Pre-Processing';'Motion Corrected, Smoothed'};
+% subnames = {'No Pre-Processing';'Motion Corrected, Smoothed'};
 
 % Plot R2p
-FabberBar(R2p(:,datapoints)','R2''',subnames,legtext);
+FabberBar(R2p(:,datapoints),'R2''',legtext(datapoints));
 
 % Plot DBV
-FabberBar(DBV(:,datapoints)','DBV',subnames,legtext);
+FabberBar(DBV(:,datapoints),'DBV',legtext(datapoints));
 
 % Plot OEF
 if exist('OEF','var')
-    FabberBar(OEF(:,datapoints)','OEF',subnames,legtext);
+    FabberBar(OEF(:,datapoints),'OEF',legtext(datapoints));
 end
 

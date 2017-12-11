@@ -3,15 +3,15 @@
 clear; clc;
 
 % select a fabber run
-fabber = '214';
-resdir = '/Users/mattcher/Documents/DPhil/Data/Fabber_Results/';
-fdname = dir([resdir,'fabber_',fabber,'_*']);
-fabdir = strcat(resdir,fdname.name,'/');
-
-% fabber = '07';
-% resdir = '/Users/mattcher/Documents/DPhil/Data/validation_sqbold/results/';
-% fdname = dir([resdir,'res_',fabber,'_*']);
+% fabber = '221';
+% resdir = '/Users/mattcher/Documents/DPhil/Data/Fabber_Results/';
+% fdname = dir([resdir,'fabber_',fabber,'_*']);
 % fabdir = strcat(resdir,fdname.name,'/');
+
+fabber = '17';
+resdir = '/Users/mattcher/Documents/DPhil/Data/validation_sqbold/results/';
+fdname = dir([resdir,'res_',fabber,'_*']);
+fabdir = strcat(resdir,fdname.name,'/');
 
 slicenum = 3:10;
 
@@ -19,8 +19,8 @@ slicenum = 3:10;
 maskslice = LoadSlice('/Users/mattcher/Documents/DPhil/Data/validation_sqbold/vs7/mask_gm_60.nii.gz',slicenum);
 
 % Load data
-DBVslice = LoadSlice([fabdir,'mean_DBV.nii.gz'],slicenum);
-R2pslice = LoadSlice([fabdir,'mean_R2p.nii.gz'],slicenum);
+DBVslice = LoadSlice([fabdir,'dbv.nii.gz'],slicenum);
+R2pslice = LoadSlice([fabdir,'r2p.nii.gz'],slicenum);
 % DFslice  = LoadSlice([fabdir,'mean_DF.nii.gz'],slicenum);
 % DBV_std  = LoadSlice([fabdir,'std_DF.nii.gz'],slicenum);
 % R2p_std  = LoadSlice([fabdir,'std_R2p.nii.gz'],slicenum);
