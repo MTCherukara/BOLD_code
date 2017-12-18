@@ -124,7 +124,7 @@ OEF = 100*R2p./(3.02*DBV);
 
 %% Plotting
 % Plot details
-datapoints = [1,5,2,3,4];
+datapoints = [1,2,3];
 % legtext = {'Grey-Matter Average','Ischaemic ROI','Contra-Ischaemic ROI'};
 % legtext = {'with FLAIR','no FLAIR Uncorrected','no FLAIR R1 Correction','no FLAIR R2 Correction','no FLAIR Biexp. Correction'};
 % legtext = {'with FLAIR','1 TE, Uncorrected','1 TE, Biexp. Correction','Multi-TE Uncorrected','Multi-TE Biexp. Correction'};
