@@ -32,17 +32,6 @@ clear;
 plot_fig = 1;       
 save_data = 0;      % set to 1 in order to save out ASE data
 
-% define v subject
-ss = 1;
-
-% Fabber Data
-fS0  = [148, 145, 128, 153, 188, 165, 188];
-fR2p = [3.65, 4.48, 3.55, 4.07, 3.87, 3.99, 3.29];
-fDBV = [5.28, 7.80, 5.29, 7.17, 7.54, 6.23, 5.44]./100;
-load('ASE_Data/Fabber_VS_14t_1C.mat');
-fdata = voldata(ss,:);
-
-
 %% Model Parameters
 % noise
 SNR = 300;
