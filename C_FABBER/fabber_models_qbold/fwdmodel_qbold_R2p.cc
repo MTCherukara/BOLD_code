@@ -363,9 +363,6 @@ void R2primeFwdModel::Evaluate(const ColumnVector &params, ColumnVector &result)
             St = exp(-0.3*DBV*pow(dw*tau,2.0));
         }
 
-        // add in the T2 effect to St
-        St *= exp(-R2t*TE);
-
         // calculate blood signal
         Sb = exp(-R2b*(TE-tau))*exp(-R2bs*abs(tau));
 
@@ -376,10 +373,15 @@ void R2primeFwdModel::Evaluate(const ColumnVector &params, ColumnVector &result)
         // Total signal
         if (single_comp)
         {
+            // Ignore T2 effect, and other compartments
             result(ii) = S0*St;
         }
         else
         {
+            // add in the T2 effect to St
+            St *= exp(-R2t*TE);
+
+            // add up compartments
             result(ii) = S0*(((1-DBV-lam)*St) + (DBV*Sb) + (lam*Se));
         }
 
