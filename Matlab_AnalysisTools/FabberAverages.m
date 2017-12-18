@@ -20,7 +20,7 @@ maskslice = LoadSlice('/Users/mattcher/Documents/DPhil/Data/validation_sqbold/vs
 
 % Load data
 DBVslice = LoadSlice([fabdir,'mean_DBV.nii.gz'],slicenum);
-R2pslice = LoadSlice([fabdir,'mean_R2p.nii.gz'],slicenum);
+R2pslice = LoadSlice([fabdir,'mean_S0.nii.gz'],slicenum);
 % DFslice  = LoadSlice([fabdir,'mean_DF.nii.gz'],slicenum);
 % DBV_std  = LoadSlice([fabdir,'std_DF.nii.gz'],slicenum);
 % R2p_std  = LoadSlice([fabdir,'std_R2p.nii.gz'],slicenum);
@@ -65,9 +65,9 @@ disp(['Median R2'': ',num2str(median(R2pslice))]);
 % disp(['R2'' Median Error: ',num2str(median(R2p_std))]);
 % disp(['R2'' Mode Error: ',num2str(cr(mr))]);
 
-disp('   ');
-disp(['Mean DBV  : ',num2str(100*mean(DBVslice))]);
-disp(['Median DBV: ',num2str(100*median(DBVslice))]);
+% disp('   ');
+% disp(['Mean DBV  : ',num2str(100*mean(DBVslice))]);
+% disp(['Median DBV: ',num2str(100*median(DBVslice))]);
 
 % disp('   ');
 % disp(['Mean OEF  : ',num2str(100*mean(R2pslice)/(301.74*mean(DBVslice)))]);

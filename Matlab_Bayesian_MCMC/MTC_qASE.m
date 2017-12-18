@@ -32,6 +32,16 @@ clear;
 plot_fig = 1;       
 save_data = 0;      % set to 1 in order to save out ASE data
 
+% define v subject
+ss = 1;
+
+% Fabber Data
+fS0  = [148, 145, 128, 153, 188, 165, 188];
+fR2p = [3.65, 4.48, 3.55, 4.07, 3.87, 3.99, 3.29];
+fDBV = [5.28, 7.80, 5.29, 7.17, 7.54, 6.23, 5.44]./100;
+load('ASE_Data/Fabber_VS_14t_1C.mat');
+fdata = voldata(ss,:);
+
 
 %% Model Parameters
 % noise
@@ -43,7 +53,7 @@ params.dChi = 2.64e-7;      % parts     - susceptibility difference
 params.gam  = 2.67513e8;    % rad/s/T   - gyromagnetic ratio
 
 % scan parameters 
-params.TE   = 0.250;        % s         - echo time
+params.TE   = 0.074;        % s         - echo time
 
 % model fitting parameters
 params.S0   = 1;            % a. units  - signal
@@ -55,6 +65,10 @@ params.zeta = 0.030;        % no units  - deoxygenated blood volume
 params.OEF  = 0.400;        % no units  - oxygen extraction fraction
 params.Hct  = 0.340;        % no units  - fractional hematocrit
 
+% comparing fabber results
+params.S0 = fS0(ss);
+params.zeta = fDBV(ss);
+params.OEF = (3*fR2p(ss))./(4*pi*params.gam*params.B0*params.dChi*params.Hct*params.zeta);
 
 %% Compute Model
 
@@ -63,7 +77,7 @@ params.Hct  = 0.340;        % no units  - fractional hematocrit
 % tau = [-16:4:16,24:8:64]./1000;
 
 % tau = (-8:2:8)/1000;
-tau = linspace(-0.016,0.200,1000); % for visualising ( tau(286) = 0 )
+tau = linspace(-0.016,0.072,1000); % for visualising ( tau(286) = 0 )
 
 TE  = params.TE;
 np = length(tau);
@@ -90,6 +104,8 @@ if plot_fig
 %     fig1 = figure('WindowStyle','docked');
     hold on; box on;
     
+    
+    
     % plot some lines
 %     plot([0 0],[-1 2],'k--','LineWidth',2);
     
@@ -99,6 +115,10 @@ if plot_fig
 %     S_log = S_sample./max(S_total);
     l.s = plot(1000*tau,S_log,'-','LineWidth',3);
     xlim([-20,80]);
+    
+    % for comparing inferred values
+    tauF = [0, 16:4:64];
+    plot(tauF,log(fdata),'kx','LineWidth',3);
     
     % labels on axes
     xlabel('Spin Echo Displacement \tau (ms)');
