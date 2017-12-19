@@ -3,7 +3,7 @@
 clear; clc;
 
 % select a fabber run
-fabber = '228';
+fabber = '207';
 resdir = '/Users/mattcher/Documents/DPhil/Data/Fabber_Results/';
 fdname = dir([resdir,'fabber_',fabber,'_*']);
 fabdir = strcat(resdir,fdname.name,'/');
