@@ -4,7 +4,7 @@
 clear; close all;
 
 % select subject
-ss = 2;
+ss = 1;
 
 % load FABBER result data
 load('ASE_Data/Fabber_VS_14t_1C.mat');
@@ -29,14 +29,16 @@ params.Hct  = 0.340;        % no units  - fractional hematocrit
 params.S0 = fS0(ss);
 params.zeta = fDBV(ss);
 params.OEF = fR2p(ss)./(301.74.*fDBV(ss));
+params.dw = fR2p(ss)./fDBV(ss);
 
 % tau ranges
 tauF = [0, 16:4:64]/1000;
-tauA = linspace(-16,64,1000)/1000;
+tauA = linspace(-16,64,100)/1000;
 
 % calculate qASE model
 S_fab = voldata(ss,:);
-[S_ana,params] = MTC_qASE_model(tauA,params.TE,params);
+S_ana = params.S0.*MTC_ASE_bessel(tauA,params.TE,params);
+S_asy = params.S0.*MTC_ASE_tissue(tauA,params.TE,params);
 
 % plot results
 figure(2);
@@ -44,6 +46,7 @@ set(gcf,'WindowStyle','docked');
 hold on; box on;
 
 plot(1000*tauA,log(S_ana),'-','LineWidth',2);
+% plot(1000*tauA,log(S_asy),'--','LineWidth',2);
 plot(1000*tauF,log(S_fab),'kx','LineWidth',2);
 
 xlabel('Spin-Echo Offset \tau (ms)');

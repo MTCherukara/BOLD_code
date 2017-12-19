@@ -95,7 +95,7 @@ end
 %% Fourth Version (tau-by-tau)
 
 % define the regime boundary
-bd = 1.5./dw; 
+bd = 1.5/dw; 
 
 % pre-allocate
 ST = zeros(1,length(TAU)); 
