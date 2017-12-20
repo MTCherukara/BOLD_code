@@ -1,4 +1,4 @@
-function ST = MTC_ASE_tissue(TAU,TE,PARAMS)
+function ST = MTC_ASE_tissue15(TAU,TE,PARAMS)
 % MTC_ASE_tissue usage:
 %
 %        ST = MTC_ASE_tissue(TAU,TE,PARAMS)
@@ -95,7 +95,7 @@ end
 %% Fourth Version (tau-by-tau)
 
 % define the regime boundary
-bd = 1/dw; 
+bd = 1.5/dw; 
 
 % pre-allocate
 ST = zeros(1,length(TAU)); 

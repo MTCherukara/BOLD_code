@@ -54,10 +54,6 @@ params.zeta = 0.030;        % no units  - deoxygenated blood volume
 params.OEF  = 0.400;        % no units  - oxygen extraction fraction
 params.Hct  = 0.340;        % no units  - fractional hematocrit
 
-% comparing fabber results
-params.S0 = fS0(ss);
-params.zeta = fDBV(ss);
-params.OEF = (3*fR2p(ss))./(4*pi*params.gam*params.B0*params.dChi*params.Hct*params.zeta);
 
 %% Compute Model
 
@@ -66,7 +62,7 @@ params.OEF = (3*fR2p(ss))./(4*pi*params.gam*params.B0*params.dChi*params.Hct*par
 % tau = [-16:4:16,24:8:64]./1000;
 
 % tau = (-8:2:8)/1000;
-tau = linspace(-0.016,0.072,1000); % for visualising ( tau(286) = 0 )
+tau = linspace(-0.016,0.072,100); % for visualising ( tau(286) = 0 )
 
 TE  = params.TE;
 np = length(tau);

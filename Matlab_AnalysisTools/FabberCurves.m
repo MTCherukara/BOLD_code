@@ -88,17 +88,42 @@ DBV = [5.28, 7.80, 5.29, 7.17, 7.54, 6.23, 5.44]./100;
 % Calculate signal based on inferred R2', DBV, and S0
 anatsignal = S0(ss).*exp(DBV(ss) - (R2p(ss).*abs(tauA)));
 
+tc = DBV(ss)./R2p(ss);
+tau_shrt = linspace(-tc,tc,100);
+tau_long = linspace(tc,0.064,100);
+
+% for curve-fitting
+T_shrt = taus(5:11);
+S_shrt = log(rawsignal(5:11));
+
+T_long = taus(12:end);
+S_long = log(rawsignal(12:end));
+
+P_shrt = polyfit(T_shrt,S_shrt,2);
+P_long = polyfit(T_long,S_long,1);
+
+Fit_shrt = (P_shrt(1).*(tau_shrt.^2)) + (P_shrt(2).*tau_shrt) + P_shrt(3);
+Fit_long = (P_long(1).*tau_long) + P_long(2);
+
 % Plot results
 figure('WindowStyle','Docked');
 hold on; box on;
 set(gca,'FontSize',18);
-% plot(1000*tauA,log(anatsignal),'-','LineWidth',2);
+plot(1000*tauA,log(anatsignal),'-','LineWidth',2);
+plot(1000*[tau_shrt,tau_long],[Fit_shrt,Fit_long],'-','LineWidth',2);
 plot(1000*taus,log(volsignal),'kx','LineWidth',2);
 plot(1000*taus,log(rawsignal),'ro','LineWidth',2);
 xlabel('Spin-Echo Offset \tau (ms)');
 ylabel('Log(Signal)');
 title(['Subject ',num2str(ss)]);
+legend('Fabber Analytical','LLS Analytical','Fabber Modelfit','Raw Data','Location','NorthEast');
 xlim([-32,68]);
+
+% Print results
+disp(['R2'' (LLS): ',num2str(-P_long(1))]);
+disp(['R2'' (FABBER): ',num2str(R2p(ss))]);
+disp(['DBV (LLS): ',num2str(P_long(2)-P_shrt(3))]);
+disp(['DBV (FABBER): ',num2str(DBV(ss))]);
 
 % save(['Temp_Volsig_',num2str(ss),'.mat'],'volsignal');
 

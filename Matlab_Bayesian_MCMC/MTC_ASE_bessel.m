@@ -25,7 +25,7 @@ fint = zeros(1,length(TAU));    % pre-allocate
 for ii = 1:length(TAU)
     
     % integrate
-    fnc0 = @(u) (2+u).*sqrt(1-u).*(1-besselj(0,1.5.*t0(ii).*u))./(u.^2);
+    fnc0 = @(u) (2+u).*sqrt(1-u).*(1-besselj(0,1.5*t0(ii).*u))./(u.^2);
     fint(ii) = integral(fnc0,0,1);
     
 end
