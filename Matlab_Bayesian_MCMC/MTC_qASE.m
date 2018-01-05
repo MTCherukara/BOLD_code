@@ -30,7 +30,7 @@ clear;
 % close all;
 
 plot_fig = 1;       
-save_data = 0;      % set to 1 in order to save out ASE data
+save_data = 1;      % set to 1 in order to save out ASE data
 
 %% Model Parameters
 % noise
@@ -45,8 +45,8 @@ params.gam  = 2.67513e8;    % rad/s/T   - gyromagnetic ratio
 params.TE   = 0.074;        % s         - echo time
 
 % model fitting parameters
-params.S0   = 1;            % a. units  - signal
-params.R2t  = 1/0.110;      % 1/s       - rate constant, tissue
+params.S0   = 100;          % a. units  - signal
+params.R2t  = 1/0.087;      % 1/s       - rate constant, tissue
 params.R2e  = 4;            % 1/s       - rate constant, extracellular
 params.dF   = 5;            % Hz        - frequency shift
 params.lam0 = 0.00;        % no units  - ISF/CSF signal contribution
@@ -60,15 +60,16 @@ params.Hct  = 0.340;        % no units  - fractional hematocrit
 % define tau values that we want to simulate
 % tau = (-16:8:64)/1000;      % for simulating data
 % tau = [-16:4:16,24:8:64]./1000;
+tau = (-28:4:64)/1000;
 
 % tau = (-8:2:8)/1000;
-tau = linspace(-0.016,0.072,100); % for visualising ( tau(286) = 0 )
+% tau = linspace(-0.016,0.072,100); % for visualising ( tau(286) = 0 )
 
 TE  = params.TE;
 np = length(tau);
 
 % call MTC_qASE_model
-[S_total,params] = MTC_qASE_model(tau,TE,params);
+[S_total,params] = MTC_qASE_modelB(tau,TE,params);
 
 
 %% Add Noise
@@ -102,12 +103,12 @@ if plot_fig
     xlim([-20,80]);
     
     % for comparing inferred values
-    tauF = [0, 16:4:64];
-    plot(tauF,log(fdata),'kx','LineWidth',3);
+%     tauF = [0, 16:4:64];
+%     plot(tauF,log(fdata),'kx','LineWidth',3);
     
     % labels on axes
     xlabel('Spin Echo Displacement \tau (ms)');
-    ylabel('Signal');
+    ylabel('Log ( Signal )');
     title('qBOLD Signal Measured Using ASE');
 %     ylim([0.7,1]);
 %     axis([1000*min(tau), 1000*max(tau), -1, -0.6]);
@@ -115,7 +116,7 @@ if plot_fig
     
 end % if plot_fig
 
-% Save Figure
+% Save Data
 if save_data
     % Check how many datasets have been saved with the same date
     dat_dir = '/Users/mattcher/Documents/DPhil/Code/Matlab_Bayesian_MCMC/';

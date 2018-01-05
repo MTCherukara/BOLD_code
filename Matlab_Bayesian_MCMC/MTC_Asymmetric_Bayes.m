@@ -34,10 +34,10 @@ np = 1000; % number of points to perform Bayesian analysis on
 nz = 41; % number of points in the third dimension
 
 % Select which parameter(s) to infer on (1 = OEF, 2 = DBV, 3 = R2', 4 = CSF, 5 = dF)
-pars = [1,2];
+pars = [1];
 
 % Load the Data:
-load('ASE_Data/ASE_FLAIRno_15taus_SNR_400.mat');
+load('ASE_Data/Data_180104_Bessel_24t.mat');
 
 % extract relevant parameters
 sigma = params.sig;   % real std of noise
@@ -188,7 +188,7 @@ if length(pars) == 1
     
     plot([trv, trv],[0, 1.1*max(pos)],'k--','LineWidth',2);
     plot(vals,pos,'-','LineWidth',4);
-    axis([min(w1), max(w1), 0, 1.1*max(pos)]);
+%     axis([min(vals), max(vals), 0, 1.1*max(pos)]);
 
     xlabel(pname);
     legend(['True ',pname],'Posterior','Location','NorthEast');
