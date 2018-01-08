@@ -69,8 +69,8 @@ else
 end
     
 % relaxation rate constant of blood
-PARAMS.R2b  = 14.9*PARAMS.Hct + 14.7 + (302.1*PARAMS.Hct + 41.8)*PARAMS.OEF^2;
-PARAMS.R2bs = 16.4*PARAMS.Hct + 4.5  + (165.2*PARAMS.Hct + 55.7)*PARAMS.OEF^2;
+PARAMS.R2b  = 16.4*PARAMS.Hct + 4.5  + (165.2*PARAMS.Hct + 55.7)*PARAMS.OEF^2;
+PARAMS.R2bs = 14.9*PARAMS.Hct + 14.7 + (302.1*PARAMS.Hct + 41.8)*PARAMS.OEF^2;
 
 % compartment weightings
 w_tis = 1 - PARAMS.lam0 - PARAMS.zeta;
@@ -80,7 +80,7 @@ w_bld = PARAMS.zeta;
 % CALCULATE MODEL:
 
 % comparments
-S_tis = w_tis.*MTC_ASE_tissue(TAU,TE,PARAMS);
+S_tis = w_tis.*MTC_ASE_bessel(TAU,TE,PARAMS);
 S_csf = w_csf.*MTC_ASE_extra(TAU,TE,PARAMS);
 S_bld = w_bld.*MTC_ASE_blood(TAU,TE,PARAMS);
 

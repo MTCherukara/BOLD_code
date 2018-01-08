@@ -30,7 +30,7 @@ clear;
 % close all;
 
 plot_fig = 1;       
-save_data = 1;      % set to 1 in order to save out ASE data
+save_data = 0;      % set to 1 in order to save out ASE data
 
 %% Model Parameters
 % noise
@@ -52,7 +52,7 @@ params.dF   = 5;            % Hz        - frequency shift
 params.lam0 = 0.00;        % no units  - ISF/CSF signal contribution
 params.zeta = 0.030;        % no units  - deoxygenated blood volume
 params.OEF  = 0.400;        % no units  - oxygen extraction fraction
-params.Hct  = 0.340;        % no units  - fractional hematocrit
+params.Hct  = 0.400;        % no units  - fractional hematocrit
 
 
 %% Compute Model
@@ -60,10 +60,10 @@ params.Hct  = 0.340;        % no units  - fractional hematocrit
 % define tau values that we want to simulate
 % tau = (-16:8:64)/1000;      % for simulating data
 % tau = [-16:4:16,24:8:64]./1000;
-tau = (-28:4:64)/1000;
+% tau = (-28:4:64)/1000;
 
 % tau = (-8:2:8)/1000;
-% tau = linspace(-0.016,0.072,100); % for visualising ( tau(286) = 0 )
+tau = linspace(-0.016,0.072,100); % for visualising ( tau(286) = 0 )
 
 TE  = params.TE;
 np = length(tau);
@@ -85,7 +85,7 @@ S_sample = S_total + max(S_total).*params.sig.*randn(1,np);
 if plot_fig
     
     % create a figure
-    figure(2);
+%     figure(2);
     set(gcf,'WindowStyle','docked');
 %     fig1 = figure('WindowStyle','docked');
     hold on; box on;

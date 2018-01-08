@@ -82,7 +82,7 @@ w_bld = PARAMS.zeta;
 % comparments
 S_tis = w_tis.*MTC_ASE_bessel(TAU,TE,PARAMS);
 S_csf = w_csf.*MTC_ASE_extra(TAU,TE,PARAMS);
-S_bld = w_bld.*MTC_ASE_blood(TAU,TE,PARAMS);
+S_bld = w_bld.*MTC_ASE_mnblood(TAU,TE,PARAMS);
 
 % add it all together:
 S = PARAMS.S0.*(S_tis + S_csf + S_bld);

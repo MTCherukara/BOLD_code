@@ -337,10 +337,10 @@ void R2primeFwdModel::Evaluate(const ColumnVector &params, ColumnVector &result)
 
     // now evaluate the static dephasing qBOLD model for 2 compartments
     dw = R2p/DBV;
-    OEF = dw/301.7433;
+    OEF = dw/354.9921;
 
-    R2b  = 10.076 + (111.868*pow(OEF,2.0));
-    R2bs = 19.766 + (144.514*pow(OEF,2.0));
+    R2b  = 11.06 + (121.87*pow(OEF,2.0));
+    R2bs = 20.66 + (162.64*pow(OEF,2.0));
 
     // loop through taus
     result.ReSize(taus.Nrows());
@@ -365,6 +365,8 @@ void R2primeFwdModel::Evaluate(const ColumnVector &params, ColumnVector &result)
 
         // calculate blood signal
         Sb = exp(-R2b*(TE-tau))*exp(-R2bs*abs(tau));
+
+        // calculate blood signal using motion narrowing model
 
         // calculate extracellular signal
         Sec = exp(-R2e*TE)*exp(-2.0*i*M_PI*dF*abs(tau));
