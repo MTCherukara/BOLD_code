@@ -50,7 +50,7 @@ params.R2t  = 1/0.087;      % 1/s       - rate constant, tissue
 params.R2e  = 4;            % 1/s       - rate constant, extracellular
 params.dF   = 5;            % Hz        - frequency shift
 params.lam0 = 0.00;        % no units  - ISF/CSF signal contribution
-params.zeta = 0.030;        % no units  - deoxygenated blood volume
+params.zeta = 0.50;        % no units  - deoxygenated blood volume
 params.OEF  = 0.400;        % no units  - oxygen extraction fraction
 params.Hct  = 0.400;        % no units  - fractional hematocrit
 
@@ -85,7 +85,7 @@ S_sample = S_total + max(S_total).*params.sig.*randn(1,np);
 if plot_fig
     
     % create a figure
-%     figure(2);
+    figure(2);
     set(gcf,'WindowStyle','docked');
 %     fig1 = figure('WindowStyle','docked');
     hold on; box on;

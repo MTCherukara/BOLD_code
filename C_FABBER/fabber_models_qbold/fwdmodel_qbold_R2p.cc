@@ -39,7 +39,7 @@ string R2primeFwdModel::GetDescription() const
 
 string R2primeFwdModel::ModelVersion() const
 {
-    return "1.0";
+    return "1.2";
 } // ModelVersion
 
 
@@ -52,6 +52,7 @@ void R2primeFwdModel::Initialize(ArgsType &args)
     infer_DBV = args.ReadBool("inferDBV");
     infer_R2t = args.ReadBool("inferR2t");
     infer_S0  = args.ReadBool("inferS0");
+    infer_Hct = args.ReadBool("inferHct");
     infer_R2e = args.ReadBool("inferR2e");
     infer_dF  = args.ReadBool("inferdF");
     infer_lam = args.ReadBool("inferlam");
@@ -124,6 +125,10 @@ void R2primeFwdModel::Initialize(ArgsType &args)
     {
         LOG << "Inferring on scaling parameter S0" << endl;
     }
+    if (infer_Hct)
+    {
+        LOG << "Inferring on fractional hematocrit" << endl;
+    }
     if (infer_R2e)
     {
         LOG << "Inferring on R2 of CSF" << endl;
@@ -163,6 +168,10 @@ void R2primeFwdModel::NameParams(vector<string> &names) const
     if (infer_S0)
     {
         names.push_back("S0");  // parameter 4 - S0 scaling factor
+    }
+    if (infer_Hct)
+    {
+        names.push_back("Hct");  // parameter 4 - S0 scaling factor
     }
     if (infer_R2e)
     {
@@ -212,6 +221,12 @@ void R2primeFwdModel::HardcodedInitialDists(MVNDist &prior, MVNDist &posterior) 
     {
         prior.means(S0_index()) = 1000.0;
         precisions(S0_index(), S0_index()) = 1e-5; // 1e-5
+    }
+
+    if (infer_Hct)
+    {
+        prior.means(Hct_index()) = 0.40;
+        precisions(Hct_index(), Hct_index()) = 1e-2; // 1e-5
     }
 
     if (infer_R2e)
@@ -273,6 +288,7 @@ void R2primeFwdModel::Evaluate(const ColumnVector &params, ColumnVector &result)
     double DBV;
     double R2t;
     double S0;
+    double Hct;
     double R2e;
     double dF;
     double lam;
@@ -310,6 +326,14 @@ void R2primeFwdModel::Evaluate(const ColumnVector &params, ColumnVector &result)
     {
         S0 = 100.0;
     }
+    if (infer_Hct)
+    {
+        Hct = (paramcpy(Hct_index()));
+    }
+    else
+    {
+        Hct = 0.4;
+    }
     if (infer_R2e)
     {
         R2e = abs(paramcpy(R2e_index()));
@@ -337,10 +361,11 @@ void R2primeFwdModel::Evaluate(const ColumnVector &params, ColumnVector &result)
 
     // now evaluate the static dephasing qBOLD model for 2 compartments
     dw = R2p/DBV;
-    OEF = dw/354.9921;
+    OEF = dw/(887.4082*Hct);
 
-    R2b  = 11.06 + (121.87*pow(OEF,2.0));
-    R2bs = 20.66 + (162.64*pow(OEF,2.0));
+    R2bs = (14.9*Hct + 14.7) + ((302.1*Hct + 41.8)*pow(OEF,2.0));
+    R2b  = (16.4*Hct +  4.5) + ((165.2*Hct + 55.7)*pow(OEF,2.0));
+    
 
     // loop through taus
     result.ReSize(taus.Nrows());
