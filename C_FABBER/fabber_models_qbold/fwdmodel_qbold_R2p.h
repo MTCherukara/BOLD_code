@@ -90,6 +90,7 @@ protected:
     bool infer_dF;
     bool infer_lam;
     bool single_comp;
+    bool motion_narr;
 
 private:
     static FactoryRegistration<FwdModelFactory, R2primeFwdModel> registration;

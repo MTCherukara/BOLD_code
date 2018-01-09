@@ -24,13 +24,11 @@ OEF = PARAMS.OEF;
 B0  = PARAMS.B0;
 
 % assign constants
-rc = 2.6e-6;    % characteristic length
-D  = 1.5e-9;    % diffusion rate
+td = 0.0045067;     % diffusion time
 
 % calculate parameters
 dChi = ((-0.736 + (0.264*OEF) )*Hct) + (0.722 * (1-Hct));
 G0   = (4/45)*Hct*(1-Hct)*((dChi*B0)^2);
-td   = (rc.^2)/D;
 kk   = 0.5*(gam^2)*G0*(td^2);
 
 

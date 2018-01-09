@@ -57,6 +57,7 @@ void R2primeFwdModel::Initialize(ArgsType &args)
     infer_dF  = args.ReadBool("inferdF");
     infer_lam = args.ReadBool("inferlam");
     single_comp = args.ReadBool("single_compartment");
+    motion_narr = args.ReadBool("motional_narrowing");
 
 
     // temporary holders for input values
@@ -226,7 +227,7 @@ void R2primeFwdModel::HardcodedInitialDists(MVNDist &prior, MVNDist &posterior) 
     if (infer_Hct)
     {
         prior.means(Hct_index()) = 0.40;
-        precisions(Hct_index(), Hct_index()) = 1e-2; // 1e-5
+        precisions(Hct_index(), Hct_index()) = 1e0; // 1e-5
     }
 
     if (infer_R2e)
@@ -278,7 +279,7 @@ void R2primeFwdModel::Evaluate(const ColumnVector &params, ColumnVector &result)
     complex<double> i(0,1);
 
     // derived parameters
-    double dw;
+    double dw;          // characteristic time (protons in water)
     double R2b;
     double R2bs;
     double OEF;
@@ -328,7 +329,7 @@ void R2primeFwdModel::Evaluate(const ColumnVector &params, ColumnVector &result)
     }
     if (infer_Hct)
     {
-        Hct = (paramcpy(Hct_index()));
+        Hct = abs(paramcpy(Hct_index()));
     }
     else
     {
@@ -363,10 +364,6 @@ void R2primeFwdModel::Evaluate(const ColumnVector &params, ColumnVector &result)
     dw = R2p/DBV;
     OEF = dw/(887.4082*Hct);
 
-    R2bs = (14.9*Hct + 14.7) + ((302.1*Hct + 41.8)*pow(OEF,2.0));
-    R2b  = (16.4*Hct +  4.5) + ((165.2*Hct + 55.7)*pow(OEF,2.0));
-    
-
     // loop through taus
     result.ReSize(taus.Nrows());
 
@@ -388,25 +385,45 @@ void R2primeFwdModel::Evaluate(const ColumnVector &params, ColumnVector &result)
             St = exp(-0.3*DBV*pow(dw*tau,2.0));
         }
 
-        // calculate blood signal
-        Sb = exp(-R2b*(TE-tau))*exp(-R2bs*abs(tau));
-
-        // calculate blood signal using motion narrowing model
-
-        // calculate extracellular signal
-        Sec = exp(-R2e*TE)*exp(-2.0*i*M_PI*dF*abs(tau));
-        Se = abs(Sec);
-
-        // Total signal
+        // compartments
         if (single_comp)
         {
-            // Ignore T2 effect, and other compartments
+            // total signal is tissue signal only
             result(ii) = S0*St;
         }
         else
         {
-            // add in the T2 effect to St
+            // apply T2 effect to tissue compartment
             St *= exp(-R2t*TE);
+
+            // add blood compartment
+            if (motion_narr)
+            {
+                // parameters
+                double td   = 0.0045067;       // (based on rc=2.6 um and D=1.5 um^2 / ms)
+                double gm   = 2.67513e8;
+                double dChi = ((-0.736 + (0.264*OEF))*Hct) + (0.722*(1-Hct));
+                double G0   = (4/45)*Hct*(1-Hct)*pow((dChi*3.0),2.0);
+                double kk   = 0.5*pow(gm,2.0)*G0*pow(td,2.0);
+
+                // motion narrowing model
+                Sb = exp(-kk* ( (TE/td) + pow((0.25 + (TE/td)),0.5) + 1.5 - 
+                                (2*pow((0.25 + (pow((TE+tau),2.0)/td) ),0.5)) - 
+                                (2*pow((0.25 + (pow((TE-tau),2.0)/td) ),0.5)) ) );
+            }
+            else
+            {
+                // relaxation rates
+                R2bs = ((14.9*Hct) + 14.7) + ( ((302.1*Hct) + 41.8)*pow(OEF,2.0) );
+                R2b  = ((16.4*Hct) +  4.5) + ( ((165.2*Hct) + 55.7)*pow(OEF,2.0) );
+
+                // linear model
+                Sb = exp(-R2b*(TE-tau))*exp(-R2bs*abs(tau));
+            }
+
+            // add extracellular compartment
+            Sec = exp(-R2e*TE)*exp(-2.0*i*M_PI*dF*abs(tau));
+            Se = abs(Sec);
 
             // add up compartments
             result(ii) = S0*(((1-DBV-lam)*St) + (DBV*Sb) + (lam*Se));
@@ -416,11 +433,11 @@ void R2primeFwdModel::Evaluate(const ColumnVector &params, ColumnVector &result)
 
     
     // alternative, if values are outside reasonable bounds
-    if ( DBV > 0.5 || lam > 0.5 )
+    if ( DBV > 0.5 || lam > 0.5 || Hct > 1.0 )
     {
         for (int ii = 1; ii <= taus.Nrows(); ii++)
         {
-            result(ii) = 10000*result(ii);
+            result(ii) = result(ii)*10000.0;
         }
     }
 
