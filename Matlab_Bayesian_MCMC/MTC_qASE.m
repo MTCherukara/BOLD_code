@@ -30,12 +30,10 @@ clear;
 % close all;
 
 plot_fig = 1;       
-save_data = 0;      % set to 1 in order to save out ASE data
+save_data = 1;      % set to 1 in order to save out ASE data
 
 %% Model Parameters
-% noise
-SNR = 300;
-params.sig  = 1/SNR;         % -         - noise standard deviation
+
 % constants 
 params.B0   = 3.0;          % T         - static magnetic field
 params.dChi = 2.64e-7;      % parts     - susceptibility difference
@@ -45,25 +43,27 @@ params.gam  = 2.67513e8;    % rad/s/T   - gyromagnetic ratio
 params.TE   = 0.074;        % s         - echo time
 
 % model fitting parameters
-params.S0   = 100;          % a. units  - signal
+params.S0   = 1;            % a. units  - signal
 params.R2t  = 1/0.087;      % 1/s       - rate constant, tissue
 params.R2e  = 4;            % 1/s       - rate constant, extracellular
 params.dF   = 5;            % Hz        - frequency shift
-params.lam0 = 0.00;        % no units  - ISF/CSF signal contribution
-params.zeta = 0.50;        % no units  - deoxygenated blood volume
+params.lam0 = 0.000;        % no units  - ISF/CSF signal contribution
+params.zeta = 0.030;        % no units  - deoxygenated blood volume
 params.OEF  = 0.400;        % no units  - oxygen extraction fraction
 params.Hct  = 0.400;        % no units  - fractional hematocrit
 
-
+% noise
+SNR = 60;
+params.sig  = params.S0/SNR;         % -         - noise standard deviation
 %% Compute Model
 
 % define tau values that we want to simulate
 % tau = (-16:8:64)/1000;      % for simulating data
 % tau = [-16:4:16,24:8:64]./1000;
-% tau = (-28:4:64)/1000;
+tau = (-28:4:64)/1000;
 
 % tau = (-8:2:8)/1000;
-tau = linspace(-0.016,0.072,100); % for visualising ( tau(286) = 0 )
+% tau = linspace(-0.016,0.072,100); % for visualising ( tau(286) = 0 )
 
 TE  = params.TE;
 np = length(tau);

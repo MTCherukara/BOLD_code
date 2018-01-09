@@ -30,14 +30,14 @@ tic;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Inference Parameters
 
-np = 1000; % number of points to perform Bayesian analysis on
+np = 100; % number of points to perform Bayesian analysis on
 nz = 41; % number of points in the third dimension
 
 % Select which parameter(s) to infer on (1 = OEF, 2 = DBV, 3 = R2', 4 = CSF, 5 = dF)
-pars = [1];
+pars = [1,2];
 
 % Load the Data:
-load('ASE_Data/Data_180104_Bessel_24t.mat');
+load('ASE_Data/Data_180109_Bessel_24t1.mat');
 
 % extract relevant parameters
 sigma = params.sig;   % real std of noise
@@ -196,7 +196,7 @@ if length(pars) == 1
 elseif length(pars) == 2 
     % Plot 2D grid search results
     
-    imagesc(vals(2,:),vals(1,:),pos,[0,1]); hold on;
+    imagesc(vals(2,:),vals(1,:),(pos)); hold on;
     c=colorbar;
     plot([trv(2),trv(2)],[  0, 30],'w-','LineWidth',2);
     plot([  0, 30],[trv(1),trv(1)],'w-','LineWidth',2);

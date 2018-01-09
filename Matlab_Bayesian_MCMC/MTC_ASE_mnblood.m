@@ -22,12 +22,13 @@ gam = PARAMS.gam;
 Hct = PARAMS.Hct;
 OEF = PARAMS.OEF;
 B0  = PARAMS.B0;
+R2b = PARAMS.R2b;
 
 % assign constants
 td = 0.0045067;     % diffusion time
 
 % calculate parameters
-dChi = ((-0.736 + (0.264*OEF) )*Hct) + (0.722 * (1-Hct));
+dChi = (((-0.736 + (0.264*OEF) )*Hct) + (0.722 * (1-Hct)))*1e-6;
 G0   = (4/45)*Hct*(1-Hct)*((dChi*B0)^2);
 kk   = 0.5*(gam^2)*G0*(td^2);
 
@@ -38,7 +39,8 @@ if length(TE) ~= length(TAU)
 end
 
 % calculate model
-SB = exp(-kk.*( (TE./td) + sqrt(0.25 + (TE./td)) + 1.5 - ...
+S  = exp(-kk.*( (TE./td) + sqrt(0.25 + (TE./td)) + 1.5 - ...
                 (2.*sqrt( 0.25 + ( ((TE + TAU).^2) ./ td ) ) ) - ...
                 (2.*sqrt( 0.25 + ( ((TE - TAU).^2) ./ td ) ) ) ) );
-           
+
+SB = S.*exp(-R2b.*TE);
