@@ -34,14 +34,13 @@ np = 100; % number of points to perform Bayesian analysis on
 nz = 41; % number of points in the third dimension
 
 % Select which parameter(s) to infer on (1 = OEF, 2 = DBV, 3 = R2', 4 = CSF, 5 = dF)
-pars = [1,2];
+pars = [2];
 
 % Load the Data:
-load('ASE_Data/Data_180109_Bessel_24t1.mat');
+load('ASE_Data/Data_180110_Bessel_24t.mat');
 
 % extract relevant parameters
-sigma = params.sig;   % real std of noise
-sigma_weight = 2/(sigma.^2);
+sigma = mean(params.sig);   % real std of noise
 ns = length(S_sample); % number of data points
 [~,t0] = min(abs(T_sample));    % index of zero-point
 params.R2p = params.dw.*params.zeta;
@@ -88,7 +87,11 @@ if length(pars) == 1
     % compare the model against the data for each value of the parameter - this
     % is the likelihood (which is proportional to the posterior in the case of
     % uniform (zero) priors)
-    pos = exp(-sum((S_samp-S_mod).^2,2)/sigma);
+    loglik = - (0.5.*ns.*log(2.*pi.*(sigma.^2))) ...
+             - ((0.5./(sigma.^2)).*(sum(S_samp-S_mod,2).^2));
+    
+	pos = loglik';
+%     pos = exp(-sum((S_samp-S_mod).^2,2)/sigma);
     
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -120,7 +123,10 @@ elseif length(pars) == 2
             S_mod = MTC_qASE_model(T_sample,TE_sample,params,noDW);
 
             % calculate posterior based on known noise value
-            pos(i1,i2) = exp(-sum((S_sample-S_mod).^2)./(sigma));
+            loglik = - (0.5.*ns.*log(2.*pi.*(sigma.^2))) ...
+                     - ((0.5./(sigma.^2)).*(sum(S_sample-S_mod).^2));
+               
+            pos(i1,i2) = loglik;
             
         end % for i2 = 1:np
     end % for i1 = 1:np
@@ -186,8 +192,8 @@ set(gca,'FontSize',16);
 if length(pars) == 1
     % Plot 1D grid search results
     
-    plot([trv, trv],[0, 1.1*max(pos)],'k--','LineWidth',2);
-    plot(vals,pos,'-','LineWidth',4);
+%     plot([trv, trv],[0, 1.1*max(pos)],'k--','LineWidth',2);
+    plot(vals,exp(pos),'-','LineWidth',4);
 %     axis([min(vals), max(vals), 0, 1.1*max(pos)]);
 
     xlabel(pname);
@@ -196,7 +202,7 @@ if length(pars) == 1
 elseif length(pars) == 2 
     % Plot 2D grid search results
     
-    imagesc(vals(2,:),vals(1,:),(pos)); hold on;
+    imagesc(vals(2,:),vals(1,:),exp(pos)); hold on;
     c=colorbar;
     plot([trv(2),trv(2)],[  0, 30],'w-','LineWidth',2);
     plot([  0, 30],[trv(1),trv(1)],'w-','LineWidth',2);

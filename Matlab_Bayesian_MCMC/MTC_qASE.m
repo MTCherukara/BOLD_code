@@ -43,7 +43,7 @@ params.gam  = 2.67513e8;    % rad/s/T   - gyromagnetic ratio
 params.TE   = 0.074;        % s         - echo time
 
 % model fitting parameters
-params.S0   = 1;            % a. units  - signal
+params.S0   = 100;          % a. units  - signal
 params.R2t  = 1/0.087;      % 1/s       - rate constant, tissue
 params.R2e  = 4;            % 1/s       - rate constant, extracellular
 params.dF   = 5;            % Hz        - frequency shift
@@ -53,8 +53,8 @@ params.OEF  = 0.400;        % no units  - oxygen extraction fraction
 params.Hct  = 0.400;        % no units  - fractional hematocrit
 
 % noise
-SNR = 60;
-params.sig  = params.S0/SNR;         % -         - noise standard deviation
+params.SNR = 60;
+
 %% Compute Model
 
 % define tau values that we want to simulate
@@ -73,24 +73,18 @@ np = length(tau);
 
 
 %% Add Noise
-% Add noise that is proportional to the maximum
-% Noise = max(S_total).*params.sig.*randn(1,np);
 T_sample = tau;
-S_sample = S_total + max(S_total).*params.sig.*randn(1,np);
-
-[~,int0] = find(tau>=0,1);
+params.sig = S_total./params.SNR;
+S_sample = normrnd(S_total,params.sig);
 
 
 %% plot figure
 if plot_fig
     
     % create a figure
-    figure(2);
+    figure();
     set(gcf,'WindowStyle','docked');
-%     fig1 = figure('WindowStyle','docked');
     hold on; box on;
-    
-    
     
     % plot some lines
 %     plot([0 0],[-1 2],'k--','LineWidth',2);
@@ -99,7 +93,8 @@ if plot_fig
     S_log = log(S_total);
 %     S_log = (S_total)./max(S_total);
 %     S_log = S_sample./max(S_total);
-    l.s = plot(1000*tau,S_log,'-','LineWidth',3);
+    l.s = plot(1000*tau,S_log,'-','LineWidth',2);
+    plot(1000*tau,log(S_sample),'kx','LineWidth',2);
     xlim([-20,80]);
     
     % for comparing inferred values
@@ -108,11 +103,9 @@ if plot_fig
     
     % labels on axes
     xlabel('Spin Echo Displacement \tau (ms)');
-    ylabel('Log ( Signal )');
+    ylabel('Log (Signal)');
     title('qBOLD Signal Measured Using ASE');
-%     ylim([0.7,1]);
-%     axis([1000*min(tau), 1000*max(tau), -1, -0.6]);
-    set(gca,'FontSize',18);
+    set(gca,'FontSize',14);
     
 end % if plot_fig
 
