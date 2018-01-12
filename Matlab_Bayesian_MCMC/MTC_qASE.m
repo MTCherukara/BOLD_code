@@ -12,6 +12,10 @@
 %
 % CHANGELOG:
 %
+% 2017-01-12 (MTC). Change the way the noise standard deviation params.sig
+%       is calculated and applied, so that it actually results in the SNR
+%       that we want. Also some cleanup.
+%
 % 2017-08-07 (MTC). Added a call to MTC_qASE_model, rather than repeating
 %       its contents here, so that the whole thing is more modular. Removed
 %       the automatic saving of the plot, as it's kind of unnecessary
@@ -53,30 +57,27 @@ params.OEF  = 0.400;        % no units  - oxygen extraction fraction
 params.Hct  = 0.400;        % no units  - fractional hematocrit
 
 % noise
-params.SNR = 60;
+params.SNR = 200;
 
 %% Compute Model
 
 % define tau values that we want to simulate
-% tau = (-16:8:64)/1000;      % for simulating data
-% tau = [-16:4:16,24:8:64]./1000;
-tau = (-28:4:64)/1000;
+tau = (-28:4:64)/1000; % for testing
+% tau = linspace(-0.016,0.072,1000); % for visualising
 
-% tau = (-8:2:8)/1000;
-% tau = linspace(-0.016,0.072,100); % for visualising ( tau(286) = 0 )
-
-TE  = params.TE;
 np = length(tau);
 
 % call MTC_qASE_model
-[S_total,params] = MTC_qASE_modelB(tau,TE,params);
+[S_total,params] = MTC_qASE_modelB(tau,params.TE,params);
 
 
 %% Add Noise
-T_sample = tau;
-params.sig = S_total./params.SNR;
-S_sample = normrnd(S_total,params.sig);
+S_sample = S_total + (S_total.*randn(1,np)./params.SNR);
+S_sample(S_sample < 0) = 0;
 
+
+% calculate maximum data standard deviaton
+params.sig = min(S_total)/params.SNR;
 
 %% plot figure
 if plot_fig
@@ -85,15 +86,13 @@ if plot_fig
     figure();
     set(gcf,'WindowStyle','docked');
     hold on; box on;
-    
+
     % plot some lines
 %     plot([0 0],[-1 2],'k--','LineWidth',2);
     
     % plot the signal
     S_log = log(S_total);
-%     S_log = (S_total)./max(S_total);
-%     S_log = S_sample./max(S_total);
-    l.s = plot(1000*tau,S_log,'-','LineWidth',2);
+    l.s = plot(1000*tau,S_log,'-','LineWidth',3);
     plot(1000*tau,log(S_sample),'kx','LineWidth',2);
     xlim([-20,80]);
     
@@ -120,10 +119,13 @@ if save_data
     % Assign the correct title
     dat_title = strcat(dat_title1,num2str(fn));
     
-    if length(TE) ~= length(tau)
+    % pull out values of TE and tau
+    T_sample = tau;
+    
+    if length(params.TE) ~= length(tau)
         TE_sample(1:length(tau)) = params.TE;
     else
-        TE_sample = TE;
+        TE_sample = params.TE;
     end
     
     % Save the data out

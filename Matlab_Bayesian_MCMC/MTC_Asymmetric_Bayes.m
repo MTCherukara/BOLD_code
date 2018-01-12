@@ -12,6 +12,12 @@
 %
 % CHANGELOG:
 %
+% 2018-01-12 (MTC). Changed the way the posterior is calculated to actually
+%       calculate log-likelihood, using the function MTC_loglike.m. This
+%       technically shouldn't alter the shape of any of the posterior
+%       distributions (in terms of their linearity) but should mean that
+%       our selected value of SNR is 'applied' to the results correctly.
+%
 % 2017-10-06 (MTC). Added the option to make a 3D grid search, and made the
 %       1D and 2D versions slightly more general (and less cumbersome) by
 %       vectorising here and there.
@@ -30,14 +36,14 @@ tic;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Inference Parameters
 
-np = 100; % number of points to perform Bayesian analysis on
+np = 1000; % number of points to perform Bayesian analysis on
 nz = 41; % number of points in the third dimension
 
 % Select which parameter(s) to infer on (1 = OEF, 2 = DBV, 3 = R2', 4 = CSF, 5 = dF)
-pars = [2];
+pars = [3,2];
 
 % Load the Data:
-load('ASE_Data/Data_180110_Bessel_24t.mat');
+load('ASE_Data/Data_180112_SNR_50.mat');
 
 % extract relevant parameters
 sigma = mean(params.sig);   % real std of noise
@@ -123,10 +129,7 @@ elseif length(pars) == 2
             S_mod = MTC_qASE_model(T_sample,TE_sample,params,noDW);
 
             % calculate posterior based on known noise value
-            loglik = - (0.5.*ns.*log(2.*pi.*(sigma.^2))) ...
-                     - ((0.5./(sigma.^2)).*(sum(S_sample-S_mod).^2));
-               
-            pos(i1,i2) = loglik;
+            pos(i1,i2) = MTC_loglike(S_sample,S_mod,sigma);
             
         end % for i2 = 1:np
     end % for i1 = 1:np
@@ -180,6 +183,8 @@ elseif length(pars) == 3
 
 end % length(pars) == 1 ... elseif ... elseif ...
 
+toc;
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Display Results
@@ -202,6 +207,7 @@ if length(pars) == 1
 elseif length(pars) == 2 
     % Plot 2D grid search results
     
+    Pscale = [quantile(pos(:),0.75), max(pos(:))];
     imagesc(vals(2,:),vals(1,:),exp(pos)); hold on;
     c=colorbar;
     plot([trv(2),trv(2)],[  0, 30],'w-','LineWidth',2);
@@ -217,7 +223,3 @@ elseif length(pars) == 2
     set(c,'FontSize',16);
     
 end % if length(pars) == 1 ... elseif ...
-
-    
-toc;
-

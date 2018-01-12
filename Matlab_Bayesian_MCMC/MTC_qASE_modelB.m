@@ -32,6 +32,9 @@ function [S,PARAMS] = MTC_qASE_modelB(TAU,TE,PARAMS,NODW)
     %
     % CHANGELOG:
     %
+    % 2018-01-12 (MTC). R2_blood and R2_blood_star were the wrong way
+    %       around. Now we have fixed that.
+    %
     % 2017-10-10 (MTC). Added the option to supply a vector of TE values
     %       outside the PARAMS struct, and made changes to the called model
     %       functions MTC_ASE_tissue.m, MTC_ASE_extra.m, MTC_ASE_blood.m,
@@ -69,8 +72,9 @@ else
 end
     
 % relaxation rate constant of blood
-PARAMS.R2b  = 14.9*PARAMS.Hct + 14.7 + (302.1*PARAMS.Hct + 41.8)*PARAMS.OEF^2;
-PARAMS.R2bs = 16.4*PARAMS.Hct + 4.5  + (165.2*PARAMS.Hct + 55.7)*PARAMS.OEF^2;
+PARAMS.R2b  = 16.4*PARAMS.Hct + 4.5  + (165.2*PARAMS.Hct + 55.7)*PARAMS.OEF^2;
+PARAMS.R2bs = 14.9*PARAMS.Hct + 14.7 + (302.1*PARAMS.Hct + 41.8)*PARAMS.OEF^2;
+
 
 % compartment weightings
 w_tis = 1 - PARAMS.lam0 - PARAMS.zeta;
