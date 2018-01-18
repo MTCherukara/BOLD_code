@@ -41,18 +41,14 @@ infer_R2p = 0;      % are we inferring on R2'?
 j_brn  = 10000;      % number of jumps in the 'burn-in' phase
 j_run  = 500000;      % number of jumps in the real thing
 j_samp = 50;        % rate of sampling (1 sample every J_SAMP jumps)
-j_updt = 100;       % rate of updating the scaling parameter
+j_updt = 10;       % rate of updating the scaling parameter
+j_rng  = 500;       % range of samples to look over when updating scaling param
 
 % counters
-c_acc = 0;      % number of accepted jumps
-c_irj = 0;      % number of jumps inside limits that were still rejected
-c_orj = 0;      % number of jumps outside limits that were rejected
 c_smp = 0;      % sample counter
 c_rt  = 0;      % rate counter
-t_acc = 0;      % track the total number of accepted jumps
-t_rej = 0;      % track the total number of rejected jumps
 
-% idea acceptance rate
+% ideal acceptance rate
 qs = 0.234;
 
 
@@ -73,14 +69,15 @@ L0 = norm(S_sample-S_mod);
 
 % pre-allocate results array
 sample_results = zeros(np,round(j_run./j_samp));
-accept_rate    = zeros( 1,round(j_brn./j_updt));
+accept_rate    = zeros( 1,round((j_brn-j_rng)./j_updt));
+accept_tracker = false(1,j_brn);
 
 % pre-generate random numbers
 rng_gauss = randn(np,j_brn+j_run)';
 rng_accpt = rand(1,j_brn+j_run)';
 
 % initial jump size
-q_sig = 0.0025*(p_rng(2,:)-p_rng(1,:));
+q_sig = 0.0100*(p_rng(2,:)-p_rng(1,:));
 
 
 %% Metropolis Algorithm
@@ -95,9 +92,7 @@ for ii = 1:(j_brn+j_run)
     % make sure the new value is within the limits
     if sum( (X1 > p_rng(2,:)) + (X1 < p_rng(1,:)) ) > 0
         
-        % if the new value is outside the limits, count one outside-rejet,
-        % and reset back to old value
-        c_orj = c_orj + 1;
+        % if the new value is outside the limits reset back to old value
         X1 = X0;
         
     else
@@ -115,44 +110,32 @@ for ii = 1:(j_brn+j_run)
         % randomly generated threshold between 0 and 1
         if (L0/L1) > rng_accpt(ii)
             
-            c_acc = c_acc + 1;      % count 1 success
+            accept_tracker(ii) = 1;
             X0 = X1;                % keep these variables
             L0 = L1;                % record this norm
             
         else
-            
-            c_irj = c_irj + 1;      % count 1 failure
             X1 = X0;                % reset variables
             
         end % if (L0/L1) > rng(accpt(ii))
         
     end % if sum( (X1 > p_rng(2,:)) + (X1 < p_rng(1,:)) ) > 0
-    
-    % update sampling distribution size
-    if ( mod(ii,j_updt) == 0 && ii < j_brn)
         
-        % calculate acceptance rate error for last J_UPDT jumps
-        ra = (c_acc/(c_acc+c_irj+c_orj));
+    % adaptive sampling range update
+    if ( mod(ii,j_updt) == 0 && ii < j_brn && ii > j_rng )
         
-        % track the acceptance rate over time
+        % calculate acceptance rate over last 100 samples
+        ra = sum(accept_tracker(ii-j_rng+1:ii))./j_rng;
+        
+        % track acceptance rate over time
         c_rt = c_rt + 1;
         accept_rate(c_rt) = ra;
         
         % change proposal distribution sigma
-        q_sig = q_sig.*(1+ra-qs);
+        q_sig = q_sig.*(1+(0.1*(ra-qs)));        
         
-%         % print feedback
-%         disp(['Acceptance Rate = ',num2str((c_acc/(c_acc+c_irj+c_orj)))]);
-%         disp(['  Updating q_sig to ',num2str(q_sig(1)),', ',num2str(q_sig(2))]);
-        
-        % reset the counters
-        t_acc = t_acc + c_acc;
-        t_rej = t_rej + c_irj + c_orj;
-        c_acc = 0;
-        c_irj = 0;
-        c_orj = 0;
-        
-    end
+    end % if ( mod(ii,j_updt) == 0 && ii < j_brn && ii > j_rng )
+    
     
     % save out samples
     if ( mod(ii,j_samp) == 0 && ii > j_brn )
@@ -164,10 +147,15 @@ end % for ii = 1:(j_brn+j_run)
 
 toc;
 
+
+%% Analysis 
+
+
+
 %% Display Acceptance Rate Trend
 figure('WindowStyle','Docked');
 hold on; box on;
-plot(accept_rate,'k-');
+plot(accept_rate(1:end-1),'k-');
 xlabel('Iterations');
 ylabel('Sample Acceptance Rate');
 set(gca,'FontSize',12);
@@ -177,7 +165,24 @@ set(gca,'FontSize',12);
 
 figure('WindowStyle','Docked');
 hold on; box on;
+
+% plot true values
+plot([params_true.OEF,params_true.OEF],[p_rng(1,2),p_rng(2,2)]  ,'r-','LineWidth',2);
+plot([p_rng(1,1),p_rng(2,1)],[params_true.zeta,params_true.zeta],'r-','LineWidth',2);
+
+% plot results
 scatter(sample_results(1,:),sample_results(2,:),'k.');
+xlabel('OEF');
+ylabel('DBV');
+set(gca,'FontSize',12);
+
+% contour plot
+figure('WindowStyle','Docked');
+hold on; box on;
+plot([params_true.OEF,params_true.OEF],[p_rng(1,2),p_rng(2,2)]  ,'k-','LineWidth',1);
+plot([p_rng(1,1),p_rng(2,1)],[params_true.zeta,params_true.zeta],'k-','LineWidth',1);
+[n,c] = hist3(sample_results',[50,50]);
+contour(c{1},c{2},n);
 xlabel('OEF');
 ylabel('DBV');
 set(gca,'FontSize',12);
