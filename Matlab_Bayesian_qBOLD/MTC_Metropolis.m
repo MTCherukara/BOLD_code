@@ -1,12 +1,13 @@
 % MTC_Metropolis.m
 %
-% Implements a Metropolis Hastings algorithm, which samples from a posterior 
-% distribution using a Markov-Chain-Monte-Carlo method, % specifically for use
-% with simulated ASE qBOLD data.
+% Implements a Metropolis algorithm, which samples from a posterior distribution
+% using a Markov-Chain-Monte-Carlo method, specifically for use with simulated
+% ASE qBOLD data.
 %
-% The algorithm is based on those presented in Metropolis et al., 1953, and
-% Hastings, 1970; this code is based on MTC_ASE_MH.m, which is in turn based on 
-% a DTC lecture example given by Saad Jbabdi, Michaelmas Term 2015.
+% The algorithm is based on that presented in Metropolis et al., 1953, with
+% furhter refinements in Gelman, Roberts, and Gilks, 1996. This code is based on
+% MTC_ASE_MH.m, which is in turn based on a DTC lecture example given by Saad
+% Jbabdi, Michaelmas Term 2015.
 %
 % 
 %       Copyright (C) University of Oxford, 2016-2017
@@ -22,7 +23,7 @@
 clear; close all;
 
 % Load Data
-load('ASE_Data/Data_180112_SNR_50.mat');
+load('ASE_Data/Data_180112_SNR_200.mat');
 params_true = params;
 
 % Parameters being inferred on: OEF and DBV
@@ -37,7 +38,7 @@ p_rng  = [ 0.0 ,  0.00  ;...
 infer_R2p = 0;      % are we inferring on R2'?
 
 
-%% Metropolis Hastings Parameters
+%% Metropolis Parameters
 j_brn  = 10000;      % number of jumps in the 'burn-in' phase
 j_run  = 500000;      % number of jumps in the real thing
 j_samp = 50;        % rate of sampling (1 sample every J_SAMP jumps)
@@ -49,7 +50,7 @@ c_smp = 0;      % sample counter
 c_rt  = 0;      % rate counter
 
 % ideal acceptance rate
-qs = 0.234;
+qs = 0.352;
 
 
 %% Algorithm Initialization
@@ -174,15 +175,16 @@ plot([p_rng(1,1),p_rng(2,1)],[params_true.zeta,params_true.zeta],'r-','LineWidth
 scatter(sample_results(1,:),sample_results(2,:),'k.');
 xlabel('OEF');
 ylabel('DBV');
-set(gca,'FontSize',12);
+set(gca,'FontSize',14);
 
-% contour plot
-figure('WindowStyle','Docked');
-hold on; box on;
-plot([params_true.OEF,params_true.OEF],[p_rng(1,2),p_rng(2,2)]  ,'k-','LineWidth',1);
-plot([p_rng(1,1),p_rng(2,1)],[params_true.zeta,params_true.zeta],'k-','LineWidth',1);
-[n,c] = hist3(sample_results',[50,50]);
-contour(c{1},c{2},n);
-xlabel('OEF');
-ylabel('DBV');
-set(gca,'FontSize',12);
+
+%% Contour Plot
+% figure('WindowStyle','Docked');
+% hold on; box on;
+% plot([params_true.OEF,params_true.OEF],[p_rng(1,2),p_rng(2,2)]  ,'k-','LineWidth',1);
+% plot([p_rng(1,1),p_rng(2,1)],[params_true.zeta,params_true.zeta],'k-','LineWidth',1);
+% [n,c] = hist3(sample_results',[50,50]);
+% contour(c{1},c{2},n);
+% xlabel('OEF');
+% ylabel('DBV');
+% set(gca,'FontSize',12);
