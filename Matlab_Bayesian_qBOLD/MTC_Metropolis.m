@@ -5,7 +5,7 @@
 % ASE qBOLD data.
 %
 % The algorithm is based on that presented in Metropolis et al., 1953, with
-% furhter refinements in Gelman, Roberts, and Gilks, 1996. This code is based on
+% further refinements in Gelman, Roberts, and Gilks, 1996. This code is based on
 % MTC_ASE_MH.m, which is in turn based on a DTC lecture example given by Saad
 % Jbabdi, Michaelmas Term 2015.
 %
@@ -16,6 +16,14 @@
 % Created by MT Cherukara, 16 January 2018
 %
 % CHANGELOG:
+%
+% 2018-01-22 (MTC). Set the algorithm to save out the results of every single
+%       jump (inluding those that were rejected), so that the total number of
+%       jumps (not including burn-in) is the same as the total number of samples
+%       collected. This has a risk of producing auto-correlation in the results,
+%       but that shouldn't be a major concern, given that it still appears to be
+%       properly sampling the whole posterior. This is a massive time saver.
+%       Also, added the possibility to infer on R2' and DBV, as well as OEF-DBV.
 
 
 %% Script Initialization
@@ -23,30 +31,35 @@
 clear; close all;
 
 % Load Data
-load('ASE_Data/Data_180112_SNR_200.mat');
+load('ASE_Data/Data_180112_SNR_50.mat');
 params_true = params;
 
 % Parameters being inferred on: OEF and DBV
 np = 2;     % number of parameters
 
 % Parameter values
-p_name = {'OEF'; 'zeta'};
-p_init = [ 0.5 ,  0.05 ];
-p_rng  = [ 0.0 ,  0.00  ;...
-           1.0 ,  0.10 ];
+% p_name = {'OEF'; 'zeta'};
+% p_init = [ 0.5 ,  0.05 ];
+% p_rng  = [ 0.0 ,  0.00  ;...
+%            1.0 ,  0.10 ];
+       
+p_name = {'R2p'; 'zeta'};
+p_init = [ 4.0 ,  0.05 ];
+p_rng  = [ 1.0 ,  0.00  ;...
+          10.0 ,  0.10 ];
       
-infer_R2p = 0;      % are we inferring on R2'?
+infer_R2p = 1;      % are we inferring on R2'?
 
+% true R2p
+params_true.R2p = params_true.zeta*params_true.dw;
 
 %% Metropolis Parameters
 j_brn  = 10000;      % number of jumps in the 'burn-in' phase
-j_run  = 500000;      % number of jumps in the real thing
-j_samp = 50;        % rate of sampling (1 sample every J_SAMP jumps)
+j_run  = 1000000;      % number of jumps in the real thing
 j_updt = 10;       % rate of updating the scaling parameter
 j_rng  = 500;       % range of samples to look over when updating scaling param
 
 % counters
-c_smp = 0;      % sample counter
 c_rt  = 0;      % rate counter
 
 % ideal acceptance rate
@@ -69,7 +82,7 @@ S_mod = MTC_qASE_model(T_sample,TE_sample,params,infer_R2p);
 L0 = norm(S_sample-S_mod);
 
 % pre-allocate results array
-sample_results = zeros(np,round(j_run./j_samp));
+sample_results = zeros(np,j_run);
 accept_rate    = zeros( 1,round((j_brn-j_rng)./j_updt));
 accept_tracker = false(1,j_brn);
 
@@ -137,20 +150,14 @@ for ii = 1:(j_brn+j_run)
         
     end % if ( mod(ii,j_updt) == 0 && ii < j_brn && ii > j_rng )
     
-    
     % save out samples
-    if ( mod(ii,j_samp) == 0 && ii > j_brn )
-        c_smp = c_smp + 1;
-        sample_results(:,c_smp) = X1;
+    if ii > j_brn
+        sample_results(:,ii-j_brn) = X1;
     end
 
 end % for ii = 1:(j_brn+j_run)
 
 toc;
-
-
-%% Analysis 
-
 
 
 %% Display Acceptance Rate Trend
@@ -159,32 +166,40 @@ hold on; box on;
 plot(accept_rate(1:end-1),'k-');
 xlabel('Iterations');
 ylabel('Sample Acceptance Rate');
-set(gca,'FontSize',12);
+set(gca,'FontSize',14);
 
 
 %% Display Results
 
-figure('WindowStyle','Docked');
-hold on; box on;
-
-% plot true values
-plot([params_true.OEF,params_true.OEF],[p_rng(1,2),p_rng(2,2)]  ,'r-','LineWidth',2);
-plot([p_rng(1,1),p_rng(2,1)],[params_true.zeta,params_true.zeta],'r-','LineWidth',2);
-
-% plot results
-scatter(sample_results(1,:),sample_results(2,:),'k.');
-xlabel('OEF');
-ylabel('DBV');
-set(gca,'FontSize',14);
+% figure('WindowStyle','Docked');
+% hold on; box on;
+% 
+% % plot true values
+% % plot([params_true.OEF,params_true.OEF],[p_rng(1,2),p_rng(2,2)]  ,'r-','LineWidth',2);
+% plot([p_rng(1,1),p_rng(2,1)],[params_true.zeta,params_true.zeta],'r-','LineWidth',2);
+% plot([params_true.R2p,params_true.R2p],[p_rng(1,2),p_rng(2,2)]  ,'r-','LineWidth',2);
+% 
+% % plot results
+% scatter(sample_results(1,:),sample_results(2,:),'k.');
+% 
+% xlabel(p_name{1});
+% ylabel(p_name{2});
+% set(gca,'FontSize',14);
 
 
 %% Contour Plot
-% figure('WindowStyle','Docked');
-% hold on; box on;
+ctres = 50; % contour resolution
+
+figure('WindowStyle','Docked');
+hold on; box on;
+
+plot([params_true.R2p,params_true.R2p],[p_rng(1,2),p_rng(2,2)]  ,'k-','LineWidth',2);
 % plot([params_true.OEF,params_true.OEF],[p_rng(1,2),p_rng(2,2)]  ,'k-','LineWidth',1);
-% plot([p_rng(1,1),p_rng(2,1)],[params_true.zeta,params_true.zeta],'k-','LineWidth',1);
-% [n,c] = hist3(sample_results',[50,50]);
-% contour(c{1},c{2},n);
-% xlabel('OEF');
-% ylabel('DBV');
-% set(gca,'FontSize',12);
+plot([p_rng(1,1),p_rng(2,1)],[params_true.zeta,params_true.zeta],'k-','LineWidth',2);
+
+[n,c] = hist3(sample_results',[ctres,ctres]);
+contour(c{1},c{2},n);
+
+xlabel(p_name{1});
+ylabel(p_name{2});
+set(gca,'FontSize',14);
