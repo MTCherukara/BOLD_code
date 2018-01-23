@@ -28,6 +28,8 @@ function PARAMS = param_update(VALUES,PARAMS,INFER)
     %
     % CHANGELOG:
     %
+    % 2018-01-23 (MTC). Added update for R2t.
+    %
     % 2017-09-04 (MTC). Added CSF compartment variables lambda, R2e and dF
     %       so that inference on data that includes CSF can also be tried.
     %
@@ -61,6 +63,8 @@ if (length(VALUES) == 1)
         PARAMS.R2e = VALUES;
     elseif strcmp(INFER,'dF')
         PARAMS.dF = VALUES;
+    elseif strcmp(INFER,'R2t')
+        PARAMS.R2t = VALUES;
     else
         disp('----param_update.m: Invalid parameter specified');
     end

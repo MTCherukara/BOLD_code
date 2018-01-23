@@ -17,6 +17,9 @@
 %
 % CHANGELOG:
 %
+% 2018-01-23 (MTC). Added multi-dimensional Metropolis, and analysis protocol
+%       for 3D.
+%
 % 2018-01-22 (MTC). Set the algorithm to save out the results of every single
 %       jump (inluding those that were rejected), so that the total number of
 %       jumps (not including burn-in) is the same as the total number of samples
@@ -31,27 +34,36 @@
 clear; close all;
 
 % Load Data
-load('ASE_Data/Data_180112_SNR_50.mat');
+load('ASE_Data/Data_180123_SNR_200.mat');
 params_true = params;
 
-% Parameters being inferred on: OEF and DBV
-np = 2;     % number of parameters
+% in analysis
+ctres = 50; % contour resolution
 
-% Parameter values
-% p_name = {'OEF'; 'zeta'};
-% p_init = [ 0.5 ,  0.05 ];
-% p_rng  = [ 0.0 ,  0.00  ;...
-%            1.0 ,  0.10 ];
-       
-p_name = {'R2p'; 'zeta'};
-p_init = [ 4.0 ,  0.05 ];
-p_rng  = [ 1.0 ,  0.00  ;...
-          10.0 ,  0.10 ];
-      
-infer_R2p = 1;      % are we inferring on R2'?
+% Parameter Values
+p_names = { 'OEF'; 'R2p'; 'zeta'; 'R2t' };
+p_infer = [   0      1  ,   1   ,   0   ];
+p_inits = [  0.5 ,  4.0 ,  0.04 ,  10.0 ];
+p_range = [  0.2 ,  1.0 ,  0.01 ,   1.0  ;...
+             0.6 , 10.0 ,  0.05 ,  20.0 ];
 
 % true R2p
-params_true.R2p = params_true.zeta*params_true.dw;
+
+% cut parameters down to size
+p_name = p_names(p_infer == 1);
+p_init = p_inits(p_infer == 1);
+p_rng  = p_range(:,p_infer == 1);
+
+% are we inferring on R2p?
+if p_infer(3) == 1
+    infer_R2p = 1;
+    params_true.R2p = params_true.zeta*params_true.dw;
+else
+    infer_R2p = 0;
+end
+
+% how many parameters?
+np = sum(p_infer);
 
 %% Metropolis Parameters
 j_brn  = 10000;      % number of jumps in the 'burn-in' phase
@@ -63,7 +75,13 @@ j_rng  = 500;       % range of samples to look over when updating scaling param
 c_rt  = 0;      % rate counter
 
 % ideal acceptance rate
-qs = 0.352;
+if np == 2
+    qs = 0.352;     % for 2 parameters
+elseif np == 3
+    qs = 0.316;     % for 3 parameters
+else % if np > 3
+    qs = 0.234;
+end
 
 
 %% Algorithm Initialization
@@ -72,8 +90,9 @@ qs = 0.352;
 X0 = p_init;
 
 % set parameter values to their initial guesses
-params = param_update(X0(1),params,p_name{1});
-params = param_update(X0(2),params,p_name{2});
+for pp = 1:np
+    params = param_update(X0(pp),params,p_name{pp});
+end
 
 % evaluate model at its initial parameter values
 S_mod = MTC_qASE_model(T_sample,TE_sample,params,infer_R2p);
@@ -111,8 +130,9 @@ for ii = 1:(j_brn+j_run)
         
     else
         % otherwise, evaluate the model
-        params = param_update(X1(1),params,p_name{1});
-        params = param_update(X1(2),params,p_name{2});
+        for pp = 1:np
+            params = param_update(X1(pp),params,p_name{pp});
+        end
         
         S_mod = MTC_qASE_model(T_sample,TE_sample,params,infer_R2p);
         
@@ -169,37 +189,91 @@ ylabel('Sample Acceptance Rate');
 set(gca,'FontSize',14);
 
 
-%% Display Results
+%% Scatter Plot
+% only when there are fewer than 20k points, otherwise the whole thing is just a
+% massive splodge
 
-% figure('WindowStyle','Docked');
-% hold on; box on;
-% 
-% % plot true values
-% % plot([params_true.OEF,params_true.OEF],[p_rng(1,2),p_rng(2,2)]  ,'r-','LineWidth',2);
-% plot([p_rng(1,1),p_rng(2,1)],[params_true.zeta,params_true.zeta],'r-','LineWidth',2);
-% plot([params_true.R2p,params_true.R2p],[p_rng(1,2),p_rng(2,2)]  ,'r-','LineWidth',2);
-% 
-% % plot results
-% scatter(sample_results(1,:),sample_results(2,:),'k.');
-% 
-% xlabel(p_name{1});
-% ylabel(p_name{2});
-% set(gca,'FontSize',14);
+if ( np == 2 && size(sample_results,2) < 20000)
+    figure('WindowStyle','Docked');
+    hold on; box on;
 
+    % plot true values
+    % plot([params_true.OEF,params_true.OEF],[p_rng(1,2),p_rng(2,2)]  ,'r-','LineWidth',2);
+    plot([p_rng(1,1),p_rng(2,1)],[params_true.zeta,params_true.zeta],'r-','LineWidth',2);
+    plot([params_true.R2p,params_true.R2p],[p_rng(1,2),p_rng(2,2)]  ,'r-','LineWidth',2);
+
+    % plot results
+    scatter(sample_results(1,:),sample_results(2,:),'k.');
+
+    xlabel(p_name{1});
+    ylabel(p_name{2});
+    set(gca,'FontSize',14);
+end
 
 %% Contour Plot
-ctres = 50; % contour resolution
+% in two dimensions
 
-figure('WindowStyle','Docked');
-hold on; box on;
+if np == 2
 
-plot([params_true.R2p,params_true.R2p],[p_rng(1,2),p_rng(2,2)]  ,'k-','LineWidth',2);
-% plot([params_true.OEF,params_true.OEF],[p_rng(1,2),p_rng(2,2)]  ,'k-','LineWidth',1);
-plot([p_rng(1,1),p_rng(2,1)],[params_true.zeta,params_true.zeta],'k-','LineWidth',2);
+    figure('WindowStyle','Docked');
+    hold on; box on;
 
-[n,c] = hist3(sample_results',[ctres,ctres]);
-contour(c{1},c{2},n);
+    if infer_R2p
+        plot([params_true.R2p,params_true.R2p],[p_rng(1,2),p_rng(2,2)]  ,'k-','LineWidth',2);
+    else
+        plot([params_true.OEF,params_true.OEF],[p_rng(1,2),p_rng(2,2)]  ,'k-','LineWidth',2);
+    end
+    plot([p_rng(1,1),p_rng(2,1)],[params_true.zeta,params_true.zeta],'k-','LineWidth',2);
 
-xlabel(p_name{1});
-ylabel(p_name{2});
-set(gca,'FontSize',14);
+    [n,c] = hist3(sample_results',[ctres,ctres]);
+    contour(c{1},c{2},n);
+
+    xlabel(p_name{1});
+    ylabel(p_name{2});
+    set(gca,'FontSize',14);
+    
+end % if np == 2
+
+
+%% 3D Analysis
+
+if np > 2
+    % choose which parameter 'plane' to look at
+    an_param = 3;       % 3 = R2
+    an_value = 11.0;
+    an_range = p_rng(2,an_param) - p_rng(1,an_param);
+
+    % how big a slice of the 3D volume?
+    slabwidth = 0.1;    % 10%
+
+    % define the boundaries of the slab
+    slabup = an_value + (slabwidth*an_range/2);
+    slabdn = an_value - (slabwidth*an_range/2);
+
+    % identify which points are within the slab
+    slab_vals = sample_results(an_param,:);
+    slab_log = logical((slab_vals > slabdn) .* (slab_vals < slabup));
+
+    % extract points from within the slab
+    slab_data = sample_results(1:2,slab_log);
+
+    % plot    
+    figure('WindowStyle','Docked');
+    hold on; box on;
+    
+    if infer_R2p
+        plot([params_true.R2p,params_true.R2p],[p_rng(1,2),p_rng(2,2)]  ,'k-','LineWidth',2);
+    else
+        plot([params_true.OEF,params_true.OEF],[p_rng(1,2),p_rng(2,2)]  ,'k-','LineWidth',2);
+    end
+    plot([p_rng(1,1),p_rng(2,1)],[params_true.zeta,params_true.zeta],'k-','LineWidth',2);
+    
+    [n,c] = hist3(slab_data',[ctres,ctres]);
+    contour(c{1},c{2},n);
+    
+    xlabel(p_name{1});
+    ylabel(p_name{2});
+    set(gca,'FontSize',14);
+
+    
+end % if np > 2

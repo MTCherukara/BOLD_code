@@ -419,7 +419,8 @@ void R2primeFwdModel::Evaluate(const ColumnVector &params, ColumnVector &result)
                 R2b  = ((16.4*Hct) +  4.5) + ( ((165.2*Hct) + 55.7)*pow(OEF,2.0) );
 
                 // linear model
-                Sb = exp(-R2b*(TE-tau))*exp(-R2bs*abs(tau));
+                // Sb = exp(-R2b*(TE-tau))*exp(-R2bs*abs(tau));
+                Sb = exp(-R2b*TE)*exp((R2b-R2bs)*abs(tau));
             }
 
             // add extracellular compartment
