@@ -146,32 +146,18 @@ void sqBOLDFwdModel::Evaluate(const ColumnVector &params, ColumnVector &result) 
     DBV = abs(paramcpy(DBV_index()));
     S0 = (paramcpy(S0_index()));
 
-    // now evaluate the static dephasing qBOLD model for 2 compartments
-    dw = R2p/DBV;
-    OEF = dw/(887.4082*Hct);
-
     // loop through taus (not the first one)
     result.ReSize(taus.Nrows());
+
+    result(1) = S0*exp(DBV);
 
     for (int ii = 2; ii <= taus.Nrows(); ii++)
     {
         double tau = taus(ii);
+        
+        // evaluate linear exponential
+        result(ii) = S0*exp(-R2p*tau);
 
-        // calculate tissue signal
-        if (tau < (-1.5/dw))
-        {
-            St = exp(DBV + (R2p*tau));
-        }
-        else if (tau > (1.5/dw))
-        {
-            St = exp(DBV - (R2p*tau));
-        }
-        else
-        {
-            St = exp(-0.3*DBV*pow(dw*tau,2.0));
-        }
-
-        result(ii) = S0*St;
     }
 
 
