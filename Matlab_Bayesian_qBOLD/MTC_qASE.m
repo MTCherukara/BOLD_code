@@ -34,7 +34,7 @@ clear;
 % close all;
 
 plot_fig = 1;       
-save_data = 1;      % set to 1 in order to save out ASE data
+save_data = 0;      % set to 1 in order to save out ASE data
 
 %% Model Parameters
 
@@ -68,7 +68,7 @@ tau = (-28:4:64)/1000; % for testing
 np = length(tau);
 
 % call MTC_qASE_model
-[S_total,params] = MTC_qASE_modelB(tau,params.TE,params);
+[S_total,params] = MTC_qASE_model(tau,params.TE,params);
 
 
 %% Add Noise

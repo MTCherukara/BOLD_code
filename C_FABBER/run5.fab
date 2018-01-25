@@ -1,8 +1,8 @@
 # fabber run 5 - SQBOLD
 
 # Input Data
-data=../../Data/validation_sqbold/vs1/sub01_ASE_FLAIR_longnorm.nii.gz
-mask=../../Data/validation_sqbold/vs1/mask_ncsf_40.nii.gz
+data=../../Data/validation_sqbold/vs7/sub07_ASE_FLAIR_longnorm.nii.gz
+mask=../../Data/validation_sqbold/vs7/mask_ncsf_40.nii.gz
 
 # Run Options
 output=../../Data/Fabber_Results/
