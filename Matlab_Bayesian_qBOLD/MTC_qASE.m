@@ -62,13 +62,13 @@ params.SNR = 200;
 %% Compute Model
 
 % define tau values that we want to simulate
-tau = (-28:4:64)/1000; % for testing
-% tau = linspace(-0.016,0.072,1000); % for visualising
+% tau = (-28:4:64)/1000; % for testing
+tau = linspace(-0.032,0.072,1000); % for visualising
 
 np = length(tau);
 
 % call MTC_qASE_model
-[S_total,params] = MTC_qASE_model(tau,params.TE,params);
+[S_total,params] = MTC_qASE_modelB(tau,params.TE,params);
 
 
 %% Add Noise
@@ -83,7 +83,7 @@ params.sig = min(S_total)/params.SNR;
 if plot_fig
     
     % create a figure
-    figure();
+    figure(2);
     set(gcf,'WindowStyle','docked');
     hold on; box on;
 
@@ -93,7 +93,7 @@ if plot_fig
     % plot the signal
     S_log = log(S_total);
     l.s = plot(1000*tau,S_log,'-','LineWidth',3);
-    plot(1000*tau,log(S_sample),'kx','LineWidth',2);
+%     plot(1000*tau,log(S_sample),'kx','LineWidth',2);
     xlim([-20,80]);
     
     % for comparing inferred values

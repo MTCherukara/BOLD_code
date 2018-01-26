@@ -105,7 +105,7 @@ void sqBOLDFwdModel::HardcodedInitialDists(MVNDist &prior, MVNDist &posterior) c
     // create diagonal matrix to store precisions
     SymmetricMatrix precisions = IdentityMatrix(NumParams()) * 1e-3;
 
-    prior.means(R2p_index()) = 6.0;
+    prior.means(R2p_index()) = 4.0;
     precisions(R2p_index(), R2p_index()) = 1e-2; // 1e-2
     
     prior.means(DBV_index()) = 0.05;

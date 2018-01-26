@@ -31,7 +31,8 @@
 
 %% Script Initialization
 
-clear; close all;
+clear; 
+% close all;
 
 % Load Data
 load('ASE_Data/Data_180123_SNR_200.mat');
@@ -42,7 +43,7 @@ ctres = 50; % contour resolution
 
 % Parameter Values
 p_names = { 'OEF'; 'R2p'; 'zeta'; 'R2t' };
-p_infer = [   0      1  ,   1   ,   0   ];
+p_infer = [   1  ,   0  ,   1   ,   0   ];
 p_inits = [  0.5 ,  4.0 ,  0.04 ,  10.0 ];
 p_range = [  0.2 ,  1.0 ,  0.01 ,   1.0  ;...
              0.6 , 10.0 ,  0.05 ,  20.0 ];
@@ -55,7 +56,7 @@ p_init = p_inits(p_infer == 1);
 p_rng  = p_range(:,p_infer == 1);
 
 % are we inferring on R2p?
-if p_infer(3) == 1
+if p_infer(2) == 1
     infer_R2p = 1;
     params_true.R2p = params_true.zeta*params_true.dw;
 else

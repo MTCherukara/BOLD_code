@@ -1,9 +1,13 @@
-% function FabberAverages(varargin)
+function FabberAverages(fabber)
 
 clear; clc;
 
 % select a fabber run
-fabber = '256';
+if ~exist('fabber','var')
+    fabber = '242';
+end
+
+% load data
 resdir = '/Users/mattcher/Documents/DPhil/Data/Fabber_Results/';
 fdname = dir([resdir,'fabber_',fabber,'_*']);
 fabdir = strcat(resdir,fdname.name,'/');

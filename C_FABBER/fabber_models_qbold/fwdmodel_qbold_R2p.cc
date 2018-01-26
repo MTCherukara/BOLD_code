@@ -202,14 +202,14 @@ void R2primeFwdModel::HardcodedInitialDists(MVNDist &prior, MVNDist &posterior) 
 
     if (infer_R2p)
     {
-        prior.means(R2p_index()) = 6.0;
-        precisions(R2p_index(), R2p_index()) = 1e-2; // 1e-2
+        prior.means(R2p_index()) = 4.0;
+        precisions(R2p_index(), R2p_index()) = 1; // 1e-2
     }
 
     if (infer_DBV)
     {
-        prior.means(DBV_index()) = 0.05;
-        precisions(DBV_index(), DBV_index()) = 1e-1; // 1e-1
+        prior.means(DBV_index()) = 0.02;
+        precisions(DBV_index(), DBV_index()) = 1000; // 1e-1
     }
 
     if (infer_R2t)
@@ -297,7 +297,7 @@ void R2primeFwdModel::Evaluate(const ColumnVector &params, ColumnVector &result)
     // assign values to parameters
     if (infer_R2p)
     {
-        R2p = abs(paramcpy(R2p_index()));
+        R2p = (paramcpy(R2p_index()));
     }
     else
     {
@@ -305,7 +305,7 @@ void R2primeFwdModel::Evaluate(const ColumnVector &params, ColumnVector &result)
     }
     if (infer_DBV)
     {
-        DBV = abs(paramcpy(DBV_index()));
+        DBV = (paramcpy(DBV_index()));
     }
     else
     {
