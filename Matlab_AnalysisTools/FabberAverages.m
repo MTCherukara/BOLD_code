@@ -1,4 +1,6 @@
 function FabberAverages(fabber)
+    % Loads a particular Fabber dataset and displays the average (mean and
+    % median) values of R2' and DBV in the top 8 slices.
 
 clear; clc;
 
