@@ -37,14 +37,14 @@ tic;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Inference Parameters
 
-np = 100; % number of points to perform Bayesian analysis on
+np = 1000; % number of points to perform Bayesian analysis on
 nz = 41; % number of points in the third dimension
 
 % Select which parameter(s) to infer on (1 = OEF, 2 = DBV, 3 = R2', 4 = CSF, 5 = dF)
-pars = [1,2];
+pars = [3,2];
 
 % Load the Data:
-load('ASE_Data/Data_180112_SNR_200.mat');
+load('ASE_Data/Data_180112_SNR_50.mat');
 
 % extract relevant parameters
 sigma = mean(params.sig);   % real std of noise
@@ -57,8 +57,8 @@ if ~exist('TE_sample','var')
 end
 
 % Parameter names and search ranges
-pnames  = { 'OEF' ; 'zeta'   ; 'R2p' ; 'lam0'    ; 'dF' };
-intervs = [ 0,1   ; 0.01,0.08 ; 2,7   ; 0.0,0.2 ; 1,10 ];  
+pnames  = { 'OEF' ; 'zeta'     ; 'R2p' ; 'lam0'    ; 'dF' };
+intervs = [ 0,1   ; 0.01,0.065 ; 2,7   ; 0.0,0.2 ; 1,10 ];  
 %            OEF     DBV        R2'     v_CSF      dF 
 
 % are we inferring on R2'?
@@ -196,7 +196,7 @@ toc;
 % create docked figure
 figure('WindowStyle','docked');
 hold on; box on;
-set(gca,'FontSize',16);
+set(gca,'FontSize',18);
 
 if length(pars) == 1
     % Plot 1D grid search results
@@ -212,7 +212,7 @@ elseif length(pars) == 2
     % Plot 2D grid search results
     
     Pscale = [quantile(pos(:),0.75), max(pos(:))];
-    imagesc(vals(2,:),vals(1,:),(pos)); hold on;
+    imagesc(vals(2,:),vals(1,:),exp(pos)); hold on;
     c=colorbar;
     plot([trv(2),trv(2)],[  0, 30],'w-','LineWidth',2);
     plot([  0, 30],[trv(1),trv(1)],'w-','LineWidth',2);
@@ -224,6 +224,6 @@ elseif length(pars) == 2
     
     axis([min(vals(2,:)),max(vals(2,:)),min(vals(1,:)),max(vals(1,:))]);
     set(gca,'YDir','normal');
-    set(c,'FontSize',16);
+    set(c,'FontSize',19);
     
 end % if length(pars) == 1 ... elseif ...

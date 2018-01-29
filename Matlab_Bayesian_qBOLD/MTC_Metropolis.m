@@ -32,21 +32,19 @@
 %% Script Initialization
 
 clear; 
-% close all;
+close all;
 
 % Load Data
-load('ASE_Data/Data_180123_SNR_200.mat');
+load('ASE_Data/Data_180112_SNR_200.mat');
 params_true = params;
 
-% in analysis
-ctres = 50; % contour resolution
 
 % Parameter Values
 p_names = { 'OEF'; 'R2p'; 'zeta'; 'R2t' };
-p_infer = [   1  ,   0  ,   1   ,   0   ];
-p_inits = [  0.5 ,  4.0 ,  0.04 ,  10.0 ];
-p_range = [  0.2 ,  1.0 ,  0.01 ,   1.0  ;...
-             0.6 , 10.0 ,  0.05 ,  20.0 ];
+p_infer = [   0  ,   1  ,   1   ,   0   ];
+p_inits = [  0.5 ,  4.0 ,  0.026,  10.0 ];
+p_range = [  0.2 ,  3.0 ,  0.02 ,   1.0  ;...
+             0.6 ,  5.5 ,  0.04 ,  20.0 ];
 
 % true R2p
 
@@ -182,12 +180,12 @@ toc;
 
 
 %% Display Acceptance Rate Trend
-figure('WindowStyle','Docked');
-hold on; box on;
-plot(accept_rate(1:end-1),'k-');
-xlabel('Iterations');
-ylabel('Sample Acceptance Rate');
-set(gca,'FontSize',14);
+% figure('WindowStyle','Docked');
+% hold on; box on;
+% plot(accept_rate(1:end-1),'k-');
+% xlabel('Iterations');
+% ylabel('Sample Acceptance Rate');
+% set(gca,'FontSize',14);
 
 
 %% Scatter Plot
@@ -215,23 +213,25 @@ end
 % in two dimensions
 
 if np == 2
+    
+    ctres = 40; % contour resolution
 
     figure('WindowStyle','Docked');
     hold on; box on;
 
     if infer_R2p
-        plot([params_true.R2p,params_true.R2p],[p_rng(1,2),p_rng(2,2)]  ,'k-','LineWidth',2);
+        plot([p_rng(1,2),p_rng(2,2)], [params_true.R2p,params_true.R2p],'k-','LineWidth',2);
     else
-        plot([params_true.OEF,params_true.OEF],[p_rng(1,2),p_rng(2,2)]  ,'k-','LineWidth',2);
+        plot([p_rng(1,2),p_rng(2,2)], [params_true.OEF,params_true.OEF],'k-','LineWidth',2);
     end
-    plot([p_rng(1,1),p_rng(2,1)],[params_true.zeta,params_true.zeta],'k-','LineWidth',2);
+    plot([params_true.zeta,params_true.zeta], [p_rng(1,1),p_rng(2,1)],'k-','LineWidth',2);
 
     [n,c] = hist3(sample_results',[ctres,ctres]);
-    contour(c{1},c{2},n);
+    contour(c{2},c{1},n);
 
-    xlabel(p_name{1});
-    ylabel(p_name{2});
-    set(gca,'FontSize',14);
+    xlabel(p_name{2});
+    ylabel(p_name{1});
+    set(gca,'FontSize',18);
     
 end % if np == 2
 
@@ -239,6 +239,9 @@ end % if np == 2
 %% 3D Analysis
 
 if np > 2
+    
+    ctres = 25; % contour resolution
+
     % choose which parameter 'plane' to look at
     an_param = 3;       % 3 = R2
     an_value = 11.0;
