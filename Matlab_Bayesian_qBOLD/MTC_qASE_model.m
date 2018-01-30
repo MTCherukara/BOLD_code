@@ -72,10 +72,13 @@ end
 PARAMS.R2b  = 16.4*PARAMS.Hct + 4.5  + (165.2*PARAMS.Hct + 55.7)*PARAMS.OEF^2;
 PARAMS.R2bs = 14.9*PARAMS.Hct + 14.7 + (302.1*PARAMS.Hct + 41.8)*PARAMS.OEF^2;
 
+% weighting of blood mb
+mb = exp(-(TE-TAU).*PARAMS.R2b).*(1 - exp(-(3-(TE-TAU)/2)/1.58) + exp(-3/1.58));
+
 % compartment weightings
-w_tis = 1 - PARAMS.lam0 - PARAMS.zeta;
 w_csf = PARAMS.lam0;
-w_bld = PARAMS.zeta;
+w_bld = 0.66.*mb.*PARAMS.zeta;
+w_tis = 1 - w_csf - w_bld;
 
 % CALCULATE MODEL:
 

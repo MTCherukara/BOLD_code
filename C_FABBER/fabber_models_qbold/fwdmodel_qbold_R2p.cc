@@ -421,6 +421,13 @@ void R2primeFwdModel::Evaluate(const ColumnVector &params, ColumnVector &result)
                 // linear model
                 // Sb = exp(-R2b*(TE-tau))*exp(-R2bs*abs(tau));
                 Sb = exp(-R2b*TE)*exp((R2b-R2bs)*abs(tau));
+
+                /*
+                // adjusted blood compartment weighting
+                /double T1 = 1.58;
+                double mb = 1 - exp(-(3.0-(TE-tau)/2)/T1) + exp(-3.0/T1);
+                Sb *= 0.66*mb;
+                */
             }
 
             // add extracellular compartment
