@@ -1,14 +1,34 @@
 % function FabberBoxes
     % Loads a bunch of FABBER datasets and displays the resulting parameter
     % estimates as box-plots (see BoxResiduals.m)
+    %
+    % MT Cherukara
+    % 29 January 2017 
     
-clear; clc;
+clear;
 
 % select a variable
-vname = 'R2p';      % 'R2p' or 'DBV'
+vname = 'OEF';      % 'R2p' or 'DBV' or 'OEF'
+
+% select a subject
+subj = 7;
 
 % designate FABBER results folders
-fsets = {'242';'243'};
+%         SQ-LS    SQ-VB   1C-VB   2C-VB    2C-VBI
+fsets = { '101'  , '250' , '208' , '201' , '236' ;...   % subject vs1
+          '102'  , '251' , '209' , '202' , '237' ;...   % subject vs2
+          '103'  , '252' , '210' , '203' , '238' ;...   % subject vs3
+          '104'  , '253' , '211' , '204' , '239' ;...   % subject vs4
+          '105'  , '254' , '212' , '205' , '240' ;...   % subject vs5
+          '106'  , '255' , '213' , '206' , '241' ;...   % subject vs6
+          '107'  , '256' , '214' , '207' , '242' };     % subject vs7
+
+
+lbls = {'sqBOLD','L-VB','1C-VB','2C-VB','2C-VB-I'};
+
+fsets = fsets(subj,:);  % pull out subjects
+% fsets = fsets(2:5);     % pull out the samples we actually want
+% lbls  = lbls( 2:5);     % take the right labells
 
 % slices
 slicenum = 3:10;
@@ -19,7 +39,8 @@ slicenum = 3:10;
 resdir = '/Users/mattcher/Documents/DPhil/Data/Fabber_Results/';
 
 % load mask slice
-maskslice = LoadSlice('/Users/mattcher/Documents/DPhil/Data/validation_sqbold/vs1/mask_gm_60.nii.gz',slicenum);
+maskslice = LoadSlice(['/Users/mattcher/Documents/DPhil/Data/validation_sqbold/vs',...
+                      num2str(subj),'/mask_gm_60.nii.gz'],slicenum);
 
 % define data vector
 alldata = [];
@@ -42,13 +63,13 @@ for ii = 1:length(fsets)
     dataslice = abs(dataslice(:));
     dataslice(dataslice == 0) = [];
 
-    % remove abberant DBV values
-    if strcmp(vname,'DBV')
+    % remove abberant values, except when inferring R2p
+    if ~strcmp(vname,'R2p')
         dataslice(dataslice > 1) = [];
     end
     
     % measure number of points we have
-    lndata = [lndata; length(dataslice)];
+    lngdata = [lngdata; length(dataslice)];
     
     % store whisker data
     wsk = [wsk; quantile(dataslice,[0.25,0.75])];
@@ -81,10 +102,27 @@ ww = max( wsk(:,2) + 1.5*(wsk(:,2)-wsk(:,1)) );
 % make the box-plot
 figure('WindowStyle','Docked');
 hold on; box on;
-boxplot(alldata,grpdata,'Width',0.75);
-ylabel(vname);
-ylim([-0.1,1.1]*ww);
-set(gca,'FontSize',16);
+h=boxplot(alldata ,grpdata ,...
+          'Width' ,  0.60  ,...
+          'Notch' ,  'on'  ,...
+          'Labels',  lbls );
+      
+set(h(7,:),'Visible','off');
+set(gca,'FontSize',18);
+title(['Subject ',num2str(subj)]);
+
+if strcmp(vname,'R2p')
+    ylabel('R_2''');
+    ylim([-0.5,12.5]);
+else
+    ylabel(vname);
+    if strcmp(vname,'DBV')
+        ylim([-0.01,0.31]);
+    else
+        ylim([-0.05,1.05]);
+    end
+end
+
 
 
 
