@@ -11,7 +11,7 @@ clear;
 vname = 'OEF';      % 'R2p' or 'DBV' or 'OEF'
 
 % select a subject
-subj = 7;
+subj = 6;
 
 % designate FABBER results folders
 %         SQ-LS    SQ-VB   1C-VB   2C-VB    2C-VBI

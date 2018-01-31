@@ -44,7 +44,7 @@ nz = 41; % number of points in the third dimension
 pars = [1,2];
 
 % Load the Data:
-load('ASE_Data/Data_180130_SNR_200.mat');
+load('ASE_Data/Data_180123_SNR_200.mat');
 
 % extract relevant parameters
 sigma = mean(params.sig);   % real std of noise
@@ -214,6 +214,7 @@ elseif length(pars) == 2
     Pscale = [quantile(pos(:),0.75), max(pos(:))];
     imagesc(vals(2,:),vals(1,:),(pos),Pscale); hold on;
     c=colorbar;
+    colormap('parula');
     plot([trv(2),trv(2)],[  0, 30],'w-','LineWidth',2);
     plot([  0, 30],[trv(1),trv(1)],'w-','LineWidth',2);
     

@@ -2,7 +2,7 @@
 
 # Input Data
 data=../../Data/validation_sqbold/vs7/sub07_ASE_FLAIR_longnorm.nii.gz
-mask=../../Data/validation_sqbold/vs7/mask_ncsf_40.nii.gz
+mask=../../Data/validation_sqbold/vs7/sub07_ASE_FLAIR_av_mask.nii.gz
 
 # Run Options
 output=../../Data/Fabber_Results/
@@ -10,13 +10,13 @@ save-residuals
 save-model-fit
 
 # Method Information
-method=vb
+method=spatialvb
 noise=white
 max-iterations=10
 
 # Spatial VB Information (remove all of this if method!=spatialvb)
-#param-spatial-priors=MMM
-#allow-bad-voxels
+param-spatial-priors=MMM
+allow-bad-voxels
 #image-prior6=../../Data/subject_06/CSF_T2fit.nii.gz
 
 # Inference Model 
