@@ -3,10 +3,11 @@ function FabberAverages(fabber)
     % median) values of R2' and DBV in the top 8 slices.
 
 clear; clc;
+% close all;
 
 % select a fabber run
 if ~exist('fabber','var')
-    fabber = '242';
+    fabber = '255';
 end
 
 % load data
@@ -78,5 +79,26 @@ disp(['Median DBV: ',num2str(100*median(DBVslice))]);
 % disp('   ');
 % disp(['Mean OEF  : ',num2str(100*mean(R2pslice)/(301.74*mean(DBVslice)))]);
 % disp(['Median OEF: ',num2str(100*median(R2pslice)/(301.74*median(DBVslice)))]);
+
+%% Histograms
+
+nb = 25;            % number of bins
+thr = [0.2,10];     % thresholds [DBV, R2p]
+
+% apply threshold by removing voxels that are too high
+DBVslice(DBVslice > thr(1)) = [];
+R2pslice(R2pslice > thr(2)) = [];
+
+figure('WindowStyle','Docked');
+hold on; box on;
+histogram(100*DBVslice,nb);
+xlabel('DBV_ ');
+set(gca,'FontSize',18);
+
+figure('WindowStyle','Docked');
+hold on; box on;
+histogram(R2pslice,nb);
+xlabel('R_2''');
+set(gca,'FontSize',18);
 
 

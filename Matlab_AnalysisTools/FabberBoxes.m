@@ -8,7 +8,7 @@
 clear;
 
 % select a variable
-vname = 'OEF';      % 'R2p' or 'DBV' or 'OEF'
+vname = 'R2p';      % 'R2p' or 'DBV' or 'OEF'
 
 % select a subject
 subj = 6;
