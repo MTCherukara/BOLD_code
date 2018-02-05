@@ -65,6 +65,8 @@ if (length(VALUES) == 1)
         PARAMS.dF = VALUES;
     elseif strcmp(INFER,'R2t')
         PARAMS.R2t = VALUES;
+    elseif strcmp(INFER,'geom')
+        PARAMS.geom = VALUES;
     else
         disp('----param_update.m: Invalid parameter specified');
     end

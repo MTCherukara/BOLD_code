@@ -11,29 +11,27 @@ runs = {'208', '209', '210', '211', '212', '213', '214'};       % 1C-VB
 % runs = {'201', '202', '203', '204', '205', '206', '207'};       % 2C-VB
 fabber = runs{ss};
 resdir = '/Users/mattcher/Documents/DPhil/Data/Fabber_Results/';
+rawdir = ['/Users/mattcher/Documents/DPhil/Data/validation_sqbold/vs',num2str(ss),'/'];
 fdname = dir([resdir,'fabber_',fabber,'_*']);
 fabdir = strcat(resdir,fdname.name,'/');
 
 slicenum = 3:10;
 
 % Load a mask
-maskslice = LoadSlice(['/Users/mattcher/Documents/DPhil/Data/validation_sqbold/vs',num2str(ss),'/mask_gm_60.nii.gz'],slicenum);
+maskslice = LoadSlice([rawdir,'mask_gm_60.nii.gz'],slicenum);
 
 % Load data
-modeldata = read_avw([fabdir,'modelfit.nii.gz']);
-rawdata   = read_avw( ['/Users/mattcher/Documents/DPhil/Data/validation_sqbold/vs',num2str(ss),'/sub0',num2str(ss),'_ASE_FLAIR_av_mc.nii.gz']);
+resdata = read_avw([fabdir,'modelfit.nii.gz']);
+rawdata = read_avw([rawdir,'sub0',num2str(ss),'_ASE_FLAIR_av_mc.nii.gz']);
 
 % Select slices
-modeldata = modeldata(:,:,slicenum,:);
+resdata = resdata(:,:,slicenum,:);
 rawdata = rawdata(:,:,slicenum,:);
-mdims = size(modeldata);
+mdims = size(resdata);
 
 % Apply mask
-modeldata = modeldata.*repmat(maskslice,1,1,1,mdims(4));
 rawdata = rawdata.*repmat(maskslice,1,1,1,mdims(4));
 
-% Identify extreme points and mask those out too
-%%% Will do this later
 
 % pre-allocate
 volsignal = zeros(1,mdims(4));
@@ -42,32 +40,43 @@ rawsignal = zeros(1,mdims(4));
 % Loop through volumes and average over grey matter
 for ii = 1:mdims(4)
     
-    voldata = modeldata(:,:,:,ii);
-    voldata = voldata(:);
+    % extract volume and apply mask
+    resvector = resdata(:,:,:,ii).*maskslice;
     
-    % remove extreme values
-    vl = quantile(voldata,0.9995);
-    voldata(voldata > vl) = [];
+    % vectorize
+    resvector = resvector(:);
     
-    % remove zeros
-    voldata(voldata == 0) = [];
+    %  remove zeros
+    resvector(resvector == 0) = [];
+    
+    % remove extremely high values
+    resvector(resvector > quantile(resvector,0.95)) = [];
+    
+    % remove extremely low values
+    resvector(resvector < quantile(resvector,0.05)) = [];
     
     % average
-    volsignal(ii) = mean(voldata);
+    volsignal(ii) = mean(resvector);
     
     % same again, but for the raw data
-    voldata = rawdata(:,:,:,ii);
-    voldata = voldata(:);
     
-    % remove extreme values
-    vl = quantile(voldata,0.9995);
-    voldata(voldata > vl) = [];
+    % extract volume and apply mask
+    rawvector = rawdata(:,:,:,ii).*maskslice;
     
-    % remove zeros
-    voldata(voldata == 0) = [];
+    % vectorize
+    rawvector = rawvector(:);
+    
+    %  remove zeros
+    rawvector(rawvector == 0) = [];
+    
+    % remove extremely high
+    rawvector(rawvector > quantile(rawvector,0.98)) = [];
+    
+    % remove extremely low values
+    rawvector(rawvector < quantile(resvector,0.02)) = [];
     
     % average
-    rawsignal(ii) = mean(voldata);
+    rawsignal(ii) = mean(rawvector);
 end
 
 % tau values

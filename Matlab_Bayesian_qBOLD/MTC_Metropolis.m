@@ -17,6 +17,9 @@
 %
 % CHANGELOG:
 %
+% 2018-02-05 (MTC). Came up with a better, more extensible, method for
+%       displaying the results.
+%
 % 2018-01-23 (MTC). Added multi-dimensional Metropolis, and analysis protocol
 %       for 3D.
 %
@@ -35,16 +38,16 @@ clear;
 close all;
 
 % Load Data
-load('ASE_Data/Data_180112_SNR_200.mat');
+load('ASE_Data/Data_180205_SNR_200.mat');
 params_true = params;
 
 
 % Parameter Values
-p_names = { 'OEF'; 'R2p'; 'zeta'; 'R2t' };
-p_infer = [   0  ,   1  ,   1   ,   0   ];
-p_inits = [  0.5 ,  4.0 ,  0.026,  10.0 ];
-p_range = [  0.2 ,  3.0 ,  0.02 ,   1.0  ;...
-             0.6 ,  5.5 ,  0.04 ,  20.0 ];
+p_names = { 'OEF'; 'R2p'; 'zeta'; 'R2t' ; 'geom' };
+p_infer = [   0  ,   1  ,   1   ,   1   ,  0     ];
+p_inits = [  0.5 ,  4.0 ,  0.026,  10.0 ,  0.3   ];
+p_range = [  0.2 ,  3.0 ,  0.02 ,   5.0 ,  0.1    ;...
+             0.6 ,  5.5 ,  0.04 ,  15.0 ,  0.5   ];
 
 % true R2p
 
@@ -90,7 +93,7 @@ X0 = p_init;
 
 % set parameter values to their initial guesses
 for pp = 1:np
-    params = param_update(X0(pp),params,p_name{pp});
+    eval(['params.',p_name{pp},'=',num2str(X0(pp)),';']);
 end
 
 % evaluate model at its initial parameter values
@@ -130,7 +133,7 @@ for ii = 1:(j_brn+j_run)
     else
         % otherwise, evaluate the model
         for pp = 1:np
-            params = param_update(X1(pp),params,p_name{pp});
+            eval(['params.',p_name{pp},'=',num2str(X1(pp)),';']);
         end
         
         S_mod = MTC_qASE_model(T_sample,TE_sample,params,infer_R2p);
@@ -210,74 +213,126 @@ if ( np == 2 && size(sample_results,2) < 20000)
 end
 
 %% Contour Plot
-% in two dimensions
-
-if np == 2
-    
-    ctres = 40; % contour resolution
-
-    figure('WindowStyle','Docked');
-    hold on; box on;
-
-    if infer_R2p
-        plot([p_rng(1,2),p_rng(2,2)], [params_true.R2p,params_true.R2p],'k-','LineWidth',2);
-    else
-        plot([p_rng(1,2),p_rng(2,2)], [params_true.OEF,params_true.OEF],'k-','LineWidth',2);
-    end
-    plot([params_true.zeta,params_true.zeta], [p_rng(1,1),p_rng(2,1)],'k-','LineWidth',2);
-
-    [n,c] = hist3(sample_results',[ctres,ctres]);
-    contour(c{2},c{1},n);
-
-    xlabel(p_name{2});
-    ylabel(p_name{1});
-    set(gca,'FontSize',18);
-    
-end % if np == 2
+% % in two dimensions
+% 
+% if np == 2
+%     
+%     ctres = 25; % contour resolution
+% 
+%     figure('WindowStyle','Docked');
+%     hold on; box on;
+% 
+%     if infer_R2p
+%         plot([p_rng(1,2),p_rng(2,2)], [params_true.R2p,params_true.R2p],'k-','LineWidth',2);
+%     else
+%         plot([p_rng(1,2),p_rng(2,2)], [params_true.OEF,params_true.OEF],'k-','LineWidth',2);
+%     end
+%     plot([params_true.zeta,params_true.zeta], [p_rng(1,1),p_rng(2,1)],'k-','LineWidth',2);
+% 
+%     [n,c] = hist3(sample_results',[ctres,ctres]);
+%     contour(c{2},c{1},n);
+% 
+%     xlabel(p_name{2});
+%     ylabel(p_name{1});
+%     set(gca,'FontSize',18);
+%     
+% end % if np == 2
 
 
 %% 3D Analysis
 
-if np > 2
+% if np > 2
+%     
+%     ctres = 25; % contour resolution
+% 
+%     % choose which parameter 'plane' to look at
+%     an_param = 3;       % 3 = R2
+%     an_value = 11.0;
+%     an_range = p_rng(2,an_param) - p_rng(1,an_param);
+% 
+%     % how big a slice of the 3D volume?
+%     slabwidth = 0.1;    % 10%
+% 
+%     % define the boundaries of the slab
+%     slabup = an_value + (slabwidth*an_range/2);
+%     slabdn = an_value - (slabwidth*an_range/2);
+% 
+%     % identify which points are within the slab
+%     slab_vals = sample_results(an_param,:);
+%     slab_log = logical((slab_vals > slabdn) .* (slab_vals < slabup));
+% 
+%     % extract points from within the slab
+%     slab_data = sample_results(1:2,slab_log);
+% 
+%     % plot    
+%     figure('WindowStyle','Docked');
+%     hold on; box on;
+%     
+%     if infer_R2p
+%         plot([params_true.R2p,params_true.R2p],[p_rng(1,2),p_rng(2,2)]  ,'k-','LineWidth',2);
+%     else
+%         plot([params_true.OEF,params_true.OEF],[p_rng(1,2),p_rng(2,2)]  ,'k-','LineWidth',2);
+%     end
+%     plot([p_rng(1,1),p_rng(2,1)],[params_true.zeta,params_true.zeta],'k-','LineWidth',2);
+%     
+%     [n,c] = hist3(slab_data',[ctres,ctres]);
+%     contour(c{1},c{2},n);
+%     
+%     xlabel(p_name{1});
+%     ylabel(p_name{2});
+%     set(gca,'FontSize',14);
+% 
+%     
+% end % if np > 2
+
+
+%% High Dimensional Result Presentation
+
+% resolutions
+hres = 25;
+cres = 25;
+
+% individual parameter histograms
+for pp = 1:np
     
-    ctres = 25; % contour resolution
-
-    % choose which parameter 'plane' to look at
-    an_param = 3;       % 3 = R2
-    an_value = 11.0;
-    an_range = p_rng(2,an_param) - p_rng(1,an_param);
-
-    % how big a slice of the 3D volume?
-    slabwidth = 0.1;    % 10%
-
-    % define the boundaries of the slab
-    slabup = an_value + (slabwidth*an_range/2);
-    slabdn = an_value - (slabwidth*an_range/2);
-
-    % identify which points are within the slab
-    slab_vals = sample_results(an_param,:);
-    slab_log = logical((slab_vals > slabdn) .* (slab_vals < slabup));
-
-    % extract points from within the slab
-    slab_data = sample_results(1:2,slab_log);
-
-    % plot    
     figure('WindowStyle','Docked');
     hold on; box on;
+    histogram(sample_results(pp,:),hres);
+    xlabel(p_name{pp});
+    xlim(p_rng(:,pp));
+    set(gca,'FontSize',18);
     
-    if infer_R2p
-        plot([params_true.R2p,params_true.R2p],[p_rng(1,2),p_rng(2,2)]  ,'k-','LineWidth',2);
-    else
-        plot([params_true.OEF,params_true.OEF],[p_rng(1,2),p_rng(2,2)]  ,'k-','LineWidth',2);
-    end
-    plot([p_rng(1,1),p_rng(2,1)],[params_true.zeta,params_true.zeta],'k-','LineWidth',2);
+end
+
+p_pairs = combnk(1:np,2);
+
+% pair-wise contour plots
+for pp = 1:size(p_pairs,1)
     
-    [n,c] = hist3(slab_data',[ctres,ctres]);
-    contour(c{1},c{2},n);
+    % parameters
+    prm1 = p_pairs(pp,1);
+    prm2 = p_pairs(pp,2);
+        
+    % collect contour points
+    [n,c] = hist3(sample_results([prm1,prm2],:)',[cres,cres]);
     
-    xlabel(p_name{1});
-    ylabel(p_name{2});
-    set(gca,'FontSize',14);
+    % plot
+    figure('WindowStyle','Docked');
+    hold on; box on;
+    contour(c{2},c{1},n);
+    
+    % labels
+    xlabel(p_name{prm2});
+    ylabel(p_name{prm1});
+    set(gca,'FontSize',18);
+    
+    % pull out true values
+    true1 = eval(['params_true.',p_name{prm1}]);
+    true2 = eval(['params_true.',p_name{prm2}]);
+    
+    % plot true values
+    plot([p_rng(1,prm2),p_rng(2,prm2)],[true1,true1],'k-','LineWidth',2);
+    plot([true2,true2],[p_rng(1,prm1),p_rng(2,prm1)],'k-','LineWidth',2);
 
     
-end % if np > 2
+end

@@ -12,6 +12,9 @@
 %
 % CHANGELOG:
 %
+% 2018-02-05 (MTC). Removed the need for the 'param_update' function. Fixed a
+%       bug in the 1D grid search method.
+%
 % 2018-01-12 (MTC). Changed the way the posterior is calculated to actually
 %       calculate log-likelihood, using the function MTC_loglike.m. This
 %       technically shouldn't alter the shape of any of the posterior
@@ -37,14 +40,15 @@ tic;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Inference Parameters
 
-np = 1000; % number of points to perform Bayesian analysis on
+np = 100; % number of points to perform Bayesian analysis on
 nz = 41; % number of points in the third dimension
 
-% Select which parameter(s) to infer on (1 = OEF, 2 = DBV, 3 = R2', 4 = CSF, 5 = dF)
-pars = [1,2];
+% Select which parameter(s) to infer on
+%       (1 = OEF, 2 = DBV, 3 = R2', 4 = CSF, 5 = dF, 6 = geom)
+pars = [6];
 
 % Load the Data:
-load('ASE_Data/Data_180123_SNR_200.mat');
+load('ASE_Data/Data_180112_SNR_50.mat');
 
 % extract relevant parameters
 sigma = mean(params.sig);   % real std of noise
@@ -57,9 +61,9 @@ if ~exist('TE_sample','var')
 end
 
 % Parameter names and search ranges
-pnames  = { 'OEF' ; 'zeta'     ; 'R2p' ; 'lam0'    ; 'dF' };
-intervs = [ 0.001,1   ; 0.001,0.1 ; 2,7   ; 0.0,0.2 ; 1,10 ];  
-%            OEF     DBV        R2'     v_CSF      dF 
+pnames  = { 'OEF'   ;  'zeta'   ; 'R2p' ; 'lam0'  ; 'dF' ; 'geom'  };
+intervs = [ 0.001,1 ; 0.001,0.1 ; 2,7   ; 0.0,0.2 ; 1,10 ; 0.1,0.5 ];  
+%            OEF     DBV        R2'     v_CSF      dF       Geom
 
 % are we inferring on R2'?
 if sum(pars == 3) > 0
@@ -80,26 +84,23 @@ if length(pars) == 1
     
     trv = eval(['params.',pname]); % true value of parameter
     vals = linspace(intervs(pn,1),intervs(pn,2),np); 
-    S_mod = zeros(np,ns);
+    pos = zeros(1,np);
     
     % step through values of the parameter and calculate the model for each one
     % of those, at all time points
     for ii = 1:np
-        params = param_update(vals(ii),params,pname);
+        
+        % update parameter
+        eval(['params.',pname,'=',num2str(vals(ii)),';']);
+        
+        % evaluate model
         S_val = MTC_qASE_model(T_sample,TE_sample,params);
-        S_mod(ii,:) = S_val./S_val(t0);
+      
+        % calculate log likelihood
+        pos(ii) = MTC_loglike(S_sample,S_val,sigma);
+
     end
 
-    S_samp = repmat(S_sample,np,1);
-
-    % compare the model against the data for each value of the parameter - this
-    % is the likelihood (which is proportional to the posterior in the case of
-    % uniform (zero) priors)
-    loglik = - (0.5.*ns.*log(2.*pi.*(sigma.^2))) ...
-             - ((0.5./(sigma.^2)).*(sum(S_samp-S_mod,2).^2));
-    
-	pos = loglik';
-%     pos = exp(-sum((S_samp-S_mod).^2,2)/sigma);
     
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%    2D Grid Search          %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -122,11 +123,14 @@ elseif length(pars) == 2
 
     for i1 = 1:np
         % loop through parameter 1
-        params = param_update(vals(1,i1),params,pname{1});
+        eval(['params.',pname{1},'=',num2str(vals(1,i1)),';']);
+
+%         params = param_update(vals(1,i1),params,pname{1});
 
         for i2 = 1:np
             % loop through parameter 2
-            params = param_update(vals(2,i2),params,pname{2});
+            eval(['params.',pname{2},'=',num2str(vals(2,i2)),';']);
+%             params = param_update(vals(2,i2),params,pname{2});
 
             % run the model to evaluate the signal with current params
             S_mod = MTC_qASE_model(T_sample,TE_sample,params,noDW);
@@ -160,16 +164,19 @@ elseif length(pars) == 3
     
     for i1 = 1:nz
         % loop through parameter 1
-        params = param_update(valz(1,i1),params,pname{1});
+        eval(['params.',pname{1},'=',num2str(valz(1,i1)),';']);
+%         params = param_update(valz(1,i1),params,pname{1});
         disp(['Iterating ',num2str(i1),' of ',num2str(nz)]);
 
         for i2 = 1:np
             % loop through parameter 2
-            params = param_update(vals(1,i2),params,pname{2});
+%             params = param_update(vals(1,i2),params,pname{2});
+            eval(['params.',pname{2},'=',num2str(vals(1,i2)),';']);
 
             for i3 = 1:np
                 % loop through parameter 3
                 params = param_update(vals(2,i3),params,pname{3});
+                eval(['params.',pname{3},'=',num2str(vals(2,i3)),';']);
 
                 % run the model to evaluate the signal with current params
                 S_mod = MTC_qASE_model(T_sample,TE_sample,params,noDW);
@@ -206,7 +213,7 @@ if length(pars) == 1
 %     axis([min(vals), max(vals), 0, 1.1*max(pos)]);
 
     xlabel(pname);
-    legend(['True ',pname],'Posterior','Location','NorthEast');
+    legend('Posterior','Location','NorthEast');
     
 elseif length(pars) == 2 
     % Plot 2D grid search results

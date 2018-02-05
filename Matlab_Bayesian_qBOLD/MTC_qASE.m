@@ -34,7 +34,7 @@ clear;
 % close all;
 
 plot_fig = 1;       
-save_data = 0;      % set to 1 in order to save out ASE data
+save_data = 1;      % set to 1 in order to save out ASE data
 
 %% Model Parameters
 
@@ -55,6 +55,7 @@ params.lam0 = 0.000;        % no units  - ISF/CSF signal contribution
 params.zeta = 0.03;        % no units  - deoxygenated blood volume
 params.OEF  = 0.40;        % no units  - oxygen extraction fraction
 params.Hct  = 0.400;        % no units  - fractional hematocrit
+params.geom = 0.3;          % no units  - quadratic regime geometry factor
 
 % noise
 params.SNR = 200;
@@ -62,13 +63,13 @@ params.SNR = 200;
 %% Compute Model
 
 % define tau values that we want to simulate
-% tau = (-28:4:64)/1000; % for testing
-tau = linspace(-0.032,0.072,1000); % for visualising
+tau = (-28:4:64)/1000; % for testing
+% tau = linspace(-0.032,0.072,1000); % for visualising
 
 np = length(tau);
 
 % call MTC_qASE_model
-[S_total,params] = MTC_qASE_modelB(tau,params.TE,params);
+[S_total,params] = MTC_qASE_model(tau,params.TE,params);
 
 
 %% Add Noise
@@ -94,7 +95,7 @@ if plot_fig
     S_log = log(S_total);
     l.s = plot(1000*tau,S_log,'-','LineWidth',3);
 %     plot(1000*tau,log(S_sample),'kx','LineWidth',2);
-    xlim([-20,80]);
+    xlim([-20,20]);
     
     % for comparing inferred values
 %     tauF = [0, 16:4:64];
