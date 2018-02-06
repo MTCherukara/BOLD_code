@@ -44,7 +44,7 @@ params_true = params;
 
 % Parameter Values
 p_names = { 'OEF'; 'R2p'; 'zeta'; 'R2t' ; 'geom' };
-p_infer = [   0  ,   1  ,   1   ,   1   ,  0     ];
+p_infer = [   0  ,   1  ,   0   ,   1   ,  0     ];
 p_inits = [  0.5 ,  4.0 ,  0.026,  10.0 ,  0.3   ];
 p_range = [  0.2 ,  3.0 ,  0.02 ,   5.0 ,  0.1    ;...
              0.6 ,  5.5 ,  0.04 ,  15.0 ,  0.5   ];
@@ -69,7 +69,7 @@ np = sum(p_infer);
 
 %% Metropolis Parameters
 j_brn  = 10000;      % number of jumps in the 'burn-in' phase
-j_run  = 1000000;      % number of jumps in the real thing
+j_run  = 100000;      % number of jumps in the real thing
 j_updt = 10;       % rate of updating the scaling parameter
 j_rng  = 500;       % range of samples to look over when updating scaling param
 

@@ -9,7 +9,7 @@ save-residuals
 save-model-fit
 
 # Method Information
-method=vb
+method=spatialvb
 noise=white
 max-iterations=10
 
@@ -23,6 +23,7 @@ model=qboldR2p
 inferR2p
 inferDBV
 inferS0
+single_compartment
 #motional_narrowing
 #inferlam
 

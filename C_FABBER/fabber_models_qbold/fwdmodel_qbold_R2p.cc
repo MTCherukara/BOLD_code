@@ -39,7 +39,7 @@ string R2primeFwdModel::GetDescription() const
 
 string R2primeFwdModel::ModelVersion() const
 {
-    return "1.2";
+    return "1.3";
 } // ModelVersion
 
 
@@ -56,6 +56,7 @@ void R2primeFwdModel::Initialize(ArgsType &args)
     infer_R2e = args.ReadBool("inferR2e");
     infer_dF  = args.ReadBool("inferdF");
     infer_lam = args.ReadBool("inferlam");
+    infer_geo = args.ReadBool("infergeo");
     single_comp = args.ReadBool("single_compartment");
     motion_narr = args.ReadBool("motional_narrowing");
 
@@ -142,6 +143,10 @@ void R2primeFwdModel::Initialize(ArgsType &args)
     {
         LOG << "Inferring on CSF volume fraction lambda" << endl;
     }
+    if (infer_geo)
+    {
+        LOG << "Inferring on Geometry Factor (the 0.3)" << endl;
+    }
     
 } // Initialize
 
@@ -186,6 +191,10 @@ void R2primeFwdModel::NameParams(vector<string> &names) const
     {
         names.push_back("lambda");  // parameter 7 - CSF volume fraction
     }
+    if (infer_geo)
+    {
+        names.push_back("geofactor");  // parameter 7 - CSF volume fraction
+    }
 
 } // NameParams
 
@@ -203,13 +212,13 @@ void R2primeFwdModel::HardcodedInitialDists(MVNDist &prior, MVNDist &posterior) 
     if (infer_R2p)
     {
         prior.means(R2p_index()) = 4.0;
-        precisions(R2p_index(), R2p_index()) = 1.0; // 1e-2 or 1
+        precisions(R2p_index(), R2p_index()) = 1e-2; // 1e-2 or 1
     }
 
     if (infer_DBV)
     {
         prior.means(DBV_index()) = 0.02;
-        precisions(DBV_index(), DBV_index()) = 1000.0; // 1e-1 or 1000
+        precisions(DBV_index(), DBV_index()) = 1e0; // 1e0 or 1000
     }
 
     if (infer_R2t)
@@ -227,7 +236,7 @@ void R2primeFwdModel::HardcodedInitialDists(MVNDist &prior, MVNDist &posterior) 
     if (infer_Hct)
     {
         prior.means(Hct_index()) = 0.40;
-        precisions(Hct_index(), Hct_index()) = 1e0; // 1e-5
+        precisions(Hct_index(), Hct_index()) = 1e0; // ?
     }
 
     if (infer_R2e)
@@ -246,6 +255,12 @@ void R2primeFwdModel::HardcodedInitialDists(MVNDist &prior, MVNDist &posterior) 
     {
         prior.means(lam_index()) = 0.001;
         precisions(lam_index(), lam_index()) = 1e2; // 1e-1
+    }
+
+    if (infer_geo)
+    {
+        prior.means(lam_index()) = 0.3;
+        precisions(lam_index(), lam_index()) = 1e-1; // 1e-1
     }
 
     prior.SetPrecisions(precisions);
@@ -293,6 +308,7 @@ void R2primeFwdModel::Evaluate(const ColumnVector &params, ColumnVector &result)
     double R2e;
     double dF;
     double lam;
+    double geom;
 
     // assign values to parameters
     if (infer_R2p)
@@ -359,6 +375,14 @@ void R2primeFwdModel::Evaluate(const ColumnVector &params, ColumnVector &result)
     {
         lam = 0.0;
     }
+    if (infer_geo)
+    {
+        geom = abs(paramcpy(geo_index()));
+    }
+    else
+    {
+        geom = 0.3;
+    }
 
     // now evaluate the static dephasing qBOLD model for 2 compartments
     dw = R2p/DBV;
@@ -383,7 +407,7 @@ void R2primeFwdModel::Evaluate(const ColumnVector &params, ColumnVector &result)
         }
         else
         {
-            St = exp(-0.3*DBV*pow(dw*tau,2.0));
+            St = exp(-geom*DBV*pow(dw*tau,2.0));
         }
 
         // compartments

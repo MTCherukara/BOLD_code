@@ -8,27 +8,31 @@
 clear;
 
 % select a variable
-vname = 'DBV';      % 'R2p' or 'DBV' or 'OEF'
+vname = 'OEF';      % 'R2p' or 'DBV' or 'OEF'
 
 % select a subject
 subj = 6;
 
 % designate FABBER results folders
-%         SQ-LS    SQ-VB   1C-VB   2C-VB    2C-VBI
-fsets = { '101'  , '250' , '208' , '201' , '236' ;...   % subject vs1
-          '102'  , '251' , '209' , '202' , '237' ;...   % subject vs2
-          '103'  , '252' , '210' , '203' , '238' ;...   % subject vs3
-          '104'  , '253' , '211' , '204' , '239' ;...   % subject vs4
-          '105'  , '254' , '212' , '205' , '240' ;...   % subject vs5
-          '106'  , '255' , '213' , '206' , '241' ;...   % subject vs6
-          '107'  , '256' , '214' , '207' , '242' };     % subject vs7
+%         SQ-LS    SQ-VB   1C-VB   1C-VBS  1C-VBI  2C-VB   2C-VBI
+fsets = { '101'  , '250' , '208' , '264' , '257' , '201' , '236' ;...   % subject vs1
+          '102'  , '251' , '209' , '265' , '258' , '202' , '237' ;...   % subject vs2
+          '103'  , '252' , '210' , '266' , '259' , '203' , '238' ;...   % subject vs3
+          '104'  , '253' , '211' , '267' , '260' , '204' , '239' ;...   % subject vs4
+          '105'  , '254' , '212' , '268' , '261' , '205' , '240' ;...   % subject vs5
+          '106'  , '255' , '213' , '269' , '262' , '206' , '241' ;...   % subject vs6
+          '107'  , '256' , '214' , '270' , '263' , '207' , '242' };     % subject vs7
 
 
-lbls = {'sqBOLD','L-VB','1C-VB','2C-VB','2C-VB-I'};
+% Data set labels
+lbls = {'sqBOLD','L-VB-S','1C-VB','1C-VB-S','1C-VB-I','2C-VB','2C-VB-I'};
+
+% choose which datasets we want to view
+dset = [3,5,6,7];
 
 fsets = fsets(subj,:);  % pull out subjects
-% fsets = fsets(2:5);     % pull out the samples we actually want
-% lbls  = lbls( 2:5);     % take the right labells
+fsets = fsets(dset);     % pull out the samples we actually want
+lbls  = lbls(dset);     % take the right labells
 
 % slices
 slicenum = 3:10;
