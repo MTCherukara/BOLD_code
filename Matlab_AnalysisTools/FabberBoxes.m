@@ -28,7 +28,7 @@ fsets = { '101'  , '250' , '208' , '264' , '257' , '201' , '236' ;...   % subjec
 lbls = {'sqBOLD','L-VB-S','1C-VB','1C-VB-S','1C-VB-I','2C-VB','2C-VB-I'};
 
 % choose which datasets we want to view
-dset = [3,5,6,7];
+dset = [1,2,4,7];
 
 fsets = fsets(subj,:);  % pull out subjects
 fsets = fsets(dset);     % pull out the samples we actually want

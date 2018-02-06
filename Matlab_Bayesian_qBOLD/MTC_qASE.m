@@ -44,7 +44,7 @@ params.dChi = 2.64e-7;      % parts     - susceptibility difference
 params.gam  = 2.67513e8;    % rad/s/T   - gyromagnetic ratio
 
 % scan parameters 
-params.TE   = 0.074;        % s         - echo time
+params.TE   = 0.060;        % s         - echo time
 
 % model fitting parameters
 params.S0   = 100;          % a. units  - signal
@@ -63,7 +63,8 @@ params.SNR = 200;
 %% Compute Model
 
 % define tau values that we want to simulate
-tau = (-28:4:64)/1000; % for testing
+% tau = (-28:4:64)/1000; % for testing
+tau = [-16:4:16,24:8:56]/1000;
 % tau = linspace(-0.032,0.072,1000); % for visualising
 
 np = length(tau);
