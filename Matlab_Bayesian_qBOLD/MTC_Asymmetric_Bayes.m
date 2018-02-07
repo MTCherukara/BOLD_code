@@ -45,15 +45,14 @@ nz = 41; % number of points in the third dimension
 
 % Select which parameter(s) to infer on
 %       (1 = OEF, 2 = DBV, 3 = R2', 4 = CSF, 5 = dF, 6 = geom)
-pars = [6];
+pars = [1,2];
 
 % Load the Data:
-load('ASE_Data/Data_180112_SNR_50.mat');
+load('ASE_Data/Data_MultiTE_180208_SNR_200.mat');
 
 % extract relevant parameters
 sigma = mean(params.sig);   % real std of noise
 ns = length(S_sample); % number of data points
-[~,t0] = min(abs(T_sample));    % index of zero-point
 params.R2p = params.dw.*params.zeta;
 
 if ~exist('TE_sample','var')
@@ -94,7 +93,7 @@ if length(pars) == 1
         eval(['params.',pname,'=',num2str(vals(ii)),';']);
         
         % evaluate model
-        S_val = MTC_qASE_model(T_sample,TE_sample,params);
+        S_val = MTC_qASE_model(T_sample,TE_sample,params,noDW);
       
         % calculate log likelihood
         pos(ii) = MTC_loglike(S_sample,S_val,sigma);

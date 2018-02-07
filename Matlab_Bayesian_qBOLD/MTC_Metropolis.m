@@ -38,13 +38,13 @@ clear;
 close all;
 
 % Load Data
-load('ASE_Data/Data_180205_SNR_200.mat');
+load('ASE_Data/Data_MultiTE_180208_SNR_200.mat');
 params_true = params;
 
 
 % Parameter Values
 p_names = { 'OEF'; 'R2p'; 'zeta'; 'R2t' ; 'geom' };
-p_infer = [   0  ,   1  ,   0   ,   1   ,  0     ];
+p_infer = [   1  ,   0  ,   0   ,   1   ,  0     ];
 p_inits = [  0.5 ,  4.0 ,  0.026,  10.0 ,  0.3   ];
 p_range = [  0.2 ,  3.0 ,  0.02 ,   5.0 ,  0.1    ;...
              0.6 ,  5.5 ,  0.04 ,  15.0 ,  0.5   ];
@@ -69,7 +69,7 @@ np = sum(p_infer);
 
 %% Metropolis Parameters
 j_brn  = 10000;      % number of jumps in the 'burn-in' phase
-j_run  = 100000;      % number of jumps in the real thing
+j_run  = 10;      % number of jumps in the real thing
 j_updt = 10;       % rate of updating the scaling parameter
 j_rng  = 500;       % range of samples to look over when updating scaling param
 
@@ -184,33 +184,35 @@ toc;
 
 %% Display Acceptance Rate Trend
 % figure('WindowStyle','Docked');
-% hold on; box on;
-% plot(accept_rate(1:end-1),'k-');
-% xlabel('Iterations');
-% ylabel('Sample Acceptance Rate');
+figure;
+hold on; box on;
+plot(accept_rate(1:end-1),'k-','LineWidth',1);
+xlabel('Iterations');
+ylabel('Sample Acceptance Rate');
+title(['Trace Plot (update range = ',num2str(j_rng),')']);
 % set(gca,'FontSize',14);
 
 
-%% Scatter Plot
-% only when there are fewer than 20k points, otherwise the whole thing is just a
-% massive splodge
-
-if ( np == 2 && size(sample_results,2) < 20000)
-    figure('WindowStyle','Docked');
-    hold on; box on;
-
-    % plot true values
-    % plot([params_true.OEF,params_true.OEF],[p_rng(1,2),p_rng(2,2)]  ,'r-','LineWidth',2);
-    plot([p_rng(1,1),p_rng(2,1)],[params_true.zeta,params_true.zeta],'r-','LineWidth',2);
-    plot([params_true.R2p,params_true.R2p],[p_rng(1,2),p_rng(2,2)]  ,'r-','LineWidth',2);
-
-    % plot results
-    scatter(sample_results(1,:),sample_results(2,:),'k.');
-
-    xlabel(p_name{1});
-    ylabel(p_name{2});
-    set(gca,'FontSize',14);
-end
+% %% Scatter Plot
+% % only when there are fewer than 20k points, otherwise the whole thing is just a
+% % massive splodge
+% 
+% if ( np == 2 && size(sample_results,2) < 20000)
+%     figure('WindowStyle','Docked');
+%     hold on; box on;
+% 
+%     % plot true values
+%     % plot([params_true.OEF,params_true.OEF],[p_rng(1,2),p_rng(2,2)]  ,'r-','LineWidth',2);
+%     plot([p_rng(1,1),p_rng(2,1)],[params_true.zeta,params_true.zeta],'r-','LineWidth',2);
+%     plot([params_true.R2p,params_true.R2p],[p_rng(1,2),p_rng(2,2)]  ,'r-','LineWidth',2);
+% 
+%     % plot results
+%     scatter(sample_results(1,:),sample_results(2,:),'k.');
+% 
+%     xlabel(p_name{1});
+%     ylabel(p_name{2});
+%     set(gca,'FontSize',14);
+% end
 
 %% Contour Plot
 % % in two dimensions
@@ -306,33 +308,48 @@ end
 
 p_pairs = combnk(1:np,2);
 
-% pair-wise contour plots
+% pair-wise scatter or contour plots
 for pp = 1:size(p_pairs,1)
     
     % parameters
     prm1 = p_pairs(pp,1);
     prm2 = p_pairs(pp,2);
-        
-    % collect contour points
-    [n,c] = hist3(sample_results([prm1,prm2],:)',[cres,cres]);
     
-    % plot
-    figure('WindowStyle','Docked');
-    hold on; box on;
-    contour(c{2},c{1},n);
-    
-    % labels
-    xlabel(p_name{prm2});
-    ylabel(p_name{prm1});
-    set(gca,'FontSize',18);
-    
-    % pull out true values
+    % true values
     true1 = eval(['params_true.',p_name{prm1}]);
     true2 = eval(['params_true.',p_name{prm2}]);
     
-    % plot true values
-    plot([p_rng(1,prm2),p_rng(2,prm2)],[true1,true1],'k-','LineWidth',2);
-    plot([true2,true2],[p_rng(1,prm1),p_rng(2,prm1)],'k-','LineWidth',2);
-
+    % make figure    
+    figure; hold on; box on;
     
+    % For a small number of samples, do a scatter plot
+    if size(sample_results,2) < 20000
+        
+        % plot scatter
+        scatter(sample_results(prm1,:),sample_results(prm2,:),'k.');
+        
+        % in this case, plot the true values on top, in red
+        plot([p_rng(1,prm2),p_rng(2,prm2)],[true1,true1],'r-');
+        plot([true2,true2],[p_rng(1,prm1),p_rng(2,prm1)],'r-');
+
+        
+    % Otherwise, make a contour plot
+    else
+        
+        % collect contour points
+        [n,c] = hist3(sample_results([prm1,prm2],:)',[cres,cres]);
+        
+        % this time, put the true values underneath the countour lines, in black
+        plot([p_rng(1,prm2),p_rng(2,prm2)],[true1,true1],'k-');
+        plot([true2,true2],[p_rng(1,prm1),p_rng(2,prm1)],'k-');
+
+        % plot
+        contour(c{2},c{1},n);
+        
+    end
+    
+    % labels
+    xlabel(p_name{prm2});
+    ylabel(p_name{prm1});   
+        
 end

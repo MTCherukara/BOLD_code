@@ -96,7 +96,7 @@ end
 %% Fourth Version (tau-by-tau)
 
 % define the regime boundary
-bd = 1/dw; 
+tc = 1/dw; 
 
 % pre-allocate
 ST = zeros(1,length(TAU)); 
@@ -104,7 +104,7 @@ ST = zeros(1,length(TAU));
 % loop through tau values
 for ii = 1:length(TAU)
     
-    if abs(TAU(ii)) < bd
+    if abs(TAU(ii)) < tc
         % short tau regime
         ST(ii) = exp(-(gm*zeta*(dw.*TAU(ii)).^2));
     else
