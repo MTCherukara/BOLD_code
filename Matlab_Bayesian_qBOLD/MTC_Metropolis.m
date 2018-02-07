@@ -40,7 +40,7 @@ close all;
 % Options
 plot_trace = 0;
 plot_results = 1;
-save_results = 0;
+save_results = 1;
 
 % Load Data
 load('ASE_Data/Data_MultiTE_180208_SNR_200.mat');
@@ -49,7 +49,7 @@ params_true = params;
 
 % Parameter Values
 p_names = { 'OEF'; 'R2p'; 'zeta'; 'R2t' ; 'geom' };
-p_infer = [   1  ,   0  ,   1   ,   1   ,  0     ];
+p_infer = [   1  ,   0  ,   0   ,   1   ,  0     ];
 p_inits = [  0.5 ,  4.0 ,  0.026,  10.0 ,  0.3   ];
 p_range = [  0.2 ,  3.0 ,  0.02 ,   5.0 ,  0.1    ;...
              0.6 ,  5.5 ,  0.04 ,  15.0 ,  0.5   ];
@@ -220,7 +220,8 @@ if plot_results
         
         if save_results
             ftitle = strcat('temp_plots/MH_',date,'_Hist_',p_name{pp});
-            export_fig([ftitle,'.eps']);
+            export_fig([ftitle,'.pdf']);
+%             print(gcf,ftitle,'-dpdf');
         end
 
     end
@@ -273,8 +274,9 @@ if plot_results
         
         if save_results
             ftitle = strcat('temp_plots/MH_',date,'_2D_',...
-                            p_name{prm2},'_',pname{prm1});
-            export_fig([ftitle,'.eps']);
+                            p_name{prm2},'_',p_name{prm1});
+            export_fig([ftitle,'.pdf']);
+%             print(gcf,ftitle,'-dpdf');
         end
 
     end % for pp = 1:size(p_pairs,1)
