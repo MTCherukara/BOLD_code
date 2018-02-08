@@ -10,7 +10,7 @@
 % Jbabdi, Michaelmas Term 2015.
 %
 % 
-%       Copyright (C) University of Oxford, 2016-2017
+%       Copyright (C) University of Oxford, 2016-2018
 %
 % 
 % Created by MT Cherukara, 16 January 2018
@@ -37,19 +37,23 @@
 clear; 
 close all;
 
+% since we'll be plotting stuff
+setFigureDefaults;
+
 % Options
-plot_trace = 0;
+plot_trace = 1;
 plot_results = 1;
-save_results = 1;
+save_figures = 0;
 
 % Load Data
-load('ASE_Data/Data_MultiTE_180208_SNR_200.mat');
+% load('ASE_Data/Data_MultiTE_180208_SNR_200.mat');
+load('ASE_Data/Data_180130_SNR_200.mat');
 params_true = params;
 
 
 % Parameter Values
 p_names = { 'OEF'; 'R2p'; 'zeta'; 'R2t' ; 'geom' };
-p_infer = [   1  ,   0  ,   0   ,   1   ,  0     ];
+p_infer = [   1  ,   0  ,   1   ,   0   ,  0     ];
 p_inits = [  0.5 ,  4.0 ,  0.026,  10.0 ,  0.3   ];
 p_range = [  0.2 ,  3.0 ,  0.02 ,   5.0 ,  0.1    ;...
              0.6 ,  5.5 ,  0.04 ,  15.0 ,  0.5   ];
@@ -98,7 +102,7 @@ X0 = p_init;
 
 % set parameter values to their initial guesses
 for pp = 1:np
-    eval(['params.',p_name{pp},'=',num2str(X0(pp)),';']);
+    params = param_update(X0(pp),params,p_name{pp});
 end
 
 % evaluate model at its initial parameter values
@@ -138,7 +142,7 @@ for ii = 1:(j_brn+j_run)
     else
         % otherwise, evaluate the model
         for pp = 1:np
-            eval(['params.',p_name{pp},'=',num2str(X1(pp)),';']);
+            params = param_update(X1(pp),params,p_name{pp});
         end
         
         S_mod = MTC_qASE_model(T_sample,TE_sample,params,infer_R2p);
@@ -218,7 +222,7 @@ if plot_results
         xlabel(p_name{pp});
         xlim(p_rng(:,pp));
         
-        if save_results
+        if save_figures
             ftitle = strcat('temp_plots/MH_',date,'_Hist_',p_name{pp});
             export_fig([ftitle,'.pdf']);
 %             print(gcf,ftitle,'-dpdf');
@@ -272,7 +276,7 @@ if plot_results
         xlabel(p_name{prm2});
         ylabel(p_name{prm1});   
         
-        if save_results
+        if save_figures
             ftitle = strcat('temp_plots/MH_',date,'_2D_',...
                             p_name{prm2},'_',p_name{prm1});
             export_fig([ftitle,'.pdf']);

@@ -90,8 +90,8 @@ if length(pars) == 1
     for ii = 1:np
         
         % update parameter
-        eval(['params.',pname,'=',num2str(vals(ii)),';']);
-        
+        params = param_update(vals(ii),params,pname);
+
         % evaluate model
         S_val = MTC_qASE_model(T_sample,TE_sample,params,noDW);
       
@@ -122,14 +122,11 @@ elseif length(pars) == 2
 
     for i1 = 1:np
         % loop through parameter 1
-        eval(['params.',pname{1},'=',num2str(vals(1,i1)),';']);
-
-%         params = param_update(vals(1,i1),params,pname{1});
+        params = param_update(vals(1,i1),params,pname{1});
 
         for i2 = 1:np
             % loop through parameter 2
-            eval(['params.',pname{2},'=',num2str(vals(2,i2)),';']);
-%             params = param_update(vals(2,i2),params,pname{2});
+            params = param_update(vals(2,i2),params,pname{2});
 
             % run the model to evaluate the signal with current params
             S_mod = MTC_qASE_model(T_sample,TE_sample,params,noDW);
@@ -163,19 +160,16 @@ elseif length(pars) == 3
     
     for i1 = 1:nz
         % loop through parameter 1
-        eval(['params.',pname{1},'=',num2str(valz(1,i1)),';']);
-%         params = param_update(valz(1,i1),params,pname{1});
+        params = param_update(valz(1,i1),params,pname{1});
         disp(['Iterating ',num2str(i1),' of ',num2str(nz)]);
 
         for i2 = 1:np
             % loop through parameter 2
-%             params = param_update(vals(1,i2),params,pname{2});
-            eval(['params.',pname{2},'=',num2str(vals(1,i2)),';']);
+            params = param_update(vals(1,i2),params,pname{2});
 
             for i3 = 1:np
                 % loop through parameter 3
                 params = param_update(vals(2,i3),params,pname{3});
-                eval(['params.',pname{3},'=',num2str(vals(2,i3)),';']);
 
                 % run the model to evaluate the signal with current params
                 S_mod = MTC_qASE_model(T_sample,TE_sample,params,noDW);
