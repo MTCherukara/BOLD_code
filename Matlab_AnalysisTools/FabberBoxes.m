@@ -11,7 +11,7 @@ clear;
 vname = 'OEF';      % 'R2p' or 'DBV' or 'OEF'
 
 % select a subject
-subj = 6;
+subj = 2;
 
 % designate FABBER results folders
 %         SQ-LS    SQ-VB   1C-VB   1C-VBS  1C-VBI  2C-VB   2C-VBI
@@ -26,9 +26,11 @@ fsets = { '101'  , '250' , '208' , '264' , '257' , '201' , '236' ;...   % subjec
 
 % Data set labels
 lbls = {'sqBOLD','L-VB-S','1C-VB','1C-VB-S','1C-VB-I','2C-VB','2C-VB-I'};
+% lbls = {'sqBOLD','Linear VB','NO','Dynamic TC','Fixed TC','Dynamic TC-I','Fixed TC-I'};
+
 
 % choose which datasets we want to view
-dset = [1,2,4,7];
+dset = [2,4,5,6,7];
 
 fsets = fsets(subj,:);  % pull out subjects
 fsets = fsets(dset);     % pull out the samples we actually want

@@ -1,4 +1,4 @@
-function ST = MTC_ASE_tissue(TAU,TE,PARAMS)
+function ST = MTC_ASE_tissue(TAU,TE,PARAMS,tc)
 % MTC_ASE_tissue usage:
 %
 %        ST = MTC_ASE_tissue(TAU,TE,PARAMS)
@@ -57,46 +57,12 @@ if length(TE) ~= length(TAU)
 end
 
 
-%% New Version
-%   
-% t0 = abs(TAU.*dw);              % predefine tau
-% fint = zeros(1,length(TAU));    % pre-allocate
-% 
-% for ii = 1:length(TAU)
-%     
-%     % integrate
-%     fnc0 = @(u) (2+u).*sqrt(1-u).*(1-besselj(0,3.*t0(ii).*u))./(u.^2);
-%     fint(ii) = integral(fnc0,0,1);
-%     
-% end
-% 
-% ST = exp(-zeta.*fint./3) .* exp(-TE.*R2t);
-
-%% Third Version (constants)
-% % 
-% % % define the regime changes in the case where tau is negative
-% % c1 = find(abs(TAU)<(1.5./dw),1);
-% % c2 = find(TAU>(1.5./dw),1);
-% % 
-% % % pre-allocate
-% % ST = zeros(1,length(TAU));
-% % 
-% % % long negative tau regime
-% % ST(1:c1-1) = exp(zeta+(zeta*dw*TAU(1:c1-1)));
-% % 
-% % % non-linear short tau regime
-% % ST(c1:c2)  = exp(-(0.3*zeta*(dw.*TAU(c1:c2)).^2));
-% % 
-% % % long positive tau regime
-% % ST(c2:end) = exp(zeta-(zeta*dw*TAU(c2:end)));
-% % 
-% % % add T2 effect
-% % ST = ST.*exp(-R2t.*TE);
-
 %% Fourth Version (tau-by-tau)
 
 % define the regime boundary
-% tc = 1/dw; 
+if ~exist('tc','var')
+    tc = 1.5/dw; 
+end
 
 % pre-allocate
 ST = zeros(1,length(TAU)); 
@@ -104,7 +70,7 @@ ST = zeros(1,length(TAU));
 % loop through tau values
 for ii = 1:length(TAU)
     
-    if abs(TAU(ii)) < 0.015
+    if abs(TAU(ii)) < tc
         % short tau regime
         ST(ii) = exp(-(gm*zeta*(dw.*TAU(ii)).^2));
     else

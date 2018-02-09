@@ -212,13 +212,13 @@ void R2primeFwdModel::HardcodedInitialDists(MVNDist &prior, MVNDist &posterior) 
     if (infer_R2p)
     {
         prior.means(R2p_index()) = 4.0;
-        precisions(R2p_index(), R2p_index()) = 1e-2; // 1e-2 or 1
+        precisions(R2p_index(), R2p_index()) = 1e-2; // 1e-2 or 1e0
     }
 
     if (infer_DBV)
     {
         prior.means(DBV_index()) = 0.02;
-        precisions(DBV_index(), DBV_index()) = 1e0; // 1e0 or 1000
+        precisions(DBV_index(), DBV_index()) = 1e0; // 1e0 or 1e3
     }
 
     if (infer_R2t)
@@ -229,7 +229,7 @@ void R2primeFwdModel::HardcodedInitialDists(MVNDist &prior, MVNDist &posterior) 
 
     if (infer_S0)
     {
-        prior.means(S0_index()) = 1000.0;
+        prior.means(S0_index()) = 100.0;
         precisions(S0_index(), S0_index()) = 1e-5; // 1e-5
     }
 
@@ -397,11 +397,11 @@ void R2primeFwdModel::Evaluate(const ColumnVector &params, ColumnVector &result)
         double TE = TEvals(ii);
 
         // calculate tissue signal
-        if (tau < (-1.5/dw))
+        if (tau < -(0.015))
         {
             St = exp(DBV + (R2p*tau));
         }
-        else if (tau > (1.5/dw))
+        else if (tau > (0.015))
         {
             St = exp(DBV - (R2p*tau));
         }

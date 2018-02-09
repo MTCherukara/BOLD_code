@@ -31,10 +31,11 @@
 %       which was apparently causing problems (I don't know why).
 
 clear; 
-% close all;
+close all;
 
 plot_fig = 1;       
-save_data = 06;      % set to 1 in order to save out ASE data
+save_data = 0;      % set to 1 in order to save out ASE data
+
 
 %% Model Parameters
 
@@ -44,7 +45,7 @@ params.dChi = 2.64e-7;      % parts     - susceptibility difference
 params.gam  = 2.67513e8;    % rad/s/T   - gyromagnetic ratio
 
 % scan parameters 
-params.TE   = 0.100;        % s         - echo time
+params.TE   = 0.074;        % s         - echo time
 
 % model fitting parameters
 params.S0   = 100;          % a. units  - signal
@@ -53,19 +54,20 @@ params.R2e  = 4;            % 1/s       - rate constant, extracellular
 params.dF   = 5;            % Hz        - frequency shift
 params.lam0 = 0.000;        % no units  - ISF/CSF signal contribution
 params.zeta = 0.03;        % no units  - deoxygenated blood volume
-params.OEF  = 0.30;        % no units  - oxygen extraction fraction
+params.OEF  = 0.40;        % no units  - oxygen extraction fraction
 params.Hct  = 0.400;        % no units  - fractional hematocrit
 params.geom = 0.3;          % no units  - quadratic regime geometry factor
 
 % noise
 params.SNR = 200;
 
+
 %% Compute Model
 
 % define tau values that we want to simulate
 % tau = (-28:4:64)/1000; % for testing
-tau = [-16:4:16,24:8:56]/1000;
-% tau = linspace(-0.032,0.072,1000); % for visualising
+% tau = [-16:4:16,24:8:56]/1000;
+tau = linspace(-0.032,0.072,1000); % for visualising
 
 np = length(tau);
 
@@ -77,36 +79,27 @@ np = length(tau);
 S_sample = S_total + (S_total.*randn(1,np)./params.SNR);
 S_sample(S_sample < 0) = 0;
 
-
 % calculate maximum data standard deviaton
 params.sig = min(S_total)/params.SNR;
+
 
 %% plot figure
 if plot_fig
     
     % create a figure
-    figure(2);
-    set(gcf,'WindowStyle','docked');
-    hold on; box on;
-
-    % plot some lines
-%     plot([0 0],[-1 2],'k--','LineWidth',2);
+    figure(2); hold on; box on;
     
     % plot the signal
     S_log = log(S_total);
-    l.s = plot(1000*tau,S_log,'-','LineWidth',3);
-%     plot(1000*tau,log(S_sample),'kx','LineWidth',2);
+    l.s = plot(1000*tau,S_log,'-');
+%     plot(1000*tau,log(S_sample),'kx');
     xlim([-20,20]);
-    
-    % for comparing inferred values
-%     tauF = [0, 16:4:64];
-%     plot(tauF,log(fdata),'kx','LineWidth',3);
+%     ylim([3.385, 3.435]);
     
     % labels on axes
     xlabel('Spin Echo Displacement \tau (ms)');
     ylabel('Log (Signal)');
     title('qBOLD Signal Measured Using ASE');
-    set(gca,'FontSize',14);
     
 end % if plot_fig
 

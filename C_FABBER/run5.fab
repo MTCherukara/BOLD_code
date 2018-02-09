@@ -13,10 +13,10 @@ save-model-fit
 method=vb
 noise=white
 max-iterations=10
+allow-bad-voxels
 
 # Spatial VB Information (remove all of this if method!=spatialvb)
 #param-spatial-priors=MMM
-#allow-bad-voxels
 #image-prior6=../../Data/subject_06/CSF_T2fit.nii.gz
 
 # Inference Model 
