@@ -47,13 +47,13 @@ save_figures = 0;
 
 % Load Data
 % load('ASE_Data/Data_MultiTE_180208_SNR_200.mat');
-load('ASE_Data/Data_180130_SNR_200.mat');
+load('ASE_Data/Data_180123_SNR_200.mat');
 params_true = params;
 
 
 % Parameter Values
 p_names = { 'OEF'; 'R2p'; 'zeta'; 'R2t' ; 'geom' };
-p_infer = [   1  ,   0  ,   1   ,   0   ,  0     ];
+p_infer = [   0  ,   1  ,   1   ,   0   ,  0     ];
 p_inits = [  0.5 ,  4.0 ,  0.026,  10.0 ,  0.3   ];
 p_range = [  0.2 ,  3.0 ,  0.02 ,   5.0 ,  0.1    ;...
              0.6 ,  5.5 ,  0.04 ,  15.0 ,  0.5   ];
@@ -77,7 +77,7 @@ end
 np = sum(p_infer);
 
 %% Metropolis Parameters
-j_run  = 1e5;       % number of jumps in the real thing
+j_run  = 1e6;       % number of jumps in the real thing
 j_updt = 10;        % rate of updating the scaling parameter
 j_rng  = 200;       % range of samples to look over when updating scaling param
 j_brn  = (200*j_updt) + j_rng;      % number of jumps in the 'burn-in' phase
@@ -114,7 +114,7 @@ L0 = norm(S_sample-S_mod);
 % pre-allocate results array
 sample_results = zeros(np,j_run);
 accept_rate    = zeros( 1,round((j_brn-j_rng)./j_updt));
-accept_tracker = false(1,j_brn);
+accept_tracker = false(1,j_brn+j_run);
 
 % pre-generate random numbers
 rng_gauss = randn(np,j_brn+j_run)';
@@ -167,7 +167,8 @@ for ii = 1:(j_brn+j_run)
     end % if sum( (X1 > p_rng(2,:)) + (X1 < p_rng(1,:)) ) > 0
         
     % adaptive sampling range update
-    if ( mod(ii,j_updt) == 0 && ii < j_brn && ii > j_rng )
+%     if ( mod(ii,j_updt) == 0 && ii < j_brn && ii > j_rng )
+    if ( mod(ii,j_updt) == 0 && ii > j_rng )
         
         % calculate acceptance rate over last 100 samples
         ra = sum(accept_tracker(ii-j_rng+1:ii))./j_rng;
@@ -212,23 +213,23 @@ if plot_results
 
     % resolutions
     hres = 25;
-    cres = 25;
+    cres = 40;
 
-    % individual parameter histograms
-    for pp = 1:np
-
-        figure; hold on; box on;
-        histogram(sample_results(pp,:),hres);
-        xlabel(p_name{pp});
-        xlim(p_rng(:,pp));
-        
-        if save_figures
-            ftitle = strcat('temp_plots/MH_',date,'_Hist_',p_name{pp});
-            export_fig([ftitle,'.pdf']);
-%             print(gcf,ftitle,'-dpdf');
-        end
-
-    end
+%     % individual parameter histograms
+%     for pp = 1:np
+% 
+%         figure; hold on; box on;
+%         histogram(sample_results(pp,:),hres);
+%         xlabel(p_name{pp});
+%         xlim(p_rng(:,pp));
+%         
+%         if save_figures
+%             ftitle = strcat('temp_plots/MH_',date,'_Hist_',p_name{pp});
+%             export_fig([ftitle,'.pdf']);
+% %             print(gcf,ftitle,'-dpdf');
+%         end
+% 
+%     end
 
     p_pairs = combnk(1:np,2);
 

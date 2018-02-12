@@ -12,6 +12,10 @@
 %
 % CHANGELOG:
 %
+% 2018-02-12 (MTC). Went back to 'param_update' since it is actually much
+%       faster. Removed the 3D grid search code because it was taking up space
+%       (it will be in the repository somewhere).
+%
 % 2018-02-05 (MTC). Removed the need for the 'param_update' function. Fixed a
 %       bug in the 1D grid search method.
 %
@@ -33,6 +37,9 @@
 
 clear;
 % close all;
+
+setFigureDefaults;  % since we're doing plotting later
+
 tic;
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -40,15 +47,15 @@ tic;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Inference Parameters
 
-np = 100; % number of points to perform Bayesian analysis on
+np = 1000; % number of points to perform Bayesian analysis on
 nz = 41; % number of points in the third dimension
 
 % Select which parameter(s) to infer on
 %       (1 = OEF, 2 = DBV, 3 = R2', 4 = CSF, 5 = dF, 6 = geom)
-pars = [1,2];
+pars = [3,2];
 
 % Load the Data:
-load('ASE_Data/Data_MultiTE_180208_SNR_200.mat');
+load('ASE_Data/Data_180112_SNR_50.mat');
 
 % extract relevant parameters
 sigma = mean(params.sig);   % real std of noise
@@ -60,8 +67,8 @@ if ~exist('TE_sample','var')
 end
 
 % Parameter names and search ranges
-pnames  = { 'OEF'   ;  'zeta'   ; 'R2p' ; 'lam0'  ; 'dF' ; 'geom'  };
-intervs = [ 0.001,1 ; 0.001,0.1 ; 2,7   ; 0.0,0.2 ; 1,10 ; 0.1,0.5 ];  
+pnames  = { 'OEF'   ;  'zeta'    ; 'R2p' ; 'lam0'  ; 'dF' ; 'geom'  };
+intervs = [ 0.001,1 ; 0.01,0.065 ; 2.5,6 ; 0.0,0.2 ; 1,10 ; 0.1,0.5 ];  
 %            OEF     DBV        R2'     v_CSF      dF       Geom
 
 % are we inferring on R2'?
@@ -137,55 +144,7 @@ elseif length(pars) == 2
         end % for i2 = 1:np
     end % for i1 = 1:np
     
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%    3D Grid Search          %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-elseif length(pars) == 3
-    % Bayesian inference on 3 parameters, using a very long grid-search
-    
-    p1 = pars(1);
-    p2 = pars(2);
-    p3 = pars(3);
-    pname = {pnames{p1}; pnames{p2}; pnames{p3}};
-    
-    trv(1) = eval(['params.',pname{1}]); % true value of parameter 1
-    trv(2) = eval(['params.',pname{2}]); % true value of parameter 2
-    trv(3) = eval(['params.',pname{3}]); % true value of parameter 3
-    
-    vals(1,:) = linspace(intervs(p2,1),intervs(p2,2),np);
-    vals(2,:) = linspace(intervs(p3,1),intervs(p3,2),np);
-    valz = linspace(intervs(p1,1),intervs(p1,2),nz); % third (smaller) dimension
-    
-    pos = zeros(nz,np,np);
-    
-    for i1 = 1:nz
-        % loop through parameter 1
-        params = param_update(valz(1,i1),params,pname{1});
-        disp(['Iterating ',num2str(i1),' of ',num2str(nz)]);
-
-        for i2 = 1:np
-            % loop through parameter 2
-            params = param_update(vals(1,i2),params,pname{2});
-
-            for i3 = 1:np
-                % loop through parameter 3
-                params = param_update(vals(2,i3),params,pname{3});
-
-                % run the model to evaluate the signal with current params
-                S_mod = MTC_qASE_model(T_sample,TE_sample,params,noDW);
-
-                % calculate posterior based on known noise value
-                pos(i1,i2,i3) = exp(-sum((S_sample-S_mod).^2)./(sigma));
-                
-            end % for i3 = 1:np
-        end % for i2 = 1:np
-    end % for i1 = 1:np
-    
-    % When doing a 3D grid search, we're always going to want to save the
-    % results (just in case!)
-    save('Grid3D_temp_001','pos','params','T_sample','TE_sample','S_sample','trv','vals','vals');
-
-end % length(pars) == 1 ... elseif ... elseif ...
+end % length(pars) == 1 ... elseif 
 
 toc;
 
@@ -194,9 +153,7 @@ toc;
 %% Display Results
 
 % create docked figure
-figure('WindowStyle','docked');
-hold on; box on;
-set(gca,'FontSize',18);
+figure; hold on; box on;
 
 if length(pars) == 1
     % Plot 1D grid search results
@@ -211,17 +168,18 @@ if length(pars) == 1
 elseif length(pars) == 2 
     % Plot 2D grid search results
     
-    Pscale = [quantile(pos(:),0.75), max(pos(:))];
-    imagesc(vals(2,:),vals(1,:),(pos),Pscale); hold on;
+    Pscale = [quantile(pos(:),0.95), max(pos(:))];
+    imagesc(vals(2,:),vals(1,:),exp(pos)); hold on;
     c=colorbar;
     colormap('parula');
-    plot([trv(2),trv(2)],[  0, 30],'w-','LineWidth',2);
-    plot([  0, 30],[trv(1),trv(1)],'w-','LineWidth',2);
+    plot([trv(2),trv(2)],[  0, 30],'w-');
+    plot([  0, 30],[trv(1),trv(1)],'w-');
     
     xlabel(pname{2});
     ylabel(pname{1});
     
     ylabel(c,'Posterior Probability Density');
+%     ylabel(c,'Log Likelihood');
     
     axis([min(vals(2,:)),max(vals(2,:)),min(vals(1,:)),max(vals(1,:))]);
     set(gca,'YDir','normal');

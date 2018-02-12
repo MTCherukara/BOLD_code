@@ -2,13 +2,21 @@
 % Display an averaged-out ASE curve from FABBER "modelfit" data
 
 clear;
+close all;
+
+save_plot = 0;
 
 % subject
-ss = 6;
+% ss = 1;
+
+for ss = 1:7
 
 % identify the correct dataset
-runs = {'208', '209', '210', '211', '212', '213', '214'};       % 1C-VB
+% runs = {'208', '209', '210', '211', '212', '213', '214'};       % 1C-VB
 % runs = {'201', '202', '203', '204', '205', '206', '207'};       % 2C-VB
+runs = {'236', '237', '238', '239', '240', '241', '242'};       % 2C-VB-I
+% runs = {'281', '282', '283', '284', '285', '286', '287'};       % 2C-VB fixed TC
+
 fabber = runs{ss};
 resdir = '/Users/mattcher/Documents/DPhil/Data/Fabber_Results/';
 rawdir = ['/Users/mattcher/Documents/DPhil/Data/validation_sqbold/vs',num2str(ss),'/'];
@@ -50,13 +58,13 @@ for ii = 1:mdims(4)
     resvector(resvector == 0) = [];
     
     % remove extremely high values
-    resvector(resvector > quantile(resvector,0.95)) = [];
+    resvector(resvector > quantile(resvector,0.99)) = [];
     
     % remove extremely low values
-    resvector(resvector < quantile(resvector,0.05)) = [];
+    resvector(resvector < quantile(resvector,0.01)) = [];
     
     % average
-    volsignal(ii) = mean(resvector);
+    volsignal(ii) = nanmean(resvector);
     
     % same again, but for the raw data
     
@@ -70,13 +78,13 @@ for ii = 1:mdims(4)
     rawvector(rawvector == 0) = [];
     
     % remove extremely high
-    rawvector(rawvector > quantile(rawvector,0.98)) = [];
+    rawvector(rawvector > quantile(rawvector,0.99)) = [];
     
     % remove extremely low values
-    rawvector(rawvector < quantile(resvector,0.02)) = [];
+    rawvector(rawvector < quantile(resvector,0.01)) = [];
     
     % average
-    rawsignal(ii) = mean(rawvector);
+    rawsignal(ii) = nanmean(rawvector);
 end
 
 % tau values
@@ -84,53 +92,28 @@ end
 taus = (-28:4:64)./1000;
 tauA = linspace(taus(1),taus(end));
 
-% % These are the inferred parameter values
-% S0  = [148, 145, 128, 153, 188, 165, 188];
-% R2p = [3.65, 4.48, 3.55, 4.07, 3.87, 3.99, 3.29];
-% DBV = [5.28, 7.80, 5.29, 7.17, 7.54, 6.23, 5.44]./100;
-% 
-% % Calculate signal based on inferred R2', DBV, and S0
-% anatsignal = S0(ss).*exp(DBV(ss) - (R2p(ss).*abs(tauA)));
-% 
-% tc = DBV(ss)./R2p(ss);
-% tau_shrt = linspace(-tc,tc,100);
-% tau_long = linspace(tc,0.064,100);
-% 
-% % for curve-fitting
-% T_shrt = taus(5:11);
-% S_shrt = log(rawsignal(5:11));
-% 
-% T_long = taus(12:end);
-% S_long = log(rawsignal(12:end));
-% 
-% P_shrt = polyfit(T_shrt,S_shrt,2);
-% P_long = polyfit(T_long,S_long,1);
-% 
-% Fit_shrt = (P_shrt(1).*(tau_shrt.^2)) + (P_shrt(2).*tau_shrt) + P_shrt(3);
-% Fit_long = (P_long(1).*tau_long) + P_long(2);
+% scale both datasets to have the same mean
+volsignal = log(volsignal)./mean(log(volsignal));
+rawsignal = log(rawsignal)./mean(log(rawsignal));
 
-% Plot results
-figure('WindowStyle','Docked');
-hold on; box on;
-set(gca,'FontSize',18);
-% plot(1000*tauA,log(anatsignal),'-','LineWidth',2);
-% plot(1000*[tau_shrt,tau_long],[Fit_shrt,Fit_long],'-','LineWidth',2);
-plot(1000*taus,log(volsignal),'kx','LineWidth',2);
-plot(1000*taus,log(rawsignal),'ro','LineWidth',2);
+ssd = sum((volsignal-rawsignal).^2);
+disp(['Subject ',num2str(ss),' difference: ',num2str(1000*ssd)]);
+
+
+%% Plot results
+figure; hold on; box on;
+plot(1000*taus,(volsignal),'kx');
+plot(1000*taus,(rawsignal),'ro');
 xlabel('Spin-Echo Offset \tau (ms)');
-ylabel('Log(Signal)');
-title(['Subject ',num2str(ss)]);
-% legend('Fabber Analytical','LLS Analytical','Fabber Modelfit','Raw Data','Location','NorthEast');
-legend('Fabber Modelfit','Raw Data','Location','NorthEast');
+ylabel('Log (Signal)');
+title(['Grey Matter Average - Subject ',num2str(ss)]);
+legend('FABBER Model Fit','Raw ASE Data','Location','NorthEast');
 xlim([-32,68]);
+ylim([0.965, 1.02]);
 
-% % Print results
-% disp(['R2'' (LLS): ',num2str(-P_long(1))]);
-% disp(['R2'' (FABBER): ',num2str(R2p(ss))]);
-% disp(['DBV (LLS): ',num2str(P_long(2)-P_shrt(3))]);
-% disp(['DBV (FABBER): ',num2str(DBV(ss))]);
 
-% save(['Temp_Volsig_',num2str(ss),'.mat'],'volsignal');
+if save_plot
+    export_fig(strcat('GM_Average_Subject_',num2str(ss),'.pdf'));
+end
 
-    
-    
+end

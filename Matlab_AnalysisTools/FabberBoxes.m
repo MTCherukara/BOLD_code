@@ -7,32 +7,37 @@
     
 clear;
 
+save_plot = 0;
+
+% since we are doing plotting here
+setFigureDefaults;
+
 % select a variable
-vname = 'OEF';      % 'R2p' or 'DBV' or 'OEF'
+vname = 'DBV';      % 'R2p' or 'DBV' or 'OEF'
 
 % select a subject
-subj = 2;
+ss = 7;
 
 % designate FABBER results folders
-%         SQ-LS    SQ-VB   1C-VB   1C-VBS  1C-VBI  2C-VB   2C-VBI
-fsets = { '101'  , '250' , '208' , '264' , '257' , '201' , '236' ;...   % subject vs1
-          '102'  , '251' , '209' , '265' , '258' , '202' , '237' ;...   % subject vs2
-          '103'  , '252' , '210' , '266' , '259' , '203' , '238' ;...   % subject vs3
-          '104'  , '253' , '211' , '267' , '260' , '204' , '239' ;...   % subject vs4
-          '105'  , '254' , '212' , '268' , '261' , '205' , '240' ;...   % subject vs5
-          '106'  , '255' , '213' , '269' , '262' , '206' , '241' ;...   % subject vs6
-          '107'  , '256' , '214' , '270' , '263' , '207' , '242' };     % subject vs7
+%         SQ-LS    SQ-VB   1C-VB   1C-VBS  1C-VBI  2C-VB   2C-VBI  2C-VBTC  2C-VBSI
+fsets = { '101'  , '250' , '208' , '264' , '257' , '201' , '236' , '281'  , '291' ;...   % subject vs1
+          '102'  , '251' , '209' , '265' , '258' , '202' , '237' , '282'  , '292' ;...   % subject vs2
+          '103'  , '252' , '210' , '266' , '259' , '203' , '238' , '283'  , '293' ;...   % subject vs3
+          '104'  , '253' , '211' , '267' , '260' , '204' , '239' , '284'  , '294' ;...   % subject vs4
+          '105'  , '254' , '212' , '268' , '261' , '205' , '240' , '285'  , '295' ;...   % subject vs5
+          '106'  , '255' , '213' , '269' , '262' , '206' , '241' , '286'  , '296' ;...   % subject vs6
+          '107'  , '256' , '214' , '270' , '263' , '207' , '242' , '287'  , '297' };     % subject vs7
 
 
 % Data set labels
-lbls = {'sqBOLD','L-VB-S','1C-VB','1C-VB-S','1C-VB-I','2C-VB','2C-VB-I'};
+lbls = {'sqBOLD','L-VB','1C-VB','1C-VB-S','1C-VB-I','2C-VB','2C-VB-I','2C-VB-TC','2C-VB-S-I'};
 % lbls = {'sqBOLD','Linear VB','NO','Dynamic TC','Fixed TC','Dynamic TC-I','Fixed TC-I'};
 
 
 % choose which datasets we want to view
-dset = [2,4,5,6,7];
+dset = [1,3,5,4];
 
-fsets = fsets(subj,:);  % pull out subjects
+fsets = fsets(ss,:);  % pull out subjects
 fsets = fsets(dset);     % pull out the samples we actually want
 lbls  = lbls(dset);     % take the right labells
 
@@ -46,7 +51,7 @@ resdir = '/Users/mattcher/Documents/DPhil/Data/Fabber_Results/';
 
 % load mask slice
 maskslice = LoadSlice(['/Users/mattcher/Documents/DPhil/Data/validation_sqbold/vs',...
-                      num2str(subj),'/mask_gm_60.nii.gz'],slicenum);
+                      num2str(ss),'/mask_gm_60.nii.gz'],slicenum);
 
 % define data vector
 alldata = [];
@@ -106,16 +111,14 @@ end
 ww = max( wsk(:,2) + 1.5*(wsk(:,2)-wsk(:,1)) );
 
 % make the box-plot
-figure('WindowStyle','Docked');
-hold on; box on;
+figure; hold on; box on;
 h=boxplot(alldata ,grpdata ,...
           'Width' ,  0.60  ,...
           'Notch' ,  'on'  ,...
           'Labels',  lbls );
       
 set(h(7,:),'Visible','off');
-set(gca,'FontSize',18);
-title(['Subject ',num2str(subj)]);
+title(['Subject ',num2str(ss)]);
 
 if strcmp(vname,'R2p')
     ylabel('R_2''');
@@ -129,6 +132,8 @@ else
     end
 end
 
-
+if save_plot
+    export_fig(strcat('Bar_Subject_',num2str(ss),'_',vname,'.pdf'));
+end
 
 
