@@ -9,13 +9,13 @@ save_plot = 0;
 % subject
 % ss = 1;
 
-for ss = 1:7
+for ss = 3%1:7
 
 % identify the correct dataset
 % runs = {'208', '209', '210', '211', '212', '213', '214'};       % 1C-VB
 % runs = {'201', '202', '203', '204', '205', '206', '207'};       % 2C-VB
-runs = {'236', '237', '238', '239', '240', '241', '242'};       % 2C-VB-I
-% runs = {'281', '282', '283', '284', '285', '286', '287'};       % 2C-VB fixed TC
+% runs = {'236', '237', '238', '239', '240', '241', '242'};       % 2C-VB-I
+runs = {'288', '289', '311', '291', '292', '293', '294'};       % 2C-VB-IS
 
 fabber = runs{ss};
 resdir = '/Users/mattcher/Documents/DPhil/Data/Fabber_Results/';

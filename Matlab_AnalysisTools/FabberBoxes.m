@@ -6,36 +6,37 @@
     % 29 January 2017 
     
 clear;
+close all;
 
-save_plot = 0;
+save_plot = 1;
 
 % since we are doing plotting here
 setFigureDefaults;
 
 % select a variable
-vname = 'DBV';      % 'R2p' or 'DBV' or 'OEF'
+vname = 'OEF';      % 'R2p' or 'DBV' or 'OEF'
 
 % select a subject
-ss = 7;
-
+for ss = 1:7
+    
 % designate FABBER results folders
-%         SQ-LS    SQ-VB   1C-VB   1C-VBS  1C-VBI  2C-VB   2C-VBI  2C-VBTC  2C-VBSI
-fsets = { '101'  , '250' , '208' , '264' , '257' , '201' , '236' , '281'  , '291' ;...   % subject vs1
-          '102'  , '251' , '209' , '265' , '258' , '202' , '237' , '282'  , '292' ;...   % subject vs2
-          '103'  , '252' , '210' , '266' , '259' , '203' , '238' , '283'  , '293' ;...   % subject vs3
-          '104'  , '253' , '211' , '267' , '260' , '204' , '239' , '284'  , '294' ;...   % subject vs4
-          '105'  , '254' , '212' , '268' , '261' , '205' , '240' , '285'  , '295' ;...   % subject vs5
-          '106'  , '255' , '213' , '269' , '262' , '206' , '241' , '286'  , '296' ;...   % subject vs6
-          '107'  , '256' , '214' , '270' , '263' , '207' , '242' , '287'  , '297' };     % subject vs7
-
+%         SQ-LS    SQ-VB   1C-VB   1C-VBS  1C-VBI  1C-VBIS  2C-VB   2C-VBI  2C-VBS  2C-VBIS
+fsets = { '101'  , '250' , '208' , '264' , '257' , '295'  , '201' , '236' , '302' , '288' ;...   % subject vs1
+          '102'  , '251' , '209' , '265' , '258' , '296'  , '202' , '237' , '303' , '289' ;...   % subject vs2
+          '103'  , '252' , '210' , '266' , '259' , '297'  , '203' , '238' , '304' , '290' ;...   % subject vs3
+          '104'  , '253' , '211' , '267' , '260' , '298'  , '204' , '239' , '305' , '291' ;...   % subject vs4
+          '105'  , '254' , '212' , '268' , '261' , '299'  , '205' , '240' , '306' , '292' ;...   % subject vs5
+          '106'  , '255' , '213' , '269' , '262' , '300'  , '206' , '241' , '307' , '293' ;...   % subject vs6
+          '107'  , '256' , '214' , '270' , '263' , '301'  , '207' , '242' , '308' , '294' };     % subject vs7
+%           1        2       3       4       5       6       7       8        9       10  
 
 % Data set labels
-lbls = {'sqBOLD','L-VB','1C-VB','1C-VB-S','1C-VB-I','2C-VB','2C-VB-I','2C-VB-TC','2C-VB-S-I'};
+lbls = {'sqBOLD','L-VB','1C-VB','1C-VB-S','1C-VB-I','1C-VB-I-S','2C-VB','2C-VB-I','2C-VB-S','2C-VB-I-S'};
 % lbls = {'sqBOLD','Linear VB','NO','Dynamic TC','Fixed TC','Dynamic TC-I','Fixed TC-I'};
 
 
 % choose which datasets we want to view
-dset = [1,3,5,4];
+dset = [3,6,7,8,10];
 
 fsets = fsets(ss,:);  % pull out subjects
 fsets = fsets(dset);     % pull out the samples we actually want
@@ -124,7 +125,7 @@ if strcmp(vname,'R2p')
     ylabel('R_2''');
     ylim([-0.5,12.5]);
 else
-    ylabel(vname);
+    ylabel(['_ ',vname,'_ ']);
     if strcmp(vname,'DBV')
         ylim([-0.01,0.31]);
     else
@@ -133,7 +134,13 @@ else
 end
 
 if save_plot
-    export_fig(strcat('Bar_Subject_',num2str(ss),'_',vname,'.pdf'));
+    figname = strcat('Bar_Subject_',num2str(ss),'_',vname,'_');
+    fignum = length(dir([figname,'*'])) + 1;
+    
+    export_fig(strcat(figname,num2str(fignum),'.pdf'));
+    
+%     export_fig(strcat('Bar_Subject_',num2str(ss),'_',vname,'.pdf'));
 end
 
+end
 

@@ -132,8 +132,7 @@ montage_image = fliplr(montage_image);
 
 %% DISPLAY FIGURE
 
-figure('WindowStyle','Docked');
-hold on;
+figure; hold on;
 imagesc(montage_image);
 colormap(cmp);
 axis equal
