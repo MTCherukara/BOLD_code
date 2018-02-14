@@ -49,7 +49,6 @@ gm   = PARAMS.geom;
 dw   = PARAMS.dw;
 zeta = PARAMS.zeta;
 R2t  = PARAMS.R2t;
-R2tp = zeta.*dw;
 
 % check whether one TE, or a vector, is supplied
 if length(TE) ~= length(TAU)

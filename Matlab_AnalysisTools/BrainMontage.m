@@ -71,7 +71,7 @@ voldata(voldata > threshold) = threshold;
 % remove some of the empty voxels from around the sides, so that the brains are
 % closer together in the montage
 
-sh_sds = 10;        % sides
+sh_sds = 12;        % sides
 sh_top = 3;         % top and bottom
 
 voldata = voldata(1+sh_sds:end-sh_sds,1+sh_top:end-sh_top,:);

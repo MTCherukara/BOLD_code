@@ -1,12 +1,13 @@
 # fabber run 7, validation sqbold data
 # Input Data
-data=../../Data/validation_sqbold/vs6/sub06_ASE_FLAIR_av_mc.nii.gz
-mask=../../Data/validation_sqbold/vs6/mask_flair.nii.gz
+data=../../Data/validation_sqbold/vs7/sub07_ASE_FLAIR_av_mc.nii.gz
+mask=../../Data/validation_sqbold/vs7/mask_flair.nii.gz
 
 # Run Options
 output=../../Data/Fabber_Results/
 save-residuals
 save-model-fit
+print-free-energy
 
 # Method Information
 method=vb
@@ -15,7 +16,7 @@ max-iterations=10
 allow-bad-voxels
 
 # Spatial VB Information (remove all of this if method!=spatialvb)
-#param-spatial-priors=MMM
+#param-spatial-priors=MMMM
 #image-prior4=../../Data/subject_04/CSF_T2w.nii.gz
 
 # Inference Model 
@@ -24,7 +25,7 @@ inferR2p
 inferDBV
 inferS0
 inferR2t
-#single_compartment
+single_compartment
 #motional_narrowing
 #inferlam
 

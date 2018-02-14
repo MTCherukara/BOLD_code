@@ -2,20 +2,21 @@
 % Display an averaged-out ASE curve from FABBER "modelfit" data
 
 clear;
-close all;
+% close all;
 
 save_plot = 0;
+setFigureDefaults;
 
 % subject
 % ss = 1;
 
-for ss = 3%1:7
+for ss = 6%1:7
 
 % identify the correct dataset
 % runs = {'208', '209', '210', '211', '212', '213', '214'};       % 1C-VB
 % runs = {'201', '202', '203', '204', '205', '206', '207'};       % 2C-VB
-% runs = {'236', '237', '238', '239', '240', '241', '242'};       % 2C-VB-I
-runs = {'288', '289', '311', '291', '292', '293', '294'};       % 2C-VB-IS
+runs = {'236', '237', '238', '239', '240', '241', '242'};       % 2C-VB-I
+% runs = {'288', '289', '311', '291', '292', '293', '294'};       % 2C-VB-IS
 
 fabber = runs{ss};
 resdir = '/Users/mattcher/Documents/DPhil/Data/Fabber_Results/';
@@ -93,8 +94,8 @@ taus = (-28:4:64)./1000;
 tauA = linspace(taus(1),taus(end));
 
 % scale both datasets to have the same mean
-volsignal = log(volsignal)./mean(log(volsignal));
-rawsignal = log(rawsignal)./mean(log(rawsignal));
+volsignal = log(volsignal)./max(log(volsignal));
+rawsignal = log(rawsignal)./max(log(rawsignal));
 
 ssd = sum((volsignal-rawsignal).^2);
 disp(['Subject ',num2str(ss),' difference: ',num2str(1000*ssd)]);
@@ -109,7 +110,7 @@ ylabel('Log (Signal)');
 title(['Grey Matter Average - Subject ',num2str(ss)]);
 legend('FABBER Model Fit','Raw ASE Data','Location','NorthEast');
 xlim([-32,68]);
-ylim([0.965, 1.02]);
+% ylim([0.965, 1.02]);
 
 
 if save_plot

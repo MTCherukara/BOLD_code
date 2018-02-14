@@ -8,13 +8,13 @@
 clear;
 close all;
 
-save_plot = 1;
+save_plot = 0;
 
 % since we are doing plotting here
 setFigureDefaults;
 
 % select a variable
-vname = 'OEF';      % 'R2p' or 'DBV' or 'OEF'
+vname = 'DBV';      % 'R2p' or 'DBV' or 'OEF'
 
 % select a subject
 for ss = 1:7
@@ -36,7 +36,7 @@ lbls = {'sqBOLD','L-VB','1C-VB','1C-VB-S','1C-VB-I','1C-VB-I-S','2C-VB','2C-VB-I
 
 
 % choose which datasets we want to view
-dset = [3,6,7,8,10];
+dset = [2,5,8];
 
 fsets = fsets(ss,:);  % pull out subjects
 fsets = fsets(dset);     % pull out the samples we actually want
@@ -124,12 +124,13 @@ title(['Subject ',num2str(ss)]);
 if strcmp(vname,'R2p')
     ylabel('R_2''');
     ylim([-0.5,12.5]);
+%     ylim([-0.2,4.2]);
 else
     ylabel(['_ ',vname,'_ ']);
     if strcmp(vname,'DBV')
         ylim([-0.01,0.31]);
     else
-        ylim([-0.05,1.05]);
+        ylim([-0.03,1.03]);
     end
 end
 
