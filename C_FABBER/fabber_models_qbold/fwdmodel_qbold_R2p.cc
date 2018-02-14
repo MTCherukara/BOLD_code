@@ -39,7 +39,7 @@ string R2primeFwdModel::GetDescription() const
 
 string R2primeFwdModel::ModelVersion() const
 {
-    return "1.3";
+    return "1.4";
 } // ModelVersion
 
 
@@ -48,6 +48,7 @@ string R2primeFwdModel::ModelVersion() const
 // ------------------------------------------------------------------------------------------
 void R2primeFwdModel::Initialize(ArgsType &args)
 {
+    infer_OEF = args.ReadBool("inferOEF");
     infer_R2p = args.ReadBool("inferR2p");
     infer_DBV = args.ReadBool("inferDBV");
     infer_R2t = args.ReadBool("inferR2t");
@@ -59,6 +60,12 @@ void R2primeFwdModel::Initialize(ArgsType &args)
     infer_geo = args.ReadBool("infergeo");
     single_comp = args.ReadBool("single_compartment");
     motion_narr = args.ReadBool("motional_narrowing");
+
+    // since we can't do both, OEF will take precidence over R2p
+    if (infer_OEF)
+    {
+        infer_R2p = false;
+    }
 
 
     // temporary holders for input values
@@ -110,7 +117,11 @@ void R2primeFwdModel::Initialize(ArgsType &args)
     for (int ii = 1; ii <= taus.Nrows(); ii++)
     {
         LOG << "    TE(" << ii << ") = " << TEvals(ii) << "    tau(" << ii << ") = " << taus(ii) << endl;
-    }    
+    }
+    if (infer_OEF)
+    {
+        LOG << "Inferring on OEF " << endl;
+    }
     if (infer_R2p)
     {
         LOG << "Inferring on R2p " << endl;
@@ -159,6 +170,10 @@ void R2primeFwdModel::NameParams(vector<string> &names) const
 {
     names.clear();
 
+    if (infer_OEF)
+    {
+        names.push_back("OEF"); // parameter 1 - Oxygen Extraction Fraction
+    }
     if (infer_R2p)
     {
         names.push_back("R2p"); // parameter 1 - R2 prime
@@ -209,34 +224,40 @@ void R2primeFwdModel::HardcodedInitialDists(MVNDist &prior, MVNDist &posterior) 
     // create diagonal matrix to store precisions
     SymmetricMatrix precisions = IdentityMatrix(NumParams()) * 1e-3;
 
+    if (infer_OEF)
+    {
+        prior.means(R2p_index()) = 0.4;
+        precisions(R2p_index(), R2p_index()) = 1e1; // 1e-1 or 1e1
+    }
+    
     if (infer_R2p)
     {
         prior.means(R2p_index()) = 5.0;
-        precisions(R2p_index(), R2p_index()) = 1e0; // 1e-2 or 1e0
+        precisions(R2p_index(), R2p_index()) = 1e-2; // 1e-2 or 1e0
     }
 
     if (infer_DBV)
     {
         prior.means(DBV_index()) = 0.02;
-        precisions(DBV_index(), DBV_index()) = 1e2; // 1e0 or 1e3
+        precisions(DBV_index(), DBV_index()) = 1e0; // 1e0 or 1e3
     }
 
     if (infer_R2t)
     {
-        prior.means(R2t_index()) = 11.5;
-        precisions(R2t_index(), R2t_index()) = 1e-2; // 1e-2
+        prior.means(R2t_index()) = 1/0.087;
+        precisions(R2t_index(), R2t_index()) = 1e0; // 1e0 - more precise
     }
 
     if (infer_S0)
     {
         prior.means(S0_index()) = 100.0;
-        precisions(S0_index(), S0_index()) = 1e-5; // 1e-5
+        precisions(S0_index(), S0_index()) = 1e-5; // 1e-5 - always imprecise
     }
 
     if (infer_Hct)
     {
         prior.means(Hct_index()) = 0.40;
-        precisions(Hct_index(), Hct_index()) = 1e0; // ?
+        precisions(Hct_index(), Hct_index()) = 1e3; // 1e3 - always very precise
     }
 
     if (infer_R2e)
@@ -297,9 +318,9 @@ void R2primeFwdModel::Evaluate(const ColumnVector &params, ColumnVector &result)
     double dw;          // characteristic time (protons in water)
     double R2b;
     double R2bs;
-    double OEF;
 
     // parameters
+    double OEF;
     double R2p;
     double DBV;
     double R2t;
@@ -384,9 +405,22 @@ void R2primeFwdModel::Evaluate(const ColumnVector &params, ColumnVector &result)
         geom = 0.3;
     }
 
-    // now evaluate the static dephasing qBOLD model for 2 compartments
-    dw = R2p/DBV;
-    OEF = dw/(887.4082*Hct);
+    // this one is a little bit different
+    if (infer_OEF)
+    {
+        OEF = (paramcpy(OEF_index()));
+        dw = 887.4082*Hct*OEF;
+        R2p = dw*DBV;
+    }
+    else if (infer_R2p)
+    {
+        dw = R2p/DBV;
+        OEF = R2p/(887.4082*Hct*DBV);
+    }
+    else
+    {
+        OEF = 0.4;
+    }
 
     // loop through taus
     result.ReSize(taus.Nrows());
@@ -466,7 +500,7 @@ void R2primeFwdModel::Evaluate(const ColumnVector &params, ColumnVector &result)
 
     
     // alternative, if values are outside reasonable bounds
-    if ( DBV > 0.5 || lam > 0.5 || Hct > 1.0 )
+    if ( DBV > 0.5 || lam > 0.5 || Hct > 1.0 || OEF > 1.0 )
     {
         for (int ii = 1; ii <= taus.Nrows(); ii++)
         {
