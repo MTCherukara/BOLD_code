@@ -29,7 +29,7 @@ function SB = MTC_ASE_blood(TAU,TE,PARAMS)
 
 % pull out constants
 R2b  = PARAMS.R2b;
-R2bs = PARAMS.R2bs;
+R2bp = PARAMS.R2bp;
 
 % check whether one TE, or a vector, is supplied
 if length(TE) ~= length(TAU)
@@ -39,5 +39,4 @@ end
 % calculate model
 TAU = abs(TAU);
 
-R2bp = R2bs-R2b;
 SB = exp(-TE.*R2b).*exp(-TAU.*R2bp);

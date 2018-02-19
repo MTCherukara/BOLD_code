@@ -69,8 +69,8 @@ else
 end
     
 % relaxation rate constant of blood
-PARAMS.R2b  = 16.4*PARAMS.Hct + 4.5  + (165.2*PARAMS.Hct + 55.7)*PARAMS.OEF^2;
-PARAMS.R2bs = 14.9*PARAMS.Hct + 14.7 + (302.1*PARAMS.Hct + 41.8)*PARAMS.OEF^2;
+PARAMS.R2b  =  4.5 + 16.4*PARAMS.Hct + (165.2*PARAMS.Hct + 55.7)*PARAMS.OEF^2;
+PARAMS.R2bp = 10.2 -  1.5*PARAMS.Hct + (136.9*PARAMS.Hct - 13.9)*PARAMS.OEF^2;
 
 % weighting of blood mb
 % mb = exp(-(TE-TAU).*PARAMS.R2b).*(1 - exp(-(3-(TE-TAU)/2)/1.58) + exp(-3/1.58));

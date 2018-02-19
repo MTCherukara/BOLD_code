@@ -317,7 +317,7 @@ void R2primeFwdModel::Evaluate(const ColumnVector &params, ColumnVector &result)
     // derived parameters
     double dw;          // characteristic time (protons in water)
     double R2b;
-    double R2bs;
+    double R2bp;
 
     // parameters
     double OEF;
@@ -473,12 +473,11 @@ void R2primeFwdModel::Evaluate(const ColumnVector &params, ColumnVector &result)
             else
             {
                 // relaxation rates
-                R2bs = ((14.9*Hct) + 14.7) + ( ((302.1*Hct) + 41.8)*pow(OEF,2.0) );
-                R2b  = ((16.4*Hct) +  4.5) + ( ((165.2*Hct) + 55.7)*pow(OEF,2.0) );
+                R2b  = ( 4.5 + (16.4*Hct)) + ( ((165.2*Hct) + 55.7)*pow(OEF,2.0) );
+                R2bp = (10.2 - ( 1.5*Hct)) + ( ((136.9*Hct) - 13.9)*pow(OEF,2.0) );
 
                 // linear model
-                // Sb = exp(-R2b*(TE-tau))*exp(-R2bs*abs(tau));
-                Sb = exp(-R2b*TE)*exp((R2b-R2bs)*abs(tau));
+                Sb = exp(-R2b*TE)*exp(-R2bp*abs(tau));
 
                 /*
                 // adjusted blood compartment weighting
