@@ -1,13 +1,14 @@
-function FabberAverages(fabber)
+% function FabberAverages(fabber)
     % Loads a particular Fabber dataset and displays the average (mean and
     % median) values of R2' and DBV in the top 8 slices.
 
 clear; clc;
 % close all;
+plot_hists = 0;
 
 % select a fabber run
 if ~exist('fabber','var')
-    fabber = '255';
+    fabber = '207';
 end
 
 % load data
@@ -25,7 +26,8 @@ slicenum = 3:10;
 % Load a mask
 maskslice = LoadSlice('/Users/mattcher/Documents/DPhil/Data/validation_sqbold/vs1/mask_gm_60.nii.gz',slicenum);
 
-% Load data
+
+%% Load data
 DBVslice = LoadSlice([fabdir,'mean_DBV.nii.gz'],slicenum);
 R2pslice = LoadSlice([fabdir,'mean_R2p.nii.gz'],slicenum);
 % DFslice  = LoadSlice([fabdir,'mean_DF.nii.gz'],slicenum);
@@ -47,19 +49,21 @@ R2pslice(R2pslice == 0) = [];
 % R2p_std = abs(R2p_std(:));
 % R2p_std(R2p_std == 0) = [];
 
-% DFslice = abs(DFslice(:));
-% DFslice(DFslice == 0) = [];
 
-% % std histograms
-% [nd,ed] = histcounts(DBV_std,100);
-% cd = (ed(2:end)+ed(1:end-1))./2;
-% [~,md] = max(nd);
-% 
-% [nr,er] = histcounts(R2p_std,100);
-% cr = (er(2:end)+er(1:end-1))./2;
-% [~,mr] = max(nr);
+%% Load in and caluclate free energy if such exists 
+freedir = dir([fabdir,'freeEnergy*']);
 
-% Display Results
+if ~isempty(freedir)
+    Fslice = LoadSlice([fabdir,'freeEnergy.nii.gz'],slicenum);
+    Fslice = Fslice.*maskslice;
+    Fslice = abs(Fslice(:));
+    Fslice(Fslice == 0) = [];
+    Fslice(~isfinite(Fslice)) = [];
+    Fslice = log(Fslice);
+end
+
+    
+%% Display Results
 disp(['  Results for ',fdname.name]);
 % disp(['Mean DF  : ',num2str(mean(DFslice))]);
 % disp(['Median DF: ',num2str(median(DFslice))]);
@@ -80,25 +84,33 @@ disp(['Median DBV: ',num2str(100*median(DBVslice))]);
 % disp(['Mean OEF  : ',num2str(100*mean(R2pslice)/(301.74*mean(DBVslice)))]);
 % disp(['Median OEF: ',num2str(100*median(R2pslice)/(301.74*median(DBVslice)))]);
 
+
+%% Free Energy
+if ~isempty(freedir)
+    disp('   ');
+    disp(['  Log(Free Energy) : ',num2str(nanmean(Fslice))]);
+end
+
+
 %% Histograms
 
-nb = 25;            % number of bins
-thr = [0.2,10];     % thresholds [DBV, R2p]
+if plot_hists
+    setFigureDefaults;
+    
+    nb = 25;            % number of bins
+    thr = [0.2,10];     % thresholds [DBV, R2p]
 
-% apply threshold by removing voxels that are too high
-DBVslice(DBVslice > thr(1)) = [];
-R2pslice(R2pslice > thr(2)) = [];
+    % apply threshold by removing voxels that are too high
+    DBVslice(DBVslice > thr(1)) = [];
+    R2pslice(R2pslice > thr(2)) = [];
 
-figure('WindowStyle','Docked');
-hold on; box on;
-histogram(100*DBVslice,nb);
-xlabel('DBV_ ');
-set(gca,'FontSize',18);
+    figure; hold on; box on;
+    histogram(100*DBVslice,nb);
+    xlabel('DBV_ ');
 
-figure('WindowStyle','Docked');
-hold on; box on;
-histogram(R2pslice,nb);
-xlabel('R_2''');
-set(gca,'FontSize',18);
+    figure; hold on; box on;
+    histogram(R2pslice,nb);
+    xlabel('R_2''');
 
+end
 

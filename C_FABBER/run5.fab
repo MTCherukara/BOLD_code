@@ -1,13 +1,14 @@
 # fabber run 5 - SQBOLD
 
 # Input Data
-data=../../Data/validation_sqbold/vs6/sub06_ASE_FLAIR_longnorm.nii.gz
-mask=../../Data/validation_sqbold/vs6/sub06_ASE_FLAIR_av_mask.nii.gz
+data=../../Data/validation_sqbold/vs7/sub07_ASE_FLAIR_longnorm.nii.gz
+mask=../../Data/validation_sqbold/vs7/mask_flair.nii.gz
 
 # Run Options
 output=../../Data/Fabber_Results/
 save-residuals
 save-model-fit
+print-free-energy
 
 # Method Information
 method=vb
