@@ -47,7 +47,7 @@ tic;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Inference Parameters
 
-np = 1000; % number of points to perform Bayesian analysis on
+np = 100; % number of points to perform Bayesian analysis on
 nz = 41; % number of points in the third dimension
 
 % Select which parameter(s) to infer on
@@ -105,6 +105,7 @@ if length(pars) == 1
         % calculate log likelihood
         pos(ii) = MTC_loglike(S_sample,S_val,sigma);
 
+        
     end
 
     
@@ -140,7 +141,7 @@ elseif length(pars) == 2
 
             % calculate posterior based on known noise value
             pos(i1,i2) = MTC_loglike(S_sample,S_mod,sigma);
-            
+                    
         end % for i2 = 1:np
     end % for i1 = 1:np
     

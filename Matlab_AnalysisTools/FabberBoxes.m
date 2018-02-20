@@ -6,7 +6,7 @@
     % 29 January 2017 
     
 clear;
-close all;
+% close all;
 
 save_plot = 0;
 
@@ -14,10 +14,10 @@ save_plot = 0;
 setFigureDefaults;
 
 % select a variable
-vname = 'DBV';      % 'R2p' or 'DBV' or 'OEF'
+vname = 'OEF';      % 'R2p' or 'DBV' or 'OEF'
 
 % select a subject
-for ss = 1%:7
+for ss = 1
     
 % designate FABBER results folders
 %         SQ-LS    SQ-VB   1C-VB   1C-VBS  1C-VBI  1C-VBIS  2C-VB   2C-VBI  2C-VBS  2C-VBIS
@@ -111,41 +111,24 @@ end
 
 %% Statistical Testing
 
-disp(['Subject ',num2str(ss),' ',vname,' t-Test:']);
+% disp(['Subject ',num2str(ss),' ',vname,' t-Test:']);
 
-% divide alldata into separate vectors for pairwise t-testing
-setdata = reshape(alldata,length(alldata)/nsets,nsets);
+data1 = alldata(grpdata == 1);
 
-
-% % Compare every combination of data
-% tpairs = nchoosek(1:nsets,2);
-% 
-% for ii = 1:size(tpairs,1)
-%     
-%     pair1 = tpairs(ii,1);
-%     pair2 = tpairs(ii,2);
-% 
-%     [hh,pval] = ttest2(setdata(:,pair1),setdata(:,pair2),'Vartype','unequal');
-%     disp(['  ',lbls{pair1},' vs ',lbls{pair2},', p = ',num2str(pval)]);
-%     
-% end
-
-% Compare everything with sqBOLD
-    
-data1 = setdata(:,1);
 hh = zeros(1,nsets-1);
 pval = zeros(1,nsets-1);
 
-for ii = 2:nsets
-    data2 = setdata(:,ii);
-    [hh(ii-1),pval(ii-1)] = ttest2(data1,data2,'VarType','Unequal');
+for ii = 1:nsets-1
+    data2 = alldata(grpdata == ii+1);
+    [hh(ii),pval(ii)] = ttest2(data1,data2,'VarType','Unequal');
     
-    if hh(ii-1)
-        disp(['  ',lbls{1},' vs ',lbls{ii},' Significant Difference']);
-        disp(['      p = ',num2str(pval(ii-1))]);
-    else
-        disp(['  ',lbls{1},' vs ',lbls{ii},' NOT SIGNIFICANT!']);
-    end
+%     if hh(ii)
+%         disp(['  ',lbls{1},' vs ',lbls{ii+1},' Significant Difference']);
+%         disp(['      p = ',num2str(pval(ii))]);
+%     else
+%         disp(['  ',lbls{1},' vs ',lbls{ii+1},' NOT SIGNIFICANT!']);
+%         disp(['      p = ',num2str(pval(ii))]);
+%     end
 end
 
 
@@ -162,24 +145,33 @@ h=boxplot(alldata ,grpdata ,...
           'Labels',  lbls );
       
 set(h(7,:),'Visible','off');
-title(['Subject ',num2str(ss)]);
+title(['Subject ',num2str(ss)],'FontSize',18);
 
 if strcmp(vname,'R2p')
     ylabel('R_2''');
     ylim([-0.5,12.5]);
-    sht = 10; % star height
+    sht = 11; % star height
 %     ylim([-0.2,4.2]);
 else
     ylabel(['_ ',vname,'_ ']);
     if strcmp(vname,'DBV')
         ylim([-0.01,0.31]);
+        sht = 0.29;
     else
         ylim([-0.03,1.03]);
+        sht = 0.9;
+    end
+end
+
+% plot some significant stars
+for ii = 1:nsets-1
+    if hh(ii)
+        plot(ii+1,sht,'k*','LineWidth',1,'MarkerSize',6)
     end
 end
 
 if save_plot
-    figname = strcat('Bar_Subject_',num2str(ss),'_',vname,'_');
+    figname = strcat('BarStar_Subject_',num2str(ss),'_',vname,'_');
     fignum = length(dir([figname,'*'])) + 1;
     
     export_fig(strcat(figname,num2str(fignum),'.pdf'));
