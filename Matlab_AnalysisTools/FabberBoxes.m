@@ -14,10 +14,10 @@ save_plot = 0;
 setFigureDefaults;
 
 % select a variable
-vname = 'R2p';      % 'R2p' or 'DBV' or 'OEF'
+vname = 'DBV';      % 'R2p' or 'DBV' or 'OEF'
 
 % select a subject
-for ss = 1:7
+for ss = 1%:7
     
 % designate FABBER results folders
 %         SQ-LS    SQ-VB   1C-VB   1C-VBS  1C-VBI  1C-VBIS  2C-VB   2C-VBI  2C-VBS  2C-VBIS
@@ -36,11 +36,14 @@ lbls = {'sqBOLD','L-VB','1C-VB','1C-VB-S','1C-VB-I','1C-VB-I-S','2C-VB','2C-VB-I
 
 
 % choose which datasets we want to view
-dset = [1,2,3,7];
+dset = [1,2,3,5,7,8];
 
 fsets = fsets(ss,:);  % pull out subjects
 fsets = fsets(dset);     % pull out the samples we actually want
 lbls  = lbls(dset);     % take the right labells
+
+nsets = length(dset);
+
 
 % slices
 slicenum = 3:10;
@@ -61,7 +64,7 @@ wsk     = [];       % for storing whisker data, for scaling the plot right
 
 
 % Loop through FABBER sets and load them in
-for ii = 1:length(fsets)
+for ii = 1:nsets
     
     fdname = dir([resdir,'fabber_',fsets{ii},'_*']);
     fabdir = strcat(resdir,fdname.name,'/');
@@ -106,6 +109,46 @@ for ii = 1:length(lngdata)
 end
 
 
+%% Statistical Testing
+
+disp(['Subject ',num2str(ss),' ',vname,' t-Test:']);
+
+% divide alldata into separate vectors for pairwise t-testing
+setdata = reshape(alldata,length(alldata)/nsets,nsets);
+
+
+% % Compare every combination of data
+% tpairs = nchoosek(1:nsets,2);
+% 
+% for ii = 1:size(tpairs,1)
+%     
+%     pair1 = tpairs(ii,1);
+%     pair2 = tpairs(ii,2);
+% 
+%     [hh,pval] = ttest2(setdata(:,pair1),setdata(:,pair2),'Vartype','unequal');
+%     disp(['  ',lbls{pair1},' vs ',lbls{pair2},', p = ',num2str(pval)]);
+%     
+% end
+
+% Compare everything with sqBOLD
+    
+data1 = setdata(:,1);
+hh = zeros(1,nsets-1);
+pval = zeros(1,nsets-1);
+
+for ii = 2:nsets
+    data2 = setdata(:,ii);
+    [hh(ii-1),pval(ii-1)] = ttest2(data1,data2,'VarType','Unequal');
+    
+    if hh(ii-1)
+        disp(['  ',lbls{1},' vs ',lbls{ii},' Significant Difference']);
+        disp(['      p = ',num2str(pval(ii-1))]);
+    else
+        disp(['  ',lbls{1},' vs ',lbls{ii},' NOT SIGNIFICANT!']);
+    end
+end
+
+
 %% Plot
 
 % calculate the y-axis limits
@@ -114,7 +157,7 @@ ww = max( wsk(:,2) + 1.5*(wsk(:,2)-wsk(:,1)) );
 % make the box-plot
 figure; hold on; box on;
 h=boxplot(alldata ,grpdata ,...
-          'Width' ,  0.60  ,...
+          'Width' ,  0.50  ,...
           'Notch' ,  'on'  ,...
           'Labels',  lbls );
       
@@ -124,6 +167,7 @@ title(['Subject ',num2str(ss)]);
 if strcmp(vname,'R2p')
     ylabel('R_2''');
     ylim([-0.5,12.5]);
+    sht = 10; % star height
 %     ylim([-0.2,4.2]);
 else
     ylabel(['_ ',vname,'_ ']);
