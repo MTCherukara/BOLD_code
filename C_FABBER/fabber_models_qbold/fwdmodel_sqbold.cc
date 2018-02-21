@@ -149,7 +149,7 @@ void sqBOLDFwdModel::Evaluate(const ColumnVector &params, ColumnVector &result) 
     // loop through taus (not the first one)
     result.ReSize(taus.Nrows());
 
-    result(1) = S0*exp(DBV);
+    result(1) = S0*exp(-DBV);
 
     for (int ii = 2; ii <= taus.Nrows(); ii++)
     {

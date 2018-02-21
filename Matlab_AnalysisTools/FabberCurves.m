@@ -2,21 +2,21 @@
 % Display an averaged-out ASE curve from FABBER "modelfit" data
 
 clear;
-% close all;
+close all;
 
 save_plot = 0;
 setFigureDefaults;
 
 % subject
-% ss = 1;
-
-for ss = 4
+for ss = 1:7
 
 % identify the correct dataset
+% runs = {'250', '251', '252', '253', '254', '255', '256'};       % SQ-VB
 % runs = {'208', '209', '210', '211', '212', '213', '214'};       % 1C-VB
+runs = {'264', '265', '266', '267', '268', '269', '270'};       % 1C-VB-TC
 % runs = {'201', '202', '203', '204', '205', '206', '207'};       % 2C-VB
 % runs = {'236', '237', '238', '239', '240', '241', '242'};       % 2C-VB-I
-runs = {'316', '317', '318', '319', '320', '321', '322'};       % 2C-VB-I-2
+% runs = {'316', '317', '318', '319', '320', '321', '322'};       % 2C-VB-I-2
 
 fabber = runs{ss};
 resdir = '/Users/mattcher/Documents/DPhil/Data/Fabber_Results/';
@@ -28,6 +28,8 @@ slicenum = 3:10;
 
 % Load a mask
 maskslice = LoadSlice([rawdir,'mask_gm_60.nii.gz'],slicenum);
+% maskslice = zeros(64,64,8);
+% maskslice(18526) = 1;
 
 % Load data
 resdata = read_avw([fabdir,'modelfit.nii.gz']);
@@ -57,12 +59,12 @@ for ii = 1:mdims(4)
     
     %  remove zeros
     resvector(resvector == 0) = [];
-    
+        
     % remove extremely high values
-    resvector(resvector > quantile(resvector,0.99)) = [];
+    resvector(resvector > quantile(resvector,0.95)) = [];
     
     % remove extremely low values
-    resvector(resvector < quantile(resvector,0.01)) = [];
+    resvector(resvector < quantile(resvector,0.05)) = [];
     
     % average
     volsignal(ii) = nanmean(resvector);
@@ -79,13 +81,14 @@ for ii = 1:mdims(4)
     rawvector(rawvector == 0) = [];
     
     % remove extremely high
-    rawvector(rawvector > quantile(rawvector,0.99)) = [];
+    rawvector(rawvector > quantile(rawvector,0.95)) = [];
     
     % remove extremely low values
-    rawvector(rawvector < quantile(resvector,0.01)) = [];
+    rawvector(rawvector < quantile(resvector,0.05)) = [];
     
     % average
     rawsignal(ii) = nanmean(rawvector);
+    
 end
 
 % tau values
@@ -110,7 +113,7 @@ ylabel('Log (Signal)');
 title(['Grey Matter Average - Subject ',num2str(ss)]);
 legend('FABBER Model Fit','Raw ASE Data','Location','NorthEast');
 xlim([-32,68]);
-% ylim([0.97, 1.005]);
+ylim([0.975, 1.015]);
 
 
 if save_plot
