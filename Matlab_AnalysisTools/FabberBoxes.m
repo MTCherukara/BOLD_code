@@ -6,37 +6,38 @@
     % 29 January 2017 
     
 clear;
-% close all;
+close all;
 
-save_plot = 0;
+save_plot = 1;
 
 % since we are doing plotting here
 setFigureDefaults;
 
 % select a variable
-vname = 'DBV';      % 'R2p' or 'DBV' or 'OEF'
+vname = 'OEF';      % 'R2p' or 'DBV' or 'OEF'
 
 % select a subject
-for ss = 6
+for ss = 1:7
     
 % designate FABBER results folders
-%         SQ-LS    SQ-VB   1C-VB   1C-VBTC 1C-VBI  1C-VB-TCI  2C-VB   2C-VBI  2C-VBS  2C-VBIS
-fsets = { '101'  , '250' , '208' , '264' , '257' , '316'    , '201' , '236' , '302' , '316' ;...   % subject vs1
-          '102'  , '251' , '209' , '265' , '258' , '317'    , '202' , '237' , '303' , '317' ;...   % subject vs2
-          '103'  , '252' , '210' , '266' , '259' , '318'    , '203' , '238' , '304' , '318' ;...   % subject vs3
-          '104'  , '253' , '211' , '267' , '260' , '319'    , '204' , '239' , '305' , '319' ;...   % subject vs4
-          '105'  , '254' , '212' , '268' , '261' , '320'    , '205' , '240' , '306' , '320' ;...   % subject vs5
-          '106'  , '255' , '213' , '269' , '262' , '321'    , '206' , '241' , '307' , '321' ;...   % subject vs6
-          '107'  , '256' , '214' , '270' , '263' , '322'    , '207' , '242' , '308' , '322' };     % subject vs7
-%           1        2       3       4       5       6          7       8        9       10  
+%         SQ-LS    SQ-VB   1C-VB   1C-VBTC 1C-VBI  1C-VB-TCI  2C-VB   2C-VBI  2C-VB-TC  2C-VB-TCI
+fsets = { '101'  , '250' , '208' , '264' , '257' , '316'    , '201' , '236' , '281'   , '309' ;...   % subject vs1
+          '102'  , '251' , '209' , '265' , '258' , '317'    , '202' , '237' , '282'   , '310' ;...   % subject vs2
+          '103'  , '252' , '210' , '266' , '259' , '318'    , '203' , '238' , '283'   , '311' ;...   % subject vs3
+          '104'  , '253' , '211' , '267' , '260' , '319'    , '204' , '239' , '284'   , '312' ;...   % subject vs4
+          '105'  , '254' , '212' , '268' , '261' , '320'    , '205' , '240' , '285'   , '313' ;...   % subject vs5
+          '106'  , '255' , '213' , '269' , '262' , '321'    , '206' , '241' , '286'   , '314' ;...   % subject vs6
+          '107'  , '256' , '214' , '270' , '263' , '322'    , '207' , '242' , '287'   , '315' };     % subject vs7
+%           1        2       3       4       5       6          7       8       9        10  
 
 % Data set labels
-lbls = {'sqBOLD','L-VB','1C-VB','1C-VB-TC','1C-VB-I','1C-VB-TC-I','2C-VB','2C-VB-I','2C-VB-S','2C-VB-I-S'};
+lbls = {'sqBOLD','L-VB','1C-VB','1C-VB','1C-VB-I','1C-VB-I','2C-VB','2C-VB-I','2C-VB','2C-VB-I'};
+% lbls = {'sqBOLD','L-VB','1C-VB','1C-VB-TC','1C-VB-I','1C-VB-TC-I','2C-VB','2C-VB-I','2C-VB-TC','2C-VB-TC-I'};
 % lbls = {'sqBOLD','Linear VB','NO','Dynamic TC','Fixed TC','Dynamic TC-I','Fixed TC-I'};
 
 
 % choose which datasets we want to view
-dset = [2,3,4,6];
+dset = [1,2,4];
 
 fsets = fsets(ss,:);  % pull out subjects
 fsets = fsets(dset);     % pull out the samples we actually want
@@ -149,14 +150,14 @@ title(['Subject ',num2str(ss)],'FontSize',18);
 
 if strcmp(vname,'R2p')
     ylabel('R_2''');
-    ylim([-0.5,12.5]);
-    sht = 11; % star height
+    ylim([-0.5,10.5]);
+    sht = 9; % star height
 %     ylim([-0.2,4.2]);
 else
     ylabel(['_ ',vname,'_ ']);
     if strcmp(vname,'DBV')
-        ylim([-0.01,0.31]);
-        sht = 0.29;
+        ylim([-0.01,0.26]);
+        sht = 0.24;
     else
         ylim([-0.03,1.03]);
         sht = 0.9;
