@@ -20,9 +20,9 @@ subs = size(Data,1);
 vars = size(Data,2);
 
 % Creature Figure
-F = figure('WindowStyle','Docked');
+setFigureDefaults;
+F = figure;
 hold on; box on;
-set(gca,'FontSize',18);
 
 % Plot
 bar(Data);

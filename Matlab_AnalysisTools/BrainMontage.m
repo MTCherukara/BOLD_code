@@ -16,8 +16,8 @@
 
 clear;
 
-%         SQ-LS    SQ-VB   1C-VB   2C-VB    2C-VBI
-%         '106'  , '255' , '213' , '206' , '241' ;...   % subject vs6
+%         SQ-LS    SQ-VB   1C-VB   1C-VBI   2C-VB    2C-VBI
+%         '101'  , '250' , '264' , '316' ,  '281' , '309' ;...   % subject vs1
 
 
 %% CHECK INPUTS

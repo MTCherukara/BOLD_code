@@ -1,7 +1,8 @@
 % Bar Charts
 
 clear;
-
+close all;
+setFigureDefaults;
 
 %% Abstract Data (CSF)
 % %       FLAIR  Uncorr T1w    T2w    T2fit  3TE u  3TE f
@@ -61,46 +62,114 @@ clear;
 
 %% Paper Data (sqBOLD)
 
-%       sqB    sq-VB  1C-VB  2C-VB  MN-VB  2C-VBI
-DBV = [ 3.68,  3.78,  5.99,  4.52,  6.46,  4.44; ...
-        4.84,  5.16,  8.08,  6.55, 10.03,  4.91; ...
-        3.38,  4.03,  6.51,  4.70,  8.02,  4.33; ...
-        3.96,  4.57,  9.17,  4.56, 11.15,  5.06; ...
-        4.07,  4.81, 13.56,  5.11, 12.94,  4.71; ...
-        4.04,  4.86,  7.72,  5.68,  8.80,  4.70; ...
-        3.72,  4.23,  8.60,  4.71,  7.33,  4.42 ];
+%       sq-VB   1C-VB   1C-VBI  2C-VB   2C-VBI
+R2p = [ 2.930,  2.869,  2.946,  2.730,  2.767; ...
+        3.160,  2.968,  3.023,  2.774,  2.824; ...
+        2.680,  2.597,  2.593,  2.450,  2.447; ...
+        3.266,  3.165,  3.178,  2.912,  2.979; ...
+        3.002,  2.890,  2.890,  2.621,  2.711; ...
+        3.389,  3.195,  3.156,  3.000,  3.010; ...
+        2.510,  2.267,  2.355,  2.107,  2.195 ];
     
-%       sqB    sq-VB  1C-VB  2C-VB  MN-VB  2C-VBI
-R2p = [ 2.81,  2.94,  3.67,  2.90,  3.64,  2.80; ...
-        3.08,  3.14,  4.02,  3.19,  3.94,  2.90; ...
-        2.24,  2.65,  3.40,  2.46,  3.50,  2.54; ...
-        2.53,  3.24,  4.00,  2.72,  4.34,  3.07; ...
-        2.52,  2.96,  4.59,  2.63,  4.00,  2.76; ...
-        2.89,  3.34,  3.98,  3.05,  4.00,  3.03; ...
-        2.26,  2.53,  3.88,  2.37,  3.25,  2.32 ];
+%       sq-VB   1C-VB   1C-VBI  2C-VB   2C-VBI
+DBV = [ 4.047,  3.937,  3.896,  4.145,  3.853; ...
+        5.753,  4.527,  4.174,  4.707,  4.105; ...
+        4.544,  3.682,  3.540,  4.024,  3.429; ...
+        5.098,  4.645,  4.033,  4.828,  3.987; ...
+        5.623,  5.045,  4.094,  5.289,  4.008; ...
+        5.603,  4.707,  4.068,  4.988,  3.931; ...
+        4.645,  3.476,  3.768,  3.454,  3.626 ];
 
-OEF = 100*R2p./(3.02*DBV);
+%       sq-VB   1C-VB   1C-VBI  2C-VB   2C-VBI
+OEF = [ 21.23,  24.15,  25.06,  21.83,  23.80; ...
+        18.21,  21.73,  24.01,  19.53,  22.80; ...
+        19.55,  23.38,  24.29,  20.18,  23.65; ...
+        21.23,  22.58,  26.11,  19.99,  24.76; ...
+        17.69,  18.96,  23.40,  16.43,  22.42; ...
+        20.05,  22.50,  25.70,  19.93,  25.38; ...
+        17.91,  21.61,  20.72,  20.22,  20.07 ];
+    
+%        sq-VB  1C-VB  1C-VBI  2C-VB  2C-VBI
+eR2p = [ 1.00,  1.11,  0.94,   1.14,  0.95; ...
+         1.10,  1.09,  0.88,   1.07,  0.86; ...
+         1.34,  1.36,  1.16,   1.31,  1.13; ...
+         1.40,  1.39,  1.14,   1.44,  1.15; ...
+         1.44,  1.38,  1.04,   1.35,  1.09; ...
+         1.37,  1.53,  1.10,   1.47,  1.09; ...
+         0.85,  0.87,  0.74,   0.81,  0.71 ];
+
+%        sq-VB  1C-VB  1C-VBI  2C-VB  2C-VBI
+eDBV = [ 2.15,  1.88,  1.21,   2.22,  1.29; ...
+         2.44,  2.13,  1.19,   2.41,  1.30; ...
+         2.54,  2.35,  1.33,   2.65,  1.32; ...
+         2.40,  2.54,  1.34,   3.01,  1.42; ...
+         3.16,  3.62,  1.77,   4.04,  1.81; ...
+         3.06,  2.67,  1.31,   3.10,  1.41; ...
+         1.92,  1.67,  1.14,   1.77,  1.19 ];
+     
+%        sq-VB  1C-VB  1C-VBI  2C-VB  2C-VBI     
+aR2p = mean(R2p);
+sR2p = std(R2p);
+aDBV = mean(DBV);
+sDBV = std(DBV);
+aOEF = mean(OEF);
+sOEF = std(OEF);
+
+% Calculate OEF error by adding R2' and DBV errors in quadrature
+eOEF = OEF.*sqrt(((eR2p./R2p).^2) + ((eDBV./DBV).^2));
 
 
 %% Plotting
 
 % Plot details
-datapoints = [1,2,4,6];
-% legtext = {'Grey-Matter Average','Ischaemic ROI','Contra-Ischaemic ROI'};
-% legtext = {'with FLAIR','no FLAIR Uncorrected','no FLAIR R1 Correction','no FLAIR R2 Correction','no FLAIR Biexp. Correction'};
-% legtext = {'with FLAIR','1 TE, Uncorrected','1 TE, Biexp. Correction','Multi-TE Uncorrected','Multi-TE Biexp. Correction'};
-legtext = {'sqBOLD LLS fit','sqBOLD VB','1-comp. qBOLD VB','2-comp. qBOLD VB','Motional Narrowing VB','qBOLD VB-I'};
-% subnames = {'Presentation';'24h Post Onset'};
-% subnames = {'No Pre-Processing';'Motion Corrected, Smoothed'};
+dpts = [1,2,4,5];
+legtext = {'L-VB','1C-VB','1C-VB-I','2C-VB','2C-VB-I'};
+
+npts = repmat((1:length(dpts))',1,7);
+lbls = legtext(dpts);
+jttr = repmat(-0.06:0.02:0.06,length(dpts),1);
 
 % Plot R2p
-FabberBar(R2p(:,datapoints),'R2''',legtext(datapoints));
+figure; hold on; box on;
+errorbar(npts+jttr,R2p(:,dpts)',eR2p(:,dpts)');
+plot(npts,R2p(:,dpts)');
+errorbar(npts(:,1),aR2p(dpts),sR2p(dpts),'k:','LineWidth',3);
+xlim([npts(1)-0.25,npts(end)+0.25]);
+ylim([1,5]);
+ylabel('R_2'' (s^-^1)');
+xticks(1:length(dpts));
+xticklabels(lbls);
 
 % Plot DBV
-FabberBar(DBV(:,datapoints),'DBV',legtext(datapoints));
+figure; hold on; box on;
+errorbar(npts+jttr,DBV(:,dpts)',eDBV(:,dpts)');
+plot(npts,DBV(:,dpts)');
+errorbar(npts(:,1),aDBV(dpts),sDBV(dpts),'k:','LineWidth',3);
+xlim([npts(1)-0.25,npts(end)+0.25]);
+ylim([1,9]);
+ylabel('DBV (%)');
+xticks(1:length(dpts));
+xticklabels(lbls);
 
 % Plot OEF
-if exist('OEF','var')
-    FabberBar(OEF(:,datapoints),'OEF',legtext(datapoints));
-end
+figure; hold on; box on;
+errorbar(npts+jttr,OEF(:,dpts)',eOEF(:,dpts)');
+plot(npts,OEF(:,dpts)');
+errorbar(npts(:,1),aOEF(dpts),sOEF(dpts),'k:','LineWidth',3);
+xlim([npts(1)-0.25,npts(end)+0.25]);
+ylim([0,40]);
+ylabel('OEF (%)');
+xticks(1:length(dpts));
+xticklabels(lbls);
 
+% % Plot R2p
+% FabberBar(R2p(:,datapoints),'R2''',legtext(datapoints));
+% 
+% % Plot DBV
+% FabberBar(DBV(:,datapoints),'DBV',legtext(datapoints));
+% 
+% % Plot OEF
+% if exist('OEF','var')
+%     FabberBar(OEF(:,datapoints),'OEF',legtext(datapoints));
+% end
+% 
