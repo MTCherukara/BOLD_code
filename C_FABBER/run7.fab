@@ -23,6 +23,7 @@ allow-bad-voxels
 model=qboldR2p
 inferR2p
 inferDBV
+inferCBV
 inferS0
 inferR2t
 #single_compartment

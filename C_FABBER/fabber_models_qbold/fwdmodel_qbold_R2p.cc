@@ -39,7 +39,7 @@ string R2primeFwdModel::GetDescription() const
 
 string R2primeFwdModel::ModelVersion() const
 {
-    return "1.4";
+    return "1.5";
 } // ModelVersion
 
 
@@ -58,6 +58,7 @@ void R2primeFwdModel::Initialize(ArgsType &args)
     infer_dF  = args.ReadBool("inferdF");
     infer_lam = args.ReadBool("inferlam");
     infer_geo = args.ReadBool("infergeo");
+    infer_CBV = args.ReadBool("inferCBV");
     single_comp = args.ReadBool("single_compartment");
     motion_narr = args.ReadBool("motional_narrowing");
 
@@ -65,6 +66,12 @@ void R2primeFwdModel::Initialize(ArgsType &args)
     if (infer_OEF)
     {
         infer_R2p = false;
+    }
+
+    // since CBV only applies in the two-compartment model
+    if (single_comp)
+    {
+        infer_CBV = false;
     }
 
 
@@ -158,6 +165,10 @@ void R2primeFwdModel::Initialize(ArgsType &args)
     {
         LOG << "Inferring on Geometry Factor (the 0.3)" << endl;
     }
+    if (infer_CBV)
+    {
+        LOG << "Inferring blood compartment volume separately from DBV" << endl;
+    }
     
 } // Initialize
 
@@ -208,7 +219,11 @@ void R2primeFwdModel::NameParams(vector<string> &names) const
     }
     if (infer_geo)
     {
-        names.push_back("geofactor");  // parameter 7 - CSF volume fraction
+        names.push_back("geofactor");  // parameter 8 - geometry factor
+    }
+    if (infer_CBV)
+    {
+        names.push_back("vCBV");  // parameter 9 - blood compartment volume (not DBV)
     }
 
 } // NameParams
@@ -284,6 +299,12 @@ void R2primeFwdModel::HardcodedInitialDists(MVNDist &prior, MVNDist &posterior) 
         precisions(lam_index(), lam_index()) = 1e-1; // 1e-1
     }
 
+    if (infer_CBV)
+    {
+        prior.means(CBV_index()) = 0.03;
+        precisions(CBV_index(), CBV_index()) = 1e2; // 1e0 or 1e2
+    }
+
     prior.SetPrecisions(precisions);
 
     posterior = prior; // we don't need to change the initial guess (at least, not at this stage)
@@ -330,6 +351,7 @@ void R2primeFwdModel::Evaluate(const ColumnVector &params, ColumnVector &result)
     double dF;
     double lam;
     double geom;
+    double CBV;
 
     // assign values to parameters
     if (infer_R2p)
@@ -422,6 +444,20 @@ void R2primeFwdModel::Evaluate(const ColumnVector &params, ColumnVector &result)
         OEF = 0.4;
     }
 
+    // as is this one
+    if (infer_CBV)
+    {
+        CBV = (paramcpy(CBV_index()));
+    }
+    else if (infer_DBV)
+    {
+        CBV = DBV;
+    }
+    else
+    {
+        CBV = 0.03;
+    }
+
     // loop through taus
     result.ReSize(taus.Nrows());
 
@@ -492,7 +528,7 @@ void R2primeFwdModel::Evaluate(const ColumnVector &params, ColumnVector &result)
             Se = abs(Sec);
 
             // add up compartments
-            result(ii) = S0*(((1-DBV-lam)*St) + (DBV*Sb) + (lam*Se));
+            result(ii) = S0*(((1-CBV-lam)*St) + (CBV*Sb) + (lam*Se));
         }
 
     } // for (int i = 1; i <= taus.Nrows(); i++)

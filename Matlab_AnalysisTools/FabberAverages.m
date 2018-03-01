@@ -8,7 +8,7 @@ plot_hists = 0;
 
 % select a fabber run
 if ~exist('fabber','var')
-    fabber = '315';
+    fabber = '329';
 end
 
 % load data
@@ -31,8 +31,8 @@ maskslice = LoadSlice('/Users/mattcher/Documents/DPhil/Data/validation_sqbold/vs
 DBVslice = LoadSlice([fabdir,'mean_DBV.nii.gz'],slicenum);
 R2pslice = LoadSlice([fabdir,'mean_R2p.nii.gz'],slicenum);
 % DFslice  = LoadSlice([fabdir,'mean_DF.nii.gz'],slicenum);
-% DBV_std  = LoadSlice([fabdir,'std_DF.nii.gz'],slicenum);
-% R2p_std  = LoadSlice([fabdir,'std_R2p.nii.gz'],slicenum);
+DBV_std  = LoadSlice([fabdir,'std_DBV.nii.gz'],slicenum);
+R2p_std  = LoadSlice([fabdir,'std_R2p.nii.gz'],slicenum);
 
 % Mask
 % DFslice  = DFslice.*maskslice;
@@ -44,10 +44,10 @@ DBVslice = abs(DBVslice(:));
 DBVslice(DBVslice == 0) = [];
 R2pslice = abs(R2pslice(:));
 R2pslice(R2pslice == 0) = [];
-% DBV_std = abs(DBV_std(:));
-% DBV_std(DBV_std == 0) = [];
-% R2p_std = abs(R2p_std(:));
-% R2p_std(R2p_std == 0) = [];
+DBV_std = (DBV_std(:));
+DBV_std(DBV_std == 0) = [];
+R2p_std = (R2p_std(:));
+R2p_std(R2p_std == 0) = [];
 
 
 %% Load in and caluclate free energy if such exists 
@@ -67,22 +67,23 @@ end
 disp(['  Results for ',fdname.name]);
 % disp(['Mean DF  : ',num2str(mean(DFslice))]);
 % disp(['Median DF: ',num2str(median(DFslice))]);
-% disp(['DBV Median Error: ',num2str(100*median(DBV_std))]);
-% disp(['DBV Mode Error: ',num2str(100*cd(md))]);
+
 
 disp('   ');
 % disp(['Mean R2''  : ',num2str(mean(R2pslice))]);
 % disp(['Median R2'': ',num2str(median(R2pslice))]);
-R2Q = quantile(R2pslice,[0.75,0.25]);
-disp(['   R2'' IQR: ',num2str((R2Q(1)-R2Q(2))./2)]);
+% R2Q = quantile(R2pslice,[0.75,0.25]);
+% disp(['   R2'' IQR: ',num2str((R2Q(1)-R2Q(2))./2)]);
 % disp(['R2'' Median Error: ',num2str(median(R2p_std))]);
-% disp(['R2'' Mode Error: ',num2str(cr(mr))]);
+disp(['R2'' Mean Error  : ',num2str(nanmean(R2p_std))]);
 
 % disp('   ');
 % disp(['Mean DBV  : ',num2str(100*mean(DBVslice))]);
 % disp(['Median DBV: ',num2str(100.*median(DBVslice))]);
-DBQ = quantile(DBVslice,[0.75,0.25]);
-disp(['   DBV IQR: ',num2str(50.*(DBQ(1)-DBQ(2)))]);
+% DBQ = quantile(DBVslice,[0.75,0.25]);
+% disp(['   DBV IQR: ',num2str(50.*(DBQ(1)-DBQ(2)))]);
+% disp(['DBV Median Error: ',num2str(100*median(DBV_std))]);
+disp(['DBV Mean Error  : ',num2str(100*nanmean(DBV_std))]);
 
 % disp('   ');
 % disp(['Mean OEF  : ',num2str(100*mean(R2pslice)/(301.74*mean(DBVslice)))]);
