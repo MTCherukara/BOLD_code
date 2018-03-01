@@ -107,7 +107,15 @@ eDBV = [ 2.15,  1.88,  1.21,   2.22,  1.29; ...
          3.06,  2.67,  1.31,   3.10,  1.41; ...
          1.92,  1.67,  1.14,   1.77,  1.19 ];
      
-%        sq-VB  1C-VB  1C-VBI  2C-VB  2C-VBI     
+% rebase
+eR2p = eR2p./repmat(R2p(:,1),1,5);
+eDBV = eDBV./repmat(DBV(:,1),1,5);
+R2p = R2p./repmat(R2p(:,1),1,5);
+DBV = DBV./repmat(DBV(:,1),1,5);
+OEF = OEF./repmat(OEF(:,1),1,5);
+
+     
+% averages   
 aR2p = mean(R2p);
 sR2p = std(R2p);
 aDBV = mean(DBV);
@@ -135,7 +143,7 @@ errorbar(npts+jttr,R2p(:,dpts)',eR2p(:,dpts)');
 plot(npts,R2p(:,dpts)');
 errorbar(npts(:,1),aR2p(dpts),sR2p(dpts),'k:','LineWidth',3);
 xlim([npts(1)-0.25,npts(end)+0.25]);
-ylim([1,5]);
+% ylim([1,5]);
 ylabel('R_2'' (s^-^1)');
 xticks(1:length(dpts));
 xticklabels(lbls);
@@ -146,7 +154,7 @@ errorbar(npts+jttr,DBV(:,dpts)',eDBV(:,dpts)');
 plot(npts,DBV(:,dpts)');
 errorbar(npts(:,1),aDBV(dpts),sDBV(dpts),'k:','LineWidth',3);
 xlim([npts(1)-0.25,npts(end)+0.25]);
-ylim([1,9]);
+% ylim([1,9]);
 ylabel('DBV (%)');
 xticks(1:length(dpts));
 xticklabels(lbls);
@@ -157,7 +165,7 @@ errorbar(npts+jttr,OEF(:,dpts)',eOEF(:,dpts)');
 plot(npts,OEF(:,dpts)');
 errorbar(npts(:,1),aOEF(dpts),sOEF(dpts),'k:','LineWidth',3);
 xlim([npts(1)-0.25,npts(end)+0.25]);
-ylim([0,40]);
+% ylim([0,40]);
 ylabel('OEF (%)');
 xticks(1:length(dpts));
 xticklabels(lbls);
