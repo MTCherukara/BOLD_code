@@ -8,7 +8,7 @@ plot_hists = 0;
 
 % select a fabber run
 if ~exist('fabber','var')
-    fabber = '329';
+    fabber = '336';
 end
 
 % load data
@@ -71,29 +71,29 @@ disp(['  Results for ',fdname.name]);
 
 disp('   ');
 % disp(['Mean R2''  : ',num2str(mean(R2pslice))]);
-% disp(['Median R2'': ',num2str(median(R2pslice))]);
-% R2Q = quantile(R2pslice,[0.75,0.25]);
-% disp(['   R2'' IQR: ',num2str((R2Q(1)-R2Q(2))./2)]);
+disp(['Median R2'': ',num2str(median(R2pslice))]);
+R2Q = quantile(R2pslice,[0.75,0.25]);
+disp(['   R2'' Mean Error  : ',num2str(nanmean(R2p_std))]);
+disp(['   R2'' IQR: ',num2str((R2Q(1)-R2Q(2))./2)]);
 % disp(['R2'' Median Error: ',num2str(median(R2p_std))]);
-disp(['R2'' Mean Error  : ',num2str(nanmean(R2p_std))]);
 
-% disp('   ');
+disp('   ');
 % disp(['Mean DBV  : ',num2str(100*mean(DBVslice))]);
-% disp(['Median DBV: ',num2str(100.*median(DBVslice))]);
-% DBQ = quantile(DBVslice,[0.75,0.25]);
-% disp(['   DBV IQR: ',num2str(50.*(DBQ(1)-DBQ(2)))]);
+disp(['Median DBV: ',num2str(100.*median(DBVslice))]);
+DBQ = quantile(DBVslice,[0.75,0.25]);
+disp(['   DBV Mean Error  : ',num2str(100*nanmean(DBV_std))]);
+disp(['   DBV IQR: ',num2str(50.*(DBQ(1)-DBQ(2)))]);
 % disp(['DBV Median Error: ',num2str(100*median(DBV_std))]);
-disp(['DBV Mean Error  : ',num2str(100*nanmean(DBV_std))]);
 
-% disp('   ');
+disp('   ');
 % disp(['Mean OEF  : ',num2str(100*mean(R2pslice)/(301.74*mean(DBVslice)))]);
-% disp(['Median OEF: ',num2str(100*median(R2pslice)/(301.74*median(DBVslice)))]);
+disp(['Median OEF: ',num2str(100*median(R2pslice)/(301.74*median(DBVslice)))]);
 
 
 %% Free Energy
 if ~isempty(freedir)
-%     disp('   ');
-%     disp(['  Log(Free Energy) : ',num2str(-nanmean(Fslice))]);
+    disp('   ');
+    disp(['  Log(Free Energy) : ',num2str(-nanmean(Fslice))]);
 end
 
 
