@@ -11,7 +11,7 @@ mean_R2p = 4;
 XR = linspace(0,8,np);
 Ru = normpdf(XR,mean_R2p,prc(1e-2));
 Ri = normpdf(XR,mean_R2p,prc(1e0));
-Ra = normpdf(XR,2.85,0.66);
+Ra = normpdf(XR,2.85,0.66); % result
 Rr = normpdf(XR,2.88,0.38);
 
 % Ru = Ru./max(Ru);
@@ -20,23 +20,28 @@ Rr = normpdf(XR,2.88,0.38);
 % Rr = Rr./max(Rr);
 
 figure; hold on; box on;
-plot(XR,Ru,'b-');
-plot(XR,Ri,'r-');
-plot(XR,Ra,'b--');
-plot(XR,Rr,'r--');
+plot(XR,Ru,'k-');
+plot(XR,Ri,'k--');
+% plot(XR,Ra,'b--');
+% plot(XR,Rr,'r--');
+axis([XR(1),XR(end),0,0.6]);
 xlabel('R_2'' (s^-^1)');
 ylabel('Prior  P(R_2'')');
 legend('Uninformative Prior','Informative Prior',...
-       'Uninformative Result','Informative Result','Location','NorthEast');
+       'Location','NorthEast');
 
 
 % DBV
-mean_DBV = 0.03;
-XD = linspace(0,0.2,np);
-Du = normpdf(XD,mean_DBV,prc(1e0));
-Di = normpdf(XD,mean_DBV,prc(1e3));
-Da = normpdf(XD,0.0429,0.0322);
+mean_DBV = 3;
+XD = linspace(-10,15,np);
+Du = normpdf(XD,mean_DBV,prc(1e-3));
+Di = normpdf(XD,mean_DBV,prc(1e-1));
+Da = normpdf(XD,0.0429,0.0322); % results
 Dr = normpdf(XD,0.0394,0.0154);
+
+% Prior prevents values that are below 0
+% Du(XD < 0) = 0;
+% Di(XD < 0) = 0;
 
 % Du = Du./max(Du);
 % Di = Di./max(Di);
@@ -44,14 +49,15 @@ Dr = normpdf(XD,0.0394,0.0154);
 % Dr = Dr./max(Dr);
 
 figure; hold on; box on;
-plot(XD,Du,'b-');
-plot(XD,Di,'r-');
-plot(XD,Da,'b--');
-plot(XD,Dr,'r--');
+plot(XD,Du,'k-');
+plot(XD,Di,'k--');
+% plot(XD,Da,'b--');
+% plot(XD,Dr,'r--');
+axis([XD(1),XD(end),0,0.20])
 xlabel('_ DBV (%)^ ');
 ylabel('Prior  P(DBV)');
 legend('Uninformative Prior','Informative Prior',...
-       'Uninformative Result','Informative Result','Location','NorthEast');
+       'Location','NorthEast');
 
 return;
 

@@ -8,30 +8,30 @@
 clear;
 close all;
 
-save_plot = 1;
+save_plot = 0;
 
 % since we are doing plotting here
 setFigureDefaults;
 
 % select a variable
-vname = 'OEF';      % 'R2p' or 'DBV' or 'OEF'
+vname = 'R2p';      % 'R2p' or 'DBV' or 'OEF'
 
 % select a subject
 for ss = 1:7
     
 % designate FABBER results folders
-%         SQ-LS    SQ-VB   1C-VB   1C-VBTC 1C-VBI  1C-VB-TCI  2C-VB   2C-VBI  2C-VB-TC  2C-VB-TCI
-fsets = { '101'  , '250' , '208' , '264' , '257' , '316'    , '201' , '236' , '281'   , '309' ;...   % subject vs1
-          '102'  , '251' , '209' , '265' , '258' , '317'    , '202' , '237' , '282'   , '310' ;...   % subject vs2
-          '103'  , '252' , '210' , '266' , '259' , '318'    , '203' , '238' , '283'   , '311' ;...   % subject vs3
-          '104'  , '253' , '211' , '267' , '260' , '319'    , '204' , '239' , '284'   , '312' ;...   % subject vs4
-          '105'  , '254' , '212' , '268' , '261' , '320'    , '205' , '240' , '285'   , '313' ;...   % subject vs5
-          '106'  , '255' , '213' , '269' , '262' , '321'    , '206' , '241' , '286'   , '314' ;...   % subject vs6
-          '107'  , '256' , '214' , '270' , '263' , '322'    , '207' , '242' , '287'   , '315' };     % subject vs7
+%         SQ-LS    SQ-VB   1C-VBS  1C-VBTC 1C-VBI  1C-VB-TCI  2C-VB   2C-VBI  2C-VB-TC  2C-VB-TCI
+fsets = { '101'  , '250' , '330' , '264' , '257' , '316'    , '201' , '236' , '281'   , '309' ;...   % subject vs1
+          '102'  , '251' , '331' , '265' , '258' , '317'    , '202' , '237' , '282'   , '310' ;...   % subject vs2
+          '103'  , '252' , '332' , '266' , '259' , '318'    , '203' , '238' , '283'   , '311' ;...   % subject vs3
+          '104'  , '253' , '333' , '267' , '260' , '319'    , '204' , '239' , '284'   , '312' ;...   % subject vs4
+          '105'  , '254' , '334' , '268' , '261' , '320'    , '205' , '240' , '285'   , '313' ;...   % subject vs5
+          '106'  , '255' , '335' , '269' , '262' , '321'    , '206' , '241' , '286'   , '314' ;...   % subject vs6
+          '107'  , '256' , '336' , '270' , '263' , '322'    , '207' , '242' , '287'   , '315' };     % subject vs7
 %           1        2       3       4       5       6          7       8       9        10  
 
 % Data set labels
-lbls = {'sqBOLD','L-VB','1C-VB','1C-VB','1C-VB-I','1C-VB-I','2C-VB','2C-VB-I','2C-VB','2C-VB-I'};
+lbls = {'sqBOLD','L-VB','1C-VBS','1C-VB','1C-VB-I','1C-VB-I','2C-VB','2C-VB-I','2C-VB','2C-VB-I'};
 % lbls = {'sqBOLD','L-VB','1C-VB','1C-VB-TC','1C-VB-I','1C-VB-TC-I','2C-VB','2C-VB-I','2C-VB-TC','2C-VB-TC-I'};
 % lbls = {'sqBOLD','Linear VB','NO','Dynamic TC','Fixed TC','Dynamic TC-I','Fixed TC-I'};
 

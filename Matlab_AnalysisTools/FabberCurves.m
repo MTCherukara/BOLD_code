@@ -7,9 +7,6 @@ close all;
 save_plot = 0;
 setFigureDefaults;
 
-% subject
-for ss = 1:7
-
 % identify the correct dataset
 % runs = {'250', '251', '252', '253', '254', '255', '256'};       % SQ-VB
 % runs = {'208', '209', '210', '211', '212', '213', '214'};       % 1C-VB
@@ -17,6 +14,13 @@ for ss = 1:7
 % runs = {'201', '202', '203', '204', '205', '206', '207'};       % 2C-VB
 % runs = {'236', '237', '238', '239', '240', '241', '242'};       % 2C-VB-I
 % runs = {'309', '310', '311', '312', '313', '314', '315'};       % 2C-VB-TC-I
+% runs = {'330', '331', '332', '333', '334', '335', '336'};       % 1C-S-VB
+
+
+% subject
+for ss = 2
+
+
 
 fabber = runs{ss};
 resdir = '/Users/mattcher/Documents/DPhil/Data/Fabber_Results/';
@@ -33,7 +37,7 @@ maskslice = LoadSlice([rawdir,'mask_gm_60.nii.gz'],slicenum);
 
 % Load data
 resdata = read_avw([fabdir,'modelfit.nii.gz']);
-rawdata = read_avw([rawdir,'sub0',num2str(ss),'_ASE_FLAIR_av_mc.nii.gz']);
+rawdata = read_avw([rawdir,'sub0',num2str(ss),'_ASE_FLAIR_spread.nii.gz']);
 
 % Select slices
 resdata = resdata(:,:,slicenum,:);
@@ -92,8 +96,9 @@ for ii = 1:mdims(4)
 end
 
 % tau values
-% taus = [0, 16:4:64]./1000;
-taus = (-28:4:64)./1000;
+% taus = [0, 16:4:64]./1000; % linear
+% taus = (-28:4:64)./1000; % standard
+taus = ([-12, -8, -4, 0, 4, 8, 12, 16, 24, 32, 40, 48, 56, 64])./1000; % spread
 tauA = linspace(taus(1),taus(end));
 
 % scale both datasets to have the same mean
@@ -112,7 +117,8 @@ xlabel('Spin-Echo Offset \tau (ms)');
 ylabel('Log (Signal)');
 title(['Grey Matter Average - Subject ',num2str(ss)]);
 legend('FABBER Model Fit','Raw ASE Data','Location','NorthEast');
-xlim([-32,68]);
+% xlim([-32,68]);
+xlim([-16,68]); % spread
 ylim([0.975, 1.015]);
 
 
