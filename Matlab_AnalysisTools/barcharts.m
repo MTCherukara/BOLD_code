@@ -131,7 +131,7 @@ FE =  [ 4.00,  4.281,  5.474,  4.880,  5.390,  6.007,  5.345,  5.379; ...
     
 %% Calculations  
 
-rebase = 1;
+rebase = 0;
 
 % rebase
 if rebase
@@ -159,7 +159,7 @@ eOEF = OEF.*sqrt(((eR2p./R2p).^2) + ((eDBV./DBV).^2));
 %% Plotting
 
 % Plot details
-dpts = [1,2,3,5,8];
+dpts = [2,3,5,6,8];
 legtext = {'L-LS','L-VB','1C-VB','1C-S-VB','1C-VB-I','2C-VB','2C-VB-I','2C-VB-I'};
 
 npts = repmat((1:length(dpts))',1,7);
@@ -173,7 +173,7 @@ if rebase
     ylabel('\DeltaR_2'' (s^-^1)');
     plot([0,10],[1,1],'k--','LineWidth',1);
 else
-    ylim([0,5.2]);
+    ylim([0.8,4.9]);
     ylabel('R_2'' (s^-^1)');
 end
 errorbar(npts+jttr,R2p(:,dpts)',eR2p(:,dpts)','.');
@@ -208,7 +208,7 @@ if rebase
     ylabel('\DeltaOEF');
     plot([0,10],[1,1],'k--','LineWidth',1);
 else
-    ylim([0,52]);
+    ylim([0,47]);
     ylabel('OEF (%)');
 end
 errorbar(npts+jttr,OEF(:,dpts)',eOEF(:,dpts)','.');
@@ -220,14 +220,14 @@ xticks(1:length(dpts));
 xticklabels(lbls);
 
 % % Plot Free Energy
-% figure; hold on; box on;
-% plot(npts,FE(:,dpts)');
-% errorbar(npts(:,1),aFE(dpts),sFE(dpts),'k:','LineWidth',3);
-% xlim([npts(1)-0.25,npts(end)+0.25]);
-% % ylim([4.1,6.1]);
-% ylabel('Free Energy (log scale)');
-% xticks(1:length(dpts));
-% xticklabels(lbls);
+figure; hold on; box on;
+plot(npts,-FE(:,dpts)');
+errorbar(npts(:,1),-aFE(dpts),sFE(dpts),'k:','LineWidth',3);
+xlim([npts(1)-0.25,npts(end)+0.25]);
+ylim([-6.2,-4.2]);
+ylabel('Free Energy');
+xticks(1:length(dpts));
+xticklabels(lbls);
 
 % % Plot R2p
 % FabberBar(R2p(:,datapoints),'R2''',legtext(datapoints));
