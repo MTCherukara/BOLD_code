@@ -15,9 +15,11 @@
 % CHANGELOG:
 
 clear;
+setFigureDefaults;
 
-%         SQ-LS    SQ-VB   1C-VB   1C-VBI   2C-VB    2C-VBI
-%         '101'  , '250' , '264' , '316' ,  '281' , '309' ;...   % subject vs1
+
+% SQ-LS    SQ-VB   1C-VBS  1C-VBTC 1C-VBI  1C-VB-TCI  2C-VB   2C-VBI  2C-VB-TC  2C-VB-TCI
+% '101'  , '250' , '330' , '264' , '257' , '316'    , '201' , '236' , '281'   , '309' ;...   % subject vs1
 
 
 %% CHECK INPUTS
@@ -65,6 +67,10 @@ end
 % Threshold
 voldata(voldata < 0) = 0;
 voldata(voldata > threshold) = threshold;
+
+% % TEMP - multiply by the grey matter mask
+% maskslice = LoadSlice('/Users/mattcher/Documents/DPhil/Data/validation_sqbold/vs2/mask_gm_60.nii.gz',1:10);
+% voldata = voldata.*repmat(maskslice,[1,1,1,17]);
 
 
 %% SHAVE THE SIDES

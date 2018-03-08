@@ -4,11 +4,11 @@
 
 clear; clc;
 % close all;
-plot_hists = 0;
+plot_hists = 1;
 
 
-setnum = 323;
-subnum = 7;
+setnum = 101;
+subnum = 6;
 fabber = num2str(setnum+subnum-1);
 
 % select a fabber run
@@ -37,15 +37,15 @@ maskslice = LoadSlice(['/Users/mattcher/Documents/DPhil/Data/validation_sqbold/v
 DBVslice = LoadSlice([fabdir,'mean_DBV.nii.gz'],slicenum);
 R2pslice = LoadSlice([fabdir,'mean_R2p.nii.gz'],slicenum);
 OEFslice  = LoadSlice([fabdir,'mean_OEF.nii.gz'],slicenum);
-DBV_std  = LoadSlice([fabdir,'std_DBV.nii.gz'],slicenum);
-R2p_std  = LoadSlice([fabdir,'std_R2p.nii.gz'],slicenum);
+% DBV_std  = LoadSlice([fabdir,'std_DBV.nii.gz'],slicenum);
+% R2p_std  = LoadSlice([fabdir,'std_R2p.nii.gz'],slicenum);
 
 % Mask
 OEFslice  = OEFslice.*maskslice;
 DBVslice = DBVslice.*maskslice;
 R2pslice = R2pslice.*maskslice;
-DBV_std = DBV_std.*maskslice;
-R2p_std = R2p_std.*maskslice;
+% DBV_std = DBV_std.*maskslice;
+% R2p_std = R2p_std.*maskslice;
 
 % remove zeros, etc
 DBVslice = abs(DBVslice(:));
@@ -59,10 +59,10 @@ OEFslice(OEFslice == 0) = [];
 OEFslice(OEFslice > 1) = 1;
 OEFslice(isnan(OEFslice)) = [];
 
-DBV_std = (DBV_std(:));
-DBV_std(DBV_std == 0) = [];
-R2p_std = (R2p_std(:));
-R2p_std(R2p_std == 0) = [];
+% DBV_std = (DBV_std(:));
+% DBV_std(DBV_std == 0) = [];
+% R2p_std = (R2p_std(:));
+% R2p_std(R2p_std == 0) = [];
 
 
 %% Load in and caluclate free energy if such exists 
@@ -86,26 +86,26 @@ disp(['  Results for ',fdname.name]);
 
 disp('   ');
 disp(['Mean R2''  : ',num2str(mean(R2pslice),4)]);
-% disp(['   Std R2'': ',num2str(std(R2pslice),3)]);
+disp(['   Std R2'': ',num2str(std(R2pslice),3)]);
 % disp(['Median R2'': ',num2str(median(R2pslice),4)]);
 % R2Q = quantile(R2pslice,[0.75,0.25]);
-disp(['   R2'' Mean Error  : ',num2str(nanmean(R2p_std),3)]);
+% disp(['   R2'' Mean Error  : ',num2str(nanmean(R2p_std),3)]);
 % disp(['   R2'' IQR: ',num2str((R2Q(1)-R2Q(2))./2,3)]);
 % disp(['R2'' Median Error: ',num2str(median(R2p_std))]);
 
 disp('   ');
 disp(['Mean DBV  : ',num2str(100*mean(DBVslice),4)]);
-% disp(['   Std DBV: ',num2str(100*std(DBVslice),3)]);
+disp(['   Std DBV: ',num2str(100*std(DBVslice),3)]);
 % disp(['Median DBV: ',num2str(100.*median(DBVslice),4)]);
 % DBQ = quantile(DBVslice,[0.75,0.25]);
-disp(['   DBV Mean Error  : ',num2str(100*nanmean(DBV_std),3)]);
+% disp(['   DBV Mean Error  : ',num2str(100*nanmean(DBV_std),3)]);
 % disp(['   DBV IQR: ',num2str(50.*(DBQ(1)-DBQ(2)),3)]);
 % disp(['DBV Median Error: ',num2str(100*median(DBV_std))]);
 
 disp('   ');
 % disp(['Mean OEF  : ',num2str(100*mean(R2pslice)/(301.74*mean(DBVslice)))]);
 disp(['Mean OEF  : ',num2str(100*mean(OEFslice),4)]);
-% disp(['   Std OEF: ',num2str(100*std(OEFslice),3)]);
+disp(['   Std OEF: ',num2str(100*std(OEFslice),3)]);
 % disp(['Median OEF: ',num2str(100*median(R2pslice)/(301.74*median(DBVslice)),4)]);
 % disp(['Median OEF: ',num2str(100.*median(OEFslice))]);
 % OEQ = quantile(OEFslice,[0.75,0.25]);
@@ -122,9 +122,9 @@ end
 %% Histograms
 
 if plot_hists
-    setFigureDefaults;
+%     setFigureDefaults;
     
-    nb = 25;            % number of bins
+    nb = 40;            % number of bins
     thr = [0.2,10];     % thresholds [DBV, R2p]
 
     % apply threshold by removing voxels that are too high
@@ -133,11 +133,15 @@ if plot_hists
 
     figure; hold on; box on;
     histogram(100*DBVslice,nb);
-    xlabel('DBV_ ');
+    xlabel('_ DBV_ ');
+    ylabel('Voxels');
+    axis([0, 19, 0, 125]);
 
     figure; hold on; box on;
     histogram(R2pslice,nb);
     xlabel('R_2''');
+    ylabel('Voxels');
+    axis([0, 9.5, 0, 125]);
 
 end
 
