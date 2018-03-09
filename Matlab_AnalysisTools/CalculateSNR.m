@@ -46,9 +46,9 @@ for ii = 1:dims(4)
     snr(ii) = 0.655*(signal./sigma);
     
     % print out result
-    disp(['  SNR of Volume ',num2str(ii),' of ',num2str(dims(4)),': ',num2str(snr(ii))]);
+    disp(['  SNR of Volume ',num2str(ii),' of ',num2str(dims(4)),': ',num2str(snr(ii),4)]);
 end
 
-disp(['Average SNR: ',num2str(mean(snr))]);
+disp(['Average SNR: ',num2str(mean(snr),4)]);
     
     

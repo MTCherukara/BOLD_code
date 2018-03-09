@@ -1,42 +1,53 @@
-# fabber run 8, single TE
-
+# fabber run 8, phantom data
 # Input Data
-data=../../Data/validation_sqbold/vs2/sub02_ASE_FLAIR_av_mc.nii.gz
-mask=../../Data/validation_sqbold/vs2/mask_ncsf_40.nii.gz
+data=../../Data/Phantom_743/ASE_TR_3_taus_7.nii.gz
+mask=../../Data/Phantom_743/ASE_mask.nii.gz
 
 # Run Options
 output=../../Data/Fabber_Results/
 save-residuals
 save-model-fit
+print-free-energy
 
 # Method Information
 method=vb
 noise=white
 max-iterations=10
+allow-bad-voxels
 
 # Spatial VB Information (remove all of this if method!=spatialvb)
-param-spatial-priors=MMM
-allow-bad-voxels
-#image-prior4=../../Data/subject_04/CSF_T2w.nii.gz
+#param-spatial-priors=MMMM
 
 # Inference Model 
 model=qboldR2p
 inferR2p
 inferDBV
+#inferCBV
 inferS0
+#inferR2t
+single_compartment
+#motional_narrowing
 #inferlam
 
 # Scan Parameters (maybe I'll think of a better way of doing this...)
-TE=0.082
+TE=0.086
 
-tau1=-0.016
-tau2=-0.008
-tau3=0.0
-tau4=0.008
-tau5=0.016
-tau6=0.024
-tau7=0.032
-tau8=0.040
-tau9=0.048
-tau10=0.056
-tau11=0.064
+#tau1=-0.016
+#tau2=-0.008
+#tau3=0.0
+#tau4=0.008
+#tau5=0.016
+#tau6=0.024
+#tau7=0.032
+#tau8=0.040
+#tau9=0.048
+#tau10=0.056
+#tau11=0.064
+
+tau1=-0.008
+tau2=0.0
+tau3=0.008
+tau4=0.016
+tau5=0.024
+tau6=0.032
+tau7=0.040
