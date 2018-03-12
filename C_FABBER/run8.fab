@@ -1,6 +1,6 @@
 # fabber run 8, phantom data
 # Input Data
-data=../../Data/Phantom_743/ASE_TR_3_taus_7.nii.gz
+data=../../Data/Phantom_743/ASE_TR_2_short_11.nii.gz
 mask=../../Data/Phantom_743/ASE_mask.nii.gz
 
 # Run Options
@@ -21,7 +21,7 @@ allow-bad-voxels
 # Inference Model 
 model=qboldR2p
 inferR2p
-inferDBV
+#inferDBV
 #inferCBV
 inferS0
 #inferR2t
@@ -44,10 +44,34 @@ TE=0.086
 #tau10=0.056
 #tau11=0.064
 
-tau1=-0.008
-tau2=0.0
-tau3=0.008
-tau4=0.016
-tau5=0.024
-tau6=0.032
-tau7=0.040
+#tau1=-0.008
+#tau2=0.0
+#tau3=0.008
+#tau4=0.016
+#tau5=0.024
+#tau6=0.032
+#tau7=0.040
+
+tau1=-0.010
+tau2=-0.008
+tau3=-0.006
+tau4=-0.004
+tau5=-0.002
+tau6=0.0
+tau7=0.002
+tau8=0.004
+tau9=0.006
+tau10=0.008
+tau11=0.010
+
+#tau1=-0.010
+#tau2=-0.006
+#tau3=-0.002
+#tau4=0.0
+#tau5=0.004
+#tau6=0.008
+#tau7=0.012
+#tau8=0.016
+#tau9=0.032
+#tau10=0.048
+#tau11=0.064

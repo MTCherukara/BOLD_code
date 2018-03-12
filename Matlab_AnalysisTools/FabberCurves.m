@@ -15,29 +15,34 @@ setFigureDefaults;
 % runs = {'236', '237', '238', '239', '240', '241', '242'};       % 2C-VB-I
 % runs = {'309', '310', '311', '312', '313', '314', '315'};       % 2C-VB-TC-I
 % runs = {'330', '331', '332', '333', '334', '335', '336'};       % 1C-S-VB
-
+runs = {'345'};
+rawname = 'ASE_TR_3_taus_11.nii.gz';
 
 % subject
-for ss = 2
+for ss = 1
 
 
 
 fabber = runs{ss};
 resdir = '/Users/mattcher/Documents/DPhil/Data/Fabber_Results/';
-rawdir = ['/Users/mattcher/Documents/DPhil/Data/validation_sqbold/vs',num2str(ss),'/'];
+% rawdir = ['/Users/mattcher/Documents/DPhil/Data/validation_sqbold/vs',num2str(ss),'/'];
+rawdir = '/Users/mattcher/Documents/DPhil/Data/Phantom_743/';
 fdname = dir([resdir,'fabber_',fabber,'_*']);
 fabdir = strcat(resdir,fdname.name,'/');
 
-slicenum = 3:10;
+% slicenum = 3:10;
+slicenum = 1:8;
 
 % Load a mask
-maskslice = LoadSlice([rawdir,'mask_gm_60.nii.gz'],slicenum);
+% maskslice = LoadSlice([rawdir,'mask_gm_60.nii.gz'],slicenum);
+maskslice = LoadSlice([rawdir,'ASE_mask.nii.gz'],slicenum);
 % maskslice = zeros(64,64,8);
 % maskslice(18526) = 1;
 
 % Load data
 resdata = read_avw([fabdir,'modelfit.nii.gz']);
-rawdata = read_avw([rawdir,'sub0',num2str(ss),'_ASE_FLAIR_spread.nii.gz']);
+% rawdata = read_avw([rawdir,'sub0',num2str(ss),'_ASE_FLAIR_spread.nii.gz']);
+rawdata = read_avw([rawdir,rawname]);
 
 % Select slices
 resdata = resdata(:,:,slicenum,:);
@@ -98,15 +103,16 @@ end
 % tau values
 % taus = [0, 16:4:64]./1000; % linear
 % taus = (-28:4:64)./1000; % standard
-taus = ([-12, -8, -4, 0, 4, 8, 12, 16, 24, 32, 40, 48, 56, 64])./1000; % spread
+% taus = ([-12, -8, -4, 0, 4, 8, 12, 16, 24, 32, 40, 48, 56, 64])./1000; % spread
+taus = (-16:8:64)./1000;
 tauA = linspace(taus(1),taus(end));
 
 % scale both datasets to have the same mean
-volsignal = log(volsignal)./mean(log(volsignal));
-rawsignal = log(rawsignal)./mean(log(rawsignal));
+% volsignal = log(volsignal)./mean(log(volsignal));
+% rawsignal = log(rawsignal)./mean(log(rawsignal));
 
-ssd = sum((volsignal-rawsignal).^2);
-disp(['Subject ',num2str(ss),' difference: ',num2str(1000*ssd)]);
+% ssd = sum((volsignal-rawsignal).^2);
+% disp(['Subject ',num2str(ss),' difference: ',num2str(1000*ssd)]);
 
 
 %% Plot results
@@ -118,8 +124,8 @@ ylabel('Log (Signal)');
 title(['Grey Matter Average - Subject ',num2str(ss)]);
 legend('FABBER Model Fit','Raw ASE Data','Location','NorthEast');
 % xlim([-32,68]);
-xlim([-16,68]); % spread
-ylim([0.975, 1.015]);
+xlim([-20,68]); % spread
+% ylim([0.975, 1.015]);
 
 
 if save_plot
