@@ -12,7 +12,7 @@
 %
 % CHANGELOG:
 %
-% 2017-01-12 (MTC). Change the way the noise standard deviation params.sig
+% 2018-01-12 (MTC). Change the way the noise standard deviation params.sig
 %       is calculated and applied, so that it actually results in the SNR
 %       that we want. Also some cleanup.
 %
@@ -34,7 +34,7 @@ clear;
 close all;
 
 plot_fig = 1;       
-save_data = 0;      % set to 1 in order to save out ASE data
+save_data = 1;      % set to 1 in order to save out ASE data
 
 
 %% Model Parameters
@@ -65,9 +65,9 @@ params.SNR = 200;
 %% Compute Model
 
 % define tau values that we want to simulate
-% tau = (-28:4:64)/1000; % for testing
+tau = (-28:4:64)/1000; % for testing
 % tau = [-16:4:16,24:8:56]/1000;
-tau = linspace(-0.032,0.072,1000); % for visualising
+% tau = linspace(-0.032,0.072,1000); % for visualising
 
 np = length(tau);
 
