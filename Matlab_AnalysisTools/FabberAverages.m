@@ -16,17 +16,17 @@ varnames = {'R2p', 'DBV', 'OEF'};
 threshld = { 10  ,   1  ,   1  };
 
 % which variables do we want?
-vars = 1;
+vars = [1,2,3];
 
 % do we also load in and calculate the standard deviations?
 inc_std = 1; 
 
-% slicenum = 3:10;
-slicenum = 1:8;
+slicenum = 3:10;
+% slicenum = 1:8;
 
 % Data set
-setnum = 351;
-subnum = 1;
+setnum = 371;
+subnum = 4;
 fabber = num2str(setnum+subnum-1);
 
 % select a fabber run
@@ -40,14 +40,14 @@ fdname = dir([resdir,'fabber_',fabber,'_*']);
 fabdir = strcat(resdir,fdname.name,'/');
 
 % Load a mask
-% maskslice = LoadSlice(['/Users/mattcher/Documents/DPhil/Data/validation_sqbold/vs',...
-%                         num2str(subnum),'/mask_gm_60.nii.gz'],slicenum);
-maskslice = LoadSlice('/Users/mattcher/Documents/DPhil/Data/Phantom_743/ASE_mask.nii.gz',slicenum);
+maskslice = LoadSlice(['/Users/mattcher/Documents/DPhil/Data/validation_sqbold/vs',...
+                        num2str(subnum),'/mask_gm_60.nii.gz'],slicenum);
+% maskslice = LoadSlice('/Users/mattcher/Documents/DPhil/Data/Phantom_743/ASE_mask.nii.gz',slicenum);
 
 % Title
 disp(['Data from ',fdname.name]);
 
-for vv = 1:vars
+for vv = 1:length(vars)
     
     % Identify variables
     vname = varnames{vars(vv)};
@@ -67,6 +67,11 @@ for vv = 1:vars
     % Upper Threshold
     Dataslice(Dataslice > thrsh) = thrsh;
     
+    % convert certain params to percentages
+    if strcmp(vname,'DBV') || strcmp(vname,'OEF')
+        Dataslice = Dataslice.*100;
+    end
+    
     % Standard deviation stuff (doesn't work for OEF)
     if inc_std && ~strcmp(vname,'OEF')
         
@@ -76,6 +81,11 @@ for vv = 1:vars
         Stdslice(Stdslice == 0) = [];
         Stdslice(~isfinite(Stdslice)) = [];
         
+        % convert certain params to percentages
+        if strcmp(vname,'DBV') || strcmp(vname,'OEF')
+            Stdslice = Stdslice.*100;
+        end
+        
     end
     
     % calculate IQR
@@ -84,9 +94,11 @@ for vv = 1:vars
     % Display results
     disp('   ');
     disp(['Mean ',vname,'  : ',num2str(mean(Dataslice),4)]);
-    disp(['   Std ',vname,': ',num2str(mean(Stdslice),3)]);
+    if ~strcmp(vname,'OEF')
+        disp(['   Std ',vname,': ',num2str(mean(Stdslice),3)]);
+    end
     
-    disp('   ');
+%     disp('   ');
     disp(['Median ',vname,': ',num2str(median(Dataslice),4)]);
     disp(['   ',vname,' IQR: ',num2str((Qs(1)-Qs(2))./2,3)]);
     
