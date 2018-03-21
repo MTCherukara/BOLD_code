@@ -1,7 +1,7 @@
 # fabber run 7, validation sqbold data
 # Input Data
-data=../../Data/validation_sqbold/vs7/sub07_ASE_FLAIR_av_mc.nii.gz
-mask=../../Data/validation_sqbold/vs7/mask_flair.nii.gz
+data=../../Data/validation_sqbold/vs6/sub06_ASE_FLAIR_av_mc.nii.gz
+mask=../../Data/validation_sqbold/vs6/mask_flair.nii.gz
 
 # Run Options
 output=../../Data/Fabber_Results/
@@ -26,8 +26,8 @@ inferDBV
 #inferCBV
 inferS0
 #inferR2t
-single_compartment
-#motional_narrowing
+#single_compartment
+motional_narrowing
 #inferlam
 
 # Scan Parameters (maybe I'll think of a better way of doing this...)

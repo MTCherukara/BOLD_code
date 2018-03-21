@@ -25,8 +25,8 @@ slicenum = 3:10;
 % slicenum = 1:8;
 
 % Data set
-setnum = 371;
-subnum = 4;
+setnum = 403;
+subnum = 6;
 fabber = num2str(setnum+subnum-1);
 
 % select a fabber run

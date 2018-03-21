@@ -302,7 +302,7 @@ void R2primeFwdModel::HardcodedInitialDists(MVNDist &prior, MVNDist &posterior) 
     if (infer_CBV)
     {
         prior.means(CBV_index()) = 0.03;
-        precisions(CBV_index(), CBV_index()) = 1e2; // 1e0 or 1e2
+        precisions(CBV_index(), CBV_index()) = 1e0; // 1e0 or 1e2
     }
 
     prior.SetPrecisions(precisions);
