@@ -21,12 +21,13 @@ vars = [1,2,3];
 % do we also load in and calculate the standard deviations?
 inc_std = 1; 
 
-slicenum = 3:10;
+% slicenum = 3:10;
 % slicenum = 1:8;
+slicenum = 2:9;
 
 % Data set
-setnum = 403;
-subnum = 6;
+setnum = 413;
+subnum = 1;
 fabber = num2str(setnum+subnum-1);
 
 % select a fabber run
@@ -40,9 +41,10 @@ fdname = dir([resdir,'fabber_',fabber,'_*']);
 fabdir = strcat(resdir,fdname.name,'/');
 
 % Load a mask
-maskslice = LoadSlice(['/Users/mattcher/Documents/DPhil/Data/validation_sqbold/vs',...
-                        num2str(subnum),'/mask_gm_60.nii.gz'],slicenum);
+% maskslice = LoadSlice(['/Users/mattcher/Documents/DPhil/Data/validation_sqbold/vs',...
+%                         num2str(subnum),'/mask_gm_60.nii.gz'],slicenum);
 % maskslice = LoadSlice('/Users/mattcher/Documents/DPhil/Data/Phantom_743/ASE_mask.nii.gz',slicenum);
+maskslice = LoadSlice('/Users/mattcher/Documents/DPhil/Data/subject_07/ASE_mask_TR_3.nii.gz',slicenum);
 
 % Title
 disp(['Data from ',fdname.name]);
@@ -112,7 +114,7 @@ if ~isempty(freedir)
     
     Fslice = LoadSlice([fabdir,'freeEnergy.nii.gz'],slicenum);
     Fslice = Fslice.*maskslice;
-    Fslice = abs(Fslice(:));
+    Fslice = -(Fslice(:));
     Fslice(Fslice == 0) = [];
     Fslice(~isfinite(Fslice)) = [];
     Fslice = log(Fslice);
