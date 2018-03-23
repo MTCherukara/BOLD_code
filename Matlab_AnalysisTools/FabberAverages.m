@@ -7,7 +7,8 @@
     % 12 March 2018 (MTC). Generalization, enabling selection of variables to
     %       plot in a more generic and extensible way.
 
-clear; clc;
+clear; 
+clc;
 % close all;
 plot_hists = 0;
 
@@ -23,10 +24,11 @@ inc_std = 1;
 
 % slicenum = 3:10;
 % slicenum = 1:8;
-slicenum = 2:9;
+% slicenum = 2:9;
+slicenum = 1:6;
 
 % Data set
-setnum = 413;
+setnum = 414;
 subnum = 1;
 fabber = num2str(setnum+subnum-1);
 
@@ -44,7 +46,7 @@ fabdir = strcat(resdir,fdname.name,'/');
 % maskslice = LoadSlice(['/Users/mattcher/Documents/DPhil/Data/validation_sqbold/vs',...
 %                         num2str(subnum),'/mask_gm_60.nii.gz'],slicenum);
 % maskslice = LoadSlice('/Users/mattcher/Documents/DPhil/Data/Phantom_743/ASE_mask.nii.gz',slicenum);
-maskslice = LoadSlice('/Users/mattcher/Documents/DPhil/Data/subject_07/ASE_mask_TR_3.nii.gz',slicenum);
+maskslice = LoadSlice('/Users/mattcher/Documents/DPhil/Data/subject_07/ASE_mask_TR_2.nii.gz',slicenum);
 
 % Title
 disp(['Data from ',fdname.name]);
@@ -117,10 +119,10 @@ if ~isempty(freedir)
     Fslice = -(Fslice(:));
     Fslice(Fslice == 0) = [];
     Fslice(~isfinite(Fslice)) = [];
-    Fslice = log(Fslice);
+    FreeEnergy = (nanmedian((Fslice)));
 
     disp('   ');
-    disp(['  Log(Free Energy) : ',num2str(-nanmean(Fslice),4)]);
+    disp(['  Log(Free Energy) : ',num2str(-FreeEnergy,3)]);
     
 end
 
