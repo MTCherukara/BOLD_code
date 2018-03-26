@@ -61,6 +61,7 @@ void R2primeFwdModel::Initialize(ArgsType &args)
     infer_CBV = args.ReadBool("inferCBV");
     single_comp = args.ReadBool("single_compartment");
     motion_narr = args.ReadBool("motional_narrowing");
+    inf_priors  = args.ReadBool("infpriors");
 
     // since we can't do both, OEF will take precidence over R2p
     if (infer_OEF)
@@ -169,6 +170,10 @@ void R2primeFwdModel::Initialize(ArgsType &args)
     {
         LOG << "Inferring blood compartment volume separately from DBV" << endl;
     }
+    if (inf_priors)
+    {
+        LOG << "Using informative priors" << endl;
+    }
     
 } // Initialize
 
@@ -242,19 +247,40 @@ void R2primeFwdModel::HardcodedInitialDists(MVNDist &prior, MVNDist &posterior) 
     if (infer_OEF)
     {
         prior.means(OEF_index()) = 0.4;
-        precisions(OEF_index(), OEF_index()) = 1e1; // 1e-1 or 1e1
+        if (inf_priors)
+        {
+            precisions(OEF_index(), OEF_index()) = 1e1; // 1e1
+        }
+        else
+        {
+            precisions(OEF_index(), OEF_index()) = 1e-1; // 1e-1
+        }
     }
     
     if (infer_R2p)
     {
         prior.means(R2p_index()) = 4.0;
-        precisions(R2p_index(), R2p_index()) = 1e-2; // 1e-2 or 1e0
+        if (inf_priors)
+        {
+            precisions(R2p_index(), R2p_index()) = 1e0; // 1e-2
+        }
+        else
+        {
+            precisions(R2p_index(), R2p_index()) = 1e-2; // 1e-2
+        }
     }
 
     if (infer_DBV)
     {
         prior.means(DBV_index()) = 0.02;
-        precisions(DBV_index(), DBV_index()) = 1e0; // 1e0 or 1e3
+        if (inf_priors)
+        {
+            precisions(DBV_index(), DBV_index()) = 1e3; // 1e3
+        }
+        else
+        {
+            precisions(DBV_index(), DBV_index()) = 1e0; // 1e0
+        }
     }
 
     if (infer_R2t)
@@ -302,7 +328,14 @@ void R2primeFwdModel::HardcodedInitialDists(MVNDist &prior, MVNDist &posterior) 
     if (infer_CBV)
     {
         prior.means(CBV_index()) = 0.03;
-        precisions(CBV_index(), CBV_index()) = 1e0; // 1e0 or 1e2
+        if (inf_priors)
+        {
+            precisions(CBV_index(), CBV_index()) = 1e2; // 1e2
+        }
+        else
+        {
+            precisions(CBV_index(), CBV_index()) = 1e0; // 1e0
+        }
     }
 
     prior.SetPrecisions(precisions);

@@ -112,6 +112,7 @@ protected:
     bool infer_CBV;
     bool single_comp;
     bool motion_narr;
+    bool inf_priors;
 
 private:
     static FactoryRegistration<FwdModelFactory, R2primeFwdModel> registration;

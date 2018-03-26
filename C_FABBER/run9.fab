@@ -1,7 +1,7 @@
 # fabber run 9, AMICI Protocol Testing
 # Input Data
-data=../../Data/subject_07/MR_746_ASE_TR_3_taus_7.nii.gz
-mask=../../Data/subject_07/ASE_mask_TR_3.nii.gz
+data=../../Data/subject_08/MR_756_ASE_TR_3_taus_7.nii.gz
+mask=../../Data/subject_08/mask_TR_3.nii.gz
 
 # Run Options
 output=../../Data/Fabber_Results/
@@ -28,6 +28,7 @@ inferDBV
 
 single_compartment
 #motional_narrowing
+infpriors
 
 # Scan Parameters
 TE=0.074
