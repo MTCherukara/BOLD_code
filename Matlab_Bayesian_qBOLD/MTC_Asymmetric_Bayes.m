@@ -12,6 +12,9 @@
 %
 % CHANGELOG:
 %
+% 2018-03-29 (MTC). Added the means for displaying the locations of the maximum
+%       values produced by a 2D grid search.
+%
 % 2018-02-12 (MTC). Went back to 'param_update' since it is actually much
 %       faster. Removed the 3D grid search code because it was taking up space
 %       (it will be in the repository somewhere).
@@ -47,7 +50,7 @@ tic;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Inference Parameters
 
-np = 1000; % number of points to perform Bayesian analysis on
+np = 100; % number of points to perform Bayesian analysis on
 nz = 41; % number of points in the third dimension
 
 % Select which parameter(s) to infer on
@@ -61,6 +64,7 @@ load('ASE_Data/Data_180112_SNR_50.mat');
 sigma = mean(params.sig);   % real std of noise
 ns = length(S_sample); % number of data points
 params.R2p = params.dw.*params.zeta;
+truepars = params;
 
 if ~exist('TE_sample','var')
     TE_sample = params.TE;
@@ -185,5 +189,15 @@ elseif length(pars) == 2
     axis([min(vals(2,:)),max(vals(2,:)),min(vals(1,:)),max(vals(1,:))]);
     set(gca,'YDir','normal');
     set(c,'FontSize',19);
+    
+    % Calculate distribution's maximum position in 2D
+    [V2G,V1G] = meshgrid(vals(2,:),vals(1,:));
+    [~,mi] = max(pos(:));
+    disp('  ');
+    d
+    disp([  'OEF = ',num2str(truepars.OEF),...
+          ', DBV = ',num2str(100*truepars.zeta)]);
+    disp(['  Maximum ',pname{1},': ',num2str(V1G(mi))]);
+    disp(['  Maximum ',pname{2},': ',num2str(V2G(mi))]);
     
 end % if length(pars) == 1 ... elseif ...

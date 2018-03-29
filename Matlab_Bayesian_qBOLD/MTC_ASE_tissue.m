@@ -60,7 +60,8 @@ end
 
 % define the regime boundary
 if ~exist('tc','var')
-    tc = 1.7/dw; 
+%     tc = 1.7/dw;
+    tc = 0.024;
 end
 
 % pre-allocate

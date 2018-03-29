@@ -15,9 +15,9 @@ setFigureDefaults;
 % runs = {'236', '237', '238', '239', '240', '241', '242'};       % 2C-VB-I
 % runs = {'309', '310', '311', '312', '313', '314', '315'};       % 2C-VB-TC-I
 % runs = {'330', '331', '332', '333', '334', '335', '336'};       % 1C-S-VB
-runs = {'411'};
+runs = {'416'};
 % rawname = 'ASE_TR_3_taus_11.nii.gz';
-rawname = 'MR_746_ASE_TR_2_taus_11.nii.gz';
+rawname = 'MR_756_ASE_TR_3_taus_11.nii.gz';
 
 % subject
 for ss = 1
@@ -27,7 +27,7 @@ for ss = 1
 fabber = runs{ss};
 resdir = '/Users/mattcher/Documents/DPhil/Data/Fabber_Results/';
 % rawdir = ['/Users/mattcher/Documents/DPhil/Data/validation_sqbold/vs',num2str(ss),'/'];
-rawdir = '/Users/mattcher/Documents/DPhil/Data/subject_07/';
+rawdir = '/Users/mattcher/Documents/DPhil/Data/subject_08/';
 fdname = dir([resdir,'fabber_',fabber,'_*']);
 fabdir = strcat(resdir,fdname.name,'/');
 
@@ -42,12 +42,14 @@ maskslice = LoadSlice([rawdir,'mask_gm_TR_2.nii.gz'],slicenum);
 
 % Load data
 resdata = read_avw([fabdir,'modelfit.nii.gz']);
+rsddata = read_avw([fabdir,'residuals.nii.gz']);
 % rawdata = read_avw([rawdir,'sub0',num2str(ss),'_ASE_FLAIR_av_mc.nii.gz']);
 rawdata = read_avw([rawdir,rawname]);
 
 % Select slices
 resdata = resdata(:,:,slicenum,:);
 rawdata = rawdata(:,:,slicenum,:);
+rsddata = rsddata(:,:,slicenum,:);
 mdims = size(resdata);
 
 % Apply mask
@@ -57,6 +59,7 @@ rawdata = rawdata.*repmat(maskslice,1,1,1,mdims(4));
 % pre-allocate
 volsignal = zeros(1,mdims(4));
 rawsignal = zeros(1,mdims(4));
+volresid  = zeros(1,mdims(4));
 
 % Loop through volumes and average over grey matter
 for ii = 1:mdims(4)
@@ -99,6 +102,26 @@ for ii = 1:mdims(4)
     % average
     rawsignal(ii) = nanmean(rawvector);
     
+    % same again, for residuals
+    
+    % extract volume and apply mask
+    rsdvector = rsddata(:,:,:,ii).*maskslice;
+    
+    % vectorize
+    rsdvector = rsdvector(:);
+    
+    %  remove zeros
+    rsdvector(rsdvector == 0) = [];
+        
+    % remove extremely high values
+    rsdvector(rsdvector > quantile(rsdvector,0.95)) = [];
+    
+    % remove extremely low values
+    rsdvector(rsdvector < quantile(rsdvector,0.05)) = [];
+    
+    % average
+    volresid(ii) = nanmean(abs(rsdvector));
+    
 end
 
 % tau values
@@ -122,6 +145,7 @@ tauA = linspace(taus(1),taus(end));
 figure; hold on; box on;
 plot(1000*taus,log(volsignal),'kx');
 plot(1000*taus,log(rawsignal),'ro');
+plot(1000*taus,log(volsignal+volresid),'bx');
 xlabel('Spin-Echo Offset \tau (ms)');
 ylabel('Log (Signal)');
 title(['Grey Matter Average - Subject ',num2str(ss)]);

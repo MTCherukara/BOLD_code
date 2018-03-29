@@ -17,19 +17,19 @@ varnames = {'R2p', 'DBV', 'OEF'};
 threshld = { 10  ,   1  ,   1  };
 
 % which variables do we want?
-vars = [1,2];
+vars = [1,2,3];
 
 % do we also load in and calculate the standard deviations?
 inc_std = 0; 
 
-slicenum = 3:10;
+% slicenum = 3:10;
 % slicenum = 1:8;
-% slicenum = 2:9;
+slicenum = 2:9;
 % slicenum = 1:6;
 
 % Data set
-setnum = 371;
-subnum = 7;
+setnum = 429;
+subnum = 1;
 fabber = num2str(setnum+subnum-1);
 
 % select a fabber run
@@ -43,10 +43,10 @@ fdname = dir([resdir,'fabber_',fabber,'_*']);
 fabdir = strcat(resdir,fdname.name,'/');
 
 % Load a mask
-maskslice = LoadSlice(['/Users/mattcher/Documents/DPhil/Data/validation_sqbold/vs',...
-                        num2str(subnum),'/mask_gm_60.nii.gz'],slicenum);
+% maskslice = LoadSlice(['/Users/mattcher/Documents/DPhil/Data/validation_sqbold/vs',...
+%                         num2str(subnum),'/mask_gm_60.nii.gz'],slicenum);
 % maskslice = LoadSlice('/Users/mattcher/Documents/DPhil/Data/Phantom_743/ASE_mask.nii.gz',slicenum);
-% maskslice = LoadSlice('/Users/mattcher/Documents/DPhil/Data/subject_08/mask_TR_3.nii.gz',slicenum);
+maskslice = LoadSlice('/Users/mattcher/Documents/DPhil/Data/subject_08/mask_MASE_gm.nii.gz',slicenum);
 
 % Title
 disp(['Data from ',fdname.name]);

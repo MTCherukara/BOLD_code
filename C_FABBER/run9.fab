@@ -1,7 +1,7 @@
 # fabber run 9, AMICI Protocol Testing
 # Input Data
-data=../../Data/subject_08/MR_756_ASE_TR_3_taus_7.nii.gz
-mask=../../Data/subject_08/mask_TR_3.nii.gz
+data=../../Data/subject_08/MR_756_ASE_FLAIR_82.nii.gz
+mask=../../Data/subject_08/mask_MASE.nii.gz
 
 # Run Options
 output=../../Data/Fabber_Results/
@@ -26,29 +26,63 @@ inferDBV
 #inferCBV
 #inferR2t
 
-single_compartment
-#motional_narrowing
+#single_compartment
+motional_narrowing
 infpriors
 
 # Scan Parameters
 TE=0.074
 
-#tau1=0.0
-#tau2=0.002
-#tau3=0.004
-#tau4=0.006
-#tau5=0.008
-#tau6=0.010
-#tau7=0.020
-#tau8=0.030
-#tau9=0.040
-#tau10=0.050
-#tau11=0.060
+#TE1=0.046
+#TE2=0.046
+#TE3=0.046
+#TE4=0.046
+#TE5=0.046
+#TE6=0.046
+#TE7=0.046
+#TE8=0.046
+#TE9=0.046
+#TE10=0.046
+#TE11=0.046
+#TE12=0.074
+#TE13=0.074
+#TE14=0.074
+#TE15=0.074
+#TE16=0.074
+#TE17=0.074
+#TE18=0.074
+#TE19=0.074
+#TE20=0.074
+#TE21=0.074
+#TE22=0.074
 
 tau1=0.0
-tau2=0.003
-tau3=0.006
-tau4=0.009
-tau5=0.020
-tau6=0.040
-tau7=0.060
+tau2=0.002
+tau3=0.004
+tau4=0.006
+tau5=0.008
+tau6=0.010
+tau7=0.020
+tau8=0.030
+tau9=0.040
+tau10=0.050
+tau11=0.060
+#tau12=0.0
+#tau13=0.002
+#tau14=0.004
+#tau15=0.006
+#tau16=0.008
+#tau17=0.010
+#tau18=0.020
+#tau19=0.030
+#tau20=0.040
+#tau21=0.050
+#tau22=0.060
+
+#tau1=0.0
+#tau2=0.003
+#tau3=0.006
+#tau4=0.009
+#tau5=0.020
+#tau6=0.040
+#tau7=0.060

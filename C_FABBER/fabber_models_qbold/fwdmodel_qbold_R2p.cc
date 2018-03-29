@@ -286,7 +286,7 @@ void R2primeFwdModel::HardcodedInitialDists(MVNDist &prior, MVNDist &posterior) 
     if (infer_R2t)
     {
         prior.means(R2t_index()) = 1/0.087;
-        precisions(R2t_index(), R2t_index()) = 1e0; // 1e0 - more precise
+        precisions(R2t_index(), R2t_index()) = 1e-2; // 1e0 - more precise
     }
 
     if (infer_S0)
