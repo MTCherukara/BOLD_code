@@ -1,22 +1,23 @@
 # fabber run 4, Frequency Shift
 
 # Input Data
-data=../../Data/subject_04/MR_699_ASE_82_FNF.nii.gz
-mask=../../Data/subject_04/MR_699_mask.nii.gz
+data=../../Data/subject_08/ASE_FNF.nii.gz
+mask=../../Data/subject_08/mask_FLAIR.nii.gz
 
 # Run Options
 output=../../Data/Fabber_Results/
 save-residuals
 save-model-fit
+print-free-energy
 
-# Method Information
+# Method  
 method=vb
 noise=white
 max-iterations=10
+allow-bad-voxels
 
 # Spatial VB Information (remove all of this if method!=spatialvb)
 #param-spatial-priors=MMM
-#allow-bad-voxels
 
 # Inference Model 
 model=freqShift

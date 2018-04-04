@@ -151,21 +151,21 @@ void FreqShiftFwdModel::HardcodedInitialDists(MVNDist &prior, MVNDist &posterior
     if (infer_DF)
     {
         prior.means(DF_index()) = 7.0;
-        precisions(DF_index(), DF_index()) = 1e-2; // 1e-2
+        precisions(DF_index(), DF_index()) = 1e-1; // 1e-2
     }
 
     // parameter 4 - R2-prime (Tissue)
     if (infer_R2p)
     {
         prior.means(R2p_index()) = 3.0;
-        precisions(R2p_index(), R2p_index()) = 1e-2; // 1e-2
+        precisions(R2p_index(), R2p_index()) = 1e-1; // 1e-2
     }
     
     // parameter 5 - DBV
     if (infer_DBV)
     {
         prior.means(DBV_index()) = 0.03;
-        precisions(DBV_index(), DBV_index()) = 1e0; // 1e-1
+        precisions(DBV_index(), DBV_index()) = 1e1; // 1e-1
     }
 
     prior.SetPrecisions(precisions);
@@ -193,7 +193,7 @@ void FreqShiftFwdModel::Evaluate(const ColumnVector &params, ColumnVector &resul
     double DBV; 
 
     // fixed-value parameters
-    double T1t = 1.000;     // Grey matter T1 (Lu et al., 2005)
+    double T1t = 1.200;     // Grey matter T1 (Lu et al., 2005)
     double T1e = 3.870;     // CSF T1 (Lu et al., 2005)  
     double T1b = 1.580;     // Blood T1 (Lu et al., 2004)
     double R2t = 11.5;      // Grey matter T2=87ms (He & Yablonskiy, 2007)
@@ -216,7 +216,7 @@ void FreqShiftFwdModel::Evaluate(const ColumnVector &params, ColumnVector &resul
     }
     if (infer_DF)
     {
-        DF = abs(paramcpy(DF_index()));
+        DF = (paramcpy(DF_index()));
     }
     else
     {
@@ -224,7 +224,7 @@ void FreqShiftFwdModel::Evaluate(const ColumnVector &params, ColumnVector &resul
     }
     if (infer_R2p)
     {
-        R2p = abs(paramcpy(R2p_index()));
+        R2p = (paramcpy(R2p_index()));
     } 
     else
     {
@@ -291,6 +291,15 @@ void FreqShiftFwdModel::Evaluate(const ColumnVector &params, ColumnVector &resul
         // Total
         result(jj) = M0 * (( (1-(DBV+VC))*St ) + (DBV*Sb) + (VC*Se));
         
+    }
+
+    // alternative, if values are outside reasonable bounds
+    if ( DBV > 0.5 || VC > 1.1 )
+    {
+        for (int ii = 1; ii <= 2*taus.Nrows(); ii++)
+        {
+            result(ii) = result(ii)*100.0;
+        }
     }
 
     return;

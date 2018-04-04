@@ -13,23 +13,25 @@ clc;
 plot_hists = 0;
 
 % sets of variables
-varnames = {'R2p', 'DBV', 'OEF'};
-threshld = { 10  ,   1  ,   1  };
+varnames = {'R2p', 'DBV', 'OEF', 'VC', 'DF'};
+threshld = { 10  ,   1  ,   1  ,  1  ,  15 };
+
 
 % which variables do we want?
-vars = [1,2,3];
+vars = [1,4,5];
 
 % do we also load in and calculate the standard deviations?
 inc_std = 0; 
 
 % slicenum = 3:10;
-% slicenum = 1:8;
-slicenum = 2:9;
+slicenum = 2:8;
+% slicenum = 2:9;
 % slicenum = 1:6;
 
 % Data set
-setnum = 429;
+setnum = 433;
 subnum = 1;
+msknum = 8;     % this is used for the DeltaF datasets
 fabber = num2str(setnum+subnum-1);
 
 % select a fabber run
@@ -45,8 +47,10 @@ fabdir = strcat(resdir,fdname.name,'/');
 % Load a mask
 % maskslice = LoadSlice(['/Users/mattcher/Documents/DPhil/Data/validation_sqbold/vs',...
 %                         num2str(subnum),'/mask_gm_60.nii.gz'],slicenum);
+maskslice = LoadSlice(['/Users/mattcher/Documents/DPhil/Data/subject_0',...
+                        num2str(msknum),'/mask_FLAIR_NW.nii.gz'],slicenum);
 % maskslice = LoadSlice('/Users/mattcher/Documents/DPhil/Data/Phantom_743/ASE_mask.nii.gz',slicenum);
-maskslice = LoadSlice('/Users/mattcher/Documents/DPhil/Data/subject_08/mask_MASE_gm.nii.gz',slicenum);
+% maskslice = LoadSlice('/Users/mattcher/Documents/DPhil/Data/subject_08/mask_MASE_gm.nii.gz',slicenum);
 
 % Title
 disp(['Data from ',fdname.name]);
@@ -72,7 +76,7 @@ for vv = 1:length(vars)
     Dataslice(Dataslice > thrsh) = thrsh;
     
     % convert certain params to percentages
-    if strcmp(vname,'DBV') || strcmp(vname,'OEF')
+    if strcmp(vname,'DBV') || strcmp(vname,'OEF') || strcmp(vname,'VC')
         Dataslice = Dataslice.*100;
     end
     
