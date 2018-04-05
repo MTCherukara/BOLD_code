@@ -31,7 +31,7 @@
 %       which was apparently causing problems (I don't know why).
 
 clear; 
-close all;
+% close all;
 
 plot_fig = 1;       
 save_data = 1;      % set to 1 in order to save out ASE data
@@ -53,26 +53,31 @@ params.R2t  = 1/0.087;      % 1/s       - rate constant, tissue
 params.R2e  = 4;            % 1/s       - rate constant, extracellular
 params.dF   = 5;            % Hz        - frequency shift
 params.lam0 = 0.000;        % no units  - ISF/CSF signal contribution
-params.zeta = 0.03;        % no units  - deoxygenated blood volume
-params.OEF  = 0.40;        % no units  - oxygen extraction fraction
+params.zeta = 0.04;        % no units  - deoxygenated blood volume
+params.OEF  = 0.25;        % no units  - oxygen extraction fraction
 params.Hct  = 0.400;        % no units  - fractional hematocrit
-params.geom = 0.3;          % no units  - quadratic regime geometry factor
+
+% analysis parameters
+params.geom   = 0.3;        % no units  - quadratic regime geometry factor
+params.tc_man = 0;          % BOOL      - should Tc be defined manually?
+params.tc_val = 0.0;        % s         - manual Tc (if tc_man = 1)
 
 % noise
-params.SNR = 200;
+params.SNR = 50;
 
 
 %% Compute Model
 
 % define tau values that we want to simulate
-tau = (-28:4:64)/1000; % for testing
+% tau = (-28:4:64)/1000; % for testing
+tau = (-24:1:64)/1000;
 % tau = [-16:4:16,24:8:56]/1000;
 % tau = linspace(-0.032,0.072,1000); % for visualising
 
 np = length(tau);
 
 % call MTC_qASE_model
-[S_total,params] = MTC_qASE_model(tau,params.TE,params);
+[S_total,params] = MTC_qASE_modelB(tau,params.TE,params);
 
 
 %% Add Noise

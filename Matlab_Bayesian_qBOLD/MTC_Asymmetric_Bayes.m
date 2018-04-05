@@ -39,9 +39,9 @@
 % 2017-04-04 (MTC). Various changes.
 
 clear;
-% close all;
+close all;
 
-setFigureDefaults;  % since we're doing plotting later
+% setFigureDefaults;  % since we're doing plotting later
 
 tic;
 
@@ -50,7 +50,7 @@ tic;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Inference Parameters
 
-np = 100; % number of points to perform Bayesian analysis on
+np = 250; % number of points to perform Bayesian analysis on
 nz = 41; % number of points in the third dimension
 
 % Select which parameter(s) to infer on
@@ -58,7 +58,10 @@ nz = 41; % number of points in the third dimension
 pars = [3,2];
 
 % Load the Data:
-load('ASE_Data/Data_180112_SNR_50.mat');
+load('ASE_Data/Data_180402_A_SNR_50.mat');
+
+params.tc_man = 1;
+params.tc_val = 0.028;
 
 % extract relevant parameters
 sigma = mean(params.sig);   % real std of noise
@@ -72,7 +75,7 @@ end
 
 % Parameter names and search ranges
 pnames  = { 'OEF'   ;  'zeta'    ; 'R2p' ; 'lam0'  ; 'dF' ; 'geom'  };
-intervs = [ 0.001,1 ; 0.01,0.065 ; 2.5,6 ; 0.0,0.2 ; 1,10 ; 0.1,0.5 ];  
+intervs = [ 0.001,1 ; 0.01,0.065 ; 2,6 ; 0.0,0.2 ; 1,10 ; 0.1,0.5 ];  
 %            OEF     DBV        R2'     v_CSF      dF       Geom
 
 % are we inferring on R2'?
@@ -194,10 +197,10 @@ elseif length(pars) == 2
     [V2G,V1G] = meshgrid(vals(2,:),vals(1,:));
     [~,mi] = max(pos(:));
     disp('  ');
-    d
     disp([  'OEF = ',num2str(truepars.OEF),...
-          ', DBV = ',num2str(100*truepars.zeta)]);
-    disp(['  Maximum ',pname{1},': ',num2str(V1G(mi))]);
-    disp(['  Maximum ',pname{2},': ',num2str(V2G(mi))]);
+          ', DBV = ',num2str(100*truepars.zeta),...
+          ', Tc = ',num2str(1000*params.tc_val),'ms']);
+    disp(['  Maximum ',pname{1},': ',num2str(V1G(mi),4)]);
+    disp(['  Maximum ',pname{2},': ',num2str(100*V2G(mi),4)]);
     
 end % if length(pars) == 1 ... elseif ...
