@@ -12,6 +12,9 @@
 %
 % CHANGELOG:
 %
+% 2018-04-05 (MTC). Added the option to set the critical time (TC) manually as a
+%       pair of parameters. Also changed MTC_ASE_tissue.m accordingly.
+%
 % 2018-01-12 (MTC). Change the way the noise standard deviation params.sig
 %       is calculated and applied, so that it actually results in the SNR
 %       that we want. Also some cleanup.
@@ -53,8 +56,8 @@ params.R2t  = 1/0.087;      % 1/s       - rate constant, tissue
 params.R2e  = 4;            % 1/s       - rate constant, extracellular
 params.dF   = 5;            % Hz        - frequency shift
 params.lam0 = 0.000;        % no units  - ISF/CSF signal contribution
-params.zeta = 0.04;        % no units  - deoxygenated blood volume
-params.OEF  = 0.25;        % no units  - oxygen extraction fraction
+params.zeta = 0.03;        % no units  - deoxygenated blood volume
+params.OEF  = 0.60;        % no units  - oxygen extraction fraction
 params.Hct  = 0.400;        % no units  - fractional hematocrit
 
 % analysis parameters
@@ -63,7 +66,7 @@ params.tc_man = 0;          % BOOL      - should Tc be defined manually?
 params.tc_val = 0.0;        % s         - manual Tc (if tc_man = 1)
 
 % noise
-params.SNR = 50;
+params.SNR = 100;
 
 
 %% Compute Model

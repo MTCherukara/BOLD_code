@@ -29,7 +29,7 @@ slicenum = 2:8;
 % slicenum = 1:6;
 
 % Data set
-setnum = 433;
+setnum = 445;
 subnum = 1;
 msknum = 8;     % this is used for the DeltaF datasets
 fabber = num2str(setnum+subnum-1);
@@ -48,7 +48,7 @@ fabdir = strcat(resdir,fdname.name,'/');
 % maskslice = LoadSlice(['/Users/mattcher/Documents/DPhil/Data/validation_sqbold/vs',...
 %                         num2str(subnum),'/mask_gm_60.nii.gz'],slicenum);
 maskslice = LoadSlice(['/Users/mattcher/Documents/DPhil/Data/subject_0',...
-                        num2str(msknum),'/mask_FLAIR_NW.nii.gz'],slicenum);
+                        num2str(msknum),'/mask_FLAIR_GM.nii.gz'],slicenum);
 % maskslice = LoadSlice('/Users/mattcher/Documents/DPhil/Data/Phantom_743/ASE_mask.nii.gz',slicenum);
 % maskslice = LoadSlice('/Users/mattcher/Documents/DPhil/Data/subject_08/mask_MASE_gm.nii.gz',slicenum);
 

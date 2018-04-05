@@ -13,7 +13,7 @@ print-free-energy
 # Method  
 method=vb
 noise=white
-max-iterations=10
+max-iterations=25
 allow-bad-voxels
 
 # Spatial VB Information (remove all of this if method!=spatialvb)

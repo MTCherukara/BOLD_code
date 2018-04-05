@@ -150,7 +150,7 @@ void FreqShiftFwdModel::HardcodedInitialDists(MVNDist &prior, MVNDist &posterior
     // parameter 3 - Delta F
     if (infer_DF)
     {
-        prior.means(DF_index()) = 7.0;
+        prior.means(DF_index()) = 5.0;
         precisions(DF_index(), DF_index()) = 1e-1; // 1e-2
     }
 
@@ -228,7 +228,7 @@ void FreqShiftFwdModel::Evaluate(const ColumnVector &params, ColumnVector &resul
     } 
     else
     {
-        R2p = 3.0;
+        R2p = 2.0;
     }
     if (infer_DBV)
     {
@@ -236,7 +236,7 @@ void FreqShiftFwdModel::Evaluate(const ColumnVector &params, ColumnVector &resul
     }
     else
     {
-        DBV = 0.03; 
+        DBV = 0.00; 
     }
     // now evaluate information
     result.ReSize(2*taus.Nrows());
