@@ -57,8 +57,12 @@ plot(1000*TCp,R_p,'k-');
 xlabel('Characteristic Time \tau_c (ms)');
 ylabel('Maximum Likelihood R_2'' (s^-^1)');
 axis([0, 30, 1, 7]);
+legend('OEF = 20%','OEF = 30%','OEF = 40%','OEF = 50%','OEF = 60%');
 
 figure(2); hold on; box on;
 plot(tc,d_DBV);
+plot([0,30],[3,3],'k-');
 xlabel('Characteristic Time \tau_c (ms)');
 ylabel('Maximum Likelihood DBV (%)');
+legend('OEF = 20%','OEF = 30%','OEF = 40%','OEF = 50%','OEF = 60%',...
+       'Location','NorthWest');

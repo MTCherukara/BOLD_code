@@ -39,7 +39,7 @@ string FreqShiftFwdModel::GetDescription() const
 
 string FreqShiftFwdModel::ModelVersion() const
 {
-    return "1.0";
+    return "1.1";
 } // ModelVersion
 
 
@@ -53,6 +53,7 @@ void FreqShiftFwdModel::Initialize(ArgsType &args)
     infer_DF = args.ReadBool("inferDF");
     infer_R2p = args.ReadBool("inferR2p");
     infer_DBV = args.ReadBool("inferDBV");
+    infer_phi = args.ReadBool("inferphi");
     
     string tau_temp; 
 
@@ -92,6 +93,10 @@ void FreqShiftFwdModel::Initialize(ArgsType &args)
     {
         LOG << "Inferring on CSF Frequency Shift" << endl;
     }
+    if (infer_phi)
+    {
+        LOG << "Inferring on CSF Phase" << endl;
+    }
     
 } // Initialize
 
@@ -121,6 +126,10 @@ void FreqShiftFwdModel::NameParams(vector<string> &names) const
     {
         names.push_back("DBV");  // parameter 5 - DBV
     }
+    if (infer_phi)
+    {
+        names.push_back("phi");  // parameter 5 - Phase shift phi
+    }
     
 
 } // NameParams
@@ -144,7 +153,7 @@ void FreqShiftFwdModel::HardcodedInitialDists(MVNDist &prior, MVNDist &posterior
     if (infer_VC)
     {
         prior.means(VC_index()) = 0.01;
-        precisions(VC_index(), VC_index()) = 1e-1; // 1e-1
+        precisions(VC_index(), VC_index()) = 1e-2; // 1e-1
     }
 
     // parameter 3 - Delta F
@@ -165,7 +174,14 @@ void FreqShiftFwdModel::HardcodedInitialDists(MVNDist &prior, MVNDist &posterior
     if (infer_DBV)
     {
         prior.means(DBV_index()) = 0.03;
-        precisions(DBV_index(), DBV_index()) = 1e1; // 1e-1
+        precisions(DBV_index(), DBV_index()) = 1e0; // 1e-1
+    }
+
+    // parameter 6 - CSF Phase shift phi
+    if (infer_phi)
+    {
+        prior.means(phi_index()) = 0.0;
+        precisions(phi_index(), phi_index()) = 1e-1; // 1e-1
     }
 
     prior.SetPrecisions(precisions);
@@ -191,6 +207,7 @@ void FreqShiftFwdModel::Evaluate(const ColumnVector &params, ColumnVector &resul
     double DF;
     double R2p; 
     double DBV; 
+    double phi;
 
     // fixed-value parameters
     double T1t = 1.200;     // Grey matter T1 (Lu et al., 2005)
@@ -201,6 +218,9 @@ void FreqShiftFwdModel::Evaluate(const ColumnVector &params, ColumnVector &resul
     double R2e = 4.00;      // CSF T2=250ms (He & Yablonskiy, 2007)
     double R2b = 27.97;     //    Calculated based on OEF=0.4, Hct=0.4, using formula from 
     double Rsb = 48.89;     //    Zhao et al., 2007 (cited in Simon et al., 2016)
+
+    // calculated parameters
+    double dw;
 
     complex<double> i(0,1);
 
@@ -236,10 +256,21 @@ void FreqShiftFwdModel::Evaluate(const ColumnVector &params, ColumnVector &resul
     }
     else
     {
-        DBV = 0.00; 
+        DBV = 0.03; 
+    }
+    if (infer_phi)
+    {
+        phi = abs(paramcpy(phi_index()));
+    }
+    else
+    {
+        phi = 0.0; 
     }
     // now evaluate information
     result.ReSize(2*taus.Nrows());
+
+    // calculate parameters
+    dw = R2p/DBV;
 
     // loop through FLAIR data
     for (int ii = 1; ii <= taus.Nrows(); ii++)
@@ -253,13 +284,22 @@ void FreqShiftFwdModel::Evaluate(const ColumnVector &params, ColumnVector &resul
         double tau = taus(ii);
 
         // Tissue Component
-        St = ( 1 - ( (2 - exp(-(TR-TI)/T1t) ) * exp(-TI/T1t))) * (exp(-R2t*TE)) * (exp(DBV - (R2p*tau)));
+        if (abs(tau) < (0.021))
+        {
+            St = exp(-0.3*pow(R2p*tau,2.0)/DBV);
+        }
+        else 
+        {
+            St = exp(DBV - (R2p*tau));
+        }
+
+        St *= ( 1 - ( (2 - exp(-(TR-TI)/T1t) ) * exp(-TI/T1t))) * (exp(-R2t*TE));
 
         // Blood Component
         Sb = ( 1 - ( (2 - exp(-(TR-TI)/T1b) ) * exp(-TI/T1b))) * (exp(-R2b*(TE-tau))) * (exp(-Rsb*tau));
 
         // CSF Component
-        Sec = ( 1 - ( (2 - exp(-(TR-TI)/T1e) ) * exp(-TI/T1e))) * (exp(-R2e*TE)) * (exp(-2.0*i*M_PI*DF*tau));
+        Sec = ( 1 - ( (2 - exp(-(TR-TI)/T1e) ) * exp(-TI/T1e))) * (exp(-R2e*TE)) * (exp(-2.0*i*M_PI*DF*tau - (i*phi)));
         Se = real(Sec);
 
         // Total
@@ -279,13 +319,22 @@ void FreqShiftFwdModel::Evaluate(const ColumnVector &params, ColumnVector &resul
         double tau = taus(jj-taus.Nrows());
 
         // Tissue Component
-        St = ( 1 - (exp(-TR/T1t)) ) * (exp(-R2t*TE)) * (exp(DBV - (R2p*tau)));
+        if (abs(tau) < (0.021))
+        {
+            St = exp(-0.3*pow(R2p*tau,2.0)/DBV);
+        }
+        else 
+        {
+            St = exp(DBV - (R2p*tau));
+        }
+
+        St *= ( 1 - (exp(-TR/T1t)) ) * (exp(-R2t*TE));
 
         // Blood Component
         Sb = ( 1 - (exp(-TR/T1b)) ) * (exp(-R2b*(TE-tau))) * (exp(-Rsb*tau));
 
         // CSF Component
-        Sec = ( 1 - (exp(-TR/T1e)) ) * (exp(-R2e*TE)) * (exp(-2.0*i*M_PI*DF*tau));
+        Sec = ( 1 - (exp(-TR/T1e)) ) * (exp(-R2e*TE)) * (exp(-2.0*i*M_PI*DF*tau - (i*phi)));
         Se = real(Sec);
 
         // Total

@@ -28,7 +28,7 @@ public:
     virtual void NameParams(vector<string> &names) const;
     virtual int NumParams() const 
     {
-        return 1 + (infer_VC ? 1 : 0) + (infer_DF ? 1 : 0) + (infer_R2p ? 1 : 0) + (infer_DBV ? 1 : 0);
+        return 1 + (infer_VC ? 1 : 0) + (infer_DF ? 1 : 0) + (infer_R2p ? 1 : 0) + (infer_DBV ? 1 : 0) + (infer_phi ? 1 : 0);
     }    
     virtual void HardcodedInitialDists(MVNDist &prior, MVNDist &posterior) const;
     virtual void Evaluate(const NEWMAT::ColumnVector &params, NEWMAT::ColumnVector &result) const;
@@ -68,11 +68,17 @@ protected:
         // DBV
         return R2p_index() + (infer_DBV ? 1 : 0);
     }
+    int phi_index() const
+    {
+        // DBV
+        return DBV_index() + (infer_phi ? 1 : 0);
+    }
 
     // For choosing which parameters to infer on
     bool infer_VC;
     bool infer_DF;
     bool infer_DBV;
+    bool infer_phi;
     bool infer_R2p;
 
 private:

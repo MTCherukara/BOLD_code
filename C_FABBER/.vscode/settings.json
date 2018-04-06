@@ -12,7 +12,8 @@
         "cmath": "cpp",
         "cstdlib": "cpp",
         "*.fab": "fab",
-        "complex": "cpp"
+        "complex": "cpp",
+        "chrono": "cpp"
     },
     "editor.minimap.enabled": false,
     "python.pythonPath": "/Users/mattcher/anaconda3/bin/python3"
