@@ -58,10 +58,10 @@ nz = 41; % number of points in the third dimension
 pars = [3,2];
 
 % Load the Data:
-load('ASE_Data/Data_180405_OEF_60.mat');
+load('ASE_Data/Data_180409_DBV_3.mat');
 
-params.tc_man = 0;
-params.tc_val = 0.03;
+params.tc_man = 1;
+params.tc_val = 0.006;
 
 % extract relevant parameters
 sigma = mean(params.sig);   % real std of noise
@@ -75,7 +75,7 @@ end
 
 % Parameter names and search ranges
 pnames  = { 'OEF'   ;  'zeta'    ; 'R2p' ; 'lam0'  ; 'dF' ; 'geom'  };
-intervs = [ 0.001,1 ; 0.020,0.070 ; 6.0,7.0 ; 0.0,0.2 ; 1,10 ; 0.1,0.5 ];  
+intervs = [ 0.001,1 ; 0.001,0.021 ; 4,5 ; 0.0,0.2 ; 1,10 ; 0.1,0.5 ];  
 %            OEF     DBV        R2'     v_CSF      dF       Geom
 
 % are we inferring on R2'?

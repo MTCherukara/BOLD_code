@@ -30,7 +30,18 @@ if [[ -d "${rdir}/${dname}" ]] ; then
     # for the R2p file, first take the absolute value
     #                   then divide by the temporary DBV file, and save to OEF
     fslmaths ${rdir}/${dname}/mean_R2p.nii.gz -abs -div temp_DBV.nii.gz ${rdir}/${dname}/mean_OEF.nii.gz 
-    rm temp_DBV.nii.gz 
+
+    # now generate a standard deviation map for OEF too, first by splitting up the MVN file
+    fslsplit ${rdir}/${dname}/finalMVN temp_MVN_ -t 
+
+    # assume that temp_MVN_0001 is the covariance of R2p and DBV (it should always be)
+    fslmaths ${rdir}/${dname}/std_R2p -div ${rdir}/${dname}/mean_R2p -sqr temp_R2p_err
+    fslmaths ${rdir}/${dname}/std_DBV -div ${rdir}/${dname}/mean_DBV -sqr temp_DBV_err
+    fslmaths temp_MVN_0001 -div ${rdir}/${dname}/mean_R2p -div ${rdir}/${dname}/mean_DBV temp_cov
+    fslmaths temp_R2p_err -add temp_DBV_err -sub temp_cov -sqrt -mul ${rdir}/${dname}/mean_OEF ${rdir}/${dname}/std_OEF
+
+    # clear temp files
+    rm temp_*.nii.gz
 else
     # if not, exit with an error
     echo "directory not found"

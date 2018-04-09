@@ -372,6 +372,7 @@ void R2primeFwdModel::Evaluate(const ColumnVector &params, ColumnVector &result)
     double dw;          // characteristic time (protons in water)
     double R2b;
     double R2bp;
+    double tc;
 
     // parameters
     double OEF;
@@ -491,6 +492,17 @@ void R2primeFwdModel::Evaluate(const ColumnVector &params, ColumnVector &result)
         CBV = 0.03;
     }
 
+    // calculate tc and threshold it if necessary
+    tc = 1.7/dw;
+    if (tc > 0.021)
+    {
+        tc = 0.021;
+    }
+    else if (tc < 0.010)
+    {
+        tc = 0.010;
+    }
+
     // loop through taus
     result.ReSize(taus.Nrows());
 
@@ -500,11 +512,11 @@ void R2primeFwdModel::Evaluate(const ColumnVector &params, ColumnVector &result)
         double TE = TEvals(ii);
 
         // calculate tissue signal
-        if (tau < -(0.019))
+        if (tau < -tc)
         {
             St = exp(DBV + (R2p*tau));
         }
-        else if (tau > (0.019))
+        else if (tau > tc)
         {
             St = exp(DBV - (R2p*tau));
         }

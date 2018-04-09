@@ -26,9 +26,12 @@ inferDBV
 #inferCBV
 inferS0
 #inferR2t
-#single_compartment
-motional_narrowing
 #inferlam
+
+single_compartment
+#motional_narrowing
+
+#infpriors
 
 # Scan Parameters (maybe I'll think of a better way of doing this...)
 TE=0.074
