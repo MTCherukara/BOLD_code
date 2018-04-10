@@ -220,7 +220,7 @@ void R2primeFwdModel::NameParams(vector<string> &names) const
     }
     if (infer_lam)
     {
-        names.push_back("lambda");  // parameter 7 - CSF volume fraction
+        names.push_back("VC");  // parameter 7 - CSF volume fraction
     }
     if (infer_geo)
     {
@@ -262,7 +262,7 @@ void R2primeFwdModel::HardcodedInitialDists(MVNDist &prior, MVNDist &posterior) 
         prior.means(R2p_index()) = 4.0;
         if (inf_priors)
         {
-            precisions(R2p_index(), R2p_index()) = 1e0; // 1e-2
+            precisions(R2p_index(), R2p_index()) = 1e-1; // 1e-1
         }
         else
         {
@@ -316,7 +316,14 @@ void R2primeFwdModel::HardcodedInitialDists(MVNDist &prior, MVNDist &posterior) 
     if (infer_lam)
     {
         prior.means(lam_index()) = 0.001;
-        precisions(lam_index(), lam_index()) = 1e2; // 1e-1
+        if (inf_priors)
+        {
+            precisions(lam_index(), lam_index()) = 1e2; // 1e2
+        }
+        else
+        {
+            precisions(lam_index(), lam_index()) = 1e0; // 1e0
+        }
     }
 
     if (infer_geo)
@@ -330,7 +337,7 @@ void R2primeFwdModel::HardcodedInitialDists(MVNDist &prior, MVNDist &posterior) 
         prior.means(CBV_index()) = 0.03;
         if (inf_priors)
         {
-            precisions(CBV_index(), CBV_index()) = 1e2; // 1e2
+            precisions(CBV_index(), CBV_index()) = 1e0; // 1e2
         }
         else
         {

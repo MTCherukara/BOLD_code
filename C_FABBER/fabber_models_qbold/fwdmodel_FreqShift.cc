@@ -152,22 +152,22 @@ void FreqShiftFwdModel::HardcodedInitialDists(MVNDist &prior, MVNDist &posterior
     // parameter 2 - V^CSF
     if (infer_VC)
     {
-        prior.means(VC_index()) = 0.01;
-        precisions(VC_index(), VC_index()) = 1e-2; // 1e-1
+        prior.means(VC_index()) = 0.05;
+        precisions(VC_index(), VC_index()) = 1e0; // 1e-1
     }
 
     // parameter 3 - Delta F
     if (infer_DF)
     {
         prior.means(DF_index()) = 5.0;
-        precisions(DF_index(), DF_index()) = 1e-1; // 1e-2
+        precisions(DF_index(), DF_index()) = 1e0; // 1e-2
     }
 
     // parameter 4 - R2-prime (Tissue)
     if (infer_R2p)
     {
         prior.means(R2p_index()) = 3.0;
-        precisions(R2p_index(), R2p_index()) = 1e-1; // 1e-2
+        precisions(R2p_index(), R2p_index()) = 1e0; // 1e-2
     }
     
     // parameter 5 - DBV

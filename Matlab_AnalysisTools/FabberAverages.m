@@ -13,12 +13,12 @@ clc;
 plot_hists = 0;
 
 % sets of variables
-varnames = {'R2p', 'DBV', 'OEF', 'VC', 'DF'};
-threshld = { 10  ,   1  ,   1  ,  1  ,  15 };
+varnames = {'R2p', 'DBV', 'OEF', 'VC', 'DF', 'lambda'};
+threshld = { 10  ,   1  ,   1  ,  1  ,  15 ,   1     };
 
 
 % which variables do we want?
-vars = [1,4,5];
+vars = [1,2,3,4];
 
 % do we also load in and calculate the standard deviations?
 inc_std = 0; 
@@ -29,7 +29,7 @@ slicenum = 2:8;     % CSF
 % slicenum = 1:6;   % TR = 2
 
 % Data set
-setnum = 449;
+setnum = 465;
 subnum = 1;
 msknum = 8;     % this is used for the DeltaF datasets
 fabber = num2str(setnum+subnum-1);
@@ -80,7 +80,7 @@ for vv = 1:length(vars)
     Dataslice(Dataslice > thrsh) = thrsh;
     
     % convert certain params to percentages
-    if strcmp(vname,'DBV') || strcmp(vname,'OEF') || strcmp(vname,'VC')
+    if strcmp(vname,'DBV') || strcmp(vname,'OEF') || strcmp(vname,'VC') || strcmp(vname,'lambda')
         Dataslice = Dataslice.*100;
     end
     
