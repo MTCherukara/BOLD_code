@@ -2,7 +2,7 @@
 
 # Input Data
 data=../../Data/subject_08/MR_756_SE.nii.gz
-mask=../../Data/subject_08/mask_TR_3.nii.gz
+mask=../../Data/subject_08/mask_SE.nii.gz
 
 # Run Options
 output=../../Data/Fabber_Results/
@@ -23,7 +23,6 @@ max-iterations=10
 # Inference Model 
 model=spinEcho
 infer_theta
-infer_r2
 
 # Scan Parameters (maybe I'll think of a better way of doing this...)
 TE1=0.066

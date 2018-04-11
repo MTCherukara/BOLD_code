@@ -1,8 +1,8 @@
 # fabber run 1 - FLAIR/non-FLAIR testing
 
 # Input Data
-data=../../Data/subject_03/ASE_NF_82.nii.gz
-mask=../../Data/subject_03/mask_FLAIR.nii.gz
+data=../../Data/subject_04/ASE_NF_82.nii.gz
+mask=../../Data/subject_04/mask_FLAIR.nii.gz
 
 # Run Options
 output=../../Data/Fabber_Results/
@@ -28,11 +28,11 @@ inferlam
 #single_compartment
 motional_narrowing
 
-#infpriors
+infpriors
 
 # Spatial VB Information (remove all of this if method!=spatialvb)
-#param-spatial-priors=NNNN
-#image-prior4=../../Data/subject_03/CSF_T1w.nii.gz
+#param-spatial-priors=NNNI
+#image-prior4=../../Data/subject_04/CSF_T1w.nii.gz
 
 # Scan Parameters (maybe I'll think of a better way of doing this...)
 TE=0.082

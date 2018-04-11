@@ -29,9 +29,9 @@ slicenum = 2:8;     % CSF
 % slicenum = 1:6;   % TR = 2
 
 % Data set
-setnum = 465;
+setnum = 480;
 subnum = 1;
-msknum = 8;     % this is used for the DeltaF datasets
+msknum = 4;     % this is used for the DeltaF datasets
 fabber = num2str(setnum+subnum-1);
 
 % select a fabber run

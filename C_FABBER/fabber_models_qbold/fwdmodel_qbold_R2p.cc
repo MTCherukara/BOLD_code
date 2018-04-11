@@ -337,7 +337,7 @@ void R2primeFwdModel::HardcodedInitialDists(MVNDist &prior, MVNDist &posterior) 
         prior.means(CBV_index()) = 0.03;
         if (inf_priors)
         {
-            precisions(CBV_index(), CBV_index()) = 1e0; // 1e2
+            precisions(CBV_index(), CBV_index()) = 1e2; // 1e2
         }
         else
         {
@@ -577,7 +577,7 @@ void R2primeFwdModel::Evaluate(const ColumnVector &params, ColumnVector &result)
 
             // add extracellular compartment
             Sec = exp(-R2e*TE)*exp(-2.0*i*M_PI*dF*abs(tau));
-            Se = abs(Sec);
+            Se = real(Sec);
 
             // add up compartments
             result(ii) = S0*(((1-CBV-lam)*St) + (CBV*Sb) + (lam*Se));
@@ -587,7 +587,7 @@ void R2primeFwdModel::Evaluate(const ColumnVector &params, ColumnVector &result)
 
     
     // alternative, if values are outside reasonable bounds
-    if ( DBV > 0.5 || lam > 0.5 || Hct > 1.0 || OEF > 1.0 )
+    if ( DBV > 0.5 || Hct > 1.0 || OEF > 1.0 )
     {
         for (int ii = 1; ii <= taus.Nrows(); ii++)
         {
