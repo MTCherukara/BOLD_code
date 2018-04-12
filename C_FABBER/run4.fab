@@ -13,12 +13,14 @@ print-free-energy
 # Method  
 method=spatialvb
 noise=white
-max-iterations=10
+max-iterations=20
 allow-bad-voxels
 
 # Spatial VB Information (remove all of this if method!=spatialvb)
-param-spatial-priors=INNNN
-image-prior1=../../Data/subject_08/CSF_T1w.nii.gz
+# NB. Magnetization (M0) is parameter #1
+param-spatial-priors=NINNNI
+image-prior2=../../Data/subject_08/CSF_T1w.nii.gz
+image-prior6=../../Data/subject_08/prior_WM.nii.gz
 
 # Inference Model 
 model=freqShift

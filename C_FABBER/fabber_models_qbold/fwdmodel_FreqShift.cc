@@ -162,14 +162,14 @@ void FreqShiftFwdModel::HardcodedInitialDists(MVNDist &prior, MVNDist &posterior
     if (infer_VC)
     {
         prior.means(VC_index()) = 0.05;
-        precisions(VC_index(), VC_index()) = 1e2; // 1e-1
+        precisions(VC_index(), VC_index()) = 1e1; // 1e-1
     }
 
     // parameter 3 - Delta F
     if (infer_DF)
     {
         prior.means(DF_index()) = 5.0;
-        precisions(DF_index(), DF_index()) = 1e-1; // 1e-2
+        precisions(DF_index(), DF_index()) = 1e0; // 1e-2
     }
 
     // parameter 4 - R2-prime (Tissue)
@@ -183,7 +183,7 @@ void FreqShiftFwdModel::HardcodedInitialDists(MVNDist &prior, MVNDist &posterior
     if (infer_DBV)
     {
         prior.means(DBV_index()) = 0.03;
-        precisions(DBV_index(), DBV_index()) = 1e1; // 1e-1
+        precisions(DBV_index(), DBV_index()) = 1e2; // 1e-1
     }
 
     // parameter 6 - CSF Phase shift phi
@@ -195,8 +195,8 @@ void FreqShiftFwdModel::HardcodedInitialDists(MVNDist &prior, MVNDist &posterior
 
     if (infer_VWM)
     {
-        prior.means(VWM_index()) = 0.0;
-        precisions(VWM_index(), VWM_index()) = 1e0; // 1e0
+        prior.means(VWM_index()) = 0.01;
+        precisions(VWM_index(), VWM_index()) = 1e1; // 1e0
     }
 
     prior.SetPrecisions(precisions);

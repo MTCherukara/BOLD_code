@@ -29,7 +29,7 @@ slicenum = 2:8;     % CSF
 % slicenum = 1:6;   % TR = 2
 
 % Data set
-setnum = 482;
+setnum = 486;
 subnum = 1;
 msknum = 8;     % this is used for the DeltaF datasets
 fabber = num2str(setnum+subnum-1);

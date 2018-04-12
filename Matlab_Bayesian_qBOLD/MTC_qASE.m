@@ -57,7 +57,7 @@ params.R2e  = 4;            % 1/s       - rate constant, extracellular
 params.dF   = 5;            % Hz        - frequency shift
 params.lam0 = 0.000;        % no units  - ISF/CSF signal contribution
 params.zeta = 0.07;        % no units  - deoxygenated blood volume
-params.OEF  = 0.40;        % no units  - oxygen extraction fraction
+params.OEF  = 0.60;        % no units  - oxygen extraction fraction
 params.Hct  = 0.400;        % no units  - fractional hematocrit
 
 % analysis parameters

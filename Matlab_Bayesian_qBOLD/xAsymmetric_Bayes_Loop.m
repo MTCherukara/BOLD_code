@@ -16,14 +16,14 @@ close all;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Inference Parameters
 
-np = 1000; % number of points to perform Bayesian analysis on
+np = 500; % number of points to perform Bayesian analysis on
 
 % Select which parameter(s) to infer on
 %       (1 = OEF, 2 = DBV, 3 = R2', 4 = CSF, 5 = dF, 6 = geom)
 pars = [3,2];
 
 % Load the Data:
-load('ASE_Data/Data_180409_DBV_7.mat');
+load('ASE_Data/Data_180412_DBV_5.mat');
 
 params.tc_man = 1;
 tcvals = (2:2:28)./1000;
@@ -40,7 +40,7 @@ end
 
 % Parameter names and search ranges
 pnames  = { 'OEF'   ;  'zeta'    ; 'R2p' ; 'lam0'  ; 'dF' ; 'geom'  };
-intervs = [ 0.001,1 ; 0.01,0.11 ; 9.0,11.0 ; 0.0,0.2 ; 1,10 ; 0.1,0.5 ];  
+intervs = [ 0.001,1 ; 0.03,0.13 ; 10,12 ; 0.0,0.2 ; 1,10 ; 0.1,0.5 ];  
 %            OEF     DBV        R2'     v_CSF      dF       Geom
 
 % are we inferring on R2'?
