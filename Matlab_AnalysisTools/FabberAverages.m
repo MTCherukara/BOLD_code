@@ -18,7 +18,7 @@ threshld = { 10  ,   1  ,   1  ,  1  ,  15 ,   1     };
 
 
 % which variables do we want?
-vars = [1,2,3,4];
+vars = [1,2,4,5];
 
 % do we also load in and calculate the standard deviations?
 inc_std = 0; 
@@ -29,9 +29,9 @@ slicenum = 2:8;     % CSF
 % slicenum = 1:6;   % TR = 2
 
 % Data set
-setnum = 480;
+setnum = 482;
 subnum = 1;
-msknum = 4;     % this is used for the DeltaF datasets
+msknum = 8;     % this is used for the DeltaF datasets
 fabber = num2str(setnum+subnum-1);
 
 % select a fabber run

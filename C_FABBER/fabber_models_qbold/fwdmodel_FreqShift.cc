@@ -54,6 +54,7 @@ void FreqShiftFwdModel::Initialize(ArgsType &args)
     infer_R2p = args.ReadBool("inferR2p");
     infer_DBV = args.ReadBool("inferDBV");
     infer_phi = args.ReadBool("inferphi");
+    infer_VWM = args.ReadBool("inferWM");
     
     string tau_temp; 
 
@@ -97,6 +98,10 @@ void FreqShiftFwdModel::Initialize(ArgsType &args)
     {
         LOG << "Inferring on CSF Phase" << endl;
     }
+    if (infer_VWM)
+    {
+        LOG << "Inferring on WM volume fraction" << endl;
+    }
     
 } // Initialize
 
@@ -128,7 +133,11 @@ void FreqShiftFwdModel::NameParams(vector<string> &names) const
     }
     if (infer_phi)
     {
-        names.push_back("phi");  // parameter 5 - Phase shift phi
+        names.push_back("phi");  // parameter 6 - Phase shift phi
+    }
+    if (infer_VWM)
+    {
+        names.push_back("V_WM");  // parameter 7 - White matter volume fraction
     }
     
 
@@ -153,14 +162,14 @@ void FreqShiftFwdModel::HardcodedInitialDists(MVNDist &prior, MVNDist &posterior
     if (infer_VC)
     {
         prior.means(VC_index()) = 0.05;
-        precisions(VC_index(), VC_index()) = 1e0; // 1e-1
+        precisions(VC_index(), VC_index()) = 1e2; // 1e-1
     }
 
     // parameter 3 - Delta F
     if (infer_DF)
     {
         prior.means(DF_index()) = 5.0;
-        precisions(DF_index(), DF_index()) = 1e0; // 1e-2
+        precisions(DF_index(), DF_index()) = 1e-1; // 1e-2
     }
 
     // parameter 4 - R2-prime (Tissue)
@@ -174,7 +183,7 @@ void FreqShiftFwdModel::HardcodedInitialDists(MVNDist &prior, MVNDist &posterior
     if (infer_DBV)
     {
         prior.means(DBV_index()) = 0.03;
-        precisions(DBV_index(), DBV_index()) = 1e0; // 1e-1
+        precisions(DBV_index(), DBV_index()) = 1e1; // 1e-1
     }
 
     // parameter 6 - CSF Phase shift phi
@@ -182,6 +191,12 @@ void FreqShiftFwdModel::HardcodedInitialDists(MVNDist &prior, MVNDist &posterior
     {
         prior.means(phi_index()) = 0.0;
         precisions(phi_index(), phi_index()) = 1e-1; // 1e-1
+    }
+
+    if (infer_VWM)
+    {
+        prior.means(VWM_index()) = 0.0;
+        precisions(VWM_index(), VWM_index()) = 1e0; // 1e0
     }
 
     prior.SetPrecisions(precisions);
@@ -208,14 +223,17 @@ void FreqShiftFwdModel::Evaluate(const ColumnVector &params, ColumnVector &resul
     double R2p; 
     double DBV; 
     double phi;
+    double VW;
 
     // fixed-value parameters
     double T1t = 1.200;     // Grey matter T1 (Lu et al., 2005)
     double T1e = 3.870;     // CSF T1 (Lu et al., 2005)  
     double T1b = 1.580;     // Blood T1 (Lu et al., 2004)
+    double T1w = 0.730;     // White matter T1 (Lue et al., 2005)
     double R2t = 11.5;      // Grey matter T2=87ms (He & Yablonskiy, 2007)
     // double R2e = 0.65;      // CSF T2=1573ms (Qin, 2011) 
     double R2e = 4.00;      // CSF T2=250ms (He & Yablonskiy, 2007)
+    double R2w = 13.89;     // White matter T2=72ms (Lu et al., 2005)
     double R2b = 27.97;     //    Calculated based on OEF=0.4, Hct=0.4, using formula from 
     double Rsb = 48.89;     //    Zhao et al., 2007 (cited in Simon et al., 2016)
 
@@ -266,6 +284,16 @@ void FreqShiftFwdModel::Evaluate(const ColumnVector &params, ColumnVector &resul
     {
         phi = 0.0; 
     }
+    if (infer_VWM)
+    {
+        VW = abs(paramcpy(VWM_index()));
+    }
+    else
+    {
+        VW = 0.01; 
+    }
+
+
     // now evaluate information
     result.ReSize(2*taus.Nrows());
 
@@ -276,9 +304,10 @@ void FreqShiftFwdModel::Evaluate(const ColumnVector &params, ColumnVector &resul
     for (int ii = 1; ii <= taus.Nrows(); ii++)
     {
         // component parameters
-        double St;      // tissue
+        double St;      // tissue (grey matter)
         double Sb;      // blood
         double Se;      // CSF
+        double Sw;      // tissue (white matter)
         complex<double> Sec; // complex version of CSF signal
 
         double tau = taus(ii);
@@ -292,6 +321,8 @@ void FreqShiftFwdModel::Evaluate(const ColumnVector &params, ColumnVector &resul
         {
             St = exp(DBV - (R2p*tau));
         }
+
+        Sw = St * ( 1 - ( (2 - exp(-(TR-TI)/T1w) ) * exp(-TI/T1w))) * (exp(-R2w*TE));
 
         St *= ( 1 - ( (2 - exp(-(TR-TI)/T1t) ) * exp(-TI/T1t))) * (exp(-R2t*TE));
 
@@ -314,6 +345,7 @@ void FreqShiftFwdModel::Evaluate(const ColumnVector &params, ColumnVector &resul
         double St;      // tissue
         double Sb;      // blood
         double Se;      // CSF
+        double Sw;      // tissue (white matter)
         complex<double> Sec; // complex version of CSF signal
 
         double tau = taus(jj-taus.Nrows());
@@ -328,6 +360,8 @@ void FreqShiftFwdModel::Evaluate(const ColumnVector &params, ColumnVector &resul
             St = exp(DBV - (R2p*tau));
         }
 
+        Sw = St * ( 1 - (exp(-TR/T1w)) ) * (exp(-R2w*TE));
+
         St *= ( 1 - (exp(-TR/T1t)) ) * (exp(-R2t*TE));
 
         // Blood Component
@@ -338,12 +372,12 @@ void FreqShiftFwdModel::Evaluate(const ColumnVector &params, ColumnVector &resul
         Se = real(Sec);
 
         // Total
-        result(jj) = M0 * (( (1-(DBV+VC))*St ) + (DBV*Sb) + (VC*Se));
+        result(jj) = M0 * (( (1-(DBV+VC+VW))*St ) + (DBV*Sb) + (VC*Se) + (VW*Sw));
         
     }
 
     // alternative, if values are outside reasonable bounds
-    if ( DBV > 0.5 || VC > 1.1 )
+    if ( DBV > 0.5 || VC > 1.1 || VW > 1.1 )
     {
         for (int ii = 1; ii <= 2*taus.Nrows(); ii++)
         {

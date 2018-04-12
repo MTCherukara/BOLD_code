@@ -11,19 +11,22 @@ save-model-fit
 print-free-energy
 
 # Method  
-method=vb
+method=spatialvb
 noise=white
-max-iterations=25
+max-iterations=10
 allow-bad-voxels
 
 # Spatial VB Information (remove all of this if method!=spatialvb)
-#param-spatial-priors=MMM
+param-spatial-priors=INNNN
+image-prior1=../../Data/subject_08/CSF_T1w.nii.gz
 
 # Inference Model 
 model=freqShift
 inferVC
 inferDF
 inferR2p
+inferDBV
+inferWM
 
 # Scan Parameters (maybe I'll think of a better way of doing this...)
 TE=0.082
