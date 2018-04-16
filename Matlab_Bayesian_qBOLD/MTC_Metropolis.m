@@ -41,22 +41,24 @@ close all;
 setFigureDefaults;
 
 % Options
-plot_trace = 1;
+plot_trace = 0;
 plot_results = 1;
 save_figures = 0;
 
 % Load Data
 % load('ASE_Data/Data_MultiTE_180208_SNR_200.mat');
-load('ASE_Data/Data_180123_SNR_200.mat');
+load('ASE_Data/Data_180412_DBV_5.mat');
 params_true = params;
 
+params.tc_man = 0;
+params.tc_val = 0.03;
 
 % Parameter Values
 p_names = { 'OEF'; 'R2p'; 'zeta'; 'R2t' ; 'geom' };
 p_infer = [   0  ,   1  ,   1   ,   0   ,  0     ];
-p_inits = [  0.5 ,  4.0 ,  0.026,  10.0 ,  0.3   ];
-p_range = [  0.2 ,  3.0 ,  0.02 ,   5.0 ,  0.1    ;...
-             0.6 ,  5.5 ,  0.04 ,  15.0 ,  0.5   ];
+p_inits = [  0.5 ,  4.0 ,  0.05,   10.0 ,  0.3   ];
+p_range = [  0.2 ,  1.0 ,  0.01 ,   5.0 ,  0.1    ;...
+             0.6 , 15.0 ,  0.15 ,  15.0 ,  0.5   ];
 
 % true R2p
 
@@ -190,6 +192,7 @@ for ii = 1:(j_brn+j_run)
 end % for ii = 1:(j_brn+j_run)
 
 toc;
+disp(num2str(mean(sample_results,2)));
 
 
 %% Display Acceptance Rate Trend
@@ -280,7 +283,7 @@ if plot_results
         if save_figures
             ftitle = strcat('temp_plots/MH_',date,'_2D_',...
                             p_name{prm2},'_',p_name{prm1});
-            export_fig([ftitle,'.pdf']);
+            export_fig [ftitle,'.pdf'] -nocrop;
 %             print(gcf,ftitle,'-dpdf');
         end
 
