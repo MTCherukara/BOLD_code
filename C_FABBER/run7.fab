@@ -22,14 +22,14 @@ allow-bad-voxels
 # Inference Model 
 model=qboldR2p
 inferR2p
-inferDBV
+#inferDBV
 #inferCBV
 inferS0
 #inferR2t
 #inferlam
 
-single_compartment
-#motional_narrowing
+#single_compartment
+motional_narrowing
 
 #infpriors
 

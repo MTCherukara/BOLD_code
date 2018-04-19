@@ -55,13 +55,13 @@ nz = 41; % number of points in the third dimension
 
 % Select which parameter(s) to infer on
 %       (1 = OEF, 2 = DBV, 3 = R2', 4 = CSF, 5 = dF, 6 = geom)
-pars = [3,2];
+pars = [1,2];
 
 % Load the Data:
-load('ASE_Data/Data_180412_DBV_5.mat');
+load('ASE_Data/Data_180405_OEF_40.mat');
 
 params.tc_man = 1;
-params.tc_val = 0.03;
+params.tc_val = 0.024;
 
 % extract relevant parameters
 sigma = mean(params.sig);   % real std of noise
@@ -75,7 +75,7 @@ end
 
 % Parameter names and search ranges
 pnames  = { 'OEF'   ;  'zeta'    ; 'R2p' ; 'lam0'  ; 'dF' ; 'geom'  };
-intervs = [ 0.001,1 ; 0.03,0.13 ; 10,12 ; 0.0,0.2 ; 1,10 ; 0.1,0.5 ];  
+intervs = [ 0.2,0.6 ; 0.001,0.071 ; 10,12 ; 0.0,0.2 ; 1,10 ; 0.1,0.5 ];  
 %            OEF     DBV        R2'     v_CSF      dF       Geom
 
 % are we inferring on R2'?
@@ -200,7 +200,7 @@ elseif length(pars) == 2
     disp([  'OEF = ',num2str(truepars.OEF),...
           ', DBV = ',num2str(100*truepars.zeta),...
           ', Tc = ',num2str(1000*params.tc_val),'ms']);
-    disp(['  Maximum ',pname{1},': ',num2str(V1G(mi),4)]);
+    disp(['  Maximum ',pname{1},': ',num2str(100*V1G(mi),4)]);
     disp(['  Maximum ',pname{2},': ',num2str(100*V2G(mi),4)]);
     
 end % if length(pars) == 1 ... elseif ...
