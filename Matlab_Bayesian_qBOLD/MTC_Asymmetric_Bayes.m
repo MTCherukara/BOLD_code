@@ -50,7 +50,7 @@ tic;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Inference Parameters
 
-np = 500; % number of points to perform Bayesian analysis on
+np = 600; % number of points to perform Bayesian analysis on
 nz = 41; % number of points in the third dimension
 
 % Select which parameter(s) to infer on
@@ -58,10 +58,17 @@ nz = 41; % number of points in the third dimension
 pars = [1,2];
 
 % Load the Data:
+<<<<<<< HEAD
 load('ASE_Data/Data_180405_OEF_40.mat');
 
 params.tc_man = 1;
 params.tc_val = 0.024;
+=======
+load('ASE_Data/Data_180412_DBV_7.mat');
+
+params.tc_man = 1;
+params.tc_val = 0.002;
+>>>>>>> 52abd89e4406873f48efdc3fc9b536b7da31b580
 
 % extract relevant parameters
 sigma = mean(params.sig);   % real std of noise
@@ -75,7 +82,11 @@ end
 
 % Parameter names and search ranges
 pnames  = { 'OEF'   ;  'zeta'    ; 'R2p' ; 'lam0'  ; 'dF' ; 'geom'  };
+<<<<<<< HEAD
 intervs = [ 0.2,0.6 ; 0.001,0.071 ; 10,12 ; 0.0,0.2 ; 1,10 ; 0.1,0.5 ];  
+=======
+intervs = [ 0.001,1 ; 0.05,0.17 ; 14.5,17.5 ; 0.0,0.2 ; 1,10 ; 0.1,0.5 ];  
+>>>>>>> 52abd89e4406873f48efdc3fc9b536b7da31b580
 %            OEF     DBV        R2'     v_CSF      dF       Geom
 
 % are we inferring on R2'?

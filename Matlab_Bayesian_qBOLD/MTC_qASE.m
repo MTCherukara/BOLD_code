@@ -37,7 +37,7 @@ clear;
 % close all;
 
 plot_fig = 1;       
-save_data = 1;      % set to 1 in order to save out ASE data
+save_data = 0;      % set to 1 in order to save out ASE data
 
 
 %% Model Parameters
@@ -56,8 +56,8 @@ params.R2t  = 1/0.087;      % 1/s       - rate constant, tissue
 params.R2e  = 4;            % 1/s       - rate constant, extracellular
 params.dF   = 5;            % Hz        - frequency shift
 params.lam0 = 0.000;        % no units  - ISF/CSF signal contribution
-params.zeta = 0.07;        % no units  - deoxygenated blood volume
-params.OEF  = 0.60;        % no units  - oxygen extraction fraction
+params.zeta = 0.03;        % no units  - deoxygenated blood volume
+params.OEF  = 0.40;        % no units  - oxygen extraction fraction
 params.Hct  = 0.400;        % no units  - fractional hematocrit
 
 % analysis parameters
@@ -73,9 +73,9 @@ params.SNR = 100;
 
 % define tau values that we want to simulate
 % tau = (-28:4:64)/1000; % for testing
-tau = (-24:1:64)/1000;
+% tau = (-24:1:64)/1000;
 % tau = [-16:4:16,24:8:56]/1000;
-% tau = linspace(-0.032,0.072,1000); % for visualising
+tau = linspace(-0.032,0.072,1000); % for visualising
 
 np = length(tau);
 
