@@ -18,19 +18,19 @@ threshld = { 10  ,   1  ,   1  ,  1  ,  15 ,   1     };
 
 
 % which variables do we want?
-vars = [1,2,4,5];
+vars = [1,2];
 
 % do we also load in and calculate the standard deviations?
 inc_std = 0; 
 
-% slicenum = 3:10;    % VS
-slicenum = 2:8;     % CSF
+slicenum = 3:10;    % VS
+% slicenum = 2:8;     % CSF
 % slicenum = 2:9;
 % slicenum = 1:6;   % TR = 2
 
 % Data set
-setnum = 486;
-subnum = 1;
+setnum = 403;
+subnum = 7;
 msknum = 8;     % this is used for the DeltaF datasets
 fabber = num2str(setnum+subnum-1);
 
@@ -44,13 +44,13 @@ resdir = '/Users/mattcher/Documents/DPhil/Data/Fabber_Results/';
 fdname = dir([resdir,'fabber_',fabber,'_*']);
 fabdir = strcat(resdir,fdname.name,'/');
 
-% % Load a mask - VS version
-% maskslice = LoadSlice(['/Users/mattcher/Documents/DPhil/Data/validation_sqbold/vs',...
-%                         num2str(subnum),'/mask_gm_60.nii.gz'],slicenum);
+% Load a mask - VS version
+maskslice = LoadSlice(['/Users/mattcher/Documents/DPhil/Data/validation_sqbold/vs',...
+                        num2str(subnum),'/mask_gm_60.nii.gz'],slicenum);
 
-% Load a mask - CSF version
-maskslice = LoadSlice(['/Users/mattcher/Documents/DPhil/Data/subject_0',...
-                        num2str(msknum),'/mask_FLAIR_GM.nii.gz'],slicenum);
+% % Load a mask - CSF version
+% maskslice = LoadSlice(['/Users/mattcher/Documents/DPhil/Data/subject_0',...
+%                         num2str(msknum),'/mask_FLAIR_GM.nii.gz'],slicenum);
                     
 % % Load a mask - other versions
 % % maskslice = LoadSlice('/Users/mattcher/Documents/DPhil/Data/Phantom_743/ASE_mask.nii.gz',slicenum);

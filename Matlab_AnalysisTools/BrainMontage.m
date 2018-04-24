@@ -32,7 +32,8 @@ end
 
 % Check whether slices have been specified, if not, default to 3:10
 if ~exist('slices','var')
-    slices = 3:10;
+%     slices = 3:8;       % VS
+    slices = 2:7;       % CSF
 end
 ns = length(slices); % number of slices
 
@@ -48,6 +49,9 @@ ns = length(slices); % number of slices
     elseif strfind(lower(niname),'oef')
         threshold = 0.5;
         cmp = parula;
+    elseif strfind(lower(niname),'df')
+        threshold = 15;
+        cmp = inferno;
     else
         threshold = 1;
         cmp = gray;
@@ -60,16 +64,17 @@ ns = length(slices); % number of slices
 [voldata, dims] = read_avw(inputnifti);
 
 % Take absolute value of DBV data
-if strfind(lower(niname),'dbv')
+% if strfind(lower(niname),'dbv')
     voldata = abs(voldata);
-end
+% end
 
 % Threshold
 voldata(voldata < 0) = 0;
 voldata(voldata > threshold) = threshold;
 
+
 % % TEMP - multiply by the grey matter mask
-% maskslice = LoadSlice('/Users/mattcher/Documents/DPhil/Data/validation_sqbold/vs2/mask_gm_60.nii.gz',1:10);
+% maskslice = LoadSlice('/Users/mattcher/Documents/DPhil/Data/validation_sqbold/vs3/mask_gm_60.nii.gz',1:10);
 % voldata = voldata.*repmat(maskslice,[1,1,1,17]);
 
 
@@ -78,7 +83,7 @@ voldata(voldata > threshold) = threshold;
 % closer together in the montage
 
 sh_sds = 12;        % sides
-sh_top = 3;         % top and bottom
+sh_top = 5;         % top and bottom
 
 voldata = voldata(1+sh_sds:end-sh_sds,1+sh_top:end-sh_top,:);
 
@@ -141,6 +146,7 @@ montage_image = fliplr(montage_image);
 figure; hold on;
 imagesc(montage_image);
 colormap(cmp);
+colorbar;
 axis equal
 set(gca,'Visible','off')
 set(gca,'LooseInset',get(gca,'TightInset'));

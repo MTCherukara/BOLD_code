@@ -56,8 +56,8 @@ params.R2t  = 1/0.087;      % 1/s       - rate constant, tissue
 params.R2e  = 4;            % 1/s       - rate constant, extracellular
 params.dF   = 5;            % Hz        - frequency shift
 params.lam0 = 0.000;        % no units  - ISF/CSF signal contribution
-params.zeta = 0.03;        % no units  - deoxygenated blood volume
-params.OEF  = 0.40;        % no units  - oxygen extraction fraction
+params.zeta = 0.05;        % no units  - deoxygenated blood volume
+params.OEF  = 0.60;        % no units  - oxygen extraction fraction
 params.Hct  = 0.400;        % no units  - fractional hematocrit
 
 % analysis parameters
@@ -75,12 +75,12 @@ params.SNR = 100;
 % tau = (-28:4:64)/1000; % for testing
 % tau = (-24:1:64)/1000;
 % tau = [-16:4:16,24:8:56]/1000;
-tau = linspace(-0.032,0.072,1000); % for visualising
+tau = linspace(-0.024,0.064,1000); % for visualising
 
 np = length(tau);
 
 % call MTC_qASE_model
-[S_total,params] = MTC_qASE_modelB(tau,params.TE,params);
+[S_total,params] = MTC_qASE_model(tau,params.TE,params);
 
 
 %% Add Noise
@@ -101,7 +101,7 @@ if plot_fig
     S_log = log(S_total);
     l.s = plot(1000*tau,S_log,'-');
 %     plot(1000*tau,log(S_sample),'kx');
-    xlim([-20,20]);
+    xlim([-8,20]);
 %     ylim([3.385, 3.435]);
     
     % labels on axes

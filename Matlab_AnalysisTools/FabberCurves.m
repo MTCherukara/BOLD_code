@@ -14,13 +14,13 @@ setFigureDefaults;
 % runs = {'201', '202', '203', '204', '205', '206', '207'};       % 2C-VB
 % runs = {'236', '237', '238', '239', '240', '241', '242'};       % 2C-VB-I
 % runs = {'309', '310', '311', '312', '313', '314', '315'};       % 2C-VB-TC-I
-runs = {'330', '331', '332', '333', '334', '446', '336'};       % 1C-S-VB
+runs = {'330', '331', '405', '333', '334', '446', '336'};       % 1C-S-VB
 % runs = {'446'};
 % rawname = 'ASE_TR_3_taus_11.nii.gz';      % not VS
 % rawname = 'MR_756_ASE_TR_3_taus_11.nii.gz';       % not VS
 
 % subject
-for ss = 6
+for ss = 3
 
 
 
@@ -31,8 +31,8 @@ rawdir = ['/Users/mattcher/Documents/DPhil/Data/validation_sqbold/vs',num2str(ss
 fdname = dir([resdir,'fabber_',fabber,'_*']);
 fabdir = strcat(resdir,fdname.name,'/');
 
-% slicenum = 3:10;
-slicenum = 1:6;
+slicenum = 3:10;
+% slicenum = 1:6;
 
 % Load a mask
 maskslice = LoadSlice([rawdir,'mask_gm_60.nii.gz'],slicenum); % VS
@@ -142,17 +142,18 @@ tauA = linspace(taus(1),taus(end));
 
 
 %% Plot results
-figure; hold on; box on;
-plot(1000*taus,log(volsignal),'kx');
-plot(1000*taus,log(rawsignal),'ro');
-% plot(1000*taus,log(volsignal+volresid),'bx');
-xlabel('Spin-Echo Offset \tau (ms)');
-ylabel('Log (Signal)');
-title(['Grey Matter Average - Subject ',num2str(ss)]);
-legend('FABBER Model Fit','Raw ASE Data','Location','NorthEast');
-% xlim([-32,68]);
-xlim([-4,64]); % spread
-% ylim([0.975, 1.015]);
+% figure(3); 
+% hold on; box on;
+plot(1000*taus,log(volsignal),'b-');
+% plot(1000*taus,log(rawsignal),'r-');
+% % plot(1000*taus,log(volsignal+volresid),'bx');
+% xlabel('Spin-Echo Offset \tau (ms)');
+% ylabel('Log (Signal)');
+% title(['Grey Matter Average - Subject ',num2str(ss)]);
+% legend('FABBER Model Fit','Raw ASE Data','Location','NorthEast');
+% % xlim([-32,68]);
+% xlim([-4,64]); % spread
+% % ylim([0.975, 1.015]);
 
 
 if save_plot
