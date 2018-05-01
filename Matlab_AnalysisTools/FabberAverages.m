@@ -18,10 +18,10 @@ threshld = { 10  ,   1  ,   1  ,  1  ,  15 ,   1     };
 
 
 % which variables do we want?
-vars = [1,2];
+vars = [1,2,3];
 
 % do we also load in and calculate the standard deviations?
-inc_std = 0; 
+inc_std = 1; 
 
 slicenum = 3:10;    % VS
 % slicenum = 2:8;     % CSF
@@ -68,51 +68,65 @@ for vv = 1:length(vars)
     % Load the dataset
     Dataslice = LoadSlice([fabdir,'mean_',vname,'.nii.gz'],slicenum);
     
-    % Apply mask
+    % Apply mask and take absolute values, vecotrize
     Dataslice = Dataslice.*maskslice;
-    
-    % Remove zeros and absolutize
     Dataslice = abs(Dataslice(:));
-    Dataslice(Dataslice == 0) = [];
-    Dataslice(~isfinite(Dataslice)) = [];
+    
+    % Create mask of values to remove
+    Badslice = (Dataslice == 0) + ~isfinite(Dataslice);
+    
+    % Standard deviation
+    if inc_std
+        
+        % Load, Mask, and Vectorize
+        Stdslice = LoadSlice([fabdir,'std_',vname,'.nii.gz'],slicenum);
+        Stdslice = Stdslice.*maskslice;
+        Stdslice = Stdslice(:);
+        
+        % Add to mask voxels where the standard deviation is NaN, or greater
+        % than the threshold, or very low, and ignore those voxels
+        Badslice = Badslice + ~isfinite(Stdslice) + (Stdslice > thrsh) + (Stdslice < (thrsh.*1e-3));
+        
+        % Remove bad values
+        Stdslice(Badslice ~= 0) = [];
+        
+        % Threshold standard deviations
+        Stdslice(Stdslice < 1e-3) = 1e-3;
+        
+        % convert certain params to percentages
+        if strcmp(vname,'DBV') || strcmp(vname,'OEF') || strcmp(vname,'VC') || strcmp(vname,'lambda')
+            Stdslice = Stdslice.*100;
+        end
+    end
+    
+    % Remove bad values
+    Dataslice(Badslice ~= 0) = [];
     
     % Upper Threshold
     Dataslice(Dataslice > thrsh) = thrsh;
-    
+   
     % convert certain params to percentages
     if strcmp(vname,'DBV') || strcmp(vname,'OEF') || strcmp(vname,'VC') || strcmp(vname,'lambda')
         Dataslice = Dataslice.*100;
     end
     
-    % Standard deviation stuff (doesn't work for OEF)
-    if inc_std && ~strcmp(vname,'OEF')
-        
-        Stdslice = LoadSlice([fabdir,'std_',vname,'.nii.gz'],slicenum);
-        Stdslice = Stdslice.*maskslice;
-        Stdslice = Stdslice(:);
-        Stdslice(Stdslice == 0) = [];
-        Stdslice(~isfinite(Stdslice)) = [];
-        
-        % convert certain params to percentages
-        if strcmp(vname,'DBV') || strcmp(vname,'OEF')
-            Stdslice = Stdslice.*100;
-        end
-        
-    end
     
     % calculate IQR
     Qs = quantile(Dataslice,[0.75,0.25]);
     
+    % calculate precision-weighted mean
+    Precslice = 1./(Stdslice.^2);
+    wmean = sum(Precslice.*Dataslice)/sum(Precslice);
+    
     % Display results
     disp('   ');
-%     disp(['Mean ',vname,'  : ',num2str(mean(Dataslice),4)]);
-%     if ~strcmp(vname,'OEF')
-%         disp(['   Std ',vname,': ',num2str(mean(Stdslice),3)]);
-%     end
+    disp(['Mean ',vname,'   : ',num2str(mean(Dataslice),4)]);
+%     disp(['Wt Mean ',vname,': ',num2str(wmean,4)]);
+    disp(['    Std ',vname,': ',num2str(mean(Stdslice),4)]);
     
 %     disp('   ');
-    disp(['Median ',vname,': ',num2str(median(Dataslice),4)]);
-    disp(['   ',vname,' IQR: ',num2str((Qs(1)-Qs(2))./2,3)]);
+%     disp(['Median ',vname,': ',num2str(median(Dataslice),4)]);
+%     disp(['   ',vname,' IQR: ',num2str((Qs(1)-Qs(2))./2,3)]);
     
 end
 
@@ -125,13 +139,28 @@ if ~isempty(freedir)
     Fslice = LoadSlice([fabdir,'freeEnergy.nii.gz'],slicenum);
     Fslice = Fslice.*maskslice;
     Fslice = (Fslice(:));
-    Fslice(Fslice == 0) = [];
-    Fslice(~isfinite(Fslice)) = [];
+    Fslice(Badslice ~= 0) = [];
     FreeEnergy = (nanmedian((Fslice)));
 
     disp('   ');
-    disp(['  Free Energy: ',num2str(FreeEnergy,4)]);
+    disp(['  Free Energy : ',num2str(FreeEnergy,4)]);
     
+end
+
+%% Load in and calculate Residuals if such exists
+resdir = dir([fabdir,'residual*']);
+
+if ~isempty(resdir)
+    
+    Rslice = LoadSlice([fabdir,'residuals.nii.gz'],slicenum);
+    Rslice = Rslice.*maskslice;
+    Rslice = abs(Rslice(:));
+    Rslice(Badslice ~= 0) = [];
+    Rslice(Rslice > 100) = [];
+    Residual = (nanmean((Rslice)));
+
+    disp(['    Residual  : ',num2str(Residual,4)]);
+
 end
 
 
