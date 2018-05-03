@@ -79,7 +79,8 @@ PARAMS.R2bp = 10.2 -  1.5*PARAMS.Hct + (136.9*PARAMS.Hct - 13.9)*PARAMS.OEF^2;
 w_csf = PARAMS.lam0;
 % w_bld = 0.66.*mb.*PARAMS.zeta;
 w_bld = PARAMS.zeta;
-w_tis = 1 - w_csf - w_bld;
+w_tis = 1 - (w_csf + w_bld);
+
 
 % CALCULATE MODEL:
 

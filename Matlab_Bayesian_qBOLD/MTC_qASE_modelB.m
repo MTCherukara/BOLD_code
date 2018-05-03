@@ -82,14 +82,14 @@ PARAMS.R2bp = 10.2 -  1.5*PARAMS.Hct + (136.9*PARAMS.Hct - 13.9)*PARAMS.OEF^2;
 w_csf = PARAMS.lam0;
 % w_bld = 0.66.*mb.*PARAMS.zeta;
 w_bld = PARAMS.zeta;
-w_tis = 1 - w_csf - w_bld;
+w_tis = 1 - (w_csf + w_bld);
 
 % CALCULATE MODEL:
 
 % comparments
 S_tis = w_tis.*MTC_ASE_bessel(TAU,TE,PARAMS);
 S_csf = w_csf.*MTC_ASE_extra(TAU,TE,PARAMS);
-S_bld = w_bld.*MTC_ASE_blood(TAU,TE,PARAMS);
+S_bld = w_bld.*MTC_ASE_mnblood(TAU,TE,PARAMS);
 
 % add it all together:
 S = PARAMS.S0.*(S_tis + S_csf + S_bld);

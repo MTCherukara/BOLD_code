@@ -36,6 +36,8 @@
 clear; 
 % close all;
 
+setFigureDefaults;
+
 plot_fig = 1;       
 save_data = 0;      % set to 1 in order to save out ASE data
 
@@ -48,16 +50,16 @@ params.dChi = 2.64e-7;      % parts     - susceptibility difference
 params.gam  = 2.67513e8;    % rad/s/T   - gyromagnetic ratio
 
 % scan parameters 
-params.TE   = 0.074;        % s         - echo time
+params.TE   = 0.200;        % s         - echo time
 
 % model fitting parameters
 params.S0   = 100;          % a. units  - signal
 params.R2t  = 1/0.087;      % 1/s       - rate constant, tissue
 params.R2e  = 4;            % 1/s       - rate constant, extracellular
 params.dF   = 5;            % Hz        - frequency shift
-params.lam0 = 0.000;        % no units  - ISF/CSF signal contribution
-params.zeta = 0.05;        % no units  - deoxygenated blood volume
-params.OEF  = 0.60;        % no units  - oxygen extraction fraction
+params.lam0 = 0.100;        % no units  - ISF/CSF signal contribution
+params.zeta = 0.05;         % no units  - deoxygenated blood volume
+params.OEF  = 0.60;         % no units  - oxygen extraction fraction
 params.Hct  = 0.400;        % no units  - fractional hematocrit
 
 % analysis parameters
@@ -75,12 +77,12 @@ params.SNR = 100;
 % tau = (-28:4:64)/1000; % for testing
 % tau = (-24:1:64)/1000;
 % tau = [-16:4:16,24:8:56]/1000;
-tau = linspace(-0.024,0.064,1000); % for visualising
+tau = linspace(-0.05,0.19,1000); % for visualising
 
 np = length(tau);
 
 % call MTC_qASE_model
-[S_total,params] = MTC_qASE_model(tau,params.TE,params);
+[S_total,params] = MTC_qASE_modelB(tau,params.TE,params);
 
 
 %% Add Noise
@@ -98,10 +100,10 @@ if plot_fig
     figure(2); hold on; box on;
     
     % plot the signal
-    S_log = log(S_total);
+    S_log = (S_total);
     l.s = plot(1000*tau,S_log,'-');
 %     plot(1000*tau,log(S_sample),'kx');
-    xlim([-8,20]);
+%     xlim([-8,20]);
 %     ylim([3.385, 3.435]);
     
     % labels on axes

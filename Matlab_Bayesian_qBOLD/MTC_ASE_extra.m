@@ -38,6 +38,6 @@ if length(TE) ~= length(TAU)
 end
 
 % calculate signal
-SE = exp( -(R2e.*TE) - 2i.*pi.*df.*abs(TAU));
+SE = exp( -R2e.*TE) .* exp(- 2i.*pi.*df.*abs(TAU));
 SE = real(SE);
 
