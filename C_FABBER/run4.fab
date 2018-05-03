@@ -1,14 +1,13 @@
 # fabber run 4, Frequency Shift
 
 # Input Data
-data=../../Data/subject_08/ASE_FNF_all.nii.gz
-mask=../../Data/subject_08/mask_FLAIR.nii.gz
+data=../../Data/subject_06/ASE_diffFLAIR.nii.gz
+mask=../../Data/subject_06/mask_FLAIR.nii.gz
 
 # Run Options
 output=../../Data/Fabber_Results/
 save-residuals
 save-model-fit
-print-free-energy
 
 # Method  
 method=spatialvb
@@ -18,17 +17,19 @@ allow-bad-voxels
 
 # Spatial VB Information (remove all of this if method!=spatialvb)
 # NB. Magnetization (M0) is parameter #1
-param-spatial-priors=NINNNI
-image-prior2=../../Data/subject_08/CSF_T1w.nii.gz
-image-prior6=../../Data/subject_08/prior_WM.nii.gz
+param-spatial-priors=NNNNN
+#image-prior2=../../Data/subject_06/CSF_T1w.nii.gz
+#image-prior6=../../Data/subject_06/prior_WM.nii.gz
 
 # Inference Model 
 model=freqShift
 inferVC
 inferDF
 inferR2p
-inferDBV
+#inferDBV
 inferWM
+
+fitDifference
 
 # Scan Parameters (maybe I'll think of a better way of doing this...)
 TE=0.082

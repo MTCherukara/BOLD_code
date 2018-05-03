@@ -1,5 +1,4 @@
 # fabber run 3 - Bi-exponential spin-echo data
-
 # Input Data
 data=../../Data/subject_08/MR_756_SE.nii.gz
 mask=../../Data/subject_08/mask_SE.nii.gz

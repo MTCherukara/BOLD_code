@@ -1,11 +1,11 @@
-/*   fwdmodel_FreqShift.h - ASE qBOLD fitting of frequency shift DF by comparing FLAIR and nonFLAIR data
+/*   fwdmodel_FreqShiftDiff.h - ASE qBOLD fitting of frequency shift DF using the subtraction of FLAIR from non-FLAIR data
 
  Matthew Cherukara, IBME
 
- Copyright (C) 2017 University of Oxford  */
+ Copyright (C) 2018 University of Oxford  */
 
-#ifndef FWDMODEL_FREQSHIFT_H
-#define FWDMODEL_FREQSHIFT_H
+#ifndef FWDMODEL_FREQSHIFTDIFF_H
+#define FWDMODEL_FREQSHIFTDIFF_H
 
 #include "fabber_core/fwdmodel.h"
 #include "fabber_core/inference.h"
@@ -16,7 +16,7 @@
 
 using namespace std;
 
-class FreqShiftFwdModel : public FwdModel {
+class FreqShiftDiffFwdModel : public FwdModel {
 public:
     static FwdModel* NewInstance();
 
@@ -86,10 +86,9 @@ protected:
     bool infer_phi;
     bool infer_R2p;
     bool infer_VWM;
-    bool fit_difference;
 
 private:
-    static FactoryRegistration<FwdModelFactory, FreqShiftFwdModel> registration;
+    static FactoryRegistration<FwdModelFactory, FreqShiftDiffFwdModel> registration;
 };
 
-#endif // FWDMODEL_FREQSHIFT_H
+#endif // FWDMODEL_FREQSHIFTDIFF_H

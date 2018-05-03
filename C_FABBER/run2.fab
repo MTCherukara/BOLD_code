@@ -1,13 +1,14 @@
-# fabber run 2 - motional narrowing model
+# fabber run 2 - patient data qBOLD
 
 # Input Data
-data=../../Data/validation_sqbold/vs2/sub02_ASE_FLAIR_av_mc.nii.gz
-mask=../../Data/validation_sqbold/vs2/mask_ncsf_40.nii.gz
+data=../../Data/patient_01/PATIENT_24h_ASE.nii.gz
+mask=../../Data/patient_01/PATIENT_24h_ASE_mask.nii.gz
 
 # Run Options
 output=../../Data/Fabber_Results/
 save-residuals
 save-model-fit
+allow-bad-voxels
 
 # Method Information
 method=vb
@@ -16,38 +17,30 @@ max-iterations=10
 
 # Spatial VB Information (remove all of this if method!=spatialvb)
 #param-spatial-priors=MMMM
-#allow-bad-voxels
 
 # Inference Model 
-model=qboldmotional
+model=qboldR2p
 inferR2p
-inferDR2
+inferDBV
 inferS0
+#inferR2t
+
+#single_compartment
+motional_narrowing
+
+#infpriors
 
 # Scan Parameters (maybe I'll think of a better way of doing this...)
 TE=0.074
 
-tau1=-0.028
-tau2=-0.024
-tau3=-0.020
-tau4=-0.016
-tau5=-0.012
-tau6=-0.008
-tau7=-0.004
-tau8=0.0
-tau9=0.004
-tau10=0.008
-tau11=0.012
-tau12=0.016
-tau13=0.020
-tau14=0.024
-tau15=0.028
-tau16=0.032
-tau17=0.036
-tau18=0.040
-tau19=0.044
-tau20=0.048
-tau21=0.052
-tau22=0.056
-tau23=0.060
-tau24=0.064
+tau1=-0.016
+tau2=-0.008
+tau3=0.0
+tau4=0.008
+tau5=0.016
+tau6=0.024
+tau7=0.032
+tau8=0.040
+tau9=0.048
+tau10=0.056
+tau11=0.064

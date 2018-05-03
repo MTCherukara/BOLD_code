@@ -18,20 +18,20 @@ threshld = { 10  ,   1  ,   1  ,  1  ,  15 ,   1     };
 
 
 % which variables do we want?
-vars = [1,2,3];
+vars = [1,5,4];
 
 % do we also load in and calculate the standard deviations?
 inc_std = 1; 
 
-slicenum = 3:10;    % VS
-% slicenum = 2:8;     % CSF
+% slicenum = 3:10;    % VS
+slicenum = 2:8;     % CSF + patient data
 % slicenum = 2:9;
 % slicenum = 1:6;   % TR = 2
 
 % Data set
-setnum = 403;
-subnum = 7;
-msknum = 8;     % this is used for the DeltaF datasets
+setnum = 496;
+subnum = 1;
+msknum = 6;     % this is used for the DeltaF datasets
 fabber = num2str(setnum+subnum-1);
 
 % select a fabber run
@@ -44,17 +44,18 @@ resdir = '/Users/mattcher/Documents/DPhil/Data/Fabber_Results/';
 fdname = dir([resdir,'fabber_',fabber,'_*']);
 fabdir = strcat(resdir,fdname.name,'/');
 
-% Load a mask - VS version
-maskslice = LoadSlice(['/Users/mattcher/Documents/DPhil/Data/validation_sqbold/vs',...
-                        num2str(subnum),'/mask_gm_60.nii.gz'],slicenum);
+% % Load a mask - VS version
+% maskslice = LoadSlice(['/Users/mattcher/Documents/DPhil/Data/validation_sqbold/vs',...
+%                         num2str(subnum),'/mask_gm_60.nii.gz'],slicenum);
 
-% % Load a mask - CSF version
-% maskslice = LoadSlice(['/Users/mattcher/Documents/DPhil/Data/subject_0',...
-%                         num2str(msknum),'/mask_FLAIR_GM.nii.gz'],slicenum);
+% Load a mask - CSF version
+maskslice = LoadSlice(['/Users/mattcher/Documents/DPhil/Data/subject_0',...
+                        num2str(msknum),'/mask_FLAIR_GM.nii.gz'],slicenum);
                     
 % % Load a mask - other versions
-% % maskslice = LoadSlice('/Users/mattcher/Documents/DPhil/Data/Phantom_743/ASE_mask.nii.gz',slicenum);
-% % maskslice = LoadSlice('/Users/mattcher/Documents/DPhil/Data/subject_08/mask_MASE_gm.nii.gz',slicenum);
+% maskslice = LoadSlice('/Users/mattcher/Documents/DPhil/Data/Phantom_743/ASE_mask.nii.gz',slicenum);
+% maskslice = LoadSlice('/Users/mattcher/Documents/DPhil/Data/subject_08/mask_MASE_gm.nii.gz',slicenum);
+% maskslice = LoadSlice('/Users/mattcher/Documents/DPhil/Data/patient_01/PATIENT_24h_ROI_mask.nii.gz',slicenum);
 
 % Title
 disp(['Data from ',fdname.name]);
@@ -120,18 +121,19 @@ for vv = 1:length(vars)
     
     % Display results
     disp('   ');
-    disp(['Mean ',vname,'   : ',num2str(mean(Dataslice),4)]);
-%     disp(['Wt Mean ',vname,': ',num2str(wmean,4)]);
-    disp(['    Std ',vname,': ',num2str(mean(Stdslice),4)]);
+    disp(['Median ',vname,': ',num2str(median(Dataslice),4)]);
+    disp(['   ',vname,' IQR: ',num2str((Qs(1)-Qs(2))./2,4)]);
     
-%     disp('   ');
-%     disp(['Median ',vname,': ',num2str(median(Dataslice),4)]);
-%     disp(['   ',vname,' IQR: ',num2str((Qs(1)-Qs(2))./2,3)]);
+    disp('   ');
+    disp(['Mean ',vname,'   : ',num2str(mean(Dataslice),4)]);
+    disp(['Wt Mean ',vname,': ',num2str(wmean,4)]);
+    disp(['    Std ',vname,': ',num2str(mean(Stdslice),4)]);
     
 end
 
 
 %% Load in and caluclate free energy if such exists 
+disp('   ');
 freedir = dir([fabdir,'freeEnergy*']);
 
 if ~isempty(freedir)
@@ -142,7 +144,6 @@ if ~isempty(freedir)
     Fslice(Badslice ~= 0) = [];
     FreeEnergy = (nanmedian((Fslice)));
 
-    disp('   ');
     disp(['  Free Energy : ',num2str(FreeEnergy,4)]);
     
 end

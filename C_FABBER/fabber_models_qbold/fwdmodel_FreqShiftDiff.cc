@@ -1,11 +1,11 @@
-/*   fwdmodel_FreqShift.cc - ASE qBOLD fitting of frequency shift DF by comparing FLAIR and nonFLAIR data
+/*   fwdmodel_FreqShiftDiff.cc - ASE qBOLD fitting of frequency shift DF by comparing FLAIR and nonFLAIR data
 
 
  Matthew Cherukara, IBME
 
- Copyright (C) 2017 University of Oxford  */
+ Copyright (C) 2018 University of Oxford  */
 
-#include "fwdmodel_FreqShift.h"
+#include "fwdmodel_FreqShiftDiff.h"
 
 #include "fabber_core/fwdmodel.h"
 
@@ -24,29 +24,29 @@ using namespace NEWMAT;
 // ------------------------------------------------------------------------------------------
 // --------         Generic Methods             ---------------------------------------------
 // ------------------------------------------------------------------------------------------
-FactoryRegistration<FwdModelFactory, FreqShiftFwdModel>
-    FreqShiftFwdModel::registration("freqShift");
+FactoryRegistration<FwdModelFactory, FreqShiftDiffFwdModel>
+    FreqShiftDiffFwdModel::registration("freqShiftDiff");
 
-FwdModel *FreqShiftFwdModel::NewInstance() // unchanged
+FwdModel *FreqShiftDiffFwdModel::NewInstance() // unchanged
 {
-    return new FreqShiftFwdModel();
+    return new FreqShiftDiffFwdModel();
 } // NewInstance
 
-string FreqShiftFwdModel::GetDescription() const 
+string FreqShiftDiffFwdModel::GetDescription() const 
 {
-    return "CSF Frequency Shift fitting model";
+    return "CSF Frequency Shift difference fitting model";
 } // GetDescription
 
-string FreqShiftFwdModel::ModelVersion() const
+string FreqShiftDiffFwdModel::ModelVersion() const
 {
-    return "1.1";
+    return "1.0";
 } // ModelVersion
 
 
 // ------------------------------------------------------------------------------------------
 // --------         Initialize                  ---------------------------------------------
 // ------------------------------------------------------------------------------------------
-void FreqShiftFwdModel::Initialize(ArgsType &args)
+void FreqShiftDiffFwdModel::Initialize(ArgsType &args)
 {
     // read boolean arguments
     infer_VC = args.ReadBool("inferVC");
@@ -55,8 +55,6 @@ void FreqShiftFwdModel::Initialize(ArgsType &args)
     infer_DBV = args.ReadBool("inferDBV");
     infer_phi = args.ReadBool("inferphi");
     infer_VWM = args.ReadBool("inferWM");
-
-    fit_difference = args.ReadBool("fitDifference");
     
     string tau_temp; 
 
@@ -80,14 +78,6 @@ void FreqShiftFwdModel::Initialize(ArgsType &args)
     // add information to the log
     LOG << "Inference using development model" << endl;     
     LOG << "Inferring on Magnetization M0" << endl;
-    if (fit_difference)
-    {
-        LOG << "Using non-FLAIR minus FLAIR difference data" << endl;
-    }
-    else
-    {
-        LOG << "Using concatenated FLAIR, nonFLAIR data" << endl;
-    }
     if (infer_R2p)
     {
         LOG << "Inferring on Reversible Transverse Dephasing R2'" << endl;
@@ -120,7 +110,7 @@ void FreqShiftFwdModel::Initialize(ArgsType &args)
 // --------         NameParameters              ---------------------------------------------
 // ------------------------------------------------------------------------------------------
 
-void FreqShiftFwdModel::NameParams(vector<string> &names) const
+void FreqShiftDiffFwdModel::NameParams(vector<string> &names) const
 {
     names.clear();
 
@@ -156,7 +146,7 @@ void FreqShiftFwdModel::NameParams(vector<string> &names) const
 // ------------------------------------------------------------------------------------------
 // --------         HardcodedInitialDists       ---------------------------------------------
 // ------------------------------------------------------------------------------------------
-void FreqShiftFwdModel::HardcodedInitialDists(MVNDist &prior, MVNDist &posterior) const
+void FreqShiftDiffFwdModel::HardcodedInitialDists(MVNDist &prior, MVNDist &posterior) const
 {
     // make sure we have the right number of means specified
     assert(prior.means.Nrows() == NumParams());
@@ -218,7 +208,7 @@ void FreqShiftFwdModel::HardcodedInitialDists(MVNDist &prior, MVNDist &posterior
 // ------------------------------------------------------------------------------------------
 // --------         Evaluate                    ---------------------------------------------
 // ------------------------------------------------------------------------------------------
-void FreqShiftFwdModel::Evaluate(const ColumnVector &params, ColumnVector &result) const
+void FreqShiftDiffFwdModel::Evaluate(const ColumnVector &params, ColumnVector &result) const
 {
     // Check we have been given the right number of parameters
     assert(params.Nrows() == NumParams());
@@ -303,133 +293,50 @@ void FreqShiftFwdModel::Evaluate(const ColumnVector &params, ColumnVector &resul
         VW = 0.01; 
     }
 
+
+    // now evaluate information
+    result.ReSize(taus.Nrows());
+
     // calculate parameters
     dw = R2p/DBV;
 
-
-    if (fit_difference)
+    // loop through tau values
+    for (int ii = 1; ii <= taus.Nrows(); ii++)
     {
-        // now evaluate information
-        result.ReSize(taus.Nrows());
+        // component parameters
+        double St;      // tissue (grey matter)
+        double Sb;      // blood
+        double Se;      // CSF
+        double Sw;      // tissue (white matter)
+        complex<double> Sec; // complex version of CSF signal
 
-        // loop through tau values
-        for (int ii = 1; ii <= taus.Nrows(); ii++)
+        double tau = taus(ii);
+
+        // Tissue Component
+        if (abs(tau) < (0.021))
         {
-            // component parameters
-            double St;      // tissue (grey matter)
-            double Sb;      // blood
-            double Se;      // CSF
-            double Sw;      // tissue (white matter)
-            complex<double> Sec; // complex version of CSF signal
-
-            double tau = taus(ii);
-
-            // Tissue Component
-            if (abs(tau) < (0.021))
-            {
-                St = exp(-0.3*pow(R2p*tau,2.0)/DBV);
-            }
-            else 
-            {
-                St = exp(DBV - (R2p*tau));
-            }
-
-            Sw = St * (exp(-R2w*TE)) * 2.0 * (exp(-TI/T1w) - exp(-TR/T1w));
-
-            St *=  (exp(-R2t*TE)) * 2.0 * (exp(-TI/T1t) - exp(-TR/T1t));
-
-            // Blood Component
-            Sb = (exp(-R2b*(TE-tau))) * (exp(-Rsb*tau)) * 2.0 * (exp(-TI/T1b) - exp(-TR/T1b));
-
-            // CSF Component
-            Sec = (exp(-R2e*TE)) * (exp(-2.0*i*M_PI*DF*tau - (i*phi))) *  2.0 * (exp(-TI/T1e) - exp(-TR/T1e));
-            Se = real(Sec);
-
-            // Total
-            result(ii) = M0 * (( (1-(DBV+VC+VW))*St ) + (DBV*Sb) + (VC*Se) + (VW*Sw));
-
+            St = exp(-0.3*pow(R2p*tau,2.0)/DBV);
         }
-    } // if (fit_difference)
-    else
-    {
-        result.ReSize(2*taus.Nrows());
-
-        // loop through FLAIR data
-        for (int ii = 1; ii <= taus.Nrows(); ii++)
+        else 
         {
-            // component parameters
-            double St;      // tissue (grey matter)
-            double Sb;      // blood
-            double Se;      // CSF
-            double Sw;      // tissue (white matter)
-            complex<double> Sec; // complex version of CSF signal
-
-            double tau = taus(ii);
-
-            // Tissue Component
-            if (abs(tau) < (0.021))
-            {
-                St = exp(-0.3*pow(R2p*tau,2.0)/DBV);
-            }
-            else 
-            {
-                St = exp(DBV - (R2p*tau));
-            }
-
-            Sw = St * ( 1 - ( (2 - exp(-(TR-TI)/T1w) ) * exp(-TI/T1w))) * (exp(-R2w*TE));
-
-            St *= ( 1 - ( (2 - exp(-(TR-TI)/T1t) ) * exp(-TI/T1t))) * (exp(-R2t*TE));
-
-            // Blood Component
-            Sb = ( 1 - ( (2 - exp(-(TR-TI)/T1b) ) * exp(-TI/T1b))) * (exp(-R2b*(TE-tau))) * (exp(-Rsb*tau));
-
-            // CSF Component
-            Sec = ( 1 - ( (2 - exp(-(TR-TI)/T1e) ) * exp(-TI/T1e))) * (exp(-R2e*TE)) * (exp(-2.0*i*M_PI*DF*tau - (i*phi)));
-            Se = real(Sec);
-
-            // Total
-            result(ii) = M0 * (( (1-(DBV+VC+VW))*St ) + (DBV*Sb) + (VC*Se) + (VW*Sw));
-
+            St = exp(DBV - (R2p*tau));
         }
 
-        // loop through non-FLAIR data
-        for (int jj = (taus.Nrows()+1); jj <= 2*taus.Nrows(); jj++)
-        {
-            // component parameters
-            double St;      // tissue
-            double Sb;      // blood
-            double Se;      // CSF
-            double Sw;      // tissue (white matter)
-            complex<double> Sec; // complex version of CSF signal
+        Sw = St * (exp(-R2w*TE)) * 2.0 * (exp(-TI/T1w) - exp(-TR/T1w));
 
-            double tau = taus(jj-taus.Nrows());
+        St *=  (exp(-R2t*TE)) * 2.0 * (exp(-TI/T1t) - exp(-TR/T1t));
 
-            // Tissue Component
-            if (abs(tau) < (0.021))
-            {
-                St = exp(-0.3*pow(R2p*tau,2.0)/DBV);
-            }
-            else 
-            {
-                St = exp(DBV - (R2p*tau));
-            }
+        // Blood Component
+        Sb = (exp(-R2b*(TE-tau))) * (exp(-Rsb*tau)) * 2.0 * (exp(-TI/T1b) - exp(-TR/T1b));
 
-            Sw = St * ( 1 - (exp(-TR/T1w)) ) * (exp(-R2w*TE));
+        // CSF Component
+        Sec = (exp(-R2e*TE)) * (exp(-2.0*i*M_PI*DF*tau - (i*phi))) *  2.0 * (exp(-TI/T1e) - exp(-TR/T1e));
+        Se = real(Sec);
 
-            St *= ( 1 - (exp(-TR/T1t)) ) * (exp(-R2t*TE));
+        // Total
+        result(ii) = M0 * (( (1-(DBV+VC+VW))*St ) + (DBV*Sb) + (VC*Se) + (VW*Sw));
 
-            // Blood Component
-            Sb = ( 1 - (exp(-TR/T1b)) ) * (exp(-R2b*(TE-tau))) * (exp(-Rsb*tau));
-
-            // CSF Component
-            Sec = ( 1 - (exp(-TR/T1e)) ) * (exp(-R2e*TE)) * (exp(-2.0*i*M_PI*DF*tau - (i*phi)));
-            Se = real(Sec);
-
-            // Total
-            result(jj) = M0 * (( (1-(DBV+VC+VW))*St ) + (DBV*Sb) + (VC*Se) + (VW*Sw));
-            
-        }
-    } // if (fit_difference) ... else ... 
+    }
 
     // alternative, if values are outside reasonable bounds
     if ( DBV > 0.5 || VC > 1.1 || VW > 1.1 )
@@ -437,13 +344,6 @@ void FreqShiftFwdModel::Evaluate(const ColumnVector &params, ColumnVector &resul
         for (int ii = 1; ii <= taus.Nrows(); ii++)
         {
             result(ii) = result(ii)*100.0;
-        }
-        if (fit_difference == false)
-        {
-            for (int ii = 1; ii <= taus.Nrows(); ii++)
-            {
-                result(ii+taus.Nrows()) = result(ii+taus.Nrows())*100.0;
-            }
         }
     }
 
