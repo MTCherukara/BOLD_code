@@ -58,14 +58,15 @@ end
 
 %% Fourth Version (tau-by-tau)
 
-% define the regime boundary
-if PARAMS.tc_man
-    tc = PARAMS.tc_val;
-else
-    tc = 1.7/dw;
-end
-    
-    
+% % define the regime boundary
+% if PARAMS.tc_man
+%     tc = PARAMS.tc_val;
+% else
+%     tc = 1.7/dw;
+% end
+
+tc = tc/dw;
+
 % pre-allocate
 ST = zeros(1,length(TAU)); 
 

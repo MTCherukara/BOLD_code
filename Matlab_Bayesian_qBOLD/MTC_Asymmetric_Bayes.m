@@ -50,7 +50,7 @@ tic;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Inference Parameters
 
-np = 600; % number of points to perform Bayesian analysis on
+np = 1000; % number of points to perform Bayesian analysis on
 nz = 41; % number of points in the third dimension
 
 % Select which parameter(s) to infer on
@@ -58,17 +58,10 @@ nz = 41; % number of points in the third dimension
 pars = [1,2];
 
 % Load the Data:
-<<<<<<< HEAD
-load('ASE_Data/Data_180405_OEF_40.mat');
+load('ASE_Data/Data_180112_SNR_50.mat');
 
-params.tc_man = 1;
+params.tc_man = 0;
 params.tc_val = 0.024;
-=======
-load('ASE_Data/Data_180412_DBV_7.mat');
-
-params.tc_man = 1;
-params.tc_val = 0.002;
->>>>>>> 52abd89e4406873f48efdc3fc9b536b7da31b580
 
 % extract relevant parameters
 sigma = mean(params.sig);   % real std of noise
@@ -82,11 +75,7 @@ end
 
 % Parameter names and search ranges
 pnames  = { 'OEF'   ;  'zeta'    ; 'R2p' ; 'lam0'  ; 'dF' ; 'geom'  };
-<<<<<<< HEAD
-intervs = [ 0.2,0.6 ; 0.001,0.071 ; 10,12 ; 0.0,0.2 ; 1,10 ; 0.1,0.5 ];  
-=======
-intervs = [ 0.001,1 ; 0.05,0.17 ; 14.5,17.5 ; 0.0,0.2 ; 1,10 ; 0.1,0.5 ];  
->>>>>>> 52abd89e4406873f48efdc3fc9b536b7da31b580
+intervs = [ 0.2,0.6 ; 0.01,0.07 ; 2.5,6.5 ; 0.0,0.2 ; 1,10 ; 0.1,0.5 ];  
 %            OEF     DBV        R2'     v_CSF      dF       Geom
 
 % are we inferring on R2'?
@@ -187,12 +176,23 @@ if length(pars) == 1
 elseif length(pars) == 2 
     % Plot 2D grid search results
     
+    vals = vals.*100;
+    
     Pscale = [quantile(pos(:),0.95), max(pos(:))];
-    imagesc(vals(2,:),vals(1,:),exp(pos)); hold on;
+    surf(vals(2,:),vals(1,:),exp(pos));
+    view(2); shading flat;
     c=colorbar;
-    colormap('parula');
-    plot([trv(2),trv(2)],[  0, 30],'w-');
-    plot([  0, 30],[trv(1),trv(1)],'w-');
+    infernoW = flipud(magma);
+%     infernoW(1,:) = [1,1,1];
+    colormap(infernoW);
+    plot3(100*[trv(2),trv(2)],[  0, 1000],[1000,1000],'k-');
+    plot3([  0, 1000],100*[trv(1),trv(1)],[1000,1000],'k-');
+    
+    % outline
+    plot3([vals(2,  1),vals(2,  1)],[vals(1,  1),vals(1,end)],[1,1],'k-','LineWidth',0.75);
+    plot3([vals(2,end),vals(2,end)],[vals(1,  1),vals(1,end)],[1,1],'k-','LineWidth',0.75);
+    plot3([vals(2,  1),vals(2,end)],[vals(1,  1),vals(1,  1)],[1,1],'k-','LineWidth',0.75);
+    plot3([vals(2,  1),vals(2,end)],[vals(1,end),vals(1,end)],[1,1],'k-','LineWidth',0.75);
     
     xlabel(pname{2});
     ylabel(pname{1});
@@ -202,16 +202,16 @@ elseif length(pars) == 2
     
     axis([min(vals(2,:)),max(vals(2,:)),min(vals(1,:)),max(vals(1,:))]);
     set(gca,'YDir','normal');
-    set(c,'FontSize',19);
+    set(c,'FontSize',14);
     
     % Calculate distribution's maximum position in 2D
-    [V2G,V1G] = meshgrid(vals(2,:),vals(1,:));
-    [~,mi] = max(pos(:));
-    disp('  ');
-    disp([  'OEF = ',num2str(truepars.OEF),...
-          ', DBV = ',num2str(100*truepars.zeta),...
-          ', Tc = ',num2str(1000*params.tc_val),'ms']);
-    disp(['  Maximum ',pname{1},': ',num2str(100*V1G(mi),4)]);
-    disp(['  Maximum ',pname{2},': ',num2str(100*V2G(mi),4)]);
+%     [V2G,V1G] = meshgrid(vals(2,:),vals(1,:));
+%     [~,mi] = max(pos(:));
+%     disp('  ');
+%     disp([  'OEF = ',num2str(truepars.OEF),...
+%           ', DBV = ',num2str(100*truepars.zeta),...
+%           ', Tc = ',num2str(1000*params.tc_val),'ms']);
+%     disp(['  Maximum ',pname{1},': ',num2str(100*V1G(mi),4)]);
+%     disp(['  Maximum ',pname{2},': ',num2str(100*V2G(mi),4)]);
     
 end % if length(pars) == 1 ... elseif ...

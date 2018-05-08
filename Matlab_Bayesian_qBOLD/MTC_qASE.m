@@ -57,7 +57,7 @@ params.S0   = 100;          % a. units  - signal
 params.R2t  = 1/0.087;      % 1/s       - rate constant, tissue
 params.R2e  = 4;            % 1/s       - rate constant, extracellular
 params.dF   = 5;            % Hz        - frequency shift
-params.lam0 = 0.100;        % no units  - ISF/CSF signal contribution
+params.lam0 = 0.000;        % no units  - ISF/CSF signal contribution
 params.zeta = 0.05;         % no units  - deoxygenated blood volume
 params.OEF  = 0.60;         % no units  - oxygen extraction fraction
 params.Hct  = 0.400;        % no units  - fractional hematocrit
@@ -77,12 +77,12 @@ params.SNR = 100;
 % tau = (-28:4:64)/1000; % for testing
 % tau = (-24:1:64)/1000;
 % tau = [-16:4:16,24:8:56]/1000;
-tau = linspace(-0.05,0.19,1000); % for visualising
+tau = linspace(-0.028,0.064,1000); % for visualising
 
 np = length(tau);
 
 % call MTC_qASE_model
-[S_total,params] = MTC_qASE_modelB(tau,params.TE,params);
+[S_total,params] = MTC_qASE_model(tau,params.TE,params);
 
 
 %% Add Noise
