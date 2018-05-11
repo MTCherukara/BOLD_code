@@ -272,10 +272,10 @@ void R2primeFwdModel::HardcodedInitialDists(MVNDist &prior, MVNDist &posterior) 
 
     if (infer_DBV)
     {
-        prior.means(DBV_index()) = 0.02;
+        prior.means(DBV_index()) = 0.03;
         if (inf_priors)
         {
-            precisions(DBV_index(), DBV_index()) = 1e3; // 1e3
+            precisions(DBV_index(), DBV_index()) = 1e2; // 1e3
         }
         else
         {
@@ -557,6 +557,9 @@ void R2primeFwdModel::Evaluate(const ColumnVector &params, ColumnVector &result)
                 Sb = exp(-kk* ( (TE/td) + pow((0.25 + (TE/td)),0.5) + 1.5 - 
                                 (2*pow((0.25 + (pow((TE+tau),2.0)/td) ),0.5)) - 
                                 (2*pow((0.25 + (pow((TE-tau),2.0)/td) ),0.5)) ) );
+
+                // T2 effect 
+                Sb *= exp(-R2b*TE);    
             }
             else
             {

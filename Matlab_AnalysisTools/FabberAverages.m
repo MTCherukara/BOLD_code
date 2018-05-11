@@ -2,6 +2,8 @@
     % Loads a particular Fabber dataset and displays the average (mean and
     % median) values of R2' and DBV in the top 8 slices.
     %
+    % Actively used as of 2018-05-11
+    %
     % Changelog:
     %
     % 12 March 2018 (MTC). Generalization, enabling selection of variables to
@@ -29,7 +31,7 @@ slicenum = 3:10;    % VS
 % slicenum = 1:6;   % TR = 2
 
 % Data set
-setnum = 350;
+setnum = 396;
 subnum = 7;
 msknum = 6;     % this is used for the DeltaF datasets
 fabber = num2str(setnum+subnum-1);
@@ -116,8 +118,8 @@ for vv = 1:length(vars)
     Qs = quantile(Dataslice,[0.75,0.25]);
     
     % calculate precision-weighted mean
-    Precslice = 1./(Stdslice.^2);
-    wmean = sum(Precslice.*Dataslice)/sum(Precslice);
+%     Precslice = 1./(Stdslice.^2);
+%     wmean = sum(Precslice.*Dataslice)/sum(Precslice);
     
     % Display results
     disp('   ');
@@ -126,7 +128,7 @@ for vv = 1:length(vars)
     
     disp('   ');
     disp(['Mean ',vname,'   : ',num2str(mean(Dataslice),4)]);
-    disp(['Wt Mean ',vname,': ',num2str(wmean,4)]);
+%     disp(['Wt Mean ',vname,': ',num2str(wmean,4)]);
     disp(['    Std ',vname,': ',num2str(mean(Stdslice),4)]);
     
 end
@@ -154,9 +156,11 @@ resdir = dir([fabdir,'residual*']);
 if ~isempty(resdir)
     
     Rslice = LoadSlice([fabdir,'residuals.nii.gz'],slicenum);
-    Rslice = Rslice.*maskslice;
+    NV = size(Rslice,4);
+    Rslice = Rslice.*repmat(maskslice,1,1,1,NV);
     Rslice = abs(Rslice(:));
-    Rslice(Badslice ~= 0) = [];
+    Bigbad = repmat(Badslice == 0,1,NV);
+    Rslice(~Bigbad) = [];
     Rslice(Rslice > 100) = [];
     Residual = (nanmean((Rslice)));
 
