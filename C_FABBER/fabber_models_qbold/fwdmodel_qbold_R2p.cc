@@ -119,6 +119,9 @@ void R2primeFwdModel::Initialize(ArgsType &args)
 
     }
 
+    // read TR
+    TR = convertTo<double>(args.ReadWithDefault("TR","3.000"));
+
 
     // add information to the log
     LOG << "Inference using development model" << endl;    
@@ -266,7 +269,7 @@ void R2primeFwdModel::HardcodedInitialDists(MVNDist &prior, MVNDist &posterior) 
         }
         else
         {
-            precisions(R2p_index(), R2p_index()) = 1e-4; // 1e-2
+            precisions(R2p_index(), R2p_index()) = 1e-3; // 1e-2
         }
     }
 
@@ -318,7 +321,7 @@ void R2primeFwdModel::HardcodedInitialDists(MVNDist &prior, MVNDist &posterior) 
         prior.means(lam_index()) = 0.001;
         if (inf_priors)
         {
-            precisions(lam_index(), lam_index()) = 1e2; // 1e2
+            precisions(lam_index(), lam_index()) = 1e0; // 1e2
         }
         else
         {
@@ -328,8 +331,8 @@ void R2primeFwdModel::HardcodedInitialDists(MVNDist &prior, MVNDist &posterior) 
 
     if (infer_geo)
     {
-        prior.means(lam_index()) = 0.3;
-        precisions(lam_index(), lam_index()) = 1e-1; // 1e-1
+        prior.means(geo_index()) = 0.3;
+        precisions(geo_index(), geo_index()) = 1e-1; // 1e-1
     }
 
     if (infer_CBV)
@@ -380,6 +383,7 @@ void R2primeFwdModel::Evaluate(const ColumnVector &params, ColumnVector &result)
     double R2b;
     double R2bp;
     double tc;
+    double lam0;
 
     // parameters
     double OEF;
@@ -393,6 +397,7 @@ void R2primeFwdModel::Evaluate(const ColumnVector &params, ColumnVector &result)
     double lam;
     double geom;
     double CBV;
+
 
     // assign values to parameters
     if (infer_R2p)
@@ -510,6 +515,33 @@ void R2primeFwdModel::Evaluate(const ColumnVector &params, ColumnVector &result)
         tc = 0.010;
     }
 
+    // evaluate blood relaxation rates
+    R2b  = ( 4.5 + (16.4*Hct)) + ( ((165.2*Hct) + 55.7)*pow(OEF,2.0) );
+    R2bp = (10.2 - ( 1.5*Hct)) + ( ((136.9*Hct) - 13.9)*pow(OEF,2.0) );
+
+    // if there is a CSF compartment, caclulate the DBV-weighting adjustment, which does not
+    // not depend on tau, so can be done outside the loop (He & Yablonskiy, 2007)
+    if (infer_lam)
+    {
+        double TE = TEvals(1);
+
+        double T1t = 1.20;
+        double T1e = 3.87;
+        double T1b = 1.58;
+
+        double nt = 0.723;
+        double ne = 0.075;
+        double nb = 0.723;
+
+        double mt = exp(-TE*R2t) * (1.0 - (2.0*exp(-(TR-(TE/2.0))/T1t)) + exp(-TR/T1t));
+        double me = exp(-TE*R2e) * (1.0 - (2.0*exp(-(TR-(TE/2.0))/T1e)) + exp(-TR/T1e));
+        double mb = exp(-TE*R2b) * (1.0 - (2.0*exp(-(TR-(TE/2.0))/T1b)) + exp(-TR/T1b));
+
+        double lamP = mb*nb*(1-lam)*DBV;
+        lam0 = (mt*nt*lam) / ( (me*ne*(1.0-lam)) + (mt*nt*lamP) );
+    }
+
+
     // loop through taus
     result.ReSize(taus.Nrows());
 
@@ -563,19 +595,14 @@ void R2primeFwdModel::Evaluate(const ColumnVector &params, ColumnVector &result)
             }
             else
             {
-                // relaxation rates
-                R2b  = ( 4.5 + (16.4*Hct)) + ( ((165.2*Hct) + 55.7)*pow(OEF,2.0) );
-                R2bp = (10.2 - ( 1.5*Hct)) + ( ((136.9*Hct) - 13.9)*pow(OEF,2.0) );
-
                 // linear model
                 Sb = exp(-R2b*TE)*exp(-R2bp*abs(tau));
+            }
 
-                /*
-                // adjusted blood compartment weighting
-                /double T1 = 1.58;
-                double mb = 1 - exp(-(3.0-(TE-tau)/2)/T1) + exp(-3.0/T1);
-                Sb *= 0.66*mb;
-                */
+            // Add correction to DBV based on CSF fraction
+            if (infer_lam)
+            {
+                CBV *= (1-lam0);
             }
 
             // add extracellular compartment
