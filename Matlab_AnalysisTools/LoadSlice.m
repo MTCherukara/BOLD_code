@@ -47,4 +47,4 @@ end
 nsl = dims(3);
 
 % for now
-slicedata = squeeze(dataset(:,:,slicenum));
+slicedata = squeeze(dataset(:,:,slicenum,:));

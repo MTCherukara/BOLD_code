@@ -1,5 +1,7 @@
 % function AverageGESEPI
 % Load a NIFTI file of GESEPI data and average out the slices
+%
+% NOT actively used 2018-05-11
 
 clear;
 

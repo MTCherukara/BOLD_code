@@ -50,16 +50,23 @@ params.dChi = 2.64e-7;      % parts     - susceptibility difference
 params.gam  = 2.67513e8;    % rad/s/T   - gyromagnetic ratio
 
 % scan parameters 
-params.TE   = 0.200;        % s         - echo time
+params.TE   = 0.074;        % s         - echo time
+params.TR   = 3.000;        % s         - repetition time
 
 % model fitting parameters
 params.S0   = 100;          % a. units  - signal
 params.R2t  = 1/0.087;      % 1/s       - rate constant, tissue
 params.R2e  = 4;            % 1/s       - rate constant, extracellular
 params.dF   = 5;            % Hz        - frequency shift
+<<<<<<< HEAD
 params.lam0 = 0.000;        % no units  - ISF/CSF signal contribution
 params.zeta = 0.05;         % no units  - deoxygenated blood volume
 params.OEF  = 0.60;         % no units  - oxygen extraction fraction
+=======
+params.lam0 = 0.100;        % no units  - ISF/CSF signal contribution
+params.zeta = 0.03;         % no units  - deoxygenated blood volume
+params.OEF  = 0.40;         % no units  - oxygen extraction fraction
+>>>>>>> 6b0ed0637f918ebec5b32d1432d5a0f219c5d7b4
 params.Hct  = 0.400;        % no units  - fractional hematocrit
 
 % analysis parameters
@@ -75,9 +82,13 @@ params.SNR = 100;
 
 % define tau values that we want to simulate
 % tau = (-28:4:64)/1000; % for testing
-% tau = (-24:1:64)/1000;
+tau = (-16:8:64)/1000;
 % tau = [-16:4:16,24:8:56]/1000;
+<<<<<<< HEAD
 tau = linspace(-0.028,0.064,1000); % for visualising
+=======
+% tau = linspace(-0.05,0.19,1000); % for visualising
+>>>>>>> 6b0ed0637f918ebec5b32d1432d5a0f219c5d7b4
 
 np = length(tau);
 

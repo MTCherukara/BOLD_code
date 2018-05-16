@@ -72,12 +72,11 @@ end
 PARAMS.R2b  =  4.5 + 16.4*PARAMS.Hct + (165.2*PARAMS.Hct + 55.7)*PARAMS.OEF^2;
 PARAMS.R2bp = 10.2 -  1.5*PARAMS.Hct + (136.9*PARAMS.Hct - 13.9)*PARAMS.OEF^2;
 
-% weighting of blood mb
-% mb = exp(-(TE-TAU).*PARAMS.R2b).*(1 - exp(-(3-(TE-TAU)/2)/1.58) + exp(-3/1.58));
+% change blood weighting
+% PARAMS.zeta = MTC_ASE_zetacorr(PARAMS);
 
 % compartment weightings
 w_csf = PARAMS.lam0;
-% w_bld = 0.66.*mb.*PARAMS.zeta;
 w_bld = PARAMS.zeta;
 w_tis = 1 - (w_csf + w_bld);
 
@@ -87,7 +86,7 @@ w_tis = 1 - (w_csf + w_bld);
 % comparments
 S_tis = w_tis.*MTC_ASE_tissue(TAU,TE,PARAMS);
 S_csf = w_csf.*MTC_ASE_extra(TAU,TE,PARAMS);
-S_bld = w_bld.*MTC_ASE_blood(TAU,TE,PARAMS);
+S_bld = w_bld.*MTC_ASE_mnblood(TAU,TE,PARAMS);
 
 % add it all together:
 S = PARAMS.S0.*(S_tis + S_csf + S_bld);
