@@ -119,9 +119,9 @@ void R2primeFwdModel::Initialize(ArgsType &args)
 
     }
 
-    // read TR
+    // read TR and TI
     TR = convertTo<double>(args.ReadWithDefault("TR","3.000"));
-
+    TI = convertTo<double>(args.ReadWithDefault("TI","1.210"));
 
     // add information to the log
     LOG << "Inference using development model" << endl;    
@@ -383,7 +383,10 @@ void R2primeFwdModel::Evaluate(const ColumnVector &params, ColumnVector &result)
     double R2b;
     double R2bp;
     double tc;
-    double lam0;
+    double lam0;        // apparent lambda (opposite way round from literature!)
+    double mt;
+    double me;
+    double mb;
 
     // parameters
     double OEF;
@@ -519,27 +522,14 @@ void R2primeFwdModel::Evaluate(const ColumnVector &params, ColumnVector &result)
     R2b  = ( 4.5 + (16.4*Hct)) + ( ((165.2*Hct) + 55.7)*pow(OEF,2.0) );
     R2bp = (10.2 - ( 1.5*Hct)) + ( ((136.9*Hct) - 13.9)*pow(OEF,2.0) );
 
-    // if there is a CSF compartment, caclulate the DBV-weighting adjustment, which does not
-    // not depend on tau, so can be done outside the loop (He & Yablonskiy, 2007)
-    if (infer_lam)
-    {
-        double TE = TEvals(1);
+    // here are some more constants we will need
+    double T1t = 1.20;
+    double T1e = 3.87;
+    double T1b = 1.58;
 
-        double T1t = 1.20;
-        double T1e = 3.87;
-        double T1b = 1.58;
-
-        double nt = 0.723;
-        double ne = 0.075;
-        double nb = 0.723;
-
-        double mt = exp(-TE*R2t) * (1.0 - (2.0*exp(-(TR-(TE/2.0))/T1t)) + exp(-TR/T1t));
-        double me = exp(-TE*R2e) * (1.0 - (2.0*exp(-(TR-(TE/2.0))/T1e)) + exp(-TR/T1e));
-        double mb = exp(-TE*R2b) * (1.0 - (2.0*exp(-(TR-(TE/2.0))/T1b)) + exp(-TR/T1b));
-
-        double lamP = mb*nb*(1-lam)*DBV;
-        lam0 = (mt*nt*lam) / ( (me*ne*(1.0-lam)) + (mt*nt*lamP) );
-    }
+    double nt = 0.723;
+    double ne = 0.075;
+    double nb = 0.723;
 
 
     // loop through taus
@@ -592,26 +582,46 @@ void R2primeFwdModel::Evaluate(const ColumnVector &params, ColumnVector &result)
 
                 // T2 effect 
                 Sb *= exp(-R2b*TE);    
-            }
-            else
+
+            } // if (motion_narr)
+            else 
             {
                 // linear model
                 Sb = exp(-R2b*TE)*exp(-R2bp*abs(tau));
-            }
+
+            } // if (motion_narr) ... else
 
             // Add correction to DBV based on CSF fraction
             if (infer_lam)
             {
-                CBV *= (1-lam0);
-            }
+                // calculate steady state magnetization values, for tissue, blood, and CSF
+                mt = exp(-(TE-tau)*R2t) * ( 1 - ( 1 + (2*exp((TE-tau)/(2*T1t))) ) 
+                                              * ( 2 - exp(-(TR-TI)/T1t)) * exp(-TI/T1t)  );
+                mb = exp(-(TE-tau)*R2b) * ( 1 - ( 1 + (2*exp((TE-tau)/(2*T1b))) ) 
+                                              * ( 2 - exp(-(TR-TI)/T1b)) * exp(-TI/T1b)  );
+                mt = exp(-(TE-tau)*R2e) * ( 1 - ( 1 + (2*exp((TE-tau)/(2*T1e))) ) 
+                                              * ( 2 - exp(-(TR-TI)/T1e)) * exp(-TI/T1e)  );
+                
+                // calculate tissue compartment weightings
+                lam0 = (ne*me*lam) / ( (nt*mt*(1-lam)) + (ne*me*lam) );
+                CBV = nb*mb*(1-lam0)*DBV;
+
+            } // if (infer_lam)
+            else
+            {
+                lam0 = lam;
+                CBV = DBV;
+                
+            } // if (infer_lam) ... else
 
             // add extracellular compartment
             Sec = exp(-R2e*TE)*exp(-2.0*i*M_PI*dF*abs(tau));
             Se = real(Sec);
 
             // add up compartments
-            result(ii) = S0*(((1-CBV-lam)*St) + (CBV*Sb) + (lam*Se));
-        }
+            result(ii) = S0*(((1-CBV-lam0)*St) + (CBV*Sb) + (lam0*Se));
+
+        } // if (single_comp) ... else
 
     } // for (int i = 1; i <= taus.Nrows(); i++)
 

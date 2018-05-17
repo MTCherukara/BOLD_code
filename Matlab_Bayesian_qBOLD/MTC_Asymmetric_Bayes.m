@@ -53,9 +53,12 @@ tic;
 np = 1000; % number of points to perform Bayesian analysis on
 nz = 41; % number of points in the third dimension
 
+nmul = 1; % plot scaling factor
+
+
 % Select which parameter(s) to infer on
 %       (1 = OEF, 2 = DBV, 3 = R2', 4 = CSF, 5 = dF, 6 = geom)
-pars = [2,4];
+pars = [4,5];
 
 % Load the Data:
 load('ASE_Data/Data_180516_CSF.mat');
@@ -68,6 +71,8 @@ sigma = mean(params.sig);   % real std of noise
 ns = length(S_sample); % number of data points
 params.R2p = params.dw.*params.zeta;
 truepars = params;
+
+% params.lam0 = 0.15;
 
 if ~exist('TE_sample','var')
     TE_sample = params.TE;
@@ -179,7 +184,7 @@ if length(pars) == 1
 elseif length(pars) == 2 
     % Plot 2D grid search results
     
-    vals = vals.*100;
+    vals = vals.*nmul;
     
     Pscale = [quantile(pos(:),0.95), max(pos(:))];
     surf(vals(2,:),vals(1,:),exp(pos));
@@ -188,8 +193,8 @@ elseif length(pars) == 2
     infernoW = flipud(magma);
 %     infernoW(1,:) = [1,1,1];
     colormap(infernoW);
-    plot3(100*[trv(2),trv(2)],[  0, 1000],[1e20,1e20],'k-');
-    plot3([  0, 1000],100*[trv(1),trv(1)],[1e20,1e20],'k-');
+    plot3(nmul*[trv(2),trv(2)],[  0, 1000],[1e20,1e20],'k-');
+    plot3([  0, 1000],nmul*[trv(1),trv(1)],[1e20,1e20],'k-');
     
     % outline
     plot3([vals(2,  1),vals(2,  1)],[vals(1,  1),vals(1,end)],[1,1],'k-','LineWidth',0.75);

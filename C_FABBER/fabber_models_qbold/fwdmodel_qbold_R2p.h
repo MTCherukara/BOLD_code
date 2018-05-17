@@ -40,6 +40,7 @@ protected:
 
     // Scan Parameters
     double TR;
+    double TI;
     NEWMAT::ColumnVector taus;
     NEWMAT::ColumnVector TEvals;
 
