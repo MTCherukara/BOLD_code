@@ -39,7 +39,7 @@ clear;
 setFigureDefaults;
 
 plot_fig = 1;       
-save_data = 0;      % set to 1 in order to save out ASE data
+save_data = 1;      % set to 1 in order to save out ASE data
 
 
 %% Model Parameters
@@ -52,22 +52,20 @@ params.gam  = 2.67513e8;    % rad/s/T   - gyromagnetic ratio
 % scan parameters 
 params.TE   = 0.074;        % s         - echo time
 params.TR   = 3.000;        % s         - repetition time
+params.TI   = 1.210;        % s         - FLAIR inversion time
 
 % model fitting parameters
 params.S0   = 100;          % a. units  - signal
 params.R2t  = 1/0.087;      % 1/s       - rate constant, tissue
 params.R2e  = 4;            % 1/s       - rate constant, extracellular
 params.dF   = 5;            % Hz        - frequency shift
-<<<<<<< HEAD
-params.lam0 = 0.000;        % no units  - ISF/CSF signal contribution
-params.zeta = 0.05;         % no units  - deoxygenated blood volume
-params.OEF  = 0.60;         % no units  - oxygen extraction fraction
-=======
-params.lam0 = 0.100;        % no units  - ISF/CSF signal contribution
+params.lam0 = 0.10;         % no units  - ISF/CSF signal contribution
 params.zeta = 0.03;         % no units  - deoxygenated blood volume
 params.OEF  = 0.40;         % no units  - oxygen extraction fraction
->>>>>>> 6b0ed0637f918ebec5b32d1432d5a0f219c5d7b4
 params.Hct  = 0.400;        % no units  - fractional hematocrit
+params.T1t  = 1.200;        % s         - tissue T1
+params.T1b  = 1.580;        % s         - blood T1
+params.T1e  = 3.870;        % s         - CSF T1
 
 % analysis parameters
 params.geom   = 0.3;        % no units  - quadratic regime geometry factor
@@ -84,37 +82,35 @@ params.SNR = 100;
 % tau = (-28:4:64)/1000; % for testing
 tau = (-16:8:64)/1000;
 % tau = [-16:4:16,24:8:56]/1000;
-<<<<<<< HEAD
-tau = linspace(-0.028,0.064,1000); % for visualising
-=======
-% tau = linspace(-0.05,0.19,1000); % for visualising
->>>>>>> 6b0ed0637f918ebec5b32d1432d5a0f219c5d7b4
+% tau = linspace(-0.028,0.064,1000); % for visualising
+
 
 np = length(tau);
 
 % call MTC_qASE_model
-[S_total,params] = MTC_qASE_model(tau,params.TE,params);
+[S_total,params] = MTC_qASE_modelB(tau,params.TE,params);
 
 
 %% Add Noise
 S_sample = S_total + (S_total.*randn(1,np)./params.SNR);
 S_sample(S_sample < 0) = 0;
+S_sample = S_sample./max(S_total);
 
 % calculate maximum data standard deviaton
-params.sig = min(S_total)/params.SNR;
+params.sig = min(S_sample)/params.SNR;
 
 
 %% plot figure
 if plot_fig
     
     % create a figure
-    figure(2); hold on; box on;
+    figure(3); hold on; box on;
     
     % plot the signal
-    S_log = (S_total);
+    S_log = (S_total)./max(S_total);
     l.s = plot(1000*tau,S_log,'-');
-%     plot(1000*tau,log(S_sample),'kx');
-%     xlim([-8,20]);
+    plot(1000*tau,(S_sample),'kx');
+    xlim([(1000*min(tau))-4, (1000*max(tau))+4]);
 %     ylim([3.385, 3.435]);
     
     % labels on axes

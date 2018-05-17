@@ -39,7 +39,7 @@
 % 2017-04-04 (MTC). Various changes.
 
 clear;
-close all;
+% close all;
 
 % setFigureDefaults;  % since we're doing plotting later
 
@@ -55,10 +55,10 @@ nz = 41; % number of points in the third dimension
 
 % Select which parameter(s) to infer on
 %       (1 = OEF, 2 = DBV, 3 = R2', 4 = CSF, 5 = dF, 6 = geom)
-pars = [1,2];
+pars = [2,4];
 
 % Load the Data:
-load('ASE_Data/Data_180112_SNR_50.mat');
+load('ASE_Data/Data_180516_CSF.mat');
 
 params.tc_man = 0;
 params.tc_val = 0.024;
@@ -144,7 +144,10 @@ elseif length(pars) == 2
             params = param_update(vals(2,i2),params,pname{2});
 
             % run the model to evaluate the signal with current params
-            S_mod = MTC_qASE_model(T_sample,TE_sample,params,noDW);
+            S_mod = MTC_qASE_model2(T_sample,TE_sample,params,noDW);
+            
+            % normalize
+            S_mod = S_mod./max(S_mod);
 
             % calculate posterior based on known noise value
             pos(i1,i2) = MTC_loglike(S_sample,S_mod,sigma);
@@ -185,8 +188,8 @@ elseif length(pars) == 2
     infernoW = flipud(magma);
 %     infernoW(1,:) = [1,1,1];
     colormap(infernoW);
-    plot3(100*[trv(2),trv(2)],[  0, 1000],[1000,1000],'k-');
-    plot3([  0, 1000],100*[trv(1),trv(1)],[1000,1000],'k-');
+    plot3(100*[trv(2),trv(2)],[  0, 1000],[1e20,1e20],'k-');
+    plot3([  0, 1000],100*[trv(1),trv(1)],[1e20,1e20],'k-');
     
     % outline
     plot3([vals(2,  1),vals(2,  1)],[vals(1,  1),vals(1,end)],[1,1],'k-','LineWidth',0.75);
