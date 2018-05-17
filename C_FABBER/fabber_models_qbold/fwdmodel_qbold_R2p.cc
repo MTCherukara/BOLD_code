@@ -121,10 +121,11 @@ void R2primeFwdModel::Initialize(ArgsType &args)
 
     // read TR and TI
     TR = convertTo<double>(args.ReadWithDefault("TR","3.000"));
-    TI = convertTo<double>(args.ReadWithDefault("TI","1.210"));
+    TI = convertTo<double>(args.ReadWithDefault("TI","3.000"));
 
     // add information to the log
-    LOG << "Inference using development model" << endl;    
+    LOG << "Inference using development model" << endl;
+    LOG << "Using TR = " << TR << "s, and TI = " << TI << "s" << endl;
     for (int ii = 1; ii <= taus.Nrows(); ii++)
     {
         LOG << "    TE(" << ii << ") = " << TEvals(ii) << "    tau(" << ii << ") = " << taus(ii) << endl;
@@ -325,7 +326,7 @@ void R2primeFwdModel::HardcodedInitialDists(MVNDist &prior, MVNDist &posterior) 
         }
         else
         {
-            precisions(lam_index(), lam_index()) = 1e0; // 1e0
+            precisions(lam_index(), lam_index()) = 1e-1; // 1e0
         }
     }
 
@@ -591,32 +592,21 @@ void R2primeFwdModel::Evaluate(const ColumnVector &params, ColumnVector &result)
 
             } // if (motion_narr) ... else
 
-            // Add correction to DBV based on CSF fraction
-            if (infer_lam)
-            {
-                // calculate steady state magnetization values, for tissue, blood, and CSF
-                mt = exp(-(TE-tau)*R2t) * ( 1 - ( 1 + (2*exp((TE-tau)/(2*T1t))) ) 
-                                              * ( 2 - exp(-(TR-TI)/T1t)) * exp(-TI/T1t)  );
-                mb = exp(-(TE-tau)*R2b) * ( 1 - ( 1 + (2*exp((TE-tau)/(2*T1b))) ) 
-                                              * ( 2 - exp(-(TR-TI)/T1b)) * exp(-TI/T1b)  );
-                mt = exp(-(TE-tau)*R2e) * ( 1 - ( 1 + (2*exp((TE-tau)/(2*T1e))) ) 
-                                              * ( 2 - exp(-(TR-TI)/T1e)) * exp(-TI/T1e)  );
-                
-                // calculate tissue compartment weightings
-                lam0 = (ne*me*lam) / ( (nt*mt*(1-lam)) + (ne*me*lam) );
-                CBV = nb*mb*(1-lam0)*DBV;
-
-            } // if (infer_lam)
-            else
-            {
-                lam0 = lam;
-                CBV = DBV;
-                
-            } // if (infer_lam) ... else
-
             // add extracellular compartment
             Sec = exp(-R2e*TE)*exp(-2.0*i*M_PI*dF*abs(tau));
             Se = real(Sec);
+
+            // calculate steady state magnetization values, for tissue, blood, and CSF
+            mt = exp(-(TE-tau)*R2t) * ( 1 - ( 1 + (2*exp((TE-tau)/(2*T1t))) ) 
+                                        * ( 2 - exp(-(TR-TI)/T1t)) * exp(-TI/T1t)  );
+            mb = exp(-(TE-tau)*R2b) * ( 1 - ( 1 + (2*exp((TE-tau)/(2*T1b))) ) 
+                                        * ( 2 - exp(-(TR-TI)/T1b)) * exp(-TI/T1b)  );
+            mt = exp(-(TE-tau)*R2e) * ( 1 - ( 1 + (2*exp((TE-tau)/(2*T1e))) ) 
+                                        * ( 2 - exp(-(TR-TI)/T1e)) * exp(-TI/T1e)  );
+            
+            // calculate tissue compartment weightings
+            lam0 = (ne*me*lam) / ( (nt*mt*(1-lam)) + (ne*me*lam) );
+            CBV = nb*mb*(1-lam0)*DBV;
 
             // add up compartments
             result(ii) = S0*(((1-CBV-lam0)*St) + (CBV*Sb) + (lam0*Se));
