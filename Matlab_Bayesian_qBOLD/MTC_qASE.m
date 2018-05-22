@@ -50,7 +50,7 @@ params.dChi = 2.64e-7;      % parts     - susceptibility difference
 params.gam  = 2.67513e8;    % rad/s/T   - gyromagnetic ratio
 
 % scan parameters 
-params.TE   = 0.300;        % s         - echo time
+params.TE   = 0.082;        % s         - echo time
 params.TR   = 3.000;        % s         - repetition time
 params.TI   = 1.210;        % s         - FLAIR inversion time
 
@@ -59,7 +59,7 @@ params.S0   = 100;          % a. units  - signal
 params.R2t  = 1/0.087;      % 1/s       - rate constant, tissue
 params.R2e  = 4;            % 1/s       - rate constant, extracellular
 params.dF   = 5;            % Hz        - frequency shift
-params.lam0 = 0.0;         % no units  - ISF/CSF signal contribution
+params.lam0 = 0.1;         % no units  - ISF/CSF signal contribution
 params.zeta = 0.03;         % no units  - deoxygenated blood volume
 params.OEF  = 0.40;         % no units  - oxygen extraction fraction
 params.Hct  = 0.400;        % no units  - fractional hematocrit
@@ -82,7 +82,7 @@ params.SNR = 100;
 % tau = (-28:4:64)/1000; % for testing
 % tau = (-16:8:64)/1000;
 % tau = [-16:4:16,24:8:56]/1000;
-tau = linspace(-0.020,0.280,1000); % for visualising
+tau = linspace(-0.020,0.064,1000); % for visualising
 
 
 np = length(tau);
