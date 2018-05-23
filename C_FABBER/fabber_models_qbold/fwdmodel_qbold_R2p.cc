@@ -39,7 +39,7 @@ string R2primeFwdModel::GetDescription() const
 
 string R2primeFwdModel::ModelVersion() const
 {
-    return "1.5";
+    return "1.6";
 } // ModelVersion
 
 
@@ -57,8 +57,6 @@ void R2primeFwdModel::Initialize(ArgsType &args)
     infer_R2e = args.ReadBool("inferR2e");
     infer_dF  = args.ReadBool("inferdF");
     infer_lam = args.ReadBool("inferlam");
-    infer_geo = args.ReadBool("infergeo");
-    infer_CBV = args.ReadBool("inferCBV");
     single_comp = args.ReadBool("single_compartment");
     motion_narr = args.ReadBool("motional_narrowing");
     inf_priors  = args.ReadBool("infpriors");
@@ -68,13 +66,6 @@ void R2primeFwdModel::Initialize(ArgsType &args)
     {
         infer_R2p = false;
     }
-
-    // since CBV only applies in the two-compartment model
-    if (single_comp)
-    {
-        infer_CBV = false;
-    }
-
 
     // temporary holders for input values
     string tau_temp;
@@ -166,14 +157,6 @@ void R2primeFwdModel::Initialize(ArgsType &args)
     {
         LOG << "Inferring on CSF volume fraction lambda" << endl;
     }
-    if (infer_geo)
-    {
-        LOG << "Inferring on Geometry Factor (the 0.3)" << endl;
-    }
-    if (infer_CBV)
-    {
-        LOG << "Inferring blood compartment volume separately from DBV" << endl;
-    }
     if (inf_priors)
     {
         LOG << "Using informative priors" << endl;
@@ -226,15 +209,6 @@ void R2primeFwdModel::NameParams(vector<string> &names) const
     {
         names.push_back("VC");  // parameter 7 - CSF volume fraction
     }
-    if (infer_geo)
-    {
-        names.push_back("geofactor");  // parameter 8 - geometry factor
-    }
-    if (infer_CBV)
-    {
-        names.push_back("vCBV");  // parameter 9 - blood compartment volume (not DBV)
-    }
-
 } // NameParams
 
 // ------------------------------------------------------------------------------------------
@@ -322,30 +296,11 @@ void R2primeFwdModel::HardcodedInitialDists(MVNDist &prior, MVNDist &posterior) 
         prior.means(lam_index()) = 0.001;
         if (inf_priors)
         {
-            precisions(lam_index(), lam_index()) = 1e0; // 1e2
+            precisions(lam_index(), lam_index()) = 1e1; // 1e2
         }
         else
         {
-            precisions(lam_index(), lam_index()) = 1e-1; // 1e0
-        }
-    }
-
-    if (infer_geo)
-    {
-        prior.means(geo_index()) = 0.3;
-        precisions(geo_index(), geo_index()) = 1e-1; // 1e-1
-    }
-
-    if (infer_CBV)
-    {
-        prior.means(CBV_index()) = 0.03;
-        if (inf_priors)
-        {
-            precisions(CBV_index(), CBV_index()) = 1e2; // 1e2
-        }
-        else
-        {
-            precisions(CBV_index(), CBV_index()) = 1e0; // 1e0
+            precisions(lam_index(), lam_index()) = 1e0; // 1e0
         }
     }
 
@@ -399,7 +354,6 @@ void R2primeFwdModel::Evaluate(const ColumnVector &params, ColumnVector &result)
     double R2e;
     double dF;
     double lam;
-    double geom;
     double CBV;
 
 
@@ -468,14 +422,7 @@ void R2primeFwdModel::Evaluate(const ColumnVector &params, ColumnVector &result)
     {
         lam = 0.0;
     }
-    if (infer_geo)
-    {
-        geom = abs(paramcpy(geo_index()));
-    }
-    else
-    {
-        geom = 0.3;
-    }
+
 
     // this one is a little bit different
     if (infer_OEF)
@@ -492,20 +439,6 @@ void R2primeFwdModel::Evaluate(const ColumnVector &params, ColumnVector &result)
     else
     {
         OEF = 0.4;
-    }
-
-    // as is this one
-    if (infer_CBV)
-    {
-        CBV = (paramcpy(CBV_index()));
-    }
-    else if (infer_DBV)
-    {
-        CBV = DBV;
-    }
-    else
-    {
-        CBV = 0.03;
     }
 
     // calculate tc and threshold it if necessary
@@ -554,7 +487,7 @@ void R2primeFwdModel::Evaluate(const ColumnVector &params, ColumnVector &result)
         {
             St = exp(-0.3*pow(R2p*tau,2.0)/DBV);
         }
-
+ 
         // compartments
         if (single_comp)
         {
@@ -617,7 +550,7 @@ void R2primeFwdModel::Evaluate(const ColumnVector &params, ColumnVector &result)
 
     
     // alternative, if values are outside reasonable bounds
-    if ( DBV > 0.5 || Hct > 1.0 || OEF > 1.0 )
+    if ( DBV > 0.5 || Hct > 1.0 || OEF > 1.0 || lam0 > 1.0 )
     {
         for (int ii = 1; ii <= taus.Nrows(); ii++)
         {

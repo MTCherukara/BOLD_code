@@ -30,8 +30,7 @@ public:
     {
         return (infer_OEF ? 1 : 0) + (infer_R2p ? 1 : 0) + (infer_DBV ? 1 : 0)
              + (infer_R2t ? 1 : 0) + (infer_S0  ? 1 : 0) + (infer_R2e ? 1 : 0) 
-             + (infer_dF  ? 1 : 0) + (infer_lam ? 1 : 0) + (infer_Hct ? 1 : 0) 
-             + (infer_geo ? 1 : 0) + (infer_CBV ? 1 : 0);
+             + (infer_dF  ? 1 : 0) + (infer_lam ? 1 : 0) + (infer_Hct ? 1 : 0);
     }    
     virtual void HardcodedInitialDists(MVNDist &prior, MVNDist &posterior) const;
     virtual void Evaluate(const NEWMAT::ColumnVector &params, NEWMAT::ColumnVector &result) const;
@@ -90,15 +89,6 @@ protected:
         return dF_index() + (infer_lam ? 1 : 0);
     }
 
-    int geo_index() const
-    {
-        return lam_index() + (infer_geo ? 1 : 0);
-    }
-
-    int CBV_index() const
-    {
-        return geo_index() + (infer_CBV ? 1 : 0);
-    }
 
     // Which parameters will we infer on
     bool infer_OEF;
@@ -110,8 +100,6 @@ protected:
     bool infer_R2e;
     bool infer_dF;
     bool infer_lam;
-    bool infer_geo;
-    bool infer_CBV;
     bool single_comp;
     bool motion_narr;
     bool inf_priors;

@@ -12,29 +12,33 @@ setFigureDefaults;
 
 
 %% Spin Echo
-% SE = [  81.96,  65.93,  51.06,  43.19,  35.95,  30.85,  27.25,  25.28; ...
-%         91.40,  70.25,  52.36,  41.40,  32.12,  26.64,  23.45,  21.52; ...
-%         58.91,  48.40,  36.95,  29.60,  23.86,  20.21,  18.53,  16.49; ...
-%        165.27, 145.09, 106.35,  83.91,  59.16,  52.57,  46.68,  40.56; ...
-%         99.57,  83.46,  64.02,  46.97,  36.39,  30.25,  25.00,  22.60 ];
-%     
-% TE = 66:26:248;
-% 
-% % % Plot Absolute SNR
-% % figure();
-% % plot(TE,SE);
-% % xlabel('Echo Time TE (ms)');
-% % xticks(TE);
-% % xlim([66,248]);
-% % ylabel('SNR');
-% 
-% % Plot Relative SNR
-% figure();
-% plot(TE,SE./repmat(SE(:,1),1,8));
-% xlabel('Echo Time TE (ms)');
-% xticks(TE);
-% axis([66,248,0,1.05]);
-% ylabel('Relative SNR');
+SE = [  81.96,  65.93,  51.06,  43.19,  35.95,  30.85,  27.25,  25.28; ...
+        91.40,  70.25,  52.36,  41.40,  32.12,  26.64,  23.45,  21.52; ...
+        58.91,  48.40,  36.95,  29.60,  23.86,  20.21,  18.53,  16.49; ...
+       165.27, 145.09, 106.35,  83.91,  59.16,  52.57,  46.68,  40.56; ...
+        99.57,  83.46,  64.02,  46.97,  36.39,  30.25,  25.00,  22.60 ];
+    
+TE = 66:26:248;
+
+% Plot Absolute SNR
+figure();
+plot(TE,SE,'LineWidth',1); hold on;
+errorbar(TE,mean(SE),std(SE),'k--','LineWidth',2);
+xlabel('Echo Time TE (ms)');
+xticks(TE);
+xlim([64,250]);
+ylabel('SNR');
+
+SER = SE./repmat(SE(:,1),1,8);
+
+% Plot Relative SNR
+figure();
+plot(TE,SER); hold on;
+errorbar(TE,mean(SER),std(SER),'k-','LineWidth',2);
+xlabel('Echo Time TE (ms)');
+xticks(TE);
+axis([66,248,0,1.05]);
+ylabel('Relative SNR');
 
 
 %% ASE FLAIR vs Non-FLAIR
@@ -67,18 +71,58 @@ NF_GM = [ 107.4196,  106.1800,  106.7981,  106.1070,  104.2065,   97.6899,   95.
 % plot
 tau = -16:8:64;
 
-% Relative SNR - FLAIR
-figure();
-plot(tau,FL_WB./repmat(FL_WB(:,1),1,length(tau)));
-xlabel('Echo Time TE (ms)');
-xticks(tau);
-axis([-16,64,0.68,1.12]);
-ylabel('Relative SNR');
+FL_WB_R = FL_WB./repmat(FL_WB(:,1),1,length(tau));
+FL_GM_R = FL_GM./repmat(FL_GM(:,1),1,length(tau));
+NF_WB_R = NF_WB./repmat(NF_WB(:,1),1,length(tau));
+NF_GM_R = NF_GM./repmat(NF_GM(:,1),1,length(tau));
 
-% Relative SNR - NonFLAIR
-figure();
-plot(tau,NF_WB./repmat(NF_WB(:,1),1,length(tau)));
-xlabel('Echo Time TE (ms)');
+FL_WB_M = mean(FL_WB);
+FL_GM_M = mean(FL_GM);
+NF_WB_M = mean(NF_WB);
+NF_GM_M = mean(NF_GM);
+
+FL_WB_S = std(FL_WB);
+FL_GM_S = std(FL_GM);
+NF_WB_S = std(NF_WB);
+NF_GM_S = std(NF_GM);
+
+
+% % Relative SNR - FLAIR
+% figure();
+% plot(tau,FL_GM_R);
+% xlabel('Spin Echo Displacement \tau (ms)');
+% xticks(tau);
+% axis([-16,64,0.68,1.12]);
+% ylabel('Relative SNR');
+% 
+% % Relative SNR - NonFLAIR
+% figure();
+% plot(tau,NF_GM_R);
+% xlabel('Spin Echo Displacement \tau (ms)');
+% xticks(tau);
+% axis([-16,64,0.68,1.12]);
+% ylabel('Relative SNR');
+
+% Mean SNR - Whole Brain
+figure(); hold on; box on;
+plot(tau,NF_WB_M,'-' ,'Color',defColour(2));
+plot(tau,FL_WB_M,'--' ,'Color',defColour(1));
+errorbar(tau,FL_WB_M,FL_WB_S,'.','Color',defColour(1));
+errorbar(tau+0.2,NF_WB_M,NF_WB_S,'.','Color',defColour(2));
+legend('non-FLAIR','FLAIR','Location','SouthEast');
+xlabel('Spin Echo Displacement \tau (ms)');
 xticks(tau);
-axis([-16,64,0.68,1.12]);
-ylabel('Relative SNR');
+ylabel('SNR');
+axis([-17,65,0,130]);
+
+% Mean SNR - Grey Matter
+figure(); hold on; box on;
+plot(tau,NF_GM_M,'-','Color',defColour(2));
+plot(tau,FL_GM_M,'--','Color',defColour(1));
+errorbar(tau,FL_GM_M,FL_GM_S,'.','Color',defColour(1));
+errorbar(tau+0.2,NF_GM_M,NF_GM_S,'.','Color',defColour(2));
+legend('non-FLAIR','FLAIR','Location','SouthEast');
+xlabel('Spin Echo Displacement \tau (ms)');
+xticks(tau);
+ylabel('Average SNR');
+axis([-17,65,0,130]);

@@ -1,7 +1,7 @@
 # fabber run 2, CSF stuff
 # Input Data
-data=../../Data/subject_08/ASE_NF_82.nii.gz
-mask=../../Data/subject_08/mask_FLAIR.nii.gz
+data=../../Data/subject_09/ASE_FLAIR_82.nii.gz
+mask=../../Data/subject_09/mask_FLAIR.nii.gz
 
 # Run Options
 output=../../Data/Fabber_Results/
@@ -36,7 +36,7 @@ motional_narrowing
 # Scan Parameters (maybe I'll think of a better way of doing this...)
 TE=0.082
 TR=3.000
-#TI=1.120
+TI=1.120
 
 tau1=-0.016
 tau2=-0.008
