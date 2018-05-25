@@ -253,7 +253,7 @@ void R2primeFwdModel::HardcodedInitialDists(MVNDist &prior, MVNDist &posterior) 
         prior.means(DBV_index()) = 0.03;
         if (inf_priors)
         {
-            precisions(DBV_index(), DBV_index()) = 1e2; // 1e3
+            precisions(DBV_index(), DBV_index()) = 1e1; // 1e3
         }
         else
         {
@@ -293,25 +293,77 @@ void R2primeFwdModel::HardcodedInitialDists(MVNDist &prior, MVNDist &posterior) 
 
     if (infer_lam)
     {
-        prior.means(lam_index()) = 0.001;
+        prior.means(lam_index()) = 0.1;
         if (inf_priors)
         {
-            precisions(lam_index(), lam_index()) = 1e1; // 1e2
+            precisions(lam_index(), lam_index()) = 1e2; // 1e2
         }
         else
         {
-            precisions(lam_index(), lam_index()) = 1e0; // 1e0
+            precisions(lam_index(), lam_index()) = 1e2; // 1e1
         }
     }
 
     prior.SetPrecisions(precisions);
+    /*
+    // Set distributions for initial posteriors
+    if (infer_OEF)
+    {
+        posterior.means(OEF_index()) = 0.4;
+        precisions(OEF_index(), OEF_index()) = 1e1; // 1e1
+    }
+    
+    if (infer_R2p)
+    {
+        posterior.means(R2p_index()) = 4.0;
+        precisions(R2p_index(), R2p_index()) = 1e0;
+    }
+
+    if (infer_DBV)
+    {
+        posterior.means(DBV_index()) = 0.05;
+        precisions(DBV_index(), DBV_index()) = 1e3; 
+    }
+
+    if (infer_R2t)
+    {
+        posterior.means(R2t_index()) = 1/0.087;
+        precisions(R2t_index(), R2t_index()) = 1e0; 
+    }
+
+    if (infer_S0)
+    {
+        posterior.means(S0_index()) = 700.0;
+        precisions(S0_index(), S0_index()) = 1e-5;
+    }
+
+    if (infer_Hct)
+    {
+        posterior.means(Hct_index()) = 0.40;
+        precisions(Hct_index(), Hct_index()) = 1e3;
+    }
+
+    if (infer_R2e)
+    {
+        posterior.means(R2e_index()) = 0.5;
+        precisions(R2e_index(), R2e_index()) = 1e-2; // 1e-2
+    }
+    
+    if (infer_dF)
+    {
+        posterior.means(dF_index()) = 5.0;
+        precisions(dF_index(), dF_index()) = 1e-2; // 1e-2
+    }
+
+    if (infer_lam)
+    {
+        posterior.means(lam_index()) = 0.1;
+        precisions(lam_index(), lam_index()) = 1e1; // 1e1
+    } */ 
 
     posterior = prior; // we don't need to change the initial guess (at least, not at this stage)
     
-    // this whole section seems unnecessary - changing the initial posterior appears to have no
-    // effect on the final outcome, which is good, because we'd expect the algorithm to converge
-    // onto the correct result regardless of where it started from. I'm still not sure, however,
-    // where our priors are truly uninformative. 
+    posterior.SetPrecisions(precisions);
 
 } // HardcodedInitialDists
 
