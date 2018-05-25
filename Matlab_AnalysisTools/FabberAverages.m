@@ -20,7 +20,7 @@ threshld = { 10  ,   1  ,   1  ,  1  ,  15 ,   1     };
 
 
 % which variables do we want?
-vars = [4];
+vars = [1,2,3,4];
 % do we also load in and calculate the standard deviations?
 inc_std = 1; 
 
@@ -30,9 +30,9 @@ slicenum = 2:8;     % CSF + patient data
 % slicenum = 1:6;   % TR = 2
 
 % Data set
-setnum = 523;
+setnum = 535;
 subnum = 1;
-msknum = 6;     % this is used for the CSF datasets
+msknum = 9;     % this is used for the CSF datasets
 fabber = num2str(setnum+subnum-1);
 
 % select a fabber run

@@ -250,10 +250,10 @@ void R2primeFwdModel::HardcodedInitialDists(MVNDist &prior, MVNDist &posterior) 
 
     if (infer_DBV)
     {
-        prior.means(DBV_index()) = 0.03;
+        prior.means(DBV_index()) = 0.04;
         if (inf_priors)
         {
-            precisions(DBV_index(), DBV_index()) = 1e1; // 1e3
+            precisions(DBV_index(), DBV_index()) = 1e3; // 1e3
         }
         else
         {
@@ -293,14 +293,14 @@ void R2primeFwdModel::HardcodedInitialDists(MVNDist &prior, MVNDist &posterior) 
 
     if (infer_lam)
     {
-        prior.means(lam_index()) = 0.1;
+        prior.means(lam_index()) = 0.0001;
         if (inf_priors)
         {
-            precisions(lam_index(), lam_index()) = 1e2; // 1e2
+            precisions(lam_index(), lam_index()) = 1e1; // 1e2
         }
         else
         {
-            precisions(lam_index(), lam_index()) = 1e2; // 1e1
+            precisions(lam_index(), lam_index()) = 1e1; // 1e1
         }
     }
 
