@@ -253,7 +253,7 @@ void R2primeFwdModel::HardcodedInitialDists(MVNDist &prior, MVNDist &posterior) 
         prior.means(DBV_index()) = 0.04;
         if (inf_priors)
         {
-            precisions(DBV_index(), DBV_index()) = 1e3; // 1e3
+            precisions(DBV_index(), DBV_index()) = 1e2; // 1e3
         }
         else
         {
@@ -269,7 +269,7 @@ void R2primeFwdModel::HardcodedInitialDists(MVNDist &prior, MVNDist &posterior) 
 
     if (infer_S0)
     {
-        prior.means(S0_index()) = 280.0;
+        prior.means(S0_index()) = 500.0;
         precisions(S0_index(), S0_index()) = 1e-5; // 1e-5 - always imprecise
     }
 
@@ -293,19 +293,22 @@ void R2primeFwdModel::HardcodedInitialDists(MVNDist &prior, MVNDist &posterior) 
 
     if (infer_lam)
     {
-        prior.means(lam_index()) = 0.0001;
+        prior.means(lam_index()) = 0.1;
         if (inf_priors)
         {
-            precisions(lam_index(), lam_index()) = 1e1; // 1e2
+            precisions(lam_index(), lam_index()) = 1e2; // 1e2
         }
         else
         {
-            precisions(lam_index(), lam_index()) = 1e1; // 1e1
+            precisions(lam_index(), lam_index()) = 1e0; // 1e1
         }
     }
 
     prior.SetPrecisions(precisions);
-    /*
+
+    posterior = prior; // we don't need to change the initial guess (at least, not at this stage)
+
+    
     // Set distributions for initial posteriors
     if (infer_OEF)
     {
@@ -316,7 +319,7 @@ void R2primeFwdModel::HardcodedInitialDists(MVNDist &prior, MVNDist &posterior) 
     if (infer_R2p)
     {
         posterior.means(R2p_index()) = 4.0;
-        precisions(R2p_index(), R2p_index()) = 1e0;
+        precisions(R2p_index(), R2p_index()) = 1e-3;
     }
 
     if (infer_DBV)
@@ -358,10 +361,9 @@ void R2primeFwdModel::HardcodedInitialDists(MVNDist &prior, MVNDist &posterior) 
     if (infer_lam)
     {
         posterior.means(lam_index()) = 0.1;
-        precisions(lam_index(), lam_index()) = 1e1; // 1e1
-    } */ 
+        precisions(lam_index(), lam_index()) = 1e-2; // 1e1
+    } 
 
-    posterior = prior; // we don't need to change the initial guess (at least, not at this stage)
     
     posterior.SetPrecisions(precisions);
 
@@ -420,7 +422,7 @@ void R2primeFwdModel::Evaluate(const ColumnVector &params, ColumnVector &result)
     }
     if (infer_DBV)
     {
-        DBV = (paramcpy(DBV_index()));
+        DBV = abs(paramcpy(DBV_index()));
     }
     else
     {
@@ -609,7 +611,7 @@ void R2primeFwdModel::Evaluate(const ColumnVector &params, ColumnVector &result)
             result(ii) = result(ii)*100.0;
         }
     }
-
+    
 
     return;
 

@@ -30,7 +30,7 @@ slicenum = 2:8;     % CSF + patient data
 % slicenum = 1:6;   % TR = 2
 
 % Data set
-setnum = 535;
+setnum = 490;
 subnum = 1;
 msknum = 9;     % this is used for the CSF datasets
 fabber = num2str(setnum+subnum-1);
@@ -122,8 +122,8 @@ for vv = 1:length(vars)
     
     % Display results
     disp('   ');
-    disp(['Median ',vname,': ',num2str(median(Dataslice),4)]);
-    disp(['   ',vname,' IQR: ',num2str((Qs(1)-Qs(2))./2,4)]);
+%     disp(['Median ',vname,': ',num2str(median(Dataslice),4)]);
+%     disp(['   ',vname,' IQR: ',num2str((Qs(1)-Qs(2))./2,4)]);
     
 %     disp('   ');
     disp(['Mean ',vname,'   : ',num2str(mean(Dataslice),4)]);
