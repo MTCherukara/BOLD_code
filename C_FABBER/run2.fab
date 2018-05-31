@@ -17,7 +17,7 @@ allow-bad-voxels
 
 # Spatial VB Information (remove all of this if method!=spatialvb)
 param-spatial-priors=NNNI
-image-prior4=../../Data/subject_09/CSF_T2fit.nii.gz
+image-prior4=../../Data/subject_09/CSF_T2w.nii.gz
 
 # Inference Model 
 model=qboldR2p
@@ -29,7 +29,7 @@ inferlam
 #single_compartment
 motional_narrowing
 
-infpriors
+#infpriors
 
 # Scan Parameters (maybe I'll think of a better way of doing this...)
 TE=0.082

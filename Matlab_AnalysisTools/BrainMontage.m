@@ -33,7 +33,7 @@ end
 % Check whether slices have been specified, if not, default to 3:10
 if ~exist('slices','var')
 %     slices = 3:8;       % VS
-    slices = 2:7;       % CSF
+    slices = 3:6;       % CSF
 end
 ns = length(slices); % number of slices
 
@@ -44,7 +44,7 @@ ns = length(slices); % number of slices
         threshold = 0.15;
         cmp = magma;
     elseif strfind(lower(niname),'r2p')
-        threshold = 10;
+        threshold = 8;
         cmp = viridis;
     elseif strfind(lower(niname),'oef')
         threshold = 0.5;
@@ -93,15 +93,16 @@ sv = size(voldata);
 
 %% DEFINE MONTAGE MATRIX
 
+% for even slices, create a 2xN grid
+if mod(ns,2) == 0
+    nrows = 2;
+    ncols = ns/2;
+
 % for 4 or fewer slices, use a single row
-if ns < 5
+elseif ns < 5
     nrows = 1;
     ncols = ns;
 
-% for even slices, create a 2xN grid
-elseif mod(ns,2) == 0
-    nrows = 2;
-    ncols = ns/2;
     
 % for odd multiples of 3, create a 3xN grid
 elseif mod(ns,3) == 0
@@ -146,7 +147,7 @@ montage_image = fliplr(montage_image);
 figure; hold on;
 imagesc(montage_image);
 colormap(cmp);
-colorbar;
+% colorbar;
 axis equal
 set(gca,'Visible','off')
 set(gca,'LooseInset',get(gca,'TightInset'));

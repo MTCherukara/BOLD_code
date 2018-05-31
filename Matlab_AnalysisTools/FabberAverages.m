@@ -30,7 +30,7 @@ slicenum = 2:8;     % CSF + patient data
 % slicenum = 1:6;   % TR = 2
 
 % Data set
-setnum = 490;
+setnum = 499;
 subnum = 1;
 msknum = 9;     % this is used for the CSF datasets
 fabber = num2str(setnum+subnum-1);

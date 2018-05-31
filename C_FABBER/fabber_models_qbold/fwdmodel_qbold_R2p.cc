@@ -300,7 +300,7 @@ void R2primeFwdModel::HardcodedInitialDists(MVNDist &prior, MVNDist &posterior) 
         }
         else
         {
-            precisions(lam_index(), lam_index()) = 1e0; // 1e1
+            precisions(lam_index(), lam_index()) = 1e2; // 1e1
         }
     }
 
