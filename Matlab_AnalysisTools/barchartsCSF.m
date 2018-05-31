@@ -114,12 +114,12 @@ T2col = [0.412, 0.569, 0.231];
 BEcol = [0.514, 0.118, 0.157];
 
 % Plot R2p
-figure; hold on; box on;
-bar(1,aR2p(1),0.6,'FaceColor',defColour(1));    % FLAIR
-bar(2,aR2p(3),0.6,'FaceColor',defColour(2));    % non-FLAIR
-bar(3,aR2p(5),0.6,'FaceColor',T1col);           % T1 weighted
-bar(4,aR2p(6),0.6,'FaceColor',T2col);           % T2 weighted
-bar(5,aR2p(7),0.6,'FaceColor',BEcol);           % BE weighted
+figure(); hold on; box on;
+bar(1,aR2p(dpts(1)),0.6,'FaceColor',defColour(1));    % FLAIR
+bar(2,aR2p(dpts(2)),0.6,'FaceColor',defColour(2));    % non-FLAIR
+bar(3,aR2p(dpts(3)),0.6,'FaceColor',T1col);           % T1 weighted
+bar(4,aR2p(dpts(4)),0.6,'FaceColor',T2col);           % T2 weighted
+bar(5,aR2p(dpts(5)),0.6,'FaceColor',BEcol);           % BE weighted
 errorbar(1:5,aR2p(dpts),sR2p(dpts),'k.','LineWidth',2,'MarkerSize',1);
 axis([0.5,length(dpts)+0.5,0,5.5]);
 ylabel('R_2'' (s^-^1)');
@@ -128,34 +128,87 @@ xticklabels(lbls);
 
 
 % Plot DBV
-figure; hold on; box on;
-bar(1,aDBV(1),0.6,'FaceColor',defColour(1));    % FLAIR
-bar(2,aDBV(3),0.6,'FaceColor',defColour(2));    % non-FLAIR
-bar(3,aDBV(5),0.6,'FaceColor',T1col);           % T1 weighted
-bar(4,aDBV(6),0.6,'FaceColor',T2col);           % T2 weighted
-bar(5,aDBV(7),0.6,'FaceColor',BEcol);           % BE weighted
+figure(2); hold on; box on;
+bar(1,aDBV(dpts(1)),0.6,'FaceColor',defColour(1));    % FLAIR
+bar(2,aDBV(dpts(2)),0.6,'FaceColor',defColour(2));    % non-FLAIR
+bar(3,aDBV(dpts(3)),0.6,'FaceColor',T1col);           % T1 weighted
+bar(4,aDBV(dpts(4)),0.6,'FaceColor',T2col);           % T2 weighted
+bar(5,aDBV(dpts(5)),0.6,'FaceColor',BEcol);           % BE weighted
 errorbar(1:5,aDBV(dpts),sDBV(dpts),'k.','LineWidth',2,'MarkerSize',1);
-axis([0.5,length(dpts)+0.5,0,12.5]);
+axis([0.5,length(dpts)+0.5,0,13.8]);
 ylabel('DBV (%)');
 xticks(1:length(dpts));
 xticklabels(lbls);
 
 % Plot OEF
-figure; hold on; box on;
-bar(1,aOEF(1),0.6,'FaceColor',defColour(1));    % FLAIR
-bar(2,aOEF(3),0.6,'FaceColor',defColour(2));    % non-FLAIR
-bar(3,aOEF(5),0.6,'FaceColor',T1col);           % T1 weighted
-bar(4,aOEF(6),0.6,'FaceColor',T2col);           % T2 weighted
-bar(5,aOEF(7),0.6,'FaceColor',BEcol);           % BE weighted
+figure(3); hold on; box on;
+bar(1,aOEF(dpts(1)),0.6,'FaceColor',defColour(1));    % FLAIR
+bar(2,aOEF(dpts(2)),0.6,'FaceColor',defColour(2));    % non-FLAIR
+bar(3,aOEF(dpts(3)),0.6,'FaceColor',T1col);           % T1 weighted
+bar(4,aOEF(dpts(4)),0.6,'FaceColor',T2col);           % T2 weighted
+bar(5,aOEF(dpts(5)),0.6,'FaceColor',BEcol);           % BE weighted
 errorbar(1:5,aOEF(dpts),sOEF(dpts),'k.','LineWidth',2,'MarkerSize',1);
 axis([0.5,length(dpts)+0.5,0,42]);
 ylabel('OEF (%)');
 xticks(1:length(dpts));
 xticklabels(lbls);
 
+% Plot Residuals
+figure(4); hold on; box on;
+bar(1,aFE(dpts(1)),0.6,'FaceColor',defColour(1));    % FLAIR
+bar(2,aFE(dpts(2)),0.6,'FaceColor',defColour(2));    % non-FLAIR
+bar(3,aFE(dpts(3)),0.6,'FaceColor',T1col);           % T1 weighted
+bar(4,aFE(dpts(4)),0.6,'FaceColor',T2col);           % T2 weighted
+bar(5,aFE(dpts(5)),0.6,'FaceColor',BEcol);           % BE weighted
+errorbar(1:5,aFE(dpts),sFE(dpts),'k.','LineWidth',2,'MarkerSize',1);
+axis([0.5,length(dpts)+0.5,0,15]);
+ylabel('Residual');
+xticks(1:length(dpts));
+xticklabels(lbls);
 
 
-% %% Line Graph Plotting
+%% Statistics
+
+% R2p ANOVA
+[~,~,stat_R2p] = anova2(R2p(:,dpts),1,'off');
+c_R = multcompare(stat_R2p,'display','off');
+
+% DBV ANOVA
+[~,~,stat_DBV] = anova2(DBV(:,dpts),1,'off');
+c_D = multcompare(stat_DBV,'display','off');
+
+% OEF ANOVA
+[~,~,stat_OEF] = anova2(OEF(:,dpts),1,'off');
+c_O = multcompare(stat_OEF,'display','off');
+
+% Pick the comparisons we want 
+grps = {[1,2];[1,3];[1,4];[1,5]};%;[2,3];[2,4];[2,5]};
+p_R = c_R(1:4,6);
+p_D = c_D(1:4,6);
+p_O = c_O(1:4,6);
+
+% Plot R2p significance stars
+figure(1);
+HR = sigstar(grps,p_R,1);
+set(HR,'Color','k')
+set(HR(:,2),'FontSize',14);
+set(HR(3,:),'Color',T2col);
+
+% Plot DBV significance stars
+figure(2);
+HD = sigstar(grps,p_D,1);
+set(HD,'Color','k')
+set(HD(:,2),'FontSize',14);
+set(HD(3,:),'Color',T2col);
+
+% Plot OEF significance stars
+figure(3);
+HO = sigstar(grps,p_O,1);
+set(HO,'Color','k')
+set(HO(:,2),'FontSize',14);
+
+
+%% Line Graph Plotting
 % jttr = repmat(-0.04:0.02:0.04,length(dpts),1);
 % 
 % % Plot R2p
