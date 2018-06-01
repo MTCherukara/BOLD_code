@@ -113,68 +113,150 @@ sFE  = std(FE);
 % eOEF = OEF.*sqrt(((eR2p./R2p).^2) + ((eDBV./DBV).^2));
 
 
-%% Plotting
-
-% Plot details
+%% Plotting Information
+ndat = size(R2p,1); % number of datapoints
 dpts = [1,2,4,5];
-% legtext = {'14\tau-Linear','14\tau-1C','14\tau-2C','24\tau-2C','24\tau-2C-I','14\tau-2C-I'};
 legtext = {'Linear','1C Model','2C Model','2C Model','2C Model (I)','2C Model (I)'};
-npts = repmat((1:length(dpts))',1,7);
+npts = length(dpts);
 lbls = legtext(dpts);
-jttr = repmat(-0.06:0.02:0.06,length(dpts),1);
+
+
+%% Bar Chart Plotting
 
 % Plot R2p
-figure; hold on; box on;
-if rebase
-    ylim([0.4,1.6]);
-    ylabel('\DeltaR_2'' (s^-^1)');
-    plot([0,10],[1,1],'k--','LineWidth',1);
-else
-    ylim([1.8,5.8]);
-    ylabel('R_2'' (s^-^1)');
-end
-errorbar(npts+jttr,R2p(:,dpts)',eR2p(:,dpts)','.');
-plot(npts,R2p(:,dpts)');
-errorbar(npts(:,1),aR2p(dpts),sR2p(dpts),'k:','LineWidth',3);
-xlim([npts(1)-0.25,npts(end)+0.25]);
+figure(1); hold on; box on;
+bar(1:npts,aR2p(dpts),0.6);
+errorbar(1:npts,aR2p(dpts),sR2p(dpts),'k.','LineWidth',2,'MarkerSize',1);
+axis([0.5,npts+0.5,0,6.5]);
 ylabel('R_2'' (s^-^1)');
 xticks(1:length(dpts));
 xticklabels(lbls);
 
 % Plot DBV
-figure; hold on; box on;
-if rebase
-    ylim([0.2,1.8]);
-    ylabel('\DeltaDBV');
-    plot([0,10],[1,1],'k--','LineWidth',1);
-else
-    ylim([0,17]);
-    ylabel('DBV (%)');
-end
-errorbar(npts+jttr,DBV(:,dpts)',eDBV(:,dpts)','.');
-plot(npts,DBV(:,dpts)');
-errorbar(npts(:,1),aDBV(dpts),sDBV(dpts),'k:','LineWidth',3);
-xlim([npts(1)-0.25,npts(end)+0.25]);
+figure(2); hold on; box on;
+bar(1:npts,aDBV(dpts),0.6);
+errorbar(1:npts,aDBV(dpts),sDBV(dpts),'k.','LineWidth',2,'MarkerSize',1);
+axis([0.5,npts+0.5,0,13.8]);
+ylabel('DBV (%)');
 xticks(1:length(dpts));
 xticklabels(lbls);
 
 % Plot OEF
-figure; hold on; box on;
-if rebase
-    ylim([0,2]);
-    ylabel('\DeltaOEF');
-    plot([0,10],[1,1],'k--','LineWidth',1);
-else
-    ylim([0,52]);
-    ylabel('OEF (%)');
-end
-errorbar(npts+jttr,OEF(:,dpts)',eOEF(:,dpts)','.');
-plot(npts,OEF(:,dpts)');
-errorbar(npts(:,1),aOEF(dpts),sOEF(dpts),'k:','LineWidth',3);
-xlim([npts(1)-0.25,npts(end)+0.25]);
-
+figure(3); hold on; box on;
+bar(1:npts,aOEF(dpts),0.6);
+errorbar(1:npts,aOEF(dpts),sOEF(dpts),'k.','LineWidth',2,'MarkerSize',1);
+axis([0.5,npts+0.5,0,42]);
+ylabel('OEF (%)');
 xticks(1:length(dpts));
 xticklabels(lbls);
+
+% Plot OEF
+figure(4); hold on; box on;
+bar(1:npts,aFE(dpts),0.6);
+errorbar(1:npts,aFE(dpts),sFE(dpts),'k.','LineWidth',2,'MarkerSize',1);
+axis([0.5,length(dpts)+0.5,0,5.5]);
+ylabel('Residual');
+xticks(1:length(dpts));
+xticklabels(lbls);
+
+
+%% Statistics
+
+% R2p ANOVA
+[~,~,stat_R2p] = anova2(R2p(:,dpts),1,'off');
+c_R = multcompare(stat_R2p,'display','off');
+
+% DBV ANOVA
+[~,~,stat_DBV] = anova2(DBV(:,dpts),1,'off');
+c_D = multcompare(stat_DBV,'display','off');
+
+% OEF ANOVA
+[~,~,stat_OEF] = anova2(OEF(:,dpts),1,'off');
+c_O = multcompare(stat_OEF,'display','off');
+
+
+% Pick the comparisons we want 
+grps = {[1,2];[1,3];[1,4];[2,3];[3,4]};%;[2,3];[2,4];[2,5]};
+p_R = c_R([1,2,3,4,6],6);
+p_D = c_D([1,2,3,4,6],6);
+p_O = c_O([1,2,3,4,6],6);
+
+% Plot R2p significance stars
+figure(1);
+HR = sigstar(grps,p_R,1);
+set(HR,'Color','k')
+set(HR(:,2),'FontSize',18);
+
+% Plot DBV significance stars
+figure(2);
+HD = sigstar(grps,p_D,1);
+set(HD,'Color','k')
+set(HD(:,2),'FontSize',18);
+
+% Plot OEF significance stars
+figure(3);
+HO = sigstar(grps,p_O,1);
+set(HO,'Color','k')
+set(HO(:,2),'FontSize',18);
+
+
+%% Plotting Lines
+
+% 
+% jttr = repmat(-0.06:0.02:0.06,length(dpts),1);
+% 
+% % Plot R2p
+% figure; hold on; box on;
+% if rebase
+%     ylim([0.4,1.6]);
+%     ylabel('\DeltaR_2'' (s^-^1)');
+%     plot([0,10],[1,1],'k--','LineWidth',1);
+% else
+%     ylim([1.8,5.8]);
+%     ylabel('R_2'' (s^-^1)');
+% end
+% errorbar(npts+jttr,R2p(:,dpts)',eR2p(:,dpts)','.');
+% plot(npts,R2p(:,dpts)');
+% errorbar(npts(:,1),aR2p(dpts),sR2p(dpts),'k:','LineWidth',3);
+% xlim([npts(1)-0.25,npts(end)+0.25]);
+% ylabel('R_2'' (s^-^1)');
+% xticks(1:length(dpts));
+% xticklabels(lbls);
+% 
+% % Plot DBV
+% figure; hold on; box on;
+% if rebase
+%     ylim([0.2,1.8]);
+%     ylabel('\DeltaDBV');
+%     plot([0,10],[1,1],'k--','LineWidth',1);
+% else
+%     ylim([0,17]);
+%     ylabel('DBV (%)');
+% end
+% errorbar(npts+jttr,DBV(:,dpts)',eDBV(:,dpts)','.');
+% plot(npts,DBV(:,dpts)');
+% errorbar(npts(:,1),aDBV(dpts),sDBV(dpts),'k:','LineWidth',3);
+% xlim([npts(1)-0.25,npts(end)+0.25]);
+% xticks(1:length(dpts));
+% xticklabels(lbls);
+% 
+% % Plot OEF
+% figure; hold on; box on;
+% if rebase
+%     ylim([0,2]);
+%     ylabel('\DeltaOEF');
+%     plot([0,10],[1,1],'k--','LineWidth',1);
+% else
+%     ylim([0,52]);
+%     ylabel('OEF (%)');
+% end
+% errorbar(npts+jttr,OEF(:,dpts)',eOEF(:,dpts)','.');
+% plot(npts,OEF(:,dpts)');
+% errorbar(npts(:,1),aOEF(dpts),sOEF(dpts),'k:','LineWidth',3);
+% xlim([npts(1)-0.25,npts(end)+0.25]);
+% 
+% xticks(1:length(dpts));
+% xticklabels(lbls);
 
 % % % Plot Free Energy
 % figure; hold on; box on;
