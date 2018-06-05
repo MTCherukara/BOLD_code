@@ -102,7 +102,7 @@ sFE  = std(FE);
 %% Plotting Information
 ndat = size(R2p,1); % number of datapoints
 dpts = [1,3,5,6,7];
-legtext = {'FLAIR','FLAIR(I)','nonFLAIR','NF(I)','T_1 seg.','T_2 seg.','T_2 biexp.','T2 corr.'};
+legtext = {'FLAIR','FLAIR(I)','R_2'' fit','NF(I)','T_1 seg.','T_2 seg.','T_2 biexp.','T_2 corr.'};
 npts = repmat((1:length(dpts))',1,ndat);
 lbls = legtext(dpts);
 

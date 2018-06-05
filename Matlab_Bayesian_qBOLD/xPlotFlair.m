@@ -6,7 +6,7 @@
 % 31 May 2018
 
 clear;
-close all;
+% close all;
 
 setFigureDefaults;
 
@@ -29,6 +29,9 @@ nt = length(tt);
 iI = 1000*(TP);         % inversion
 iR = 1000*(TP+TR);      % first TR
 i2 = iR+(1000*TR)-1;    % second TR
+
+% calculate ideal TI given T1 and TR
+Tideal = T1e.*(log(2) - log(1+exp(-TR/T1e)));
 
 % iI = find(tt > TP,1);
 
@@ -62,7 +65,7 @@ Sb(iR:i2) = M0.*(1-2*exp(-tr/T1b)+exp(-TR/T1b));
 Se(iR:i2) = M0.*(1-2*exp(-tr/T1e)+exp(-TR/T1e));
 
 % plot
-figure(1); hold on; box on;
+figure(); hold on; box on;
 
 % signal zero line
 plot([-TT,TT],[0,0],'k-','LineWidth',1);
@@ -71,6 +74,8 @@ plot([-TT,TT],[0,0],'k-','LineWidth',1);
 plot([   TR,   TR],[-1.5,1.5],'k--','LineWidth',1);     % Second Inversion
 plot([TR+TI,TR+TI],[-1.5,1.5],'k--','LineWidth',1);     % Second Readout
 plot([ 2*TR, 2*TR],[-1.5,1.5],'k--','LineWidth',1);     % Third Inversion
+% plot([Tideal,Tideal],[-1.5,1.5],'k--','LineWidth',1);     % Third Inversion
+
 
 % Compartment signals
 Lt = plot(tt,St,'-','Color',defColour(1));
@@ -80,6 +85,8 @@ Le = plot(tt,Se,'-','Color',defColour(3));
 % Axis
 axis([(TR-TP),(2*TR+TP),-1.1,1.1]);
 ylabel('Steady-State  M_z');
+xlabel('Time');
 legend([Lt,Lb,Le],'Tissue Signal','Blood Signal','CSF Signal','Location','SouthEast');
+% xticks([0,Tideal]);
 xticks([TR,TR+TI,2*TR]);
-xticklabels({'Inversion','Readout','TR'});
+xticklabels({'0','TI','TR'});
