@@ -58,10 +58,10 @@ nmul = 1; % plot scaling factor
 
 % Select which parameter(s) to infer on
 %       (1 = OEF, 2 = DBV, 3 = R2', 4 = CSF, 5 = dF, 6 = geom)
-pars = [4,5];
+pars = [3,2];
 
 % Load the Data:
-load('ASE_Data/Data_180516_CSF.mat');
+load('ASE_Data/Data_180606_TauSet4_D.mat');
 
 params.tc_man = 0;
 params.tc_val = 0.024;

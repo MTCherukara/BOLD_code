@@ -39,7 +39,7 @@ clear;
 setFigureDefaults;
 
 plot_fig = 1;       
-save_data = 0;      % set to 1 in order to save out ASE data
+save_data = 1;      % set to 1 in order to save out ASE data
 
 
 %% Model Parameters
@@ -59,9 +59,9 @@ params.S0   = 100;          % a. units  - signal
 params.R2t  = 1/0.087;      % 1/s       - rate constant, tissue
 params.R2e  = 4;            % 1/s       - rate constant, extracellular
 params.dF   = 5;            % Hz        - frequency shift
-params.lam0 = 0.1;         % no units  - ISF/CSF signal contribution
-params.zeta = 0.03;         % no units  - deoxygenated blood volume
-params.OEF  = 0.40;         % no units  - oxygen extraction fraction
+params.lam0 = 0.0;          % no units  - ISF/CSF signal contribution
+params.zeta = 0.04;         % no units  - deoxygenated blood volume
+params.OEF  = 0.30;         % no units  - oxygen extraction fraction
 params.Hct  = 0.400;        % no units  - fractional hematocrit
 params.T1t  = 1.200;        % s         - tissue T1
 params.T1b  = 1.580;        % s         - blood T1
@@ -73,7 +73,7 @@ params.tc_man = 0;          % BOOL      - should Tc be defined manually?
 params.tc_val = 0.0;        % s         - manual Tc (if tc_man = 1)
 
 % noise
-params.SNR = 100;
+params.SNR = 50;
 
 
 %% Compute Model
@@ -81,8 +81,9 @@ params.SNR = 100;
 % define tau values that we want to simulate
 % tau = (-28:4:64)/1000; % for testing
 % tau = (-16:8:64)/1000;
-% tau = [-16:4:16,24:8:56]/1000;
-tau = linspace(-0.020,0.064,1000); % for visualising
+% tau = [0:2:10,20:10:60]/1000;
+tau = [-8,-4,0:6:30,40,50,60]/1000;
+% tau = linspace(-0.020,0.064,1000); % for visualising
 
 
 np = length(tau);
@@ -109,7 +110,7 @@ if plot_fig
     % plot the signal
     S_log = (S_total)./max(S_total);
     l.s = plot(1000*tau,log(S_log),'-');
-%     plot(1000*tau,(S_sample),'kx');
+    plot(1000*tau,log(S_sample),'kx');
     xlim([(1000*min(tau))-4, (1000*max(tau))+4]);
 %     ylim([3.385, 3.435]);
     
