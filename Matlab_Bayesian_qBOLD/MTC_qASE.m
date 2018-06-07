@@ -81,8 +81,8 @@ params.SNR = 50;
 % define tau values that we want to simulate
 % tau = (-28:4:64)/1000; % for testing
 % tau = (-16:8:64)/1000;
-% tau = [0:2:10,20:10:60]/1000;
-tau = [-8,-4,0:6:30,40,50,60]/1000;
+tau = [0:3:12,20:10:70]/1000;
+% tau = [-8,-4,0:6:30,40,50,60]/1000;
 % tau = linspace(-0.020,0.064,1000); % for visualising
 
 
