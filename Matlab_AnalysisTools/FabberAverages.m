@@ -30,7 +30,7 @@ slicenum = 3:10;    % VS
 % slicenum = 1:6;   % TR = 2
 
 % Data set
-setnum = 501;
+setnum = 530;
 subnum = 7;
 msknum = 9;     % this is used for the CSF datasets
 fabber = num2str(setnum+subnum-1);
@@ -138,23 +138,8 @@ for vv = 1:length(vars)
 end
 
 
-%% Load in and caluclate free energy if such exists 
-disp('   ');
-freedir = dir([fabdir,'freeEnergy*']);
-
-if ~isempty(freedir)
-    
-    Fslice = LoadSlice([fabdir,'freeEnergy.nii.gz'],slicenum);
-    Fslice = Fslice.*maskslice;
-    Fslice = (Fslice(:));
-    Fslice(Badslice ~= 0) = [];
-    FreeEnergy = (nanmedian((Fslice)));
-
-    disp(['  Free Energy : ',num2str(FreeEnergy,4)]);
-    
-end
-
 %% Load in and calculate Residuals if such exists
+disp('   ');
 resdir = dir([fabdir,'residual*']);
 
 if ~isempty(resdir)
@@ -171,6 +156,23 @@ if ~isempty(resdir)
     disp(['    Residual  : ',num2str(Residual,4)]);
 
 end
+
+
+%% Load in and caluclate free energy if such exists 
+freedir = dir([fabdir,'freeEnergy*']);
+
+if ~isempty(freedir)
+    
+    Fslice = LoadSlice([fabdir,'freeEnergy.nii.gz'],slicenum);
+    Fslice = Fslice.*maskslice;
+    Fslice = (Fslice(:));
+    Fslice(Badslice ~= 0) = [];
+    FreeEnergy = (nanmedian((Fslice)));
+
+    disp(['  Free Energy : ',num2str(FreeEnergy,4)]);
+    
+end
+
 
 
 %% Histograms - got to sort this one out a bit
