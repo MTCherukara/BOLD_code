@@ -192,15 +192,15 @@ p_O = c_O(1:4,6);
 figure(1);
 HR = sigstar(grps,p_R,1);
 set(HR,'Color','k')
-set(HR(:,2),'FontSize',14);
-set(HR(3,:),'Color',[1,1,1]);
+set(HR(:,2),'FontSize',16);
+% set(HR(3,:),'Color',[1,1,1]);
 
 % Plot DBV significance stars
 figure(2);
 HD = sigstar(grps,p_D,1);
 set(HD,'Color','k')
-set(HD(:,2),'FontSize',14);
-set(HD(3,:),'Color',[1,1,1]);
+set(HD(:,2),'FontSize',16);
+% set(HD(3,:),'Color',[1,1,1]);
 
 % % Plot OEF significance stars
 % figure(3);

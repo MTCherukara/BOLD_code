@@ -11,20 +11,35 @@ clear;
 clc;
 % close all;
 
+CSF_data = 0;
+
 
 %% Choosing Stuff
 % Choose which datasets and variables we want to compare
-vname = 'DBV';              % variable name
+vname = 'OEF';              % variable name
 fsets = [523, 516, 501];    % FABBER datasets of interest
-subnum = 7;                 % subject number
-slices = 3:10;              % which slices we want
+subnum = 5;                 % subject number
+nsets = length(fsets);      % number of sets
+fsets = fsets + subnum - 1;     % automatically adjust the set numbers
 
-fsets = fsets + subnum - 1;
-nsets = length(fsets); % number of sets
+    
+% Specific things depending on the data-set
+if CSF_data
+    slices = 2:8;
+    
+    % Define the right subject numbers for loading masks later on 
+    CSF_subs = containers.Map([ 1, 2, 3, 4, 5 ], ...
+                              [ 3, 4, 6, 8, 9 ]);
+    subnum = CSF_subs(subnum);     
+    
+else
+    slices = 3:10;
+end
+
 
 % For plotting later, define a maximum y-axis value based on the variable:
-yMax = containers.Map({'R2p', 'DBV' , 'OEF' , 'VC', 'DF', 'lambda'},...
-                      [ 6.5 ,  0.17 ,  0.55 ,  1  ,  15 ,   1     ]);  
+yMax = containers.Map({'R2p', 'DBV' , 'OEF' , 'VC', 'DF', 'lambda'}, ...
+                      [ 8.3 ,  0.17 ,  0.55 ,  1  ,  15 ,   1     ]);  
                       
 % Pre-allocate some arrays for Data and Variances
         % these are deliberately too big, but since the exact number of data
@@ -75,8 +90,14 @@ aStd  = mean(volStd);
 [~,~,daStats] = anova2(volData,1,'off');
 daC = multcompare(daStats,'display','off');
 
-grps = {[1,2];[1,3];[2,3]};
-pvls = daC(:,6);
+% Extract p-values for the pairs we want
+if CSF_data
+    grps = {[1,2];[1,3];[1,4];[1,5]};
+    pvls = daC(1:4,6);
+else
+    grps = {[1,2];[1,3];[2,3]};
+    pvls = daC(:,6);
+end
 
 
 %% Plotting
@@ -92,9 +113,15 @@ errorbar(1:nsets,aData,aStd,'k.','LineWidth',2,'MarkerSize',1);
 % Set Axes
 axis([0.5,nsets+0.5,0,yMax(vname)]);
 xticks(1:nsets);
-xticklabels({'L. Model','1C. Model','2C. Model'});
 ylabel(vname);
 title(['Subject ',num2str(subnum)]);
+
+% label the data
+if CSF_data
+    xticklabels({'FLAIR','R_2'' fit','T_1 seg.','T_2 seg.','T_2 biexp.'});
+else
+    xticklabels({'L. Model','1C. Model','2C. Model'});
+end
 
 % Add Significance Information
 HD = sigstar(grps,pvls,1);

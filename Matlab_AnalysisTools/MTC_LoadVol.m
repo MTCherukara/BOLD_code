@@ -25,7 +25,7 @@ if ~exist('slices','var')
 end
 
 threshes = containers.Map({'R2p', 'DBV', 'OEF', 'VC', 'DF', 'lambda'},...
-                          [ 15  ,   1  ,   1  ,  1  ,  15 ,   1     ]);  
+                          [ 20  ,   1  ,   1  ,  1  ,  15 ,   1     ]);  
 
 
 % Find the right folder
@@ -36,10 +36,21 @@ fabdir = strcat(resdir,fdname.name,'/');
 % Load the Data
 Dataslice = LoadSlice([fabdir,'mean_',varname,'.nii.gz'],slices);
 
-% Load the Mask
-Maskslice = LoadSlice(['/Users/mattcher/Documents/DPhil/Data/validation_sqbold/vs',...
-                        num2str(subnum),'/mask_gm_60.nii.gz'],slices);
-                    
+% Determine which type of mask to load and load it
+if strfind(fdname.name,'_vs')
+    
+    % Load Mask from VS set
+    Maskslice = LoadSlice(['/Users/mattcher/Documents/DPhil/Data/validation_sqbold/vs',...
+                            num2str(subnum),'/mask_gm_60.nii.gz'],slices);
+
+else
+    
+    % Load Mask from CSF set
+    Maskslice = LoadSlice(['/Users/mattcher/Documents/DPhil/Data/subject_0',...
+                            num2str(subnum),'/mask_FLAIR_GM.nii.gz'],slices);
+    
+end
+
 % Load Standard Deviation Data
 Stdslice = LoadSlice([fabdir,'std_',varname,'.nii.gz'],slices);
 
@@ -53,15 +64,15 @@ Stdslice = Stdslice.*Maskslice;
 Stdslice = Stdslice(:);
 
 % Create a mask of values to remove
-Badslice = (Dataslice == 0) + ~isfinite(Dataslice);
+Badslice = (Dataslice == 0) + ~isfinite(Dataslice) + (Dataslice > thrsh);
 Badslice = Badslice + ~isfinite(Stdslice) + (Stdslice > thrsh) + (Stdslice < (thrsh.*1e-3));
 
 % Remove bad values
 Dataslice(Badslice ~= 0) = [];
 Stdslice(Badslice ~= 0) = [];
 
-% Apply upper threshold
-Dataslice(Dataslice > thrsh) = thrsh;
+% % Apply upper threshold
+% Dataslice(Dataslice > thrsh) = thrsh;
 
 % Output
 volData = Dataslice;
