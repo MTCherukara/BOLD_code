@@ -95,11 +95,13 @@ rebase = 0;
 
 % rebase
 if rebase
-    eR2p = eR2p./repmat(R2p(:,1),1,8);
-    eDBV = eDBV./repmat(DBV(:,1),1,8);
-    R2p = R2p./repmat(R2p(:,1),1,8);
-    DBV = DBV./repmat(DBV(:,1),1,8);
-    OEF = OEF./repmat(OEF(:,1),1,8);
+    eR2p = eR2p./repmat(R2p(:,2),1,4);
+    eDBV = eDBV./repmat(DBV(:,2),1,4);
+    eOEF = eOEF./repmat(OEF(:,2),1,4);
+
+    R2p = R2p./repmat(R2p(:,2),1,4);
+    DBV = DBV./repmat(DBV(:,2),1,4);
+    OEF = OEF./repmat(OEF(:,2),1,4);
 end
      
 % averages   
@@ -118,8 +120,8 @@ sFE  = std(FE);
 
 %% Plotting Information
 ndat = size(R2p,1); % number of datapoints
-dpts = [2,1,3,4];
-legtext = {'1C Full','LT Linear','2C Full','2C Linear'};
+dpts = [2,1,3];
+legtext = {'1C. Model','L. Model','2C. Model','2C Linear'};
 npts = length(dpts);
 lbls = legtext(dpts);
 
@@ -128,18 +130,26 @@ lbls = legtext(dpts);
 
 % Plot R2p
 figure(1); hold on; box on;
-bar(1:npts,aR2p(dpts),0.6);
+BR = bar(1:npts,aR2p(dpts),0.6);
 errorbar(1:npts,aR2p(dpts),sR2p(dpts),'k.','LineWidth',2,'MarkerSize',1);
-axis([0.5,npts+0.5,0,6.5]);
+if rebase
+    axis([0.5,npts+0.5,0,2]);
+else
+    axis([0.5,npts+0.5,0,5.6]);
+end
 ylabel('R_2'' (s^-^1)');
 xticks(1:length(dpts));
-xticklabels(lbls);
+xticklabels(lbls); 
 
 % Plot DBV
 figure(2); hold on; box on;
 bar(1:npts,aDBV(dpts),0.6);
 errorbar(1:npts,aDBV(dpts),sDBV(dpts),'k.','LineWidth',2,'MarkerSize',1);
-axis([0.5,npts+0.5,0,13.8]);
+if rebase
+    axis([0.5,npts+0.5,0,2]);
+else
+    axis([0.5,npts+0.5,0,11.8]);
+end
 ylabel('DBV (%)');
 xticks(1:length(dpts));
 xticklabels(lbls);
@@ -148,19 +158,23 @@ xticklabels(lbls);
 figure(3); hold on; box on;
 bar(1:npts,aOEF(dpts),0.6);
 errorbar(1:npts,aOEF(dpts),sOEF(dpts),'k.','LineWidth',2,'MarkerSize',1);
-axis([0.5,npts+0.5,0,42]);
+if rebase
+    axis([0.5,npts+0.5,0,2]);
+else
+    axis([0.5,npts+0.5,0,48]);
+end
 ylabel('OEF (%)');
 xticks(1:length(dpts));
 xticklabels(lbls);
 
-% Plot Free Energy
-figure(4); hold on; box on;
-bar(1:npts,aFE(dpts),0.6);
-errorbar(1:npts,aFE(dpts),sFE(dpts),'k.','LineWidth',2,'MarkerSize',1);
-axis([0.5,length(dpts)+0.5,0,200]);
-ylabel('-Free Energy');
-xticks(1:length(dpts));
-xticklabels(lbls);
+% % Plot Free Energy
+% figure(4); hold on; box on;
+% bar(1:npts,aFE(dpts),0.6);
+% errorbar(1:npts,aFE(dpts),sFE(dpts),'k.','LineWidth',2,'MarkerSize',1);
+% axis([0.5,length(dpts)+0.5,0,200]);
+% ylabel('-Free Energy');
+% xticks(1:length(dpts));
+% xticklabels(lbls);
 
 
 %% Statistics
@@ -179,7 +193,7 @@ c_O = multcompare(stat_OEF,'display','off');
 
 
 % Pick the comparisons we want 
-grps = {[1,2];[1,3];[1,4]};%;[2,3];[2,4];[2,5]};
+grps = {[1,2];[1,3];[2,3]};%;[2,3];[2,4];[2,5]};
 p_R = c_R([1,2,3],6);
 p_D = c_D([1,2,3],6);
 p_O = c_O([1,2,3],6);
@@ -188,18 +202,21 @@ p_O = c_O([1,2,3],6);
 figure(1);
 HR = sigstar(grps,p_R,1);
 set(HR,'Color','k')
-set(HR(:,2),'FontSize',18);
+set(HR(:,2),'FontSize',16);
+% set(HR(:,2),'String','^n^.^s^.')
 
 % Plot DBV significance stars
 figure(2);
 HD = sigstar(grps,p_D,1);
 set(HD,'Color','k')
-set(HD(:,2),'FontSize',18);
+set(HD(:,2),'FontSize',16);
+% set(HD(:,2),'String','^n^.^s^.')
 
 % Plot OEF significance stars
 figure(3);
 HO = sigstar(grps,p_O,1);
 set(HO,'Color','k')
-set(HO(:,2),'FontSize',18);
+set(HO(:,2),'FontSize',16);
+% set(HO(3,2),'String','^n^.^s^.')
 
 
