@@ -11,13 +11,13 @@ clear;
 clc;
 % close all;
 
-CSF_data = 0;
+CSF_data = 1;
 
 
 %% Choosing Stuff
 % Choose which datasets and variables we want to compare
 vname = 'OEF';              % variable name
-fsets = [523, 516, 501];    % FABBER datasets of interest
+fsets = [456, 466, 476, 481, 486];    % FABBER datasets of interest
 subnum = 5;                 % subject number
 nsets = length(fsets);      % number of sets
 fsets = fsets + subnum - 1;     % automatically adjust the set numbers

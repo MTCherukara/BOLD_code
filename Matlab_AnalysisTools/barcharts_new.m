@@ -130,7 +130,7 @@ lbls = legtext(dpts);
 
 % Plot R2p
 figure(1); hold on; box on;
-BR = bar(1:npts,aR2p(dpts),0.6);
+bar(1:npts,aR2p(dpts),0.6,'FaceColor',defColour(1));
 errorbar(1:npts,aR2p(dpts),sR2p(dpts),'k.','LineWidth',2,'MarkerSize',1);
 if rebase
     axis([0.5,npts+0.5,0,2]);
@@ -143,12 +143,12 @@ xticklabels(lbls);
 
 % Plot DBV
 figure(2); hold on; box on;
-bar(1:npts,aDBV(dpts),0.6);
+bar(1:npts,aDBV(dpts),0.6,'FaceColor',defColour(1));
 errorbar(1:npts,aDBV(dpts),sDBV(dpts),'k.','LineWidth',2,'MarkerSize',1);
 if rebase
     axis([0.5,npts+0.5,0,2]);
 else
-    axis([0.5,npts+0.5,0,11.8]);
+    axis([0.5,npts+0.5,0,12.8]);
 end
 ylabel('DBV (%)');
 xticks(1:length(dpts));
@@ -156,12 +156,12 @@ xticklabels(lbls);
 
 % Plot OEF
 figure(3); hold on; box on;
-bar(1:npts,aOEF(dpts),0.6);
+bar(1:npts,aOEF(dpts),0.6,'FaceColor',defColour(1));
 errorbar(1:npts,aOEF(dpts),sOEF(dpts),'k.','LineWidth',2,'MarkerSize',1);
 if rebase
     axis([0.5,npts+0.5,0,2]);
 else
-    axis([0.5,npts+0.5,0,48]);
+    axis([0.5,npts+0.5,0,43]);
 end
 ylabel('OEF (%)');
 xticks(1:length(dpts));

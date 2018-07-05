@@ -101,7 +101,8 @@ sFE  = std(FE);
 
 %% Plotting Information
 dpts = [1,2,4];
-legtext = {'FLAIR','R_2'' fit','T_1 seg.','T_2 seg.','T_2 biexp.'};
+% legtext = {'FLAIR','R_2'' fit','T_1 seg.','T_2 seg.','T_2 biexp.'};
+legtext = {'FLAIR','non-FLAIR','T_1 seg.','NF corr.','T_2 biexp.'};
 npts = repmat((1:length(dpts))',1,ndat);
 ndps = length(dpts);
 lbls = legtext(dpts);
@@ -117,12 +118,12 @@ NFcol = [207, 122, 48]./256;
 % Plot R2p
 figure(); hold on; box on;
 bar(1,aR2p(dpts(1)),0.6,'FaceColor',defColour(1));    % FLAIR
-bar(2,aR2p(dpts(2)),0.6,'FaceColor',NFcol);           % non-FLAIR
-bar(3,aR2p(dpts(3)),0.6,'FaceColor',T1col);           % T1 weighted
+bar(2,aR2p(dpts(2)),0.6,'FaceColor',defColour(1));           % non-FLAIR
+bar(3,aR2p(dpts(3)),0.6,'FaceColor',defColour(1));           % T1 weighted
 % bar(4,aR2p(dpts(4)),0.6,'FaceColor',T2col);           % T2 weighted
 % bar(5,aR2p(dpts(5)),0.6,'FaceColor',BEcol);           % BE weighted
 errorbar(1:ndps,aR2p(dpts),sR2p(dpts),'k.','LineWidth',2,'MarkerSize',1);
-axis([0.5,ndps+0.5,0,5.5]);
+axis([0.5,ndps+0.5,0,5.6]);
 ylabel('R_2'' (s^-^1)');
 xticks(1:ndps);
 xticklabels(lbls);
@@ -131,12 +132,12 @@ xticklabels(lbls);
 % Plot DBV
 figure(2); hold on; box on;
 bar(1,aDBV(dpts(1)),0.6,'FaceColor',defColour(1));    % FLAIR
-bar(2,aDBV(dpts(2)),0.6,'FaceColor',NFcol);           % non-FLAIR
-bar(3,aDBV(dpts(3)),0.6,'FaceColor',T1col);           % T1 weighted
+bar(2,aDBV(dpts(2)),0.6,'FaceColor',defColour(1));           % non-FLAIR
+bar(3,aDBV(dpts(3)),0.6,'FaceColor',defColour(1));           % T1 weighted
 % bar(4,aDBV(dpts(4)),0.6,'FaceColor',T2col);           % T2 weighted
 % bar(5,aDBV(dpts(5)),0.6,'FaceColor',BEcol);           % BE weighted
 errorbar(1:ndps,aDBV(dpts),sDBV(dpts),'k.','LineWidth',2,'MarkerSize',1);
-axis([0.5,ndps+0.5,0,13.8]);
+axis([0.5,ndps+0.5,0,12.8]);
 ylabel('DBV (%)');
 xticks(1:ndps);
 xticklabels(lbls);
@@ -144,12 +145,12 @@ xticklabels(lbls);
 % Plot OEF
 figure(3); hold on; box on;
 bar(1,aOEF(dpts(1)),0.6,'FaceColor',defColour(1));    % FLAIR
-bar(2,aOEF(dpts(2)),0.6,'FaceColor',NFcol);           % non-FLAIR
-bar(3,aOEF(dpts(3)),0.6,'FaceColor',T1col);           % T1 weighted
+bar(2,aOEF(dpts(2)),0.6,'FaceColor',defColour(1));           % non-FLAIR
+bar(3,aOEF(dpts(3)),0.6,'FaceColor',defColour(1));           % T1 weighted
 % bar(4,aOEF(dpts(4)),0.6,'FaceColor',T2col);           % T2 weighted
 % bar(5,aOEF(dpts(5)),0.6,'FaceColor',BEcol);           % BE weighted
 errorbar(1:ndps,aOEF(dpts),sOEF(dpts),'k.','LineWidth',2,'MarkerSize',1);
-axis([0.5,ndps+0.5,0,42]);
+axis([0.5,ndps+0.5,0,43]);
 ylabel('OEF (%)');
 xticks(1:ndps);
 xticklabels(lbls);
