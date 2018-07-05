@@ -185,9 +185,22 @@ c_O = multcompare(stat_OEF,'display','off');
 
 % Pick the comparisons we want 
 grps = {[1,2];[1,3]};
-p_R = c_R([1,3],6);
-p_D = c_D([1,3],6);
-p_O = c_O([1,3],6);
+
+% Pre-allocate p-value arrays
+p_R = zeros(length(grps),1);
+p_D = zeros(length(grps),1);
+p_O = zeros(length(grps),1);
+
+% Loop through comparison pairs and extract p values from the multcompare arrays
+for gg = 1:length(grps)
+    
+    grp = grps{gg};
+    comp_line = (c_R(:,1) == grp(1)) .* (c_R(:,2) == grp(2));
+    p_R(gg) = c_R((comp_line==1),6);
+    p_D(gg) = c_D((comp_line==1),6);
+    p_O(gg) = c_O((comp_line==1),6);
+
+end
 
 % Plot R2p significance stars
 figure(1);
