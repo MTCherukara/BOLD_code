@@ -240,7 +240,7 @@ void R2primeFwdModel::HardcodedInitialDists(MVNDist &prior, MVNDist &posterior) 
         prior.means(R2p_index()) = 4.0;
         if (inf_priors)
         {
-            precisions(R2p_index(), R2p_index()) = 1e-1; // 1e-1
+            precisions(R2p_index(), R2p_index()) = 1e-2; // 1e-1
         }
         else
         {
@@ -294,14 +294,7 @@ void R2primeFwdModel::HardcodedInitialDists(MVNDist &prior, MVNDist &posterior) 
     if (infer_lam)
     {
         prior.means(lam_index()) = 0.1;
-        if (inf_priors)
-        {
-            precisions(lam_index(), lam_index()) = 1e2; // 1e2
-        }
-        else
-        {
-            precisions(lam_index(), lam_index()) = 1e2; // 1e1
-        }
+        precisions(lam_index(), lam_index()) = 1e2; // 1e1
     }
 
     prior.SetPrecisions(precisions);
@@ -361,7 +354,7 @@ void R2primeFwdModel::HardcodedInitialDists(MVNDist &prior, MVNDist &posterior) 
     if (infer_lam)
     {
         posterior.means(lam_index()) = 0.1;
-        precisions(lam_index(), lam_index()) = 1e-2; // 1e1
+        precisions(lam_index(), lam_index()) = 1e2; // 1e1
     } 
 
     
@@ -458,7 +451,7 @@ void R2primeFwdModel::Evaluate(const ColumnVector &params, ColumnVector &result)
     }
     else
     {
-        R2e = 0.50;
+        R2e = 4.0;
     }
     if (infer_dF)
     {

@@ -28,8 +28,8 @@ slicenum = 2:8;     % CSF + patient data
 % slicenum = 1:6;   % TR = 2
 
 % Choose Data set
-setnum = 486;
-subnum = 5;
+setnum = 546;
+subnum = 1;
 
 setnum = setnum + subnum - 1;
 
@@ -57,11 +57,11 @@ for vv = 1:length(vars)
     % Display results
     disp('   ');
     disp(['Mean ',vname,'   : ',num2str(mean(volData),4)]);
-    if strcmp(vname,'VC')
-        disp(['    Std ',vname,': ',num2str(std(volData),4)]);
-    else
+%     if strcmp(vname,'VC')
+%         disp(['    Std ',vname,': ',num2str(std(volData),4)]);
+%     else
         disp(['    Std ',vname,': ',num2str(mean(volStdv),4)]);
-    end
+%     end
     
     
 end

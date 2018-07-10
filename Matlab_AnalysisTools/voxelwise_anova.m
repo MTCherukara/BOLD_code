@@ -16,8 +16,8 @@ CSF_data = 1;
 
 %% Choosing Stuff
 % Choose which datasets and variables we want to compare
-vname = 'OEF';              % variable name
-fsets = [456, 466, 476, 481, 486];    % FABBER datasets of interest
+vname = 'DBV';              % variable name
+fsets = [541, 546, 456, 466];    % FABBER datasets of interest
 subnum = 5;                 % subject number
 nsets = length(fsets);      % number of sets
 fsets = fsets + subnum - 1;     % automatically adjust the set numbers
@@ -90,13 +90,19 @@ aStd  = mean(volStd);
 [~,~,daStats] = anova2(volData,1,'off');
 daC = multcompare(daStats,'display','off');
 
-% Extract p-values for the pairs we want
-if CSF_data
-    grps = {[1,2];[1,3];[1,4];[1,5]};
-    pvls = daC(1:4,6);
-else
-    grps = {[1,2];[1,3];[2,3]};
-    pvls = daC(:,6);
+% Pick the comparisons we want 
+grps = {[1,2];[1,3];[3,4];[2,4]};
+
+% Pre-allocate p-value array
+pvls = zeros(length(grps),1);
+
+% Loop through comparison pairs and extract p values from the multcompare array
+for gg = 1:length(grps)
+    
+    grp = grps{gg};
+    comp_line = (daC(:,1) == grp(1)) .* (daC(:,2) == grp(2));
+    pvls(gg) = daC((comp_line==1),6);
+
 end
 
 
@@ -118,7 +124,8 @@ title(['Subject ',num2str(subnum)]);
 
 % label the data
 if CSF_data
-    xticklabels({'FLAIR','R_2'' fit','T_1 seg.','T_2 seg.','T_2 biexp.'});
+%     xticklabels({'FLAIR','R_2'' fit','T_1 seg.','T_2 seg.','T_2 biexp.'});
+    xticklabels({'FP R2e=4','NF R2e=4','FP R2e=0.5','NF R2e=0.5'});
 else
     xticklabels({'L. Model','1C. Model','2C. Model'});
 end
