@@ -16,26 +16,25 @@
     %       plot in a more generic and extensible way.
 
 clear; 
-clc;
-% close all;
+% clc;
 
 % Choose Variables
-vars = {'R2p','DBV','OEF','VC'};
+vars = {'R2p','DBV','OEF'};
 
 % Choose the slices we want
-% slicenum = 3:10;    % VS
-slicenum = 2:8;     % CSF + patient data
+slicenum = 3:10;    % VS
+% slicenum = 2:8;     % CSF + patient data
 % slicenum = 1:6;   % TR = 2
 
 % Choose Data set
-setnum = 546;
-subnum = 1;
+setnum = 537;
+subnum = 2;
 
 setnum = setnum + subnum - 1;
 
 CSF_subs = containers.Map([ 1, 2, 3, 4, 5 ], ...
                           [ 3, 4, 6, 8, 9 ]);
-subnum = CSF_subs(subnum);     
+% subnum = CSF_subs(subnum);     
 
 % Title
 disp(['Data from Fabber Set ',num2str(setnum),'. Subject ',num2str(subnum)]);

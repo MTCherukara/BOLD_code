@@ -1,7 +1,7 @@
 # fabber run 7, validation sqbold data
 # Input Data
-data=../../Data/validation_sqbold/vs6/sub06_ASE_FLAIR_longnorm.nii.gz
-mask=../../Data/validation_sqbold/vs6/mask_flair.nii.gz
+data=../../Data/validation_sqbold/vs2/sub02_ASE_FLAIR_11.nii.gz
+mask=../../Data/validation_sqbold/vs2/mask_flair.nii.gz
 
 # Run Options
 output=../../Data/Fabber_Results/
@@ -36,17 +36,17 @@ motional_narrowing
 # Scan Parameters (maybe I'll think of a better way of doing this...)
 TE=0.074
 
-#tau1=-0.016
-#tau2=-0.008
-#tau3=0.0
-#tau4=0.008
-#tau5=0.016
-#tau6=0.024
-#tau7=0.032
-#tau8=0.040
-#tau9=0.048
-#tau10=0.056
-#tau11=0.064
+tau1=-0.016
+tau2=-0.008
+tau3=0.0
+tau4=0.008
+tau5=0.016
+tau6=0.024
+tau7=0.032
+tau8=0.040
+tau9=0.048
+tau10=0.056
+tau11=0.064
 
 #tau1=0.028
 #tau2=0.020
@@ -63,20 +63,20 @@ TE=0.074
 #tau13=0.056
 #tau14=0.064
 
-tau1=0.0
-tau2=0.016
-tau3=0.020
-tau4=0.024
-tau5=0.028
-tau6=0.032
-tau7=0.036
-tau8=0.040
-tau9=0.044
-tau10=0.048
-tau11=0.052
-tau12=0.056
-tau13=0.060
-tau14=0.064
+#tau1=0.0
+#tau2=0.016
+#tau3=0.020
+#tau4=0.024
+#tau5=0.028
+#tau6=0.032
+#tau7=0.036
+#tau8=0.040
+#tau9=0.044
+#tau10=0.048
+#tau11=0.052
+#tau12=0.056
+#tau13=0.060
+#tau14=0.064
 
 #tau1=0.028
 #tau2=0.024

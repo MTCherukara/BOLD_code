@@ -12,6 +12,9 @@
 %
 % CHANGELOG:
 %
+% 2018-07-13 (MTC). Started re-writing this. It needs to be paralellizible, and
+%       more easily generic. And able to be shared.
+%
 % 2018-03-29 (MTC). Added the means for displaying the locations of the maximum
 %       values produced by a 2D grid search.
 %
@@ -41,28 +44,25 @@
 clear;
 % close all;
 
-% setFigureDefaults;  % since we're doing plotting later
+setFigureDefaults;  % since we're doing plotting later
 
 tic;
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%    Initialization          %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%% Inference Parameters
-
-np = 1000; % number of points to perform Bayesian analysis on
-nz = 41; % number of points in the third dimension
-
-nmul = 1; % plot scaling factor
-
-
-% Select which parameter(s) to infer on
-%       (1 = OEF, 2 = DBV, 3 = R2', 4 = CSF, 5 = dF, 6 = geom)
-pars = [3,2];
 
 % Load the Data:
 load('ASE_Data/Data_180606_TauSet5_E.mat');
 
+
+% Choose parameters, their range, and the number of points each way:
+pnames = { 'R2p'    ; 'zeta'     };
+interv = [ 2.5, 6.5 ; 0.01, 0.07 ];
+np     = [ 1000     ; 1000       ];
+
+
+% Specifically for testing critical tau. 
 params.tc_man = 0;
 params.tc_val = 0.024;
 
@@ -78,10 +78,7 @@ if ~exist('TE_sample','var')
     TE_sample = params.TE;
 end
 
-% Parameter names and search ranges
-pnames  = { 'OEF'   ;  'zeta'    ; 'R2p' ; 'lam0'  ; 'dF' ; 'geom'  };
-intervs = [ 0.2,0.6 ; 0.01,0.07 ; 2.5,6.5 ; 0.0,0.2 ; 1,10 ; 0.1,0.5 ];  
-%            OEF     DBV        R2'     v_CSF      dF       Geom
+
 
 % are we inferring on R2'?
 if sum(pars == 3) > 0
@@ -148,8 +145,7 @@ elseif length(pars) == 2
             % loop through parameter 2
             params = param_update(vals(2,i2),params,pname{2});
 
-            % run the model to evaluate the signal with current params
-            S_mod = MTC_qASE_model2(T_sample,TE_sample,params,noDW);
+            % run the model to evaluate the signal with current params             S_mod = MTC_qASE_model2(T_sample,TE_sample,params,noDW);
             
             % normalize
             S_mod = S_mod./max(S_mod);
