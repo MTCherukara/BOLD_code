@@ -1,19 +1,20 @@
 % MTC_Asymmetric_Bayes.m
-% Perform Bayesian inference on ASE/BOLD data from MTC_qBOLD.m using a 1D
-% or 2D grid search
+% Perform Bayesian inference on ASE/BOLD data from MTC_qBOLD.m using a 2D grid
+% search
 %
 % Based on MTC_Bayes_BOLD.m
 %
 % 
-%       Copyright (C) University of Oxford, 2016-2017
+%       Copyright (C) University of Oxford, 2016-2018
 %
 % 
 % Created by MT Cherukara, 17 May 2016
 %
 % CHANGELOG:
 %
-% 2018-07-13 (MTC). Started re-writing this. It needs to be paralellizible, and
-%       more easily generic. And able to be shared.
+% 2018-07-16 (MTC). Parallelized using parfor, on a 6-core i5, this achieves a
+%       greater than four-fold speed-up. Functionality for 1D and ND grid search
+%       has been lost, but this can be added in later.
 %
 % 2018-03-29 (MTC). Added the means for displaying the locations of the maximum
 %       values produced by a 2D grid search.
@@ -28,38 +29,40 @@
 % 2018-01-12 (MTC). Changed the way the posterior is calculated to actually
 %       calculate log-likelihood, using the function MTC_loglike.m. This
 %       technically shouldn't alter the shape of any of the posterior
-%       distributions (in terms of their linearity) but should mean that
-%       our selected value of SNR is 'applied' to the results correctly.
+%       distributions (in terms of their linearity) but should mean that our
+%       selected value of SNR is 'applied' to the results correctly.
 %
 % 2017-10-06 (MTC). Added the option to make a 3D grid search, and made the
 %       1D and 2D versions slightly more general (and less cumbersome) by
 %       vectorising here and there.
 %
-% 2017-08-07 (MTC). Added R2'/DBV inference, and made the whole thing
-%       better organised. The 1D grid search isn't working right, but it
-%       isn't particularly important at this stage.
+% 2017-08-07 (MTC). Added R2'/DBV inference, and made the whole thing better
+%       organised. The 1D grid search isn't working right, but it isn't
+%       particularly important at this stage.
 %
 % 2017-04-04 (MTC). Various changes.
 
 clear;
 % close all;
 
-setFigureDefaults;  % since we're doing plotting later
+% setFigureDefaults;  % since we're doing plotting later
 
 tic;
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%    Initialization          %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%    Initialization          %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % Load the Data:
-load('ASE_Data/Data_180606_TauSet5_E.mat');
+load('ASE_Data/Data_180606_TauSet4_A.mat');
 
 
 % Choose parameters, their range, and the number of points each way:
 pnames = { 'R2p'    ; 'zeta'     };
-interv = [ 2.5, 6.5 ; 0.01, 0.07 ];
-np     = [ 1000     ; 1000       ];
+% interv = [ 2.5, 6.5 ; 0.01, 0.07 ];
+% np     = [ 1000     ; 1000       ];
+interv = [ 3.5, 5.5 ; 0.01, 0.07 ];
+np     = [  500     ; 1000       ];
 
 
 % Specifically for testing critical tau. 
@@ -70,7 +73,6 @@ params.tc_val = 0.024;
 sigma = mean(params.sig);   % real std of noise
 ns = length(S_sample); % number of data points
 params.R2p = params.dw.*params.zeta;
-truepars = params;
 
 % params.lam0 = 0.15;
 
@@ -79,137 +81,113 @@ if ~exist('TE_sample','var')
 end
 
 
-
 % are we inferring on R2'?
-if sum(pars == 3) > 0
+if any(strcmp(pnames,'R2p'))
     noDW = 1; % this changes what happens in MTC_qASE_model.m
 else
     noDW = 0;
 end
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%    1D Line Search          %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%    1D Line Search          %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Inference
-if length(pars) == 1
-    % Bayesian inference on a single parameter using 1D grid search
-    
-    pn = pars(1); % pull out the parameter's number
-    pname = pnames{pn}; % the name of the parameter being searched over
-    
-    trv = eval(['params.',pname]); % true value of parameter
-    vals = linspace(intervs(pn,1),intervs(pn,2),np); 
-    pos = zeros(1,np);
-    
-    % step through values of the parameter and calculate the model for each one
-    % of those, at all time points
-    for ii = 1:np
-        
-        % update parameter
-        params = param_update(vals(ii),params,pname);
-
-        % evaluate model
-        S_val = MTC_qASE_model(T_sample,TE_sample,params,noDW);
-      
-        % calculate log likelihood
-        pos(ii) = MTC_loglike(S_sample,S_val,sigma);
-
-        
-    end
+if length(pnames) == 1
+    disp('1D Grid Search currently unsupported');
 
     
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%    2D Grid Search          %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-elseif length(pars) == 2
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%    2D Grid Search          %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+elseif length(pnames) == 2
     % Bayesian Inference on two parameters, using grid search
     
-    % pull out parameter numbers
-    p1 = pars(1);
-    p2 = pars(2);
-    pname = {pnames{p1}; pnames{p2}};
+    % pull out parameter names
+    pn1 = pnames{1};
+    pn2 = pnames{2};
+    
+    np1 = np(1);
+    np2 = np(2);
+        
+    % find true values of parameters
+    trv(1) = eval(['params.',pn1]); % true value of parameter 1
+    trv(2) = eval(['params.',pn2]); % true value of parameter 2
 
-    trv(1) = eval(['params.',pname{1}]); % true value of parameter 1
-    trv(2) = eval(['params.',pname{2}]); % true value of parameter 2
+    % generate parameter distributions
+    pv1 = linspace(interv(1,1),interv(1,2),np1);
+    pv2 = linspace(interv(2,1),interv(2,2),np2);
 
-    vals(1,:) = linspace(intervs(p1,1),intervs(p1,2),np);
-    vals(2,:) = linspace(intervs(p2,1),intervs(p2,2),np);
+    pos = zeros(np(1),np(2));
 
-    pos = zeros(np,np);
-
-    for i1 = 1:np
+    parfor i1 = 1:np1
         % loop through parameter 1
-        params = param_update(vals(1,i1),params,pname{1});
-
-        for i2 = 1:np
+        
+        % create a parameters object
+        looppars = param_update(pv1(i1),params,pn1);
+        posvec = zeros(1,np2);
+        
+        pv22 = pv2; % to avoid using pv2 as a broadcast variable
+        
+        for i2 = 1:np2
             % loop through parameter 2
-            params = param_update(vals(2,i2),params,pname{2});
+            
+            % create a parameters object
+            inpars = param_update(pv22(i2),looppars,pn2);
 
-            % run the model to evaluate the signal with current params             S_mod = MTC_qASE_model2(T_sample,TE_sample,params,noDW);
+            % run the model to evaluate the signal with current params            
+            S_mod = MTC_qASE_model2(T_sample,TE_sample,inpars,noDW);
             
             % normalize
             S_mod = S_mod./max(S_mod);
 
             % calculate posterior based on known noise value
-            pos(i1,i2) = MTC_loglike(S_sample,S_mod,sigma);
-                    
-        end % for i2 = 1:np
-    end % for i1 = 1:np
+            posvec(i2) = MTC_loglike(S_sample,S_mod,sigma);
+                                
+        end % for i2 = 1:np2
+        
+        pos(i1,:) = posvec;
+        
+    end % parfor i1 = 1:np1
     
 end % length(pars) == 1 ... elseif 
 
 toc;
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%% Display Results
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%    Display Results         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Display
 
 % create docked figure
-figure; hold on; box on;
+figure('WindowStyle','Docked');
+hold on; box on;
 
-if length(pars) == 1
-    % Plot 1D grid search results
-    
-%     plot([trv, trv],[0, 1.1*max(pos)],'k--','LineWidth',2);
-    plot(vals,exp(pos),'-','LineWidth',4);
-%     axis([min(vals), max(vals), 0, 1.1*max(pos)]);
+% Plot 2D grid search results
+surf(pv2,pv1,exp(pos));
+view(2); shading flat;
+c=colorbar;
+% infernoW = flipud(magma);
+% colormap(infernoW);
+plot3([trv(2),trv(2)],[  0, 1000],[1e20,1e20],'k-');
+plot3([  0, 1000],[trv(1),trv(1)],[1e20,1e20],'k-');
 
-    xlabel(pname);
-    legend('Posterior','Location','NorthEast');
+% outline
+plot3([pv1(  1),pv2(  1)],[pv1(  1),pv1(end)],[1,1],'k-','LineWidth',0.75);
+plot3([pv2(end),pv2(end)],[pv1(  1),pv1(end)],[1,1],'k-','LineWidth',0.75);
+plot3([pv2(  1),pv2(end)],[pv1(  1),pv1(  1)],[1,1],'k-','LineWidth',0.75);
+plot3([pv2(  1),pv2(end)],[pv1(end),pv1(end)],[1,1],'k-','LineWidth',0.75);
+
+xlabel(pn2);
+ylabel(pn1);
+
+ylabel(c,'Posterior Probability Density');
+
+axis([min(pv2),max(pv2),min(pv1),max(pv1)]);
+set(gca,'YDir','normal');
+set(c,'FontSize',14);
     
-elseif length(pars) == 2 
-    % Plot 2D grid search results
-    
-    vals = vals.*nmul;
-    
-    Pscale = [quantile(pos(:),0.95), max(pos(:))];
-    surf(vals(2,:),vals(1,:),exp(pos));
-    view(2); shading flat;
-    c=colorbar;
-    infernoW = flipud(magma);
-%     infernoW(1,:) = [1,1,1];
-    colormap(infernoW);
-    plot3(nmul*[trv(2),trv(2)],[  0, 1000],[1e20,1e20],'k-');
-    plot3([  0, 1000],nmul*[trv(1),trv(1)],[1e20,1e20],'k-');
-    
-    % outline
-    plot3([vals(2,  1),vals(2,  1)],[vals(1,  1),vals(1,end)],[1,1],'k-','LineWidth',0.75);
-    plot3([vals(2,end),vals(2,end)],[vals(1,  1),vals(1,end)],[1,1],'k-','LineWidth',0.75);
-    plot3([vals(2,  1),vals(2,end)],[vals(1,  1),vals(1,  1)],[1,1],'k-','LineWidth',0.75);
-    plot3([vals(2,  1),vals(2,end)],[vals(1,end),vals(1,end)],[1,1],'k-','LineWidth',0.75);
-    
-    xlabel(pname{2});
-    ylabel(pname{1});
-    
-    ylabel(c,'Posterior Probability Density');
-%     ylabel(c,'Log Likelihood');
-    
-    axis([min(vals(2,:)),max(vals(2,:)),min(vals(1,:)),max(vals(1,:))]);
-    set(gca,'YDir','normal');
-    set(c,'FontSize',14);
-    
-    % Calculate distribution's maximum position in 2D
-%     [V2G,V1G] = meshgrid(vals(2,:),vals(1,:));
+% Calculate distribution's maximum position in 2D
+%     [V2G,V1G] = meshgrid(pv2,pv1);
 %     [~,mi] = max(pos(:));
 %     disp('  ');
 %     disp([  'OEF = ',num2str(truepars.OEF),...
@@ -218,4 +196,3 @@ elseif length(pars) == 2
 %     disp(['  Maximum ',pname{1},': ',num2str(100*V1G(mi),4)]);
 %     disp(['  Maximum ',pname{2},': ',num2str(100*V2G(mi),4)]);
     
-end % if length(pars) == 1 ... elseif ...
