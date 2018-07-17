@@ -224,7 +224,7 @@ void R2primeFwdModel::HardcodedInitialDists(MVNDist &prior, MVNDist &posterior) 
 
     if (infer_OEF)
     {
-        prior.means(OEF_index()) = 0.4;
+        prior.means(OEF_index()) = 0.2;
         if (inf_priors)
         {
             precisions(OEF_index(), OEF_index()) = 1e1; // 1e1
@@ -237,7 +237,7 @@ void R2primeFwdModel::HardcodedInitialDists(MVNDist &prior, MVNDist &posterior) 
     
     if (infer_R2p)
     {
-        prior.means(R2p_index()) = 2.5;
+        prior.means(R2p_index()) = 2.6;
         if (inf_priors)
         {
             precisions(R2p_index(), R2p_index()) = 1e-2; // 1e-1
@@ -250,7 +250,7 @@ void R2primeFwdModel::HardcodedInitialDists(MVNDist &prior, MVNDist &posterior) 
 
     if (infer_DBV)
     {
-        prior.means(DBV_index()) = 0.04;
+        prior.means(DBV_index()) = 0.036;
         if (inf_priors)
         {
             precisions(DBV_index(), DBV_index()) = 1e2; // 1e3
@@ -305,19 +305,19 @@ void R2primeFwdModel::HardcodedInitialDists(MVNDist &prior, MVNDist &posterior) 
     // Set distributions for initial posteriors
     if (infer_OEF)
     {
-        posterior.means(OEF_index()) = 0.4;
+        posterior.means(OEF_index()) = 0.21;
         precisions(OEF_index(), OEF_index()) = 1e1; // 1e1
     }
     
     if (infer_R2p)
     {
-        posterior.means(R2p_index()) = 2.5;
+        posterior.means(R2p_index()) = 2.6;
         precisions(R2p_index(), R2p_index()) = 1e-3;
     }
 
     if (infer_DBV)
     {
-        posterior.means(DBV_index()) = 0.05;
+        posterior.means(DBV_index()) = 0.036;
         precisions(DBV_index(), DBV_index()) = 1e3; 
     }
 
@@ -419,7 +419,7 @@ void R2primeFwdModel::Evaluate(const ColumnVector &params, ColumnVector &result)
     }
     else
     {
-        DBV = 0.02;
+        DBV = 0.03;
     }
     if (infer_R2t)
     {
@@ -485,7 +485,7 @@ void R2primeFwdModel::Evaluate(const ColumnVector &params, ColumnVector &result)
     }
     else
     {
-        OEF = 0.4;
+        OEF = 0.3;
     }
 
     // calculate tc and threshold it if necessary

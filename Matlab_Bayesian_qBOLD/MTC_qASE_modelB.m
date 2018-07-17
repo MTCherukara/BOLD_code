@@ -72,24 +72,24 @@ else
     % otherwise, proceed as normal and calculate dw:
     PARAMS.dw   = (4/3)*pi*PARAMS.gam*PARAMS.dChi*PARAMS.Hct*PARAMS.OEF*PARAMS.B0;    
 end
-    
-% relaxation rate constant of blood
-PARAMS.R2b  =  4.5 + 16.4*PARAMS.Hct + (165.2*PARAMS.Hct + 55.7)*PARAMS.OEF^2;
-PARAMS.R2bp = 10.2 -  1.5*PARAMS.Hct + (136.9*PARAMS.Hct - 13.9)*PARAMS.OEF^2;
-
-% pull out parameters
-Ve = PARAMS.lam0;
-Vb = PARAMS.zeta;
 
 % spin densities
 nt = 0.723;
 ne = 0.070;
-nb = 0.723;
+nb = 0.723;    
+
+% relaxation rate constant of blood
+PARAMS.R2b  =  4.5 + 16.4*PARAMS.Hct + (165.2*PARAMS.Hct + 55.7)*PARAMS.OEF^2;
+PARAMS.R2bp = 10.2 -  1.5*PARAMS.Hct + (136.9*PARAMS.Hct - 13.9)*PARAMS.OEF^2;
 
 % calculate compartment steady-state magnetization
 m_tis = MTC_magnetization(TAU,TE,PARAMS.TR,PARAMS.T1t,1./PARAMS.R2t,PARAMS.TI);
 m_bld = MTC_magnetization(TAU,TE,PARAMS.TR,PARAMS.T1b,1./PARAMS.R2b,PARAMS.TI);
 m_csf = MTC_magnetization(TAU,TE,PARAMS.TR,PARAMS.T1e,1./PARAMS.R2e,PARAMS.TI);
+
+% pull out parameters
+Ve = PARAMS.lam0;
+Vb = PARAMS.zeta;
 
 % calculate compartment weightings
 w_csf = (ne.*m_csf.*Ve) ./ ( (nt.*m_tis) + (ne.*m_csf.*Ve) - (nt.*m_tis.*Ve) );

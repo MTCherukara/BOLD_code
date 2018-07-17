@@ -60,8 +60,8 @@ params.R2t  = 1/0.087;      % 1/s       - rate constant, tissue
 params.R2e  = 4;            % 1/s       - rate constant, extracellular
 params.dF   = 5;            % Hz        - frequency shift
 params.lam0 = 0.1;          % no units  - ISF/CSF signal contribution
-params.zeta = 0.03;         % no units  - deoxygenated blood volume
-params.OEF  = 0.40;         % no units  - oxygen extraction fraction
+params.zeta = 0.04;         % no units  - deoxygenated blood volume
+params.OEF  = 0.30;         % no units  - oxygen extraction fraction
 params.Hct  = 0.400;        % no units  - fractional hematocrit
 params.T1t  = 1.200;        % s         - tissue T1
 params.T1b  = 1.580;        % s         - blood T1
@@ -80,25 +80,34 @@ params.SNR = 50;
 
 % define tau values that we want to simulate
 % tau = (-28:4:64)/1000; % for testing
-% tau = (-16:8:64)/1000;
+tau = (-24:4:24)/1000;
+ttt = linspace(-0.024,0.024,1000); 
 % tau = [0:3:12,20:10:70]/1000;
 % tau = [-8,-4,0:6:30,40,50,60]/1000;
-tau = linspace(-0.020,0.064,1000); % for visualising
+% tau = linspace(-0.020,0.064,1000); % for visualising
 
 
 np = length(tau);
 
 % call MTC_qASE_model
-[S_total,params] = MTC_qASE_modelB(tau,params.TE,params);
+[S_total,params] = MTC_qASE_modelB(ttt,params.TE,params);
+
+
+params.tc_man = 1;
+params.tc_val = 0.026;
+S_short = MTC_qASE_model2(tau,params.TE,params);
+
+params.tc_val = 0.002;
+S_long  = MTC_qASE_model2(tau,params.TE,params);
 
 
 %% Add Noise
-S_sample = S_total + (S_total.*randn(1,np)./params.SNR);
-S_sample(S_sample < 0) = 0;
-S_sample = S_sample./max(S_total);
-
-% calculate maximum data standard deviaton
-params.sig = min(S_sample)/params.SNR;
+% S_sample = S_total + (S_total.*randn(1,np)./params.SNR);
+% S_sample(S_sample < 0) = 0;
+% S_sample = S_sample./max(S_total);
+% 
+% % calculate maximum data standard deviaton
+% params.sig = min(S_sample)/params.SNR;
 
 
 %% plot figure
@@ -109,16 +118,22 @@ if plot_fig
     
     % plot the signal
     S_log = (S_total)./max(S_total);
-    l.s = plot(1000*tau,log(S_log),'-');
+    S_short = S_short./max(S_total);
+    S_long = S_long./max(S_total);
+    l.s = plot(1000*ttt,log(S_log),'k-');
+    plot(1000*tau,log(S_long ),'x--');
+    plot(1000*tau,log(S_short),'x--');
 %     plot(1000*tau,log(S_sample),'kx');
-    xlim([(1000*min(tau))-4, (1000*max(tau))+4]);
+    ylim([-0.07,0]);
+    xlim([(1000*min(tau))-0, (1000*max(tau))+0]);
 %     ylim([3.385, 3.435]);
     
     % labels on axes
     xlabel('Spin Echo Displacement \tau (ms)');
     ylabel('Log (Signal)');
     title('qBOLD Signal Measured Using ASE');
-    
+    legend('Full Model','Long-\tau Regime','Short-\tau Regime','Location','South')
+
 end % if plot_fig
 
 % Save Data

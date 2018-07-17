@@ -13,8 +13,9 @@
 % CHANGELOG:
 %
 % 2018-07-16 (MTC). Parallelized using parfor, on a 6-core i5, this achieves a
-%       greater than four-fold speed-up. Functionality for 1D and ND grid search
-%       has been lost, but this can be added in later.
+%       greater than four-fold speed-up. On a dual-core i5 (MacBook Pro), this
+%       is roughly a 50% speed-up. Functionality for 1D and ND grid search has
+%       been lost, but this can be added in later.
 %
 % 2018-03-29 (MTC). Added the means for displaying the locations of the maximum
 %       values produced by a 2D grid search.
@@ -54,7 +55,7 @@ tic;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % Load the Data:
-load('ASE_Data/Data_180606_TauSet4_A.mat');
+load('ASE_Data/Data_180606_TauSet1_D.mat');
 
 
 % Choose parameters, their range, and the number of points each way:
@@ -74,8 +75,7 @@ sigma = mean(params.sig);   % real std of noise
 ns = length(S_sample); % number of data points
 params.R2p = params.dw.*params.zeta;
 
-% params.lam0 = 0.15;
-
+% fill in TE if necessary
 if ~exist('TE_sample','var')
     TE_sample = params.TE;
 end
@@ -135,7 +135,7 @@ elseif length(pnames) == 2
             inpars = param_update(pv22(i2),looppars,pn2);
 
             % run the model to evaluate the signal with current params            
-            S_mod = MTC_qASE_model2(T_sample,TE_sample,inpars,noDW);
+            S_mod = MTC_qASE_modelB(T_sample,TE_sample,inpars,noDW);
             
             % normalize
             S_mod = S_mod./max(S_mod);
@@ -166,8 +166,7 @@ hold on; box on;
 surf(pv2,pv1,exp(pos));
 view(2); shading flat;
 c=colorbar;
-% infernoW = flipud(magma);
-% colormap(infernoW);
+colormap(flipud(magma));
 plot3([trv(2),trv(2)],[  0, 1000],[1e20,1e20],'k-');
 plot3([  0, 1000],[trv(1),trv(1)],[1e20,1e20],'k-');
 

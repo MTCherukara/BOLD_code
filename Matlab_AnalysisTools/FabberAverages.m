@@ -16,19 +16,19 @@
     %       plot in a more generic and extensible way.
 
 clear; 
-% clc;
+clc;
 
 % Choose Variables
 vars = {'R2p','DBV','OEF'};
 
 % Choose the slices we want
-slicenum = 3:10;    % VS
+slicenum = 4:9;     % VS - instead of 3:10
 % slicenum = 2:8;     % CSF + patient data
 % slicenum = 1:6;   % TR = 2
 
 % Choose Data set
 setnum = 537;
-subnum = 2;
+subnum = 7;
 
 setnum = setnum + subnum - 1;
 
@@ -53,14 +53,18 @@ for vv = 1:length(vars)
         volStdv = volStdv.*100;
     end
     
+    % calculate IQR
+    qnt = quantile(volData,[0.75,0.25]);
+    iqr = qnt(1) - qnt(2) ./ 2;
+    
     % Display results
+%     disp('   ');
+%     disp(['Mean ',vname,'   : ',num2str(mean(volData),4)]);
+%     disp(['    Std ',vname,': ',num2str(mean(volStdv),4)]);
+
     disp('   ');
-    disp(['Mean ',vname,'   : ',num2str(mean(volData),4)]);
-%     if strcmp(vname,'VC')
-%         disp(['    Std ',vname,': ',num2str(std(volData),4)]);
-%     else
-        disp(['    Std ',vname,': ',num2str(mean(volStdv),4)]);
-%     end
+    disp(['Median ',vname,': ',num2str(median(volData),4)]);
+    disp(['   IQR ',vname,': ',num2str(iqr,4)]);
     
     
 end

@@ -4,34 +4,44 @@ clear;
 
 setFigureDefaults;
 
-sn = 1;         % set number
-gs = 1000;      % grid size
 ng = 5;         % number of grids
 
 % pre-allocate array
-Postr = zeros(gs,gs,ng);
+Postr = zeros(500,1000,ng);
 
 % fill array
 for ii = 1:ng
     
-    load(strcat('Post_Set',num2str(sn),'_',num2str(ii),'.mat'));
+    load(strcat('~/Documents/DPhil/Data/GridSearches/BesselGrid_TauSet3_',num2str(ii),'.mat'));
     Postr(:,:,ii) = pos;
     
 end
+
+% set out true values
+trv = [params.R2p, params.zeta];
+
+% create values vectors
+np1 = size(pos,1);
+np2 = size(pos,2);
+
+pv1 = linspace(interv(1,1),interv(1,2),np1);
+pv2 = linspace(interv(2,1),interv(2,2),np2);
+
 
 % average and take the exponent
 Posterior = exp(mean(Postr,3));
 
 % plot figure;
 figure; hold on; box on;
-surf(vals(2,:),vals(1,:),Posterior);
+surf(pv2,pv1,Posterior);
 view(2);
 shading flat;
 colormap(flipud(magma));
 c=colorbar;
 
 % set axes
-axis([min(vals(2,:)),max(vals(2,:)),min(vals(1,:)),max(vals(1,:))]);
+xlim(interv(2,:));
+ylim([2.5,6.5]);
 
 % label axes
 ylabel('R_2'' (s^-^1)')
@@ -42,11 +52,3 @@ xticklabels({'1','2','3','4','5','6','7'})
 plot3([trv(2),trv(2)],[  0, 1000],[1e20,1e20],'k-');
 plot3([  0, 1000],[trv(1),trv(1)],[1e20,1e20],'k-');
 
-% plot outline
-plot3([vals(2,  1),vals(2,  1)],[vals(1,  1),vals(1,end)],[1,1],'k-','LineWidth',0.75);
-plot3([vals(2,end),vals(2,end)],[vals(1,  1),vals(1,end)],[1,1],'k-','LineWidth',0.75);
-plot3([vals(2,  1),vals(2,end)],[vals(1,  1),vals(1,  1)],[1,1],'k-','LineWidth',0.75);
-plot3([vals(2,  1),vals(2,end)],[vals(1,end),vals(1,end)],[1,1],'k-','LineWidth',0.75);
-
-% save stuff out
-save(['Posterior_Set_',num2str(sn)],'Posterior','vals','trv');
