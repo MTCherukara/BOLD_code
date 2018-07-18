@@ -36,7 +36,7 @@
 clear; 
 % close all;
 
-% setFigureDefaults;
+setFigureDefaults;
 
 plot_fig = 1;       
 save_data = 0;      % set to 1 in order to save out ASE data
@@ -60,8 +60,8 @@ params.R2t  = 1/0.087;      % 1/s       - rate constant, tissue
 params.R2e  = 4;            % 1/s       - rate constant, extracellular
 params.dF   = 5;            % Hz        - frequency shift
 params.lam0 = 0.1;          % no units  - ISF/CSF signal contribution
-params.zeta = 0.04;         % no units  - deoxygenated blood volume
-params.OEF  = 0.30;         % no units  - oxygen extraction fraction
+params.zeta = 0.03;         % no units  - deoxygenated blood volume
+params.OEF  = 0.25;         % no units  - oxygen extraction fraction
 params.Hct  = 0.400;        % no units  - fractional hematocrit
 params.T1t  = 1.200;        % s         - tissue T1
 params.T1b  = 1.580;        % s         - blood T1
@@ -80,8 +80,8 @@ params.SNR = 50;
 
 % define tau values that we want to simulate
 % tau = (-28:4:64)/1000; % for testing
-tau = (-24:4:24)/1000;
-ttt = linspace(-0.024,0.024,1000); 
+tau = (-24:1:64)/1000;
+% ttt = linspace(-0.024,0.024,1000); 
 % tau = [0:3:12,20:10:70]/1000;
 % tau = [-8,-4,0:6:30,40,50,60]/1000;
 % tau = linspace(-0.020,0.064,1000); % for visualising
@@ -90,15 +90,15 @@ ttt = linspace(-0.024,0.024,1000);
 np = length(tau);
 
 % call MTC_qASE_model
-[S_total,params] = MTC_qASE_modelB(ttt,params.TE,params);
+[S_total,params] = MTC_qASE_modelB(tau,params.TE,params);
 
 
-params.tc_man = 1;
-params.tc_val = 0.026;
-S_short = MTC_qASE_model2(tau,params.TE,params);
-
-params.tc_val = 0.002;
-S_long  = MTC_qASE_model2(tau,params.TE,params);
+% params.tc_man = 1;
+% params.tc_val = 0.026;
+% S_short = MTC_qASE_model2(tau,params.TE,params);
+% 
+% params.tc_val = 0.002;
+% S_long  = MTC_qASE_model2(tau,params.TE,params);
 
 
 %% Add Noise
@@ -114,25 +114,21 @@ S_long  = MTC_qASE_model2(tau,params.TE,params);
 if plot_fig
     
     % create a figure
-    figure(1); hold on; box on;
+    figure(); hold on; box on;
     
     % plot the signal
-    S_log = (S_total)./max(S_total);
-    S_short = S_short./max(S_total);
-    S_long = S_long./max(S_total);
-    l.s = plot(1000*ttt,log(S_log),'k-');
-    plot(1000*tau,log(S_long ),'x--');
-    plot(1000*tau,log(S_short),'x--');
+    S_log = log((S_total)./max(S_total));
+    l.s = plot(1000*tau,S_log,'k-');
 %     plot(1000*tau,log(S_sample),'kx');
-    ylim([-0.07,0]);
-    xlim([(1000*min(tau))-0, (1000*max(tau))+0]);
+%     ylim([-0.07,0]);
+    xlim([(1000*min(tau))-4, (1000*max(tau))+4]);
 %     ylim([3.385, 3.435]);
     
     % labels on axes
     xlabel('Spin Echo Displacement \tau (ms)');
     ylabel('Log (Signal)');
     title('qBOLD Signal Measured Using ASE');
-    legend('Full Model','Long-\tau Regime','Short-\tau Regime','Location','South')
+%     legend('Full Model','Long-\tau Regime','Short-\tau Regime','Location','South')
 
 end % if plot_fig
 
@@ -160,3 +156,40 @@ if save_data
     save(dat_title,'T_sample','S_sample','TE_sample','params');
 end % if save_data
     
+
+%% Further Model Analyses - 18 July 2018
+
+% calculate R2p
+params.R2p = params.dw.*params.zeta;
+
+
+% define short tau regime
+shrts = abs(tau) < (1.7/params.dw);
+T_shrt = tau(  shrts);
+S_shrt = S_log(shrts);
+
+% define long tau regime
+longs = tau > (1.7/params.dw);
+T_long = tau(  longs);
+S_long = S_log(longs);
+
+% define "very long tau" regime
+vlongs = tau > 0.0395;
+T_vlong = tau(  vlongs);
+S_vlong = S_log(vlongs);
+
+% define transition regime (within 5 ms of Tc) 
+trns = abs( tau - (1.7/params.dw) ) < 0.005;
+T_mid = tau(  trns);
+S_mid = S_log(trns);
+
+
+% solve for A in "new" exponential long tau model
+A_long = ( params.zeta - S_long - (params.R2p*T_long) ) ./ (T_long.^2);
+
+% plot a figure
+figure; hold on; box on;
+plot(1000*T_long,A_long,'k-');
+
+xlabel('tau (ms)');
+ylabel('A');
