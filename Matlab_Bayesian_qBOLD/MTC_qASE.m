@@ -29,7 +29,7 @@
 % 2016-11-08 (MTC). Changed tau range to go up to 64 ms, changed some
 %       other constants, added saving out of data sampled at key points,
 %       with noise added in too.
-%
+% 
 % 2016-05-27 (MTC). Changed the way the compartments are added together,
 %       which was apparently causing problems (I don't know why).
 
@@ -68,7 +68,6 @@ params.T1b  = 1.580;        % s         - blood T1
 params.T1e  = 3.870;        % s         - CSF T1
 
 % analysis parameters
-params.geom   = 0.3;        % no units  - quadratic regime geometry factor
 params.tc_man = 0;          % BOOL      - should Tc be defined manually?
 params.tc_val = 0.0;        % s         - manual Tc (if tc_man = 1)
 
@@ -114,7 +113,7 @@ np = length(tau);
 if plot_fig
     
     % create a figure
-    figure(); hold on; box on;
+    figure(3); hold on; box on;
     
     % plot the signal
     S_log = log((S_total)./max(S_total));
@@ -187,9 +186,9 @@ S_mid = S_log(trns);
 % solve for A in "new" exponential long tau model
 A_long = ( params.zeta - S_long - (params.R2p*T_long) ) ./ (T_long.^2);
 
-% plot a figure
-figure; hold on; box on;
-plot(1000*T_long,A_long,'k-');
-
-xlabel('tau (ms)');
-ylabel('A');
+% % plot a figure
+% figure; hold on; box on;
+% plot(1000*T_long,A_long,'k-');
+% 
+% xlabel('tau (ms)');
+% ylabel('A');

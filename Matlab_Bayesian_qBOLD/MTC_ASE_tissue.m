@@ -1,4 +1,4 @@
-function ST = MTC_ASE_tissue(TAU,TE,PARAMS,tc)
+function ST = MTC_ASE_tissue(TAU,TE,PARAMS)
 % MTC_ASE_tissue usage:
 %
 %        ST = MTC_ASE_tissue(TAU,TE,PARAMS)
@@ -45,7 +45,6 @@ function ST = MTC_ASE_tissue(TAU,TE,PARAMS,tc)
 % 2016-05-19 (MTC). Added integral function (BesselJ).
 
 % pull out constants
-gm   = PARAMS.geom;
 dw   = PARAMS.dw;
 zeta = PARAMS.zeta;
 R2t  = PARAMS.R2t;
@@ -75,7 +74,7 @@ for ii = 1:length(TAU)
     
     if abs(TAU(ii)) < tc
         % short tau regime
-        ST(ii) = exp(-(gm*zeta*(dw.*TAU(ii)).^2));
+        ST(ii) = exp(-(0.3*zeta*(dw.*TAU(ii)).^2));
     else
         % long tau regime
         ST(ii) = exp(zeta-(zeta*dw*abs(TAU(ii))));

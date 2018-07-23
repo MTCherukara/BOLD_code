@@ -2,7 +2,7 @@
 
  Matthew Cherukara, IBME
 
- Copyright (C) 2017 University of Oxford  */
+ Copyright (C) 2018 University of Oxford  */
 
 #ifndef FWDMODEL_QBOLD_R2P_H
 #define FWDMODEL_QBOLD_R2P_H
@@ -30,7 +30,8 @@ public:
     {
         return (infer_OEF ? 1 : 0) + (infer_R2p ? 1 : 0) + (infer_DBV ? 1 : 0)
              + (infer_R2t ? 1 : 0) + (infer_S0  ? 1 : 0) + (infer_R2e ? 1 : 0) 
-             + (infer_dF  ? 1 : 0) + (infer_lam ? 1 : 0) + (infer_Hct ? 1 : 0);
+             + (infer_dF  ? 1 : 0) + (infer_lam ? 1 : 0) + (infer_Hct ? 1 : 0)
+             + (infer_Ax  ? 1 : 0);
     }    
     virtual void HardcodedInitialDists(MVNDist &prior, MVNDist &posterior) const;
     virtual void Evaluate(const NEWMAT::ColumnVector &params, NEWMAT::ColumnVector &result) const;
@@ -89,6 +90,11 @@ protected:
         return dF_index() + (infer_lam ? 1 : 0);
     }
 
+    int Ax_index() const
+    {  
+        return lam_index() + (infer_Ax ? 1 : 0);
+    }
+
 
     // Which parameters will we infer on
     bool infer_OEF;
@@ -100,6 +106,7 @@ protected:
     bool infer_R2e;
     bool infer_dF;
     bool infer_lam;
+    bool infer_Ax;
     bool single_comp;
     bool motion_narr;
     bool inf_priors;

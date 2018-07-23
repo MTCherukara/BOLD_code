@@ -39,7 +39,7 @@ string R2primeFwdModel::GetDescription() const
 
 string R2primeFwdModel::ModelVersion() const
 {
-    return "1.6";
+    return "1.7";
 } // ModelVersion
 
 
@@ -57,6 +57,7 @@ void R2primeFwdModel::Initialize(ArgsType &args)
     infer_R2e = args.ReadBool("inferR2e");
     infer_dF  = args.ReadBool("inferdF");
     infer_lam = args.ReadBool("inferlam");
+    infer_Ax  = args.ReadBool("inferAx");
     single_comp = args.ReadBool("single_compartment");
     motion_narr = args.ReadBool("motional_narrowing");
     inf_priors  = args.ReadBool("infpriors");
@@ -157,6 +158,10 @@ void R2primeFwdModel::Initialize(ArgsType &args)
     {
         LOG << "Inferring on CSF volume fraction lambda" << endl;
     }
+    if (infer_Ax)
+    {
+        LOG << "Inferring on quadratic exponential long tau model" << endl;
+    }
     if (inf_priors)
     {
         LOG << "Using informative priors" << endl;
@@ -208,6 +213,10 @@ void R2primeFwdModel::NameParams(vector<string> &names) const
     if (infer_lam)
     {
         names.push_back("VC");  // parameter 7 - CSF volume fraction
+    }
+    if (infer_Ax)
+    {
+        names.push_back("Ax");  // parameter 9 - Quadratic long tau factor
     }
 } // NameParams
 
@@ -297,6 +306,12 @@ void R2primeFwdModel::HardcodedInitialDists(MVNDist &prior, MVNDist &posterior) 
         precisions(lam_index(), lam_index()) = 1e2; // 1e1
     }
 
+    if (infer_Ax)
+    {
+        prior.means(Ax_index()) = 5.0;
+        precisions(Ax_index(), Ax_index()) = 1e-2; // 1e-3
+    } 
+
     prior.SetPrecisions(precisions);
 
     posterior = prior; // we don't need to change the initial guess (at least, not at this stage)
@@ -357,6 +372,12 @@ void R2primeFwdModel::HardcodedInitialDists(MVNDist &prior, MVNDist &posterior) 
         precisions(lam_index(), lam_index()) = 1e2; // 1e1
     } 
 
+    if (infer_Ax)
+    {
+        posterior.means(Ax_index()) = 5.0;
+        precisions(Ax_index(), Ax_index()) = 1e-1;
+    } 
+
     
     posterior.SetPrecisions(precisions);
 
@@ -402,6 +423,7 @@ void R2primeFwdModel::Evaluate(const ColumnVector &params, ColumnVector &result)
     double dF;
     double lam;
     double CBV;
+    double Ax;
 
 
     // assign values to parameters
@@ -469,6 +491,14 @@ void R2primeFwdModel::Evaluate(const ColumnVector &params, ColumnVector &result)
     {
         lam = 0.0;
     }
+    if (infer_Ax)
+    {
+        Ax = abs(paramcpy(Ax_index()));
+    }
+    else
+    {
+        Ax = 0.0;
+    }
 
 
     // this one is a little bit different
@@ -524,11 +554,11 @@ void R2primeFwdModel::Evaluate(const ColumnVector &params, ColumnVector &result)
         // calculate tissue signal
         if (tau < -tc)
         {
-            St = exp(DBV + (R2p*tau));
+            St = exp(DBV + (R2p*tau) - (Ax*pow(tau,2.0)));
         }
         else if (tau > tc)
         {
-            St = exp(DBV - (R2p*tau));
+            St = exp(DBV - (R2p*tau) - (Ax*pow(tau,2.0)));
         }
         else
         {

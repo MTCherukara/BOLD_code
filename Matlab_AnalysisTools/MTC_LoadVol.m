@@ -24,8 +24,8 @@ if ~exist('slices','var')
     slices = 3:10;
 end
 
-threshes = containers.Map({'R2p', 'DBV', 'OEF', 'VC', 'DF', 'lambda'},...
-                          [ 20  ,   1  ,   1  ,  1  ,  15 ,   1     ]);  
+threshes = containers.Map({'R2p', 'DBV', 'OEF', 'VC', 'DF', 'lambda', 'Ax' },...
+                          [ 20  ,   1  ,   1  ,  1  ,  15 ,   1     ,  30  ]);  
 
 
 % Find the right folder

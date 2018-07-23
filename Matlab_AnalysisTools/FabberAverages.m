@@ -19,7 +19,7 @@ clear;
 clc;
 
 % Choose Variables
-vars = {'R2p','DBV','OEF'};
+vars = {'R2p','DBV','OEF','Ax'};
 
 % Choose the slices we want
 slicenum = 4:9;     % VS - instead of 3:10
@@ -27,7 +27,7 @@ slicenum = 4:9;     % VS - instead of 3:10
 % slicenum = 1:6;   % TR = 2
 
 % Choose Data set
-setnum = 537;
+setnum = 544;
 subnum = 7;
 
 setnum = setnum + subnum - 1;
