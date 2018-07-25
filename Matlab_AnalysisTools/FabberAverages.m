@@ -27,8 +27,8 @@ slicenum = 4:9;     % VS - instead of 3:10
 % slicenum = 1:6;   % TR = 2
 
 % Choose Data set
-setnum = 537;
-subnum = 5;
+setnum = 544;
+subnum = 7;
 
 setnum = setnum + subnum - 1;
 
@@ -71,12 +71,15 @@ end
 
 %% Free Energy
 
-[FEData,RData] = MTC_LoadFreeEnergy(setnum,subnum,slicenum);
+[FEData,RData,MData] = MTC_LoadFreeEnergy(setnum,subnum,slicenum);
 
 disp('   ');
 disp(['     Mean Residual : ',num2str(mean(RData),4)]);
 disp([' Absolute Residual : ',num2str(mean(abs(RData)),4)]);
 disp(['   Median Residual : ',num2str(median(RData),4)]);
+
+disp('   ');
+disp(['      Modelfit SNR : ',num2str(mean(MData)./mean(abs(RData)),4)]);
 
 % disp('   ');
 % disp(['  Mean Free Energy : ',num2str(-mean(FEData),4)]);
