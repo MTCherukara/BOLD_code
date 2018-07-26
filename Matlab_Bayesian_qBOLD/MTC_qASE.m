@@ -79,7 +79,7 @@ params.SNR = 50;
 
 % define tau values that we want to simulate
 % tau = (-28:4:64)/1000; % for testing
-tau = (-24:1:64)/1000;
+tau = (-28:1:28)/1000;
 % ttt = linspace(-0.024,0.024,1000); 
 % tau = [0:3:12,20:10:70]/1000;
 % tau = [-8,-4,0:6:30,40,50,60]/1000;
@@ -89,7 +89,7 @@ tau = (-24:1:64)/1000;
 np = length(tau);
 
 % call MTC_qASE_model
-[S_total,params] = MTC_qASE_modelB(tau,params.TE,params);
+[S_total,params] = MTC_qASE_model2(tau,params.TE,params);
 
 
 % params.tc_man = 1;
@@ -117,7 +117,7 @@ if plot_fig
     
     % plot the signal
     S_log = log((S_total)./max(S_total));
-    l.s = plot(1000*tau,S_log,'k-');
+    l.s = plot(1000*tau,S_log,'r--');
 %     plot(1000*tau,log(S_sample),'kx');
 %     ylim([-0.07,0]);
     xlim([(1000*min(tau))-4, (1000*max(tau))+4]);
