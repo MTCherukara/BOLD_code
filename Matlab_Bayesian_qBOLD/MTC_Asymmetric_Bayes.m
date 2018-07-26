@@ -55,7 +55,7 @@ tic;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % Load the Data:
-load('ASE_Data/Data_180606_TauSet1_D.mat');
+load('ASE_Data/Data_180726_40_4_SNR_100_1.mat');
 
 
 % Choose parameters, their range, and the number of points each way:
@@ -135,7 +135,7 @@ elseif length(pnames) == 2
             inpars = param_update(pv22(i2),looppars,pn2);
 
             % run the model to evaluate the signal with current params            
-            S_mod = MTC_qASE_modelB(T_sample,TE_sample,inpars,noDW);
+            S_mod = MTC_qASE_model2(T_sample,TE_sample,inpars,noDW);
             
             % normalize
             S_mod = S_mod./max(S_mod);

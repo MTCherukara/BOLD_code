@@ -39,7 +39,7 @@ clear;
 setFigureDefaults;
 
 plot_fig = 1;       
-save_data = 0;      % set to 1 in order to save out ASE data
+save_data = 1;      % set to 1 in order to save out ASE data
 
 
 %% Model Parameters
@@ -59,9 +59,9 @@ params.S0   = 100;          % a. units  - signal
 params.R2t  = 1/0.087;      % 1/s       - rate constant, tissue
 params.R2e  = 4;            % 1/s       - rate constant, extracellular
 params.dF   = 5;            % Hz        - frequency shift
-params.lam0 = 0.1;          % no units  - ISF/CSF signal contribution
-params.zeta = 0.03;         % no units  - deoxygenated blood volume
-params.OEF  = 0.25;         % no units  - oxygen extraction fraction
+params.lam0 = 0.0;          % no units  - ISF/CSF signal contribution
+params.zeta = 0.04;         % no units  - deoxygenated blood volume
+params.OEF  = 0.40;         % no units  - oxygen extraction fraction
 params.Hct  = 0.400;        % no units  - fractional hematocrit
 params.T1t  = 1.200;        % s         - tissue T1
 params.T1b  = 1.580;        % s         - blood T1
@@ -72,14 +72,14 @@ params.tc_man = 0;          % BOOL      - should Tc be defined manually?
 params.tc_val = 0.0;        % s         - manual Tc (if tc_man = 1)
 
 % noise
-params.SNR = 50;
+params.SNR = 100;
 
 
 %% Compute Model
 
 % define tau values that we want to simulate
 % tau = (-28:4:64)/1000; % for testing
-tau = (-28:1:28)/1000;
+tau = (-28:1:72)/1000;
 % ttt = linspace(-0.024,0.024,1000); 
 % tau = [0:3:12,20:10:70]/1000;
 % tau = [-8,-4,0:6:30,40,50,60]/1000;
@@ -89,7 +89,7 @@ tau = (-28:1:28)/1000;
 np = length(tau);
 
 % call MTC_qASE_model
-[S_total,params] = MTC_qASE_model2(tau,params.TE,params);
+[S_total,params] = MTC_qASE_modelB(tau,params.TE,params);
 
 
 % params.tc_man = 1;
@@ -101,23 +101,23 @@ np = length(tau);
 
 
 %% Add Noise
-% S_sample = S_total + (S_total.*randn(1,np)./params.SNR);
-% S_sample(S_sample < 0) = 0;
-% S_sample = S_sample./max(S_total);
-% 
-% % calculate maximum data standard deviaton
-% params.sig = min(S_sample)/params.SNR;
+S_sample = S_total + (S_total.*randn(1,np)./params.SNR);
+S_sample(S_sample < 0) = 0;
+S_sample = S_sample./max(S_total);
+
+% calculate maximum data standard deviaton
+params.sig = min(S_sample)/params.SNR;
 
 
 %% plot figure
 if plot_fig
     
     % create a figure
-    figure(3); hold on; box on;
+    figure(); hold on; box on;
     
     % plot the signal
     S_log = log((S_total)./max(S_total));
-    l.s = plot(1000*tau,S_log,'r--');
+    l.s = plot(1000*tau,S_log,'k-');
 %     plot(1000*tau,log(S_sample),'kx');
 %     ylim([-0.07,0]);
     xlim([(1000*min(tau))-4, (1000*max(tau))+4]);
