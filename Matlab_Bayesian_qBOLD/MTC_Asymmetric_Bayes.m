@@ -66,8 +66,8 @@ for jj = 1:nj
     disp(['Analysing Dataset ',num2str(jj), ' of ',num2str(nj)]);
 
     % Choose which tau values we want
-    taus = -21:6:57;
-%     taus = [0,16:4:64];
+%     taus = -21:6:57;
+    taus = [-28:4:-20,0,28:4:64];
 
     % pull out the right values
     samps = find(ismember(T_sample,taus./1e3));
@@ -153,7 +153,7 @@ for jj = 1:nj
                 inpars = param_update(pv22(i2),looppars,pn2);
 
                 % run the model to evaluate the signal with current params            
-                S_mod = MTC_qASE_modelB(T_sample,TE_sample,inpars,noDW);
+                S_mod = MTC_qASE_model2(T_sample,TE_sample,inpars,noDW);
 
                 % normalize
                 S_mod = S_mod./max(S_mod);
