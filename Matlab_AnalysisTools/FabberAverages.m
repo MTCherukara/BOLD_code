@@ -27,8 +27,8 @@ slicenum = 4:9;     % VS - instead of 3:10
 % slicenum = 1:6;   % TR = 2
 
 % Choose Data set
-setnum = 537;
-subnum = 5;
+setnum = 565;
+subnum = 7;
 
 setnum = setnum + subnum - 1;
 
@@ -64,21 +64,23 @@ for vv = 1:length(vars)
     
     disp('   ');
     disp(['Mean ',vname,'   : ',num2str(mean(volData),4)]);
-    disp(['    Std ',vname,': ',num2str(mean(volStdv),4)]);
+%     disp(['    Std ',vname,': ',num2str(mean(volStdv),4)]);
+    disp(['    Std ',vname,': ',num2str(std(volData),4)]);
+
 end
 
 %% Free Energy
 
-[FEData,RData,MData] = MTC_LoadFreeEnergy(setnum,subnum,slicenum);
-
-disp('   ');
-disp(['     Mean Residual : ',num2str(mean(RData),4)]);
-disp([' Absolute Residual : ',num2str(mean(abs(RData)),4)]);
-disp(['   Median Residual : ',num2str(median(RData),4)]);
-
-disp('   ');
-disp(['      Modelfit SNR : ',num2str(mean(MData)./mean(abs(RData)),4)]);
-
-disp('   ');
-disp(['  Mean Free Energy : ',num2str(-mean(FEData),4)]);
-disp(['Median Free Energy : ',num2str(-median(FEData),4)]);
+% [FEData,RData,MData] = MTC_LoadFreeEnergy(setnum,subnum,slicenum);
+% 
+% disp('   ');
+% disp(['     Mean Residual : ',num2str(mean(RData),4)]);
+% disp([' Absolute Residual : ',num2str(mean(abs(RData)),4)]);
+% disp(['   Median Residual : ',num2str(median(RData),4)]);
+% 
+% disp('   ');
+% disp(['      Modelfit SNR : ',num2str(mean(MData)./mean(abs(RData)),4)]);
+% 
+% disp('   ');
+% disp(['  Mean Free Energy : ',num2str(-mean(FEData),4)]);
+% disp(['Median Free Energy : ',num2str(-median(FEData),4)]);
