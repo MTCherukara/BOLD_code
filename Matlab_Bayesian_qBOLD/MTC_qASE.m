@@ -39,7 +39,7 @@ clear;
 setFigureDefaults;
 
 plot_fig = 1;       
-save_data = 1;      % set to 1 in order to save out ASE data
+save_data = 0;      % set to 1 in order to save out ASE data
 
 
 %% Model Parameters
@@ -59,9 +59,9 @@ params.S0   = 100;          % a. units  - signal
 params.R2t  = 1/0.087;      % 1/s       - rate constant, tissue
 params.R2e  = 4;            % 1/s       - rate constant, extracellular
 params.dF   = 5;            % Hz        - frequency shift
-params.lam0 = 0.0;          % no units  - ISF/CSF signal contribution
-params.zeta = 0.04;         % no units  - deoxygenated blood volume
-params.OEF  = 0.40;         % no units  - oxygen extraction fraction
+params.lam0 = 0.10;          % no units  - ISF/CSF signal contribution
+params.zeta = 0.027;         % no units  - deoxygenated blood volume
+params.OEF  = 0.30;         % no units  - oxygen extraction fraction
 params.Hct  = 0.400;        % no units  - fractional hematocrit
 params.T1t  = 1.200;        % s         - tissue T1
 params.T1b  = 1.580;        % s         - blood T1
@@ -79,11 +79,11 @@ params.SNR = 100;
 
 % define tau values that we want to simulate
 % tau = (-28:4:64)/1000; % for testing
-tau = (-28:1:72)/1000;
+% tau = (-28:1:72)/1000;
 % ttt = linspace(-0.024,0.024,1000); 
 % tau = [0:3:12,20:10:70]/1000;
 % tau = [-8,-4,0:6:30,40,50,60]/1000;
-% tau = linspace(-0.020,0.064,1000); % for visualising
+tau = linspace(-0.028,0.064,1000); % for visualising
 
 
 np = length(tau);
@@ -113,11 +113,11 @@ params.sig = min(S_sample)/params.SNR;
 if plot_fig
     
     % create a figure
-    figure(); hold on; box on;
+    figure(1); hold on; box on;
     
     % plot the signal
     S_log = log((S_total)./max(S_total));
-    l.s = plot(1000*tau,S_log,'k-');
+    l.s = plot(1000*tau,S_log,'--','Color',defColour(2));
 %     plot(1000*tau,log(S_sample),'kx');
 %     ylim([-0.07,0]);
     xlim([(1000*min(tau))-4, (1000*max(tau))+4]);
@@ -126,7 +126,7 @@ if plot_fig
     % labels on axes
     xlabel('Spin Echo Displacement \tau (ms)');
     ylabel('Log (Signal)');
-    title('qBOLD Signal Measured Using ASE');
+%     title('qBOLD Signal Measured Using ASE');
 %     legend('Full Model','Long-\tau Regime','Short-\tau Regime','Location','South')
 
 end % if plot_fig
@@ -158,37 +158,37 @@ end % if save_data
 
 %% Further Model Analyses - 18 July 2018
 
-% calculate R2p
-params.R2p = params.dw.*params.zeta;
-
-
-% define short tau regime
-shrts = abs(tau) < (1.7/params.dw);
-T_shrt = tau(  shrts);
-S_shrt = S_log(shrts);
-
-% define long tau regime
-longs = tau > (1.7/params.dw);
-T_long = tau(  longs);
-S_long = S_log(longs);
-
-% define "very long tau" regime
-vlongs = tau > 0.0395;
-T_vlong = tau(  vlongs);
-S_vlong = S_log(vlongs);
-
-% define transition regime (within 5 ms of Tc) 
-trns = abs( tau - (1.7/params.dw) ) < 0.005;
-T_mid = tau(  trns);
-S_mid = S_log(trns);
-
-
-% solve for A in "new" exponential long tau model
-A_long = ( params.zeta - S_long - (params.R2p*T_long) ) ./ (T_long.^2);
-
-% % plot a figure
-% figure; hold on; box on;
-% plot(1000*T_long,A_long,'k-');
+% % calculate R2p
+% params.R2p = params.dw.*params.zeta;
 % 
-% xlabel('tau (ms)');
-% ylabel('A');
+% 
+% % define short tau regime
+% shrts = abs(tau) < (1.7/params.dw);
+% T_shrt = tau(  shrts);
+% S_shrt = S_log(shrts);
+% 
+% % define long tau regime
+% longs = tau > (1.7/params.dw);
+% T_long = tau(  longs);
+% S_long = S_log(longs);
+% 
+% % define "very long tau" regime
+% vlongs = tau > 0.0395;
+% T_vlong = tau(  vlongs);
+% S_vlong = S_log(vlongs);
+% 
+% % define transition regime (within 5 ms of Tc) 
+% trns = abs( tau - (1.7/params.dw) ) < 0.005;
+% T_mid = tau(  trns);
+% S_mid = S_log(trns);
+% 
+% 
+% % solve for A in "new" exponential long tau model
+% A_long = ( params.zeta - S_long - (params.R2p*T_long) ) ./ (T_long.^2);
+% 
+% % % plot a figure
+% % figure; hold on; box on;
+% % plot(1000*T_long,A_long,'k-');
+% % 
+% % xlabel('tau (ms)');
+% % ylabel('A');

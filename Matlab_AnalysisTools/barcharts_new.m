@@ -11,15 +11,15 @@ setFigureDefaults;
 %% Plotting Information
 
 % key to data array columns
-legtext = {'L. Model','1C. Model','2C. Model','L. Model','1C. Model','2C. Model','QL. Model','QL. Model','Least Sq','Least Sq'};
-%           1          2           3           4          5           6           7           8           9          10     .
+legtext = {'L Model','1C Model','2C Model','L Model','1C Model','2C Model','QL Model','QL Model','L Model','L Model'};
+%           1         2          3          4         5          6          7          8          9         10     .
 
 % Choose which columns to plot
-% dpts = [9,1,2,3];
-dpts = [10,4,5,6];
+% dpts = [9,2,3];
+dpts = [10,5,6];
 
 % Pick pairwise comparisons from DPTS values
-grps = {[1,2],[1,3],[1,4],[2,3],[2,4]};
+grps = {[1,2],[1,3],[2,3]};
 
 % Decide on additional plots
 plot_FE = 0;    % Free Energy

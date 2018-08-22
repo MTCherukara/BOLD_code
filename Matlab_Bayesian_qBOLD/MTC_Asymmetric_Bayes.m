@@ -49,39 +49,41 @@ clear;
 % setFigureDefaults;  % since we're doing plotting later
 
 % Options
-plot_fig = 0;
+plot_fig = 1;
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%    Initialization          %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-nj = 5;
+nj = 1;
 maxes = zeros(2,nj);
 for jj = 1:nj
 
     tic;
+    
+    load('ASE_Data/ASE_CSF_demo.mat');
 
-    % Load the Data:
-    load(['ASE_Data/Data_180726_40_4_SNR_100_',num2str(jj),'.mat']);
-    disp(['Analysing Dataset ',num2str(jj), ' of ',num2str(nj)]);
-
-    % Choose which tau values we want
+%     % Load the Data:
+%     load(['ASE_Data/Data_180726_40_4_SNR_100_',num2str(jj),'.mat']);
+%     disp(['Analysing Dataset ',num2str(jj), ' of ',num2str(nj)]);
+% 
+%     % Choose which tau values we want
 %     taus = -21:6:57;
-    taus = [-28:4:-20,0,28:4:64];
-
-    % pull out the right values
-    samps = find(ismember(T_sample,taus./1e3));
-    T_sample  = T_sample(samps);
-    TE_sample = TE_sample(samps);
-    S_sample  = S_sample(samps);
+%     taus = [-28:4:-20,0,28:4:64];
+% 
+%     % pull out the right values
+%     samps = find(ismember(T_sample,taus./1e3));
+%     T_sample  = T_sample(samps);
+%     TE_sample = TE_sample(samps);
+%     S_sample  = S_sample(samps);
 
 
     % Choose parameters, their range, and the number of points each way:
-    pnames = { 'R2p'    ; 'zeta'     };
+    pnames = { 'lam0'    ; 'zeta'     };
     % interv = [ 3.5, 7.5 ; 0.01, 0.07 ];
     % np     = [ 1000     ; 1000       ];
-    interv = [ 5.0, 6.5 ; 0.02, 0.06 ];
-    np     = [  400     ; 700        ];
+    interv = [ 0, 0.2 ; 0.01, 0.05 ];
+    np     = [  1000     ; 1000        ];
 
 
     % Specifically for testing critical tau. 
@@ -185,8 +187,8 @@ for jj = 1:nj
         view(2); shading flat;
         c=colorbar;
         colormap(flipud(magma));
-        plot3([trv(2),trv(2)],[  0, 1000],[1e20,1e20],'k-');
-        plot3([  0, 1000],[trv(1),trv(1)],[1e20,1e20],'k-');
+        plot3([trv(2),trv(2)],[  0, 1000],[1e40,1e40],'k-');
+        plot3([  0, 1000],[trv(1),trv(1)],[1e40,1e40],'k-');
 
         % outline
         plot3([pv1(  1),pv2(  1)],[pv1(  1),pv1(end)],[1,1],'k-','LineWidth',0.75);
