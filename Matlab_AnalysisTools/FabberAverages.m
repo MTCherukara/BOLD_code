@@ -2,7 +2,7 @@
     % Loads a particular Fabber dataset and displays the average (mean and
     % median) values of R2' and DBV in the top 8 slices.
     %
-    % Actively used as of 2018-06-27
+    % Actively used as of 2018-08-27
     %
     % Changelog:
     %
@@ -27,8 +27,8 @@ slicenum = 4:9;     % VS - instead of 3:10
 % slicenum = 1:6;   % TR = 2
 
 % Choose Data set
-setnum = 565;
-subnum = 7;
+setnum = 572;
+subnum = 3;
 
 setnum = setnum + subnum - 1;
 
@@ -58,9 +58,9 @@ for vv = 1:length(vars)
     iqr = qnt(1) - qnt(2) ./ 2;
     
 %     Display results
-    disp('   ');
-    disp(['Median ',vname,': ',num2str(median(volData),4)]);
-    disp(['   IQR ',vname,': ',num2str(iqr,4)]);
+%     disp('   ');
+%     disp(['Median ',vname,': ',num2str(median(volData),4)]);
+%     disp(['   IQR ',vname,': ',num2str(iqr,4)]);
     
     disp('   ');
     disp(['Mean ',vname,'   : ',num2str(mean(volData),4)]);
@@ -71,8 +71,8 @@ end
 
 %% Free Energy
 
-% [FEData,RData,MData] = MTC_LoadFreeEnergy(setnum,subnum,slicenum);
-% 
+[FEData,RData,MData] = MTC_LoadFreeEnergy(setnum,subnum,slicenum);
+
 % disp('   ');
 % disp(['     Mean Residual : ',num2str(mean(RData),4)]);
 % disp([' Absolute Residual : ',num2str(mean(abs(RData)),4)]);
@@ -80,7 +80,7 @@ end
 % 
 % disp('   ');
 % disp(['      Modelfit SNR : ',num2str(mean(MData)./mean(abs(RData)),4)]);
-% 
-% disp('   ');
-% disp(['  Mean Free Energy : ',num2str(-mean(FEData),4)]);
-% disp(['Median Free Energy : ',num2str(-median(FEData),4)]);
+
+disp('   ');
+disp(['  Mean Free Energy : ',num2str(-mean(FEData),4)]);
+disp(['Median Free Energy : ',num2str(-median(FEData),4)]);
