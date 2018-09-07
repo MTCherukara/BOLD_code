@@ -38,7 +38,7 @@ clear;
 
 setFigureDefaults;
 
-plot_fig = 0;       
+plot_fig = 1;       
 save_data = 1;      % set to 1 in order to save out ASE data
 
 
@@ -50,7 +50,7 @@ params.dChi = 2.64e-7;      % parts     - susceptibility difference
 params.gam  = 2.67513e8;    % rad/s/T   - gyromagnetic ratio
 
 % scan parameters 
-params.TE   = 0.082;        % s         - echo time
+params.TE   = 0.250;        % s         - echo time
 params.TR   = 3.000;        % s         - repetition time
 params.TI   = 0;        % s         - FLAIR inversion time
 
@@ -78,9 +78,9 @@ params.SNR = 100;
 %% Compute Model
 
 % define tau values that we want to simulate
-tau = (-28:4:64)/1000; % for testing
+% tau = (-28:4:64)/1000; % for testing
 % tau = (-28:1:72)/1000;
-% ttt = linspace(-0.024,0.024,1000); 
+tau = linspace(-0.028,0.240,24); 
 % tau = [0:3:12,20:10:70]/1000;
 % tau = [-8,-4,0:6:30,40,50,60]/1000;
 % tau = linspace(-0.028,0.064,1000); % for visualising
