@@ -12,7 +12,7 @@
 % should still be useable on its own, as in within simrun.m)
 %
 % 
-%       Copyright (C) University of Oxford, 2017
+%       Copyright (C) University of Oxford, 2017-2018
 %
 % 
 % Created by MT Cherukara, February 2017
@@ -41,12 +41,13 @@ function simAnalyse(varargin)
 %         disp('Display the gui!');
     
     % h - structure containing all ui element handles
-    % r - structure containing all random parameter information
-    r.open = 1; % initialize the structure, because we refer to it later
     
     % create figure
     fig = figure(99);
-    set(fig,'Name','simAnalyse','OuterPosition',[200, 200, 800, 600]);
+    set(fig,'WindowStyle','Normal');
+    set(fig,'Name','simAnalyse',...
+            'OuterPosition',[200, 200, 800, 600],...
+            'Color',[0.94, 0.94, 0.94]);
     
     
     % Title Text
@@ -118,7 +119,7 @@ function simAnalyse(varargin)
     % Edit field - TE - default 74 ms
     h.inTE = uicontrol('Style','Edit',...
                        'Position',[160,330,100,25],...
-                       'String','74',...
+                       'String','82',...
                        'FontSize',14,...
                        'HorizontalAlignment','Right');
     
@@ -129,7 +130,7 @@ function simAnalyse(varargin)
                        'Fontsize',14,...
                        'HorizontalAlignment','Left');
      
-    % Text - 'tau' 
+    % Text - 'delta tau' 
     h.tx14 = uicontrol('Style','Text',...
                        'Position',[120,270,40,25],...
                        'String','tau:',...
@@ -233,7 +234,7 @@ function simAnalyse(varargin)
     % Edit field - T2 - default 110 ms
 	h.inT2 = uicontrol('Style','Edit',...
                        'Position',[490,240,60,25],...
-                       'String','110',...
+                       'String','87',...
                        'FontSize',14,...
                        'HorizontalAlignment','Right',...
                        'Enable','off');
@@ -283,7 +284,7 @@ function simAnalyse(varargin)
                        'FontSize',14,...
                        'HorizontalAlignment','Left');
                    
-    % Text - 'Title:' - for when Plot Grah is selected
+    % Text - 'Title:' - for when Plot Graph is selected
     h.tx32 = uicontrol('Style','Text',...
                        'Position',[300,90,50,25],...
                        'String','Title:',...
@@ -357,11 +358,11 @@ function simAnalyse(varargin)
         addRequired(p,'phasedata', @(x) isa(x,'char'));
         
         % optional parameters, to be supplied as name-value pairs
-        addParameter(p,'TE',60);        % TE        -   60 ms
-        addParameter(p,'tau',2);        % tau       -	2 ms
+        addParameter(p,'TE',82);        % TE        -   82 ms
+        addParameter(p,'tau',2);        % tau step  -	2 ms
         addParameter(p,'normalise',1);  % normalise -   yes
         addParameter(p,'incT2',1);      % T2 effect -   include
-        addParameter(p,'T2',110);       % T2 value  -   110 ms
+        addParameter(p,'T2',87);        % T2 value  -   87 ms
         addParameter(p,'incIV',1);      % blood signal - include
         addParameter(p,'display',0);    % display plot - no
         addParameter(p,'save',0);       % save results - yes
