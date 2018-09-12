@@ -1,4 +1,4 @@
-function [sigTOT tau sigEV sigIV]=generate_signal(p,storedPhase,varargin)
+function [sigTOT, tau, sigEV, sigIV]=generate_signal(p,storedPhase,varargin)
 
 	q=inputParser;
 	addParameter(q,'TE',p.TE,@isnumeric); %target echo time
@@ -20,7 +20,6 @@ function [sigTOT tau sigEV sigIV]=generate_signal(p,storedPhase,varargin)
 	%error checking
 	if or(mod(round(r.TE*1000),(round(p.deltaTE*2000)))>0,p.TE<=0)
 		disp(['TE must be in the range ' num2str(p.deltaTE*2000) 'ms to ' num2str(t(end)*1000) 'ms in steps of ' num2str(p.deltaTE*2000) 'ms!']);
-		sig_ase=[];
 		return;
 	end
 	
@@ -51,7 +50,7 @@ function [sigTOT tau sigEV sigIV]=generate_signal(p,storedPhase,varargin)
 	elseif strcmp(r.seq,'GESSE')
 		%generate a GESSE weighted signal
 		if isempty(r.tau)
-			tau=(-r.TE./2:p.deltaTE:(p.TE.*2-r.TE))';
+			tau=(-r.TE/2:p.deltaTE:(p.TE*2-r.TE))';
 		else
 			tau=r.tau;
 		end
@@ -66,21 +65,23 @@ function [sigTOT tau sigEV sigIV]=generate_signal(p,storedPhase,varargin)
 	else
 		disp('Sequence unknown');
 		return;
-	end
-
+    end
+      
 	numStepsInVessel=p.numStepsInVessel;
 	
 	switch(r.permeable)
 		case true
 			protonIndex=(1:5000);
 		case false
-			protonIndex=find(numStepsInVessel==0,5000,'first');
-		otherwise
-			protonIndex=find(numStepsInVessel==0,5000,'first');
+            protonIndex=(1:5000);
+% 			protonIndex=find(numStepsInVessel==0,5000,'first');
+        otherwise
+            protonIndex=(1:5000);
+% 			protonIndex=find(numStepsInVessel==0,5000,'first');
 	end
 
 	if length(protonIndex)<5000
-		sigEV=repmat(NaN,length(tau),1);
+		sigEV=NaN(length(tau),1);
 	else
 		sigEV=calc_sig(Phase(:,protonIndex),p,r).*exp(-TE./r.T2EV);
 	end
@@ -91,7 +92,8 @@ function [sigTOT tau sigEV sigIV]=generate_signal(p,storedPhase,varargin)
 	else
 		sigTOT=sigEV;
 		sigIV=calc_sigIV(p,r,TE,tau);
-	end
+    end
+end
 	
 	function sigEV=calc_sig(Phase,p,r)
 
@@ -101,7 +103,7 @@ function [sigTOT tau sigEV sigIV]=generate_signal(p,storedPhase,varargin)
 			Suscscale=1;
 		end
 		
-		sigEV=abs(sum(exp(-i.*Phase.*Suscscale),2)./length(Phase));
+		sigEV=abs(sum(exp(-1i.*Phase.*Suscscale),2)./length(Phase));
 
 		if length(p.R)==1
 			shapeEV=-log(sigEV)./p.vesselFraction;
@@ -124,7 +126,7 @@ function [sigTOT tau sigEV sigIV]=generate_signal(p,storedPhase,varargin)
 				+(3/2)-2.*((1/4)+(TE-(TE-tau)/2)./taud).^(1/2)...
 				-2.*((1./4)+((TE-tau)/2)/taud).^(1/2))).*exp(-TE./r.T2b0);
 		else
-			sigIV=repmat(NaN,length(tau),1);
+			sigIV=NaN(length(tau),1);
 		end
 		
 	return;

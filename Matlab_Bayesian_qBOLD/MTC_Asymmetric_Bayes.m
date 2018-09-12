@@ -61,7 +61,7 @@ for jj = 1:nj
 
     tic;
     
-    load('ASE_Data/ASE_CSF_demo_long.mat');
+    load('ASE_Data/Simdata_Sharan.mat');
 
 %     % Load the Data:
 %     load(['ASE_Data/Data_180726_40_4_SNR_100_',num2str(jj),'.mat']);
@@ -79,11 +79,11 @@ for jj = 1:nj
 
 
     % Choose parameters, their range, and the number of points each way:
-    pnames = { 'lam0'    ; 'zeta'     };
-    % interv = [ 3.5, 7.5 ; 0.01, 0.07 ];
-    % np     = [ 1000     ; 1000       ];
-    interv = [ 0, 0.1 ; 0.01, 0.05 ];
-    np     = [  1000     ; 1000        ];
+    pnames = { 'R2p'    ; 'zeta'     };
+    interv = [ 3.5, 7.5 ; 0.001, 0.041 ];
+    np     = [ 100     ; 100       ];
+%     interv = [ 0, 0.1 ; 0.01, 0.05 ];
+%     np     = [  1000     ; 1000        ];
 
 
     % Specifically for testing critical tau. 
@@ -139,7 +139,7 @@ for jj = 1:nj
 
         pos = zeros(np(1),np(2));
 
-        parfor i1 = 1:np1
+        for i1 = 1:np1
             % loop through parameter 1
 
             % create a parameters object
@@ -226,5 +226,5 @@ for jj = 1:nj
 
 end
 
-save('GridMaxima_1.mat','taus','maxes','params');
+% save('GridMaxima_1.mat','taus','maxes','params');
 
