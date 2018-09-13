@@ -1,8 +1,8 @@
-% MTC_Asymmetric_Bayes.m
-% Perform Bayesian inference on ASE/BOLD data from MTC_qBOLD.m using a 2D grid
-% search
+% MTC_GridSearch_Bayes.m
 %
-% Based on MTC_Bayes_BOLD.m
+% Perform Bayesian inference on ASE qBOLD data from qASE.m using a 2D grid
+% search. Requires qASE_model.m, which should all be in the same folder.
+% Also requires a .mat file of simulated ASE qBOLD data produced by qASE.m
 %
 % 
 %       Copyright (C) University of Oxford, 2016-2018
@@ -89,6 +89,9 @@ for jj = 1:nj
     % Specifically for testing critical tau. 
     params.tc_man = 0;
     params.tc_val = 0.024;
+    
+    % Model selection
+    params.asymp = 1;  % should the asymptotic tissue model be used?
 
     % extract relevant parameters
     sigma = mean(params.sig);   % real std of noise
@@ -103,9 +106,9 @@ for jj = 1:nj
 
     % are we inferring on R2'?
     if any(strcmp(pnames,'R2p'))
-        noDW = 1; % this changes what happens in MTC_qASE_model.m
+        params.calcDW = 0; % this changes what happens in MTC_qASE_model.m
     else
-        noDW = 0;
+        params.calcDW = 1;
     end
 
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -143,7 +146,7 @@ for jj = 1:nj
             % loop through parameter 1
 
             % create a parameters object
-            looppars = param_update(pv1(i1),params,pn1);
+            looppars = updateParams(pv1(i1),params,pn1);
             posvec = zeros(1,np2);
 
             pv22 = pv2; % to avoid using pv2 as a broadcast variable
@@ -152,16 +155,16 @@ for jj = 1:nj
                 % loop through parameter 2
 
                 % create a parameters object
-                inpars = param_update(pv22(i2),looppars,pn2);
+                inpars = updateParams(pv22(i2),looppars,pn2);
 
                 % run the model to evaluate the signal with current params            
-                S_mod = MTC_qASE_model2(T_sample,TE_sample,inpars,noDW);
+                S_mod = qASE_model(T_sample,TE_sample,inpars);
 
                 % normalize
                 S_mod = S_mod./max(S_mod);
 
                 % calculate posterior based on known noise value
-                posvec(i2) = MTC_loglike(S_sample,S_mod,sigma);
+                posvec(i2) = calcLogLikelihood(S_sample,S_mod,sigma);
 
             end % for i2 = 1:np2
 

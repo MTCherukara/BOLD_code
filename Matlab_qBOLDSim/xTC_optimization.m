@@ -6,6 +6,11 @@
 
 % MT Cherukara
 % 9 February 2018
+%
+% CHANGELOG:
+%
+% 2018-09-13 (MTC). NB: THIS SCRIPT NEEDS TO BE UPDATED TO REFLECT CHANGES TO
+%       THE MODEL CALCULATION FUNCTIONS!!
 
 clear;
 % close all;

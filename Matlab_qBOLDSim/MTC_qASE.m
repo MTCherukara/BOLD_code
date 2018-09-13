@@ -70,6 +70,8 @@ params.T1e  = 3.870;        % s         - CSF T1
 % analysis parameters
 params.tc_man = 0;          % BOOL      - should Tc be defined manually?
 params.tc_val = 0.0;        % s         - manual Tc (if tc_man = 1)
+params.asymp  = 0;          % BOOL      - should the asymptotic tissue model be used?
+params.calcDW = 1;          % BOOL      - should dw be recalculated based on OEF?
 
 % noise
 params.SNR = 100;
@@ -89,7 +91,7 @@ tau = linspace(-0.028,0.240,24);
 np = length(tau);
 
 % call MTC_qASE_model
-[S_total,params] = MTC_qASE_modelB(tau,params.TE,params);
+[S_total,params] = qASE_model(tau,params.TE,params);
 
 
 % params.tc_man = 1;

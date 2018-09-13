@@ -17,6 +17,9 @@
 %
 % CHANGELOG:
 %
+% 2018-09-13 (MTC). NB: THIS SCRIPT NEEDS TO BE UPDATED TO REFLECT CHANGES TO
+%       THE MODEL CALCULATION FUNCTIONS!!
+%
 % 2018-02-05 (MTC). Came up with a better, more extensible, method for
 %       displaying the results.
 %

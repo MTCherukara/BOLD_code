@@ -3,6 +3,10 @@
 % generate a 3D surface of signal as a function of both TE and tau for
 % given values of OEF and DBV
 
+%
+% 2018-09-13 (MTC). NB: THIS SCRIPT NEEDS TO BE UPDATED TO REFLECT CHANGES TO
+%       THE MODEL CALCULATION FUNCTIONS!!
+
 clear;
 close all;
 
@@ -54,7 +58,7 @@ for iO = 1:length(OEF)
             params.TE = TE(iT);
             
             % run the model
-            S0(iO,iZ,iT,:) = MTC_qASE_model(tau,params);
+            S0(iO,iZ,iT,:) = qASE_model(tau,TE(iT),params);
         end
     end
 end
