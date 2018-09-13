@@ -1,8 +1,8 @@
 # fabber run 1 - FLAIR/non-FLAIR testing
 
 # Input Data
-data=../../Data/subject_04/ASE_NF_82.nii.gz
-mask=../../Data/subject_04/mask_FLAIR.nii.gz
+data=../../Data/DicksonData.nii.gz
+mask=../../Data/DicksonMask.nii.gz
 
 # Run Options
 output=../../Data/Fabber_Results/
@@ -11,13 +11,13 @@ save-model-fit
 print-free-energy
 
 # Method Information
-method=vb
+method=nlls
 noise=white
 max-iterations=10
 allow-bad-voxels
 
 # Inference Model 
-model=qboldR2p
+model=phenom
 inferR2p
 inferDBV
 #inferCBV

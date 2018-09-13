@@ -61,7 +61,7 @@ for jj = 1:nj
 
     tic;
     
-    load('ASE_Data/Simdata_Sharan.mat');
+    load('ASE_Data/Data_180913_Dickson.mat');
 
 %     % Load the Data:
 %     load(['ASE_Data/Data_180726_40_4_SNR_100_',num2str(jj),'.mat']);
@@ -80,8 +80,12 @@ for jj = 1:nj
 
     % Choose parameters, their range, and the number of points each way:
     pnames = { 'R2p'    ; 'zeta'     };
-    interv = [ 3.5, 7.5 ; 0.001, 0.041 ];
-    np     = [ 100     ; 100       ];
+    interv = [ 2.5, 6.5 ; 0.01, 0.07 ];
+    np     = [ 1000     ; 1000       ];
+    
+%     pnames = { 'OEF'    ; 'zeta'     };
+%     interv = [ 0.2, 0.6 ; 0.01, 0.07 ];
+%     np     = [ 1000     ; 1000       ];
 %     interv = [ 0, 0.1 ; 0.01, 0.05 ];
 %     np     = [  1000     ; 1000        ];
 
@@ -142,7 +146,7 @@ for jj = 1:nj
 
         pos = zeros(np(1),np(2));
 
-        for i1 = 1:np1
+        parfor i1 = 1:np1
             % loop through parameter 1
 
             % create a parameters object
@@ -194,7 +198,7 @@ for jj = 1:nj
         plot3([  0, 1000],[trv(1),trv(1)],[1e40,1e40],'k-');
 
         % outline
-        plot3([pv1(  1),pv2(  1)],[pv1(  1),pv1(end)],[1,1],'k-','LineWidth',0.75);
+        plot3([pv2(  1),pv2(  1)],[pv1(  1),pv1(end)],[1,1],'k-','LineWidth',0.75);
         plot3([pv2(end),pv2(end)],[pv1(  1),pv1(end)],[1,1],'k-','LineWidth',0.75);
         plot3([pv2(  1),pv2(end)],[pv1(  1),pv1(  1)],[1,1],'k-','LineWidth',0.75);
         plot3([pv2(  1),pv2(end)],[pv1(end),pv1(end)],[1,1],'k-','LineWidth',0.75);

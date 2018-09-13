@@ -12,7 +12,8 @@ setFigureDefaults;
 
 % acquisition parameters
 TE  = 80;   % ms
-tau = linspace(-28,64,1000);    % ms
+% tau = linspace(-28,64,1000);    % ms
+tau = -28:4:64;
 
 % model parameters of importance
 zeta = 0.03;
@@ -49,10 +50,11 @@ ST = exp(-zeta.*F);
 % Add R2 decay
 % ST = ST.*exp(-TE./T2);
 
+% ST = log((ST)./max(ST));
 
 %% Plot ASE
 
-figure(1);
+figure(2);
 plot(tau,ST); hold on;
 
 legend(['OEF=',num2str(100*OEF),'%, DBV=',num2str(100*zeta),'%'],...

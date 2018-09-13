@@ -94,9 +94,10 @@ w_tis = 1 - (w_csf + w_bld);
 
 % tissue compartment
 if PARAMS.asymp
-    S_tis = w_tis.*calcAsympTissue(TAU,TE,PARAMS);
+    S_tis = w_tis.*calcTissueAsymp(TAU,TE,PARAMS);
 else
-    S_tis = w_tis.*calcTissueCompartment(TAU,TE,PARAMS);
+%     S_tis = w_tis.*calcTissueCompartment(TAU,TE,PARAMS);
+    S_tis = w_tis.*calcTissuePhenom(TAU,TE,PARAMS);
 end
 
 S_csf = w_csf.*calcExtraCompartment(TAU,TE,PARAMS);
@@ -210,8 +211,8 @@ function SE = calcExtraCompartment(TAU,TE,PARAMS)
 end
 
 
-%% calcAsympTissue function
-function ST = calcAsympTissue(TAU,TE,PARAMS)
+%% calcTissueAsymp function
+function ST = calcTissueAsymp(TAU,TE,PARAMS)
     % Calculate the tissue contribution to ASE qBOLD signal using the asymptotic
     % version of the Yablonskiy (1994) static dephasing model
     
@@ -249,41 +250,40 @@ function ST = calcAsympTissue(TAU,TE,PARAMS)
 end
 
 
-%% calcTissueDickson function
-function ST = calcTissueDickson(TAU,TE,PARAMS)
+%% calcTissuePhenom function
+function ST = calcTissuePhenom(TAU,TE,PARAMS)
     % calculate the phenomenological qBOLD model presented in Dickson et al.,
-    % 2011
+    % 2011, adapted for ASE. Note that the coefficients are defined for time
+    % values given in ms, as opposed to s
     
-    % values of the coefficients (given by Dickson, for GESSE):
-    B11 =  70.4280;
-    B12 =  57.7890;
-    B13 =   1.4565;
-    B21 =   0.0324;
-    B22 =  -0.1708;
-    B23 =   2.1357;
-    B31 =   0.2587;
-    B32 =   0.1752;
-    B33 =   6.1483;
-    B41 =  58.1100;
-    B42 =  62.8920;
-    B43 =   1.5827;
+    % values of the coefficients (given by Dickson, for FID):
+    B11 = 55.385;
+    B12 = 52.719;
+    B13 = -0.0242;
+    B21 = 35.314;
+    B22 = 34.989;
+    B23 = -0.0034;
+    B31 =  0.3172;
+    B32 =  0.3060;
+    B33 =  3.1187;
     
     % model parameters of importance
     zeta = PARAMS.zeta;
     OEF  = PARAMS.OEF;
-    
+    R2t  = PARAMS.R2t;
+
     % Calculate second order coefficients
     A1 = OEF*(B11 - (B12 * exp(-B13*OEF)));
     A2 = OEF*(B21 - (B22 * exp(-B23*OEF)));
     A3 = OEF*(B31 - (B32 * exp(-B33*OEF)));
-    A4 = OEF*(B41 - (B42 * exp(-B43*OEF)));
     
     % Calculate F
-    F = ( A1.*(exp(-A2.*abs(tau)) - 1) ) + (A3.*abs(tau)) + A4;
+    F = ( A1.*(exp(-A2.*abs(1000*TAU)) - 1) ) + (A3.*abs(1000*TAU));
     
     % Calculate ST
     ST = exp(-zeta.*F);
     
     % add T2 effect
-    ST = ST.*exp(-PARAMS.R2t.*TE);
+    ST = ST.*exp(-R2t.*TE);
+    
 end
