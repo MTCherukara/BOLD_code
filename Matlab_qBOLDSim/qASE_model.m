@@ -247,3 +247,43 @@ function ST = calcAsympTissue(TAU,TE,PARAMS)
     % add T2 effect
     ST = ST.*exp(-R2t.*TE);
 end
+
+
+%% calcTissueDickson function
+function ST = calcTissueDickson(TAU,TE,PARAMS)
+    % calculate the phenomenological qBOLD model presented in Dickson et al.,
+    % 2011
+    
+    % values of the coefficients (given by Dickson, for GESSE):
+    B11 =  70.4280;
+    B12 =  57.7890;
+    B13 =   1.4565;
+    B21 =   0.0324;
+    B22 =  -0.1708;
+    B23 =   2.1357;
+    B31 =   0.2587;
+    B32 =   0.1752;
+    B33 =   6.1483;
+    B41 =  58.1100;
+    B42 =  62.8920;
+    B43 =   1.5827;
+    
+    % model parameters of importance
+    zeta = PARAMS.zeta;
+    OEF  = PARAMS.OEF;
+    
+    % Calculate second order coefficients
+    A1 = OEF*(B11 - (B12 * exp(-B13*OEF)));
+    A2 = OEF*(B21 - (B22 * exp(-B23*OEF)));
+    A3 = OEF*(B31 - (B32 * exp(-B33*OEF)));
+    A4 = OEF*(B41 - (B42 * exp(-B43*OEF)));
+    
+    % Calculate F
+    F = ( A1.*(exp(-A2.*abs(tau)) - 1) ) + (A3.*abs(tau)) + A4;
+    
+    % Calculate ST
+    ST = exp(-zeta.*F);
+    
+    % add T2 effect
+    ST = ST.*exp(-PARAMS.R2t.*TE);
+end
