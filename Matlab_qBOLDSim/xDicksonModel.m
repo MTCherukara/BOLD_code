@@ -16,7 +16,7 @@ TE  = 80;   % ms
 tau = -28:1:64;
 
 % model parameters of importance
-zeta = 0.03;
+zeta = 0.06;
 OEF  = 0.40;
 T2   = 87;   % ms
 
