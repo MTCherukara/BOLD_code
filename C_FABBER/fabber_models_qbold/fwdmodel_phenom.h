@@ -28,7 +28,7 @@ public:
     virtual void NameParams(vector<string> &names) const;
     virtual int NumParams() const 
     {
-        return 9;
+        return 9 + (infer_OEF ? 1 : 0) + (infer_DBV ? 1 : 0);
     }    
     virtual void HardcodedInitialDists(MVNDist &prior, MVNDist &posterior) const;
     virtual void Evaluate(const NEWMAT::ColumnVector &params, NEWMAT::ColumnVector &result) const;
@@ -36,57 +36,29 @@ public:
 protected:
 
     // Simulation Parameters
-    double OEF;
-    double DBV;
+    double fixedOEF;
+    double fixedDBV; 
     double TE;
+
     NEWMAT::ColumnVector taus;
 
-    // Model coefficients
-    int b11_index() const
+    double tau_start;
+    double tau_step;
+    double tau_end;
+
+    // indices of parametes
+    int OEF_index() const
     {
-        return 1;
+        return (infer_OEF ? 10 : 0);
+    }
+    int DBV_index() const
+    {
+        return (infer_DBV ? (10 + (infer_OEF ? 1 : 0)) : 0 );
     }
 
-    int b12_index() const
-    {
-        return 2;
-    }
-
-    int b13_index() const
-    {
-        return 3;
-    }
-
-    int b21_index() const
-    {
-        return 4;
-    }
-
-    int b22_index() const
-    {
-        return 5;
-    }
-
-    int b23_index() const
-    {
-        return 6;
-    }
-
-    int b31_index() const
-    {
-        return 7;
-    }
-
-    int b32_index() const
-    {
-        return 8;
-    }
-
-    int b33_index() const
-    {
-        return 9;
-    }
-
+    // Do we want to infer on OEF and DBV
+    bool infer_OEF;
+    bool infer_DBV;
 
 private:
     static FactoryRegistration<FwdModelFactory, PhenomFwdModel> registration;

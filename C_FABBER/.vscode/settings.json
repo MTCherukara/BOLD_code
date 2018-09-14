@@ -14,7 +14,21 @@
         "*.fab": "fab",
         "complex": "cpp",
         "chrono": "cpp",
-        "iterator": "cpp"
+        "iterator": "cpp",
+        "__config": "cpp",
+        "cstddef": "cpp",
+        "exception": "cpp",
+        "initializer_list": "cpp",
+        "new": "cpp",
+        "stdexcept": "cpp",
+        "typeinfo": "cpp",
+        "cctype": "cpp",
+        "cinttypes": "cpp",
+        "cstdint": "cpp",
+        "cstdio": "cpp",
+        "cwchar": "cpp",
+        "cwctype": "cpp",
+        "type_traits": "cpp"
     },
     "editor.minimap.enabled": false,
     "python.pythonPath": "/Users/mattcher/anaconda3/bin/python3"

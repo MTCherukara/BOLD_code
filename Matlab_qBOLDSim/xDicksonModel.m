@@ -3,7 +3,7 @@
 % testing the phenomenological qBOLD model given by Dickson et al., (2011), and
 % adapting it for ASE (as opposed to GESSE)
 
-clear;
+% clear;
 % close all;
 setFigureDefaults;
 
@@ -13,7 +13,7 @@ setFigureDefaults;
 % acquisition parameters
 TE  = 80;   % ms
 % tau = linspace(-28,64,1000);    % ms
-tau = -28:4:64;
+tau = -28:1:64;
 
 % model parameters of importance
 zeta = 0.03;
@@ -34,6 +34,16 @@ B23 = -0.0034;
 B31 =  0.3172;
 B32 =  0.3060;
 B33 =  3.1187;
+
+% B11 = 0.00012 ;
+% B12 = 0.000 ;
+% B13 = 0.033305 ;
+% B21 = 1.953244 ;
+% B22 = 21.874702 ;
+% B23 = 1.033624 ;
+% B31 = 1.303155 ;
+% B32 = 1.216965 ;
+% B33 = 0.035923 ;
 
 
 % Calculate second order coefficients
@@ -63,7 +73,7 @@ ylabel('ASE Signal [a.u.]');
 xlabel('Spin Echo Displacement \tau (ms)');
 title('Dickson Phenomenological Model');
 xlim([min(tau)-4,max(tau)+4]);
-
+ylim([0.84,1.01]);
 
 
 %% Random timeline stuff

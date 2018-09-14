@@ -47,28 +47,69 @@ string PhenomFwdModel::ModelVersion() const
 void PhenomFwdModel::Initialize(ArgsType &args)
 {
 
-    // First read tau values, since these will always be specified
+    // Decide on inference targets
+    infer_OEF = args.ReadBool("inferOEF");
+    infer_DBV = args.ReadBool("inferDBV");
+
+    // Read tau values
 
     // temporary holder
     string tau_temp;
 
-    // this parses through the input args for tau1=X, tau2=X and so on, until it reaches a tau
-    // that isn't supplied in the argument, and it adds all these to the ColumnVector taus
-    while (true)
+    
+    // Check whether tau_start has been supplied
+    tau_temp = args.ReadWithDefault("tau_start", "nope");
+ 
+    if (tau_temp == "nope")
     {
-        int N = taus.Nrows()+1;
-        tau_temp = args.ReadWithDefault("tau"+stringify(N), "stop!");
-        if (tau_temp == "stop!") break;
+        // since there is no tau_start, read through individual taus as before:
+        while (true)
+        {
+            int N = taus.Nrows()+1;
+            tau_temp = args.ReadWithDefault("tau"+stringify(N), "stop!");
+            if (tau_temp == "stop!") break;
 
-        ColumnVector tmp(1);
-        tmp = convertTo<double>(tau_temp);
-        taus &= tmp;
+            ColumnVector tmp(1);
+            tmp = convertTo<double>(tau_temp);
+            taus &= tmp;
 
-    }
+        }
+    } // if (tau_temp == "nope") 
 
-    OEF = convertTo<double>(args.ReadWithDefault("OEF","0.400"));
-    DBV = convertTo<double>(args.ReadWithDefault("DBV","0.030"));
+    else
+    { 
+        // read in specificied tau parameters        
+        tau_start = convertTo<double>(tau_temp);;
+        tau_end   = convertTo<double>(args.ReadWithDefault("tau_end", "0.064"));;
+        tau_step  = convertTo<double>(args.ReadWithDefault("tau_step", "0.004"));;
+
+        // generate a column-vector of taus
+        double tau_val = tau_start;
+
+        // populate the taus vector
+        while (tau_val <= tau_end + 0.0001)
+        {
+            ColumnVector tmp(1);
+            tmp = tau_val;
+            taus &= tmp;
+            tau_val += tau_step;
+        }
+        
+
+    } // if (tau_temp == "nope") ... else ...
+
+    // Read TE
     TE  = convertTo<double>(args.ReadWithDefault("TE", "0.074"));
+
+    // read OEF/DBV information
+    if (!infer_OEF)
+    {
+        fixedOEF = convertTo<double>(args.ReadWithDefault("OEF","0.400"));
+    }
+    if (!infer_DBV)
+    {
+        fixedDBV = convertTo<double>(args.ReadWithDefault("DBV","0.030"));
+    }
 
     // add information to the log
     LOG << "Inference using development model" << endl;
@@ -76,7 +117,22 @@ void PhenomFwdModel::Initialize(ArgsType &args)
     {
         LOG << "    tau(" << ii << ") = " << taus(ii) << endl;
     }
-    
+    if (infer_OEF)
+    {
+        LOG << "Inferring on OEF " << endl;
+    }
+    else
+    {
+        LOG << "OEF fixed to " << fixedOEF << endl;
+    }
+    if (infer_DBV)
+    {
+        LOG << "Inferring on DBV " << endl;
+    }
+    else
+    {
+        LOG << "DBV fixed to " << fixedDBV << endl;
+    }
     
 } // Initialize
 
@@ -98,6 +154,14 @@ void PhenomFwdModel::NameParams(vector<string> &names) const
     names.push_back("b31"); 
     names.push_back("b32"); 
     names.push_back("b33"); 
+    if (infer_OEF)
+    {
+        names.push_back("OEF"); // parameter 1 - Oxygen Extraction Fraction
+    }
+    if (infer_DBV)
+    {
+        names.push_back("DBV"); // parameter 2 - DBV
+    }
 
 } // NameParams
 
@@ -112,37 +176,73 @@ void PhenomFwdModel::HardcodedInitialDists(MVNDist &prior, MVNDist &posterior) c
     // create diagonal matrix to store precisions
     SymmetricMatrix precisions = IdentityMatrix(NumParams()) * 1e-3;
 
-    prior.means(b11_index()) = 50.0;
-    precisions(b11_index(), b11_index()) = 1e-6;
+    prior.means(1) = 55.0;
+    precisions(1, 1) = 1e-2;
 
-    prior.means(b12_index()) = 50.0;
-    precisions(b12_index(), b12_index()) = 1e-6;
+    prior.means(2) = 53.0;
+    precisions(2, 2) = 1e-2;
 
-    prior.means(b13_index()) = 0.0;
-    precisions(b13_index(), b13_index()) = 1e-6;
+    prior.means(3) = -0.0242;
+    precisions(3, 3) = 1e0;
 
-    prior.means(b21_index()) = 30.0;
-    precisions(b21_index(), b21_index()) = 1e-6;
+    prior.means(4) = 35.0;
+    precisions(4, 4) = 1e-2;
 
-    prior.means(b22_index()) = 30.0;
-    precisions(b22_index(), b22_index()) = 1e-6;
+    prior.means(5) = 35.0;
+    precisions(5, 5) = 1e-2;
 
-    prior.means(b22_index()) = 0.0;
-    precisions(b22_index(), b22_index()) = 1e-6;
+    prior.means(6) = -0.0034;
+    precisions(6, 6) = 1e1;
 
-    prior.means(b22_index()) = 0.0;
-    precisions(b22_index(), b22_index()) = 1e-6;
+    prior.means(7) = 0.3;
+    precisions(7, 7) = 1e0;
 
-    prior.means(b22_index()) = 0.0;
-    precisions(b22_index(), b22_index()) = 1e-6;
+    prior.means(8) = 0.3;
+    precisions(8, 8) = 1e0;
 
-    prior.means(b22_index()) = 3.0;
-    precisions(b22_index(), b22_index()) = 1e-6;
+    prior.means(9) = 3.0;
+    precisions(9, 9) = 1e-1;
+
+    if (infer_OEF)
+    {
+        prior.means(OEF_index()) = 0.40;
+        precisions(OEF_index(), OEF_index()) = 1e3;
+    }
+    if (infer_DBV)
+    {
+        prior.means(DBV_index()) = 0.03;
+        precisions(DBV_index(), DBV_index()) = 1e3;
+    }
 
 
     prior.SetPrecisions(precisions);
 
-    posterior = prior; // we don't need to change the initial guess (at least, not at this stage)
+    posterior = prior;
+
+    // set distributions for initial posteriors
+
+    /*
+    posterior.means(1) = 55.4;
+    precisions(1, 1) = 1e-1; 
+    posterior.means(2) = 52.7;
+    precisions(2, 2) = 1e-1; 
+    posterior.means(3) = -0.0242;
+    precisions(3, 3) = 1e2; 
+    posterior.means(4) = 35.0;
+    precisions(4, 4) = 1e-1; 
+    posterior.means(5) = 35.0;
+    precisions(5, 5) = 1e-1; 
+    posterior.means(6) = -0.003;
+    precisions(6, 6) = 1e2; 
+    posterior.means(7) = 0.3;
+    precisions(7, 7) = 1e1; 
+    posterior.means(8) = 0.3;
+    precisions(8, 8) = 1e1; 
+    posterior.means(9) = 3.0;
+    precisions(9, 9) = 1e0; 
+    
+    posterior.SetPrecisions(precisions);
+    */
 
 } // HardcodedInitialDists
 
@@ -175,16 +275,37 @@ void PhenomFwdModel::Evaluate(const ColumnVector &params, ColumnVector &result) 
     double b32;
     double b33;
 
+    // physiological parameters
+    double OEF;
+    double DBV;
+
+    if (infer_OEF)
+    {
+        OEF = paramcpy(OEF_index());
+    }
+    else
+    {
+        OEF = fixedOEF;
+    }
+    if (infer_DBV)
+    {
+        DBV = paramcpy(DBV_index());
+    }
+    else
+    {
+        DBV = fixedDBV;
+    }
+
     // assign values to parameters
-    b11 = paramcpy(b11_index());
-    b12 = paramcpy(b12_index());
-    b13 = paramcpy(b13_index());
-    b21 = paramcpy(b21_index());
-    b22 = paramcpy(b22_index());
-    b23 = paramcpy(b23_index());
-    b31 = paramcpy(b31_index());
-    b32 = paramcpy(b32_index());
-    b33 = paramcpy(b33_index());
+    b11 = paramcpy(1);
+    b12 = paramcpy(2);
+    b13 = paramcpy(3);
+    b21 = paramcpy(4);
+    b22 = paramcpy(5);
+    b23 = paramcpy(6);
+    b31 = paramcpy(7);
+    b32 = paramcpy(8);
+    b33 = paramcpy(9);
 
     // loop through taus
     result.ReSize(taus.Nrows());

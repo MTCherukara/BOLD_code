@@ -1,49 +1,57 @@
 # fabber run 11 - phenomenological model testing
 
 # Input Data
-data=../../Data/DicksonData.nii.gz
+data=../../Data/DicksonDataOEF.nii.gz
 mask=../../Data/DicksonMask.nii.gz
 
 # Run Options
-output=../../Data/Fabber_Results/
+output=../../Data/Fabber_ModelFits/
 save-residuals
 save-model-fit
-print-free-energy
+#print-free-energy
 
 # Method Information
-method=vb
+method=spatialvb
 noise=white
 max-iterations=10
 allow-bad-voxels
 
+# Spatial VB Information (remove all of this if method!=spatialvb)
+param-spatial-priors=MMMMMMMMMI
+image-prior10=../../Data/OEFvalues.nii.gz
+
 # Inference Model 
 model=phenom
-
+inferOEF
 
 # Scan Parameters (maybe I'll think of a better way of doing this...)
 
-tau1=0.028
-tau2=0.024
-tau3=0.020
-tau4=0.016
-tau5=0.012
-tau6=0.008
-tau7=0.004
-tau8=0.0
-tau9=0.004
-tau10=0.008
-tau11=0.012
-tau12=0.016
-tau13=0.020
-tau14=0.024
-tau15=0.028
-tau16=0.032
-tau17=0.036
-tau18=0.040
-tau19=0.044
-tau20=0.048
-tau21=0.052
-tau22=0.056
-tau23=0.060
-tau24=0.064
+tau_start=-0.028
+tau_end=0.064
+tau_step=0.001
 
+
+#tau1=-0.028
+#tau2=-0.024
+#tau3=-0.020
+#tau4=-0.016
+#tau5=-0.012
+#tau6=-0.008
+#tau7=-0.004
+#tau8=0.0
+#tau9=0.004
+#tau10=0.008
+#tau11=0.012
+#tau12=0.016
+#tau13=0.020
+#tau14=0.024
+#tau15=0.028
+#tau16=0.032
+#tau17=0.036
+#tau18=0.040
+#tau19=0.044
+#tau20=0.048
+#tau21=0.052
+#tau22=0.056
+#tau23=0.060
+#tau24=0.064
