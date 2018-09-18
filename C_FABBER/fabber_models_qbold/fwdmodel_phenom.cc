@@ -176,37 +176,46 @@ void PhenomFwdModel::HardcodedInitialDists(MVNDist &prior, MVNDist &posterior) c
     // create diagonal matrix to store precisions
     SymmetricMatrix precisions = IdentityMatrix(NumParams()) * 1e-3;
 
+    // b11
     prior.means(1) = 55.0;
-    precisions(1, 1) = 1e-2;
+    precisions(1, 1) = 1e-1;
 
+    // b12
     prior.means(2) = 53.0;
-    precisions(2, 2) = 1e-2;
+    precisions(2, 2) = 1e-1;
 
+    // b13
     prior.means(3) = -0.0242;
-    precisions(3, 3) = 1e0;
+    precisions(3, 3) = 1e2;
 
+    // b21
     prior.means(4) = 35.0;
-    precisions(4, 4) = 1e-2;
+    precisions(4, 4) = 1e-1;
 
+    // b22
     prior.means(5) = 35.0;
-    precisions(5, 5) = 1e-2;
+    precisions(5, 5) = 1e-1;
 
+    // b23
     prior.means(6) = -0.0034;
-    precisions(6, 6) = 1e1;
+    precisions(6, 6) = 1e3;
 
+    // b31
     prior.means(7) = 0.3;
-    precisions(7, 7) = 1e0;
+    precisions(7, 7) = 1e1;
 
+    // b32
     prior.means(8) = 0.3;
-    precisions(8, 8) = 1e0;
+    precisions(8, 8) = 1e1;
 
+    // b33
     prior.means(9) = 3.0;
-    precisions(9, 9) = 1e-1;
+    precisions(9, 9) = 1e0;
 
     if (infer_OEF)
     {
         prior.means(OEF_index()) = 0.40;
-        precisions(OEF_index(), OEF_index()) = 1e3;
+        precisions(OEF_index(), OEF_index()) = 1e0;
     }
     if (infer_DBV)
     {

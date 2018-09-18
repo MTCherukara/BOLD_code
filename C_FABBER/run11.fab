@@ -8,17 +8,17 @@ mask=../../Data/DicksonMask.nii.gz
 output=../../Data/Fabber_ModelFits/
 save-residuals
 save-model-fit
-#print-free-energy
+print-free-energy
 
 # Method Information
-method=spatialvb
+method=vb
 noise=white
 max-iterations=10
 allow-bad-voxels
 
 # Spatial VB Information (remove all of this if method!=spatialvb)
-param-spatial-priors=MMMMMMMMMI
-image-prior10=../../Data/OEFvalues.nii.gz
+#param-spatial-priors=MMMMMMMMMN
+#image-prior10=../../Data/OEFvalues.nii.gz
 
 # Inference Model 
 model=phenom

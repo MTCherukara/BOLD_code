@@ -3,7 +3,7 @@
 % testing the phenomenological qBOLD model given by Dickson et al., (2011), and
 % adapting it for ASE (as opposed to GESSE)
 
-% clear;
+clear;
 % close all;
 setFigureDefaults;
 
@@ -16,7 +16,7 @@ TE  = 80;   % ms
 tau = -28:1:64;
 
 % model parameters of importance
-zeta = 0.06;
+zeta = 0.03;
 OEF  = 0.40;
 T2   = 87;   % ms
 
@@ -25,25 +25,25 @@ T2   = 87;   % ms
 
 
 % values of the coefficients (given by Dickson, for FID):
-B11 = 55.385;
-B12 = 52.719;
-B13 = -0.0242;
-B21 = 35.314;
-B22 = 34.989;
-B23 = -0.0034;
-B31 =  0.3172;
-B32 =  0.3060;
-B33 =  3.1187;
+% B11 = 55.385;
+% B12 = 52.719;
+% B13 = -0.0242;
+% B21 = 35.314;
+% B22 = 34.989;
+% B23 = -0.0034;
+% B31 =  0.3172;
+% B32 =  0.3060;
+% B33 =  3.1187;
 
-% B11 = 0.00012 ;
-% B12 = 0.000 ;
-% B13 = 0.033305 ;
-% B21 = 1.953244 ;
-% B22 = 21.874702 ;
-% B23 = 1.033624 ;
-% B31 = 1.303155 ;
-% B32 = 1.216965 ;
-% B33 = 0.035923 ;
+B11 =  58.85;
+B12 =  50.85;
+B13 = -10.74;
+B21 =  53.59;
+B22 =  13.54;
+B23 = -1.300;
+B31 = -28.30;
+B32 = -5.052;
+B33 = -33.13;
 
 
 % Calculate second order coefficients

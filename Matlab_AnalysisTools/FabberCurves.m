@@ -1,163 +1,97 @@
 % FabberCurves.m
-% Display an averaged-out ASE curve from FABBER "modelfit" data
+% Display an averaged-out ASE curve from FABBER "modelfit" data, or from other
+% 4D ASE-type datasets (designed for use with the VS dataset)
+%
+% MT Cherukara
+% 
+% Actively used as of 2018-09-19
 
 clear;
 % close all;
 
-save_plot = 0;
 setFigureDefaults;
 
-% identify the correct dataset
-% runs = {'250', '251', '252', '253', '254', '255', '256'};       % SQ-VB
-% runs = {'208', '209', '210', '211', '212', '213', '214'};       % 1C-VB
-% runs = {'264', '265', '266', '267', '268', '269', '270'};       % 1C-VB-TC
-% runs = {'201', '202', '203', '204', '205', '206', '207'};       % 2C-VB
-% runs = {'236', '237', '238', '239', '240', '241', '242'};       % 2C-VB-I
-% runs = {'309', '310', '311', '312', '313', '314', '315'};       % 2C-VB-TC-I
-runs = {'330', '331', '405', '333', '334', '446', '336'};       % 1C-S-VB
-% runs = {'446'};
-% rawname = 'ASE_TR_3_taus_11.nii.gz';      % not VS
-% rawname = 'MR_756_ASE_TR_3_taus_11.nii.gz';       % not VS
+% Parameters
+slices = 4:9;
+save_plot = 0;
 
-% subject
-for ss = 3
+%% Load the data
 
+% Have the users specify a file to load, which will be either ASE data, or
+% modelfit, or residual
+[dname, ddir] = uigetfile('*.nii.gz','Select NIFTY Data to load...');
 
+% Extract the VS number from the chosen directory's name
+C = strsplit(ddir,'vs');
+VSnum = C{2}(1);
 
-fabber = runs{ss};
-resdir = '/Users/mattcher/Documents/DPhil/Data/Fabber_Results/';
-rawdir = ['/Users/mattcher/Documents/DPhil/Data/validation_sqbold/vs',num2str(ss),'/']; % VS
-% rawdir = '/Users/mattcher/Documents/DPhil/Data/subject_08/'; % not VS
-fdname = dir([resdir,'fabber_',fabber,'_*']);
-fabdir = strcat(resdir,fdname.name,'/');
-
-slicenum = 3:10;
-% slicenum = 1:6;
-
-% Load a mask
-maskslice = LoadSlice([rawdir,'mask_gm_60.nii.gz'],slicenum); % VS
-% maskslice = LoadSlice([rawdir,'mask_gm_TR_2.nii.gz'],slicenum); % not VS
-% maskslice = zeros(64,64,8);
-% maskslice(18526) = 1;
-
-% Load data
-resdata = read_avw([fabdir,'modelfit.nii.gz']);
-rsddata = read_avw([fabdir,'residuals.nii.gz']);
-rawdata = read_avw([rawdir,'sub0',num2str(ss),'_ASE_FLAIR_av_mc.nii.gz']); % VS
-% rawdata = read_avw([rawdir,rawname]);     % not VS
-
-% Select slices
-resdata = resdata(:,:,slicenum,:);
-rawdata = rawdata(:,:,slicenum,:);
-rsddata = rsddata(:,:,slicenum,:);
-mdims = size(resdata);
-
-% Apply mask
-rawdata = rawdata.*repmat(maskslice,1,1,1,mdims(4));
+% Load the appropriate grey-matter mask
+Maskslice = LoadSlice(['/Users/mattcher/Documents/DPhil/Data/validation_sqbold/vs',...
+                       VSnum,'/mask_gm_60.nii.gz'],slices);
 
 
-% pre-allocate
-volsignal = zeros(1,mdims(4));
-rawsignal = zeros(1,mdims(4));
-volresid  = zeros(1,mdims(4));
+% Load the data
+Dataset = LoadSlice([ddir,dname],slices);
 
-% Loop through volumes and average over grey matter
-for ii = 1:mdims(4)
+
+%% Do some averaging
+
+% number of time-points
+nt = size(Dataset,4);
+
+% Pre-allocate results vectors
+Sig_mean = zeros(1,nt);
+Sig_std  = zeros(1,nt);
+Sig_med  = zeros(1,nt);
+Sig_iqr  = zeros(1,nt);
+
+
+% Loop through time points:
+for ii = 1:nt
     
-    % extract volume and apply mask
-    resvector = resdata(:,:,:,ii).*maskslice;
+    Dataslice = Dataset(:,:,:,ii);
     
-    % vectorize
-    resvector = resvector(:);
+    % Apply mask and vectorize
+    Dataslice = Dataslice(:).*Maskslice(:);
     
-    %  remove zeros
-    resvector(resvector == 0) = [];
-        
-    % remove extremely high values
-    resvector(resvector > quantile(resvector,0.95)) = [];
+    % Remove zeros
+    Dataslice(Dataslice == 0) = [];
     
-    % remove extremely low values
-    resvector(resvector < quantile(resvector,0.05)) = [];
+    % Calculate signal averages
+    Sig_mean(ii) = mean(Dataslice);
+    Sig_std(ii)  = std(Dataslice);
+    Sig_med(ii)  = median(Dataslice);
     
-    % average
-    volsignal(ii) = nanmean(resvector);
-    
-    % same again, but for the raw data
-    
-    % extract volume and apply mask
-    rawvector = rawdata(:,:,:,ii).*maskslice;
-    
-    % vectorize
-    rawvector = rawvector(:);
-    
-    %  remove zeros
-    rawvector(rawvector == 0) = [];
-    
-    % remove extremely high
-    rawvector(rawvector > quantile(rawvector,0.95)) = [];
-    
-    % remove extremely low values
-    rawvector(rawvector < quantile(resvector,0.05)) = [];
-    
-    % average
-    rawsignal(ii) = nanmean(rawvector);
-    
-    % same again, for residuals
-    
-    % extract volume and apply mask
-    rsdvector = rsddata(:,:,:,ii).*maskslice;
-    
-    % vectorize
-    rsdvector = rsdvector(:);
-    
-    %  remove zeros
-    rsdvector(rsdvector == 0) = [];
-        
-    % remove extremely high values
-    rsdvector(rsdvector > quantile(rsdvector,0.95)) = [];
-    
-    % remove extremely low values
-    rsdvector(rsdvector < quantile(rsdvector,0.05)) = [];
-    
-    % average
-    volresid(ii) = nanmean(abs(rsdvector));
-    
+    qnt = quantile(Dataslice,[0.75,0.25]);
+    Sig_iqr(ii)  = (qnt(1) - qnt(2)) ./ 2;
+
 end
+
+
+%% Plot
 
 % tau values
-% taus = [0, 16:4:64]./1000; % linear
-taus = (-28:4:64)./1000; % VS
-% taus = ([0, 2, 4,  6,  8, 10, 20, 30, 40, 50, 60])./1000;
-% taus = ([0, 3, 6,  9, 20, 40, 60])./1000;
-% taus = ([-12, -8, -4, 0, 4, 8, 12, 16, 24, 32, 40, 48, 56, 64])./1000; % spread
-% taus = (-16:8:64)./1000;
-tauA = linspace(taus(1),taus(end));
-
-% scale both datasets to have the same mean
-% volsignal = log(volsignal)./mean(log(volsignal));
-% rawsignal = log(rawsignal)./mean(log(rawsignal));
-
-% ssd = sum((volsignal-rawsignal).^2);
-% disp(['Subject ',num2str(ss),' difference: ',num2str(1000*ssd)]);
+if nt == 24
+    taus = (-28:4:64)./1000; % VS
+elseif nt == 14
+    taus = [-28, -20, -12, -4, 0, 4, 8, 16, 24, 32, 40, 48, 56, 64]./1000;
+else
+    taus = (1:1:nt)./1000;
+end
 
 
-%% Plot results
-% figure(3); 
-% hold on; box on;
-plot(1000*taus,log(volsignal),'b-');
-% plot(1000*taus,log(rawsignal),'r-');
-% % plot(1000*taus,log(volsignal+volresid),'bx');
-% xlabel('Spin-Echo Offset \tau (ms)');
-% ylabel('Log (Signal)');
-% title(['Grey Matter Average - Subject ',num2str(ss)]);
-% legend('FABBER Model Fit','Raw ASE Data','Location','NorthEast');
-% % xlim([-32,68]);
-% xlim([-4,64]); % spread
-% % ylim([0.975, 1.015]);
+figure(1);
+hold on; box on;
+plot(1000*taus,log(Sig_med),'-');
 
+xlabel('Spin echo displacement \tau (ms)')
+ylabel('ASE Signal');
+title(['Subject vs',VSnum,' (GM average)']);
+
+xlim([-32,68]);
+% ylim([4.69,5.01]);
 
 if save_plot
-    export_fig(strcat('GM_Average_Subject_',num2str(ss),'.pdf'));
+    export_fig(strcat('GM_Average_Subject_',VSnum,'.pdf'));
 end
 
-end
