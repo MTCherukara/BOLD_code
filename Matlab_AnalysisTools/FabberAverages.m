@@ -22,19 +22,19 @@ clc;
 vars = {'R2p','DBV'};
 
 % Choose the slices we want
-% slicenum = 4:9;     % VS - instead of 3:10
-slicenum = 3:8;     % CSF + patient data
+slicenum = 4:9;     % VS - instead of 3:10
+% slicenum = 3:8;     % CSF + patient data
 % slicenum = 1:6;   % TR = 2
 
 % Choose Data set
-setnum = 589;
-subnum = 5;
+setnum = 537;
+subnum = 2;
 
 setnum = setnum + subnum - 1;
 
 CSF_subs = containers.Map([ 1, 2, 3, 4, 5 ], ...
                           [ 3, 4, 6, 8, 9 ]);
-subnum = CSF_subs(subnum);     
+% subnum = CSF_subs(subnum);     
 
 % Title
 disp(['Data from Fabber Set ',num2str(setnum),'. Subject ',num2str(subnum)]);
