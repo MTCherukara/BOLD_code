@@ -1,5 +1,5 @@
-/*   fwdmodel_qbold_R2p.cc - Implements the ASE qBOLD curve fitting model
-                             measuring DBV and R2-prime
+/*   fwdmodel_qbold_R2p.cc - ASE qBOLD curve fitting model
+
 
  Matthew Cherukara, IBME
 

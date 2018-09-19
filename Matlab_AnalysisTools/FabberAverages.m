@@ -19,7 +19,7 @@ clear;
 clc;
 
 % Choose Variables
-vars = {'R2p','DBV'};
+vars = {'R2p','DBV','OEF'};
 
 % Choose the slices we want
 slicenum = 4:9;     % VS - instead of 3:10
@@ -71,16 +71,16 @@ end
 
 %% Free Energy
 
-[FEData,RData,MData] = MTC_LoadFreeEnergy(setnum,subnum,slicenum);
-
-% disp('   ');
-% disp(['     Mean Residual : ',num2str(mean(RData),4)]);
-% disp([' Absolute Residual : ',num2str(mean(abs(RData)),4)]);
-% disp(['   Median Residual : ',num2str(median(RData),4)]);
+% [FEData,RData,MData] = MTC_LoadFreeEnergy(setnum,subnum,slicenum);
 % 
 % disp('   ');
+% % disp(['     Mean Residual : ',num2str(mean(RData),4)]);
+% disp([' Absolute Residual : ',num2str(mean(abs(RData)),4)]);
+% % disp(['   Median Residual : ',num2str(median(RData),4)]);
+% % 
+% % disp('   ');
 % disp(['      Modelfit SNR : ',num2str(mean(MData)./mean(abs(RData)),4)]);
-
-disp('   ');
-disp(['  Mean Free Energy : ',num2str(-mean(FEData),4)]);
-disp(['Median Free Energy : ',num2str(-median(FEData),4)]);
+% 
+% disp('   ');
+% % disp(['  Mean Free Energy : ',num2str(-mean(FEData),4)]);
+% disp(['Median Free Energy : ',num2str(-median(FEData),4)]);

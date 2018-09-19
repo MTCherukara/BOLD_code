@@ -1,4 +1,4 @@
-/*   fwdmodel_qbold_R2p.h - The ASE qBOLD curve fitting model, fitting R2-prime and DBV
+/*   fwdmodel_qbold_R2p.h - ASE qBOLD curve fitting model
 
  Matthew Cherukara, IBME
 
