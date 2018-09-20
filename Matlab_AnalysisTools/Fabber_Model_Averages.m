@@ -11,7 +11,7 @@ clc;
 vars = {'b11','b12','b13','b21','b22','b23','b31','b32','b33'};
 
 % Set number
-setnum = 108;
+setnum = 110;
 
 % Slices
 slicenum = 1:9;
@@ -26,11 +26,20 @@ fabdir = strcat(resdir,fdname.name,'/');
 
 % First, have a look at OEF estimation
 OEFslice = LoadSlice([fabdir,'mean_OEF.nii.gz'],slicenum);
-
+% DBVslice = LoadSlice([fabdir,'mean_DBV.nii.gz'],slicenum);
 
 % Make a mask of all bad OEF voxels
 badOEF = (OEFslice > 1.0) + (OEFslice < 0.0);
+
+% calculate average OEFs
+OEFvalues = OEFslice.*(1-badOEF);
+OEFav = sum(OEFvalues,2)./sum(OEFvalues~=0,2);
+
+% vectorize this, for later
 badOEF = badOEF(:);
+
+% store all the B values in a single vector (for later analyis)
+bb = zeros(length(vars),1);
 
 % Loop through variables
 for vv = 1:length(vars)
@@ -46,9 +55,14 @@ for vv = 1:length(vars)
     Datslice = Datslice(:);
     Datslice(badOEF ~= 0) = [];
     
+    vmn = mean(Datslice);
+    vsd = std(Datslice);
+    vSR = abs(vmn)./vsd;
+    
     % Average and display the results
-    disp(['  ',vname,' = ',num2str(mean(Datslice)),' +/- ',num2str(std(Datslice))]);
-   
+    disp(['  ',vname,' = ',num2str(vmn),' +/- ',num2str(vsd),' (SNR=',num2str(vSR),')']);
+    
+    bb(vv) = vmn;
 
 end
 

@@ -39,7 +39,7 @@ clear;
 setFigureDefaults;
 
 plot_fig = 1;       
-save_data = 1;      % set to 1 in order to save out ASE data
+save_data = 0;      % set to 1 in order to save out ASE data
 
 
 %% Model Parameters
@@ -80,9 +80,9 @@ params.SNR = 100;
 %% Compute Model
 
 % define tau values that we want to simulate
-tau = (-28:4:64)/1000; % for testing
+% tau = (-28:4:64)/1000; % for testing
 % tau = (-28:1:72)/1000;
-% tau = linspace(-0.028,0.064,1000); 
+tau = linspace(-0.028,0.064,1000); 
 % tau = [0:3:12,20:10:70]/1000;
 % tau = [-8,-4,0:6:30,40,50,60]/1000;
 % tau = linspace(-0.028,0.064,1000); % for visualising
@@ -118,7 +118,7 @@ if plot_fig
     figure(1); hold on; box on;
     
     % plot the signal
-    S_log = log((S_total)./max(S_total));
+    S_log = ((S_total)./max(S_total));
     l.s = plot(1000*tau,S_log,'-','Color',defColour(2));
 %     plot(1000*tau,log(S_sample),'kx');
 %     ylim([-0.07,0]);

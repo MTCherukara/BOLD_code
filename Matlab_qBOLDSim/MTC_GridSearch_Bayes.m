@@ -95,7 +95,7 @@ for jj = 1:nj
     params.tc_val = 0.024;
     
     % Model selection
-    params.asymp = 1;  % should the asymptotic tissue model be used?
+    params.asymp = 0;  % should the asymptotic tissue model be used?
 
     % extract relevant parameters
     sigma = mean(params.sig);   % real std of noise

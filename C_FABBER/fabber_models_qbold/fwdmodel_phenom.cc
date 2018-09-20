@@ -178,11 +178,11 @@ void PhenomFwdModel::HardcodedInitialDists(MVNDist &prior, MVNDist &posterior) c
 
     // b11
     prior.means(1) = 55.0;
-    precisions(1, 1) = 1e-1;
+    precisions(1, 1) = 1e-2;
 
     // b12
     prior.means(2) = 53.0;
-    precisions(2, 2) = 1e-1;
+    precisions(2, 2) = 1e-2;
 
     // b13
     prior.means(3) = -0.0242;
@@ -190,11 +190,11 @@ void PhenomFwdModel::HardcodedInitialDists(MVNDist &prior, MVNDist &posterior) c
 
     // b21
     prior.means(4) = 35.0;
-    precisions(4, 4) = 1e-1;
+    precisions(4, 4) = 1e-2;
 
     // b22
     prior.means(5) = 35.0;
-    precisions(5, 5) = 1e-1;
+    precisions(5, 5) = 1e-2;
 
     // b23
     prior.means(6) = -0.0034;
@@ -210,17 +210,17 @@ void PhenomFwdModel::HardcodedInitialDists(MVNDist &prior, MVNDist &posterior) c
 
     // b33
     prior.means(9) = 3.0;
-    precisions(9, 9) = 1e0;
+    precisions(9, 9) = 1e-1;
 
     if (infer_OEF)
     {
         prior.means(OEF_index()) = 0.40;
-        precisions(OEF_index(), OEF_index()) = 1e0;
+        precisions(OEF_index(), OEF_index()) = 1e-1;
     }
     if (infer_DBV)
     {
         prior.means(DBV_index()) = 0.03;
-        precisions(DBV_index(), DBV_index()) = 1e3;
+        precisions(DBV_index(), DBV_index()) = 1e1;
     }
 
 
@@ -298,7 +298,7 @@ void PhenomFwdModel::Evaluate(const ColumnVector &params, ColumnVector &result) 
     }
     if (infer_DBV)
     {
-        DBV = paramcpy(DBV_index());
+        DBV = abs(paramcpy(DBV_index()));
     }
     else
     {
