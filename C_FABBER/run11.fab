@@ -1,7 +1,7 @@
 # fabber run 11 - phenomenological model testing
 
 # Input Data
-data=../../Data/DicksonDataOEFNoiseB.nii.gz
+data=../../Data/DicksonDataClean.nii.gz
 mask=../../Data/DicksonMask.nii.gz
 
 # Run Options

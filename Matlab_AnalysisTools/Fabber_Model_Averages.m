@@ -49,14 +49,17 @@ for vv = 1:length(vars)
     
     % Load Data and Standard Deviation
     Datslice = LoadSlice([fabdir,'mean_',vname,'.nii.gz'],slicenum);
-%     Stdslice = LoadSlice([fabdir,'std_',vname,'.nii.gz'],slicenum);
+    Stdslice = LoadSlice([fabdir,'std_',vname,'.nii.gz'],slicenum);
 
     % Remove bad voxels
     Datslice = Datslice(:);
     Datslice(badOEF ~= 0) = [];
     
+    Stdslice = Stdslice(:);
+    Stdslice(badOEF ~= 0) = [];
+    
     vmn = mean(Datslice);
-    vsd = std(Datslice);
+    vsd = mean(Stdslice);
     vSR = abs(vmn)./vsd;
     
     % Average and display the results
