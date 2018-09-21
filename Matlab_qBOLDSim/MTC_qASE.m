@@ -39,7 +39,7 @@ clear;
 setFigureDefaults;
 
 plot_fig = 1;       
-save_data = 0;      % set to 1 in order to save out ASE data
+save_data = 1;      % set to 1 in order to save out ASE data
 
 
 %% Model Parameters
@@ -56,10 +56,10 @@ params.TI   = 0;        % s         - FLAIR inversion time
 
 % model fitting parameters
 params.S0   = 100;          % a. units  - signal
-params.R2t  = 1/0.087;         % 1/s       - rate constant, tissue
+params.R2t  = 11.5;         % 1/s       - rate constant, tissue
 params.R2e  = 4;            % 1/s       - rate constant, extracellular
 params.dF   = 5;            % Hz        - frequency shift
-params.lam0 = 0.00;          % no units  - ISF/CSF signal contribution
+params.lam0 = 0.05;          % no units  - ISF/CSF signal contribution
 params.zeta = 0.03;         % no units  - deoxygenated blood volume
 params.OEF  = 0.40;         % no units  - oxygen extraction fraction
 params.Hct  = 0.400;        % no units  - fractional hematocrit
@@ -80,9 +80,9 @@ params.SNR = 100;
 %% Compute Model
 
 % define tau values that we want to simulate
-% tau = (-28:4:64)/1000; % for testing
+tau = (-28:4:64)/1000; % for testing
 % tau = (-28:1:72)/1000;
-tau = linspace(-0.028,0.064,1000); 
+% tau = linspace(-0.028,0.064,1000); 
 % tau = [0:3:12,20:10:70]/1000;
 % tau = [-8,-4,0:6:30,40,50,60]/1000;
 % tau = linspace(-0.028,0.064,1000); % for visualising

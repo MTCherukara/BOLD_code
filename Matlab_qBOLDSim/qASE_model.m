@@ -96,8 +96,8 @@ w_tis = 1 - (w_csf + w_bld);
 if PARAMS.asymp
     S_tis = w_tis.*calcTissueAsymp(TAU,TE,PARAMS);
 else
-%     S_tis = w_tis.*calcTissueCompartment(TAU,TE,PARAMS);
-    S_tis = w_tis.*calcTissuePhenom(TAU,TE,PARAMS);
+    S_tis = w_tis.*calcTissueCompartment(TAU,TE,PARAMS);
+%     S_tis = w_tis.*calcTissuePhenom(TAU,TE,PARAMS);
 end
 
 S_csf = w_csf.*calcExtraCompartment(TAU,TE,PARAMS);

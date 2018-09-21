@@ -61,14 +61,14 @@ for jj = 1:nj
 
     tic;
     
-    load('ASE_Data/Data_180913_Dickson.mat');
+    load('ASE_Data/Data_180921_40_3_SNR_100.mat');
 
 %     % Load the Data:
 %     load(['ASE_Data/Data_180726_40_4_SNR_100_',num2str(jj),'.mat']);
 %     disp(['Analysing Dataset ',num2str(jj), ' of ',num2str(nj)]);
 % 
 %     % Choose which tau values we want
-%     taus = -21:6:57;
+%     taus = -28:4:64;
 %     taus = [-28:4:-20,0,28:4:64];
 % 
 %     % pull out the right values
@@ -208,7 +208,7 @@ for jj = 1:nj
         ylabel(c,'Posterior Probability Density');
         axis([min(pv2),max(pv2),min(pv1),max(pv1)]);
         set(gca,'YDir','normal');
-        set(c,'FontSize',14);
+        set(c,'FontSize',16);
     end
 
 
