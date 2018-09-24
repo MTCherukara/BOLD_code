@@ -9,10 +9,12 @@
 
 #include "fabber_core/fwdmodel.h"
 #include "fabber_core/inference.h"
+#include <fabber_core/tools.h>
 
 #include "newmat.h"
 
 #include <string>
+#include <vector>
 
 using namespace std;
 
@@ -32,6 +34,10 @@ public:
     }    
     virtual void HardcodedInitialDists(MVNDist &prior, MVNDist &posterior) const;
     virtual void Evaluate(const NEWMAT::ColumnVector &params, NEWMAT::ColumnVector &result) const;
+
+    using FwdModel::SetupARD;
+    virtual void SetupARD(const MVNDist &posterior, MVNDist &prior, double &Fard);
+    virtual void UpdateARD(const MVNDist &posterior, MVNDist &prior, double &Fard) const;
 
 protected:
 
@@ -56,9 +62,15 @@ protected:
         return (infer_DBV ? (10 + (infer_OEF ? 1 : 0)) : 0 );
     }
 
+    // vector indices for the parameters to experience ARD
+    std::vector<int> ard_index;
+
     // Do we want to infer on OEF and DBV
     bool infer_OEF;
     bool infer_DBV;
+
+    // Are we doing ARD?
+    bool doard;
 
 private:
     static FactoryRegistration<FwdModelFactory, PhenomFwdModel> registration;

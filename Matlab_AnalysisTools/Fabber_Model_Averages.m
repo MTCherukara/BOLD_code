@@ -5,13 +5,13 @@
 % FabberAverages.m
 
 clear; 
-clc;
+% clc;
 
 % Variable names
 vars = {'b11','b12','b13','b21','b22','b23','b31','b32','b33'};
 
 % Set number
-setnum = 110;
+setnum = 113;
 
 % Slices
 slicenum = 1:9;
@@ -29,7 +29,7 @@ OEFslice = LoadSlice([fabdir,'mean_OEF.nii.gz'],slicenum);
 % DBVslice = LoadSlice([fabdir,'mean_DBV.nii.gz'],slicenum);
 
 % Make a mask of all bad OEF voxels
-badOEF = (OEFslice > 1.0) + (OEFslice < 0.0);
+badOEF = (OEFslice > 1.0) + (OEFslice < 0.000001);
 
 % calculate average OEFs
 OEFvalues = OEFslice.*(1-badOEF);

@@ -14,11 +14,12 @@
 #include <string>
 #include <newmatio.h>
 #include <stdexcept> 
+#include <miscmaths/miscmaths.h>
 #include <cmath>
 
 using namespace std;
 using namespace NEWMAT;
-
+using MISCMATHS::digamma;
 // ------------------------------------------------------------------------------------------
 // --------         Generic Methods             ---------------------------------------------
 // ------------------------------------------------------------------------------------------
@@ -50,6 +51,9 @@ void PhenomFwdModel::Initialize(ArgsType &args)
     // Decide on inference targets
     infer_OEF = args.ReadBool("inferOEF");
     infer_DBV = args.ReadBool("inferDBV");
+
+    // Decide on ARD
+    doard = args.ReadBool("doard");
 
     // Read tau values
 
@@ -133,6 +137,10 @@ void PhenomFwdModel::Initialize(ArgsType &args)
     {
         LOG << "DBV fixed to " << fixedDBV << endl;
     }
+    if (doard)
+    {
+        LOG << "Using Automatic Relevance Detection (ARD)" << endl;
+    }
     
 } // Initialize
 
@@ -177,39 +185,39 @@ void PhenomFwdModel::HardcodedInitialDists(MVNDist &prior, MVNDist &posterior) c
     SymmetricMatrix precisions = IdentityMatrix(NumParams()) * 1e-3;
 
     // b11
-    prior.means(1) = 55.0;
+    prior.means(1) = 55.0; // 55.0
     precisions(1, 1) = 1e-2;
 
     // b12
-    prior.means(2) = 53.0;
+    prior.means(2) = 55.0; // 55.0
     precisions(2, 2) = 1e-2;
 
     // b13
-    prior.means(3) = -0.0242;
+    prior.means(3) = -0.024; // -0.024
     precisions(3, 3) = 1e2;
 
     // b21
-    prior.means(4) = 35.0;
+    prior.means(4) = 35.0; // 35.0
     precisions(4, 4) = 1e-2;
 
     // b22
-    prior.means(5) = 35.0;
+    prior.means(5) = 35.0; // 35.0
     precisions(5, 5) = 1e-2;
 
     // b23
-    prior.means(6) = -0.0034;
+    prior.means(6) = -0.0034; // -0.0034;
     precisions(6, 6) = 1e3;
 
     // b31
-    prior.means(7) = 0.3;
+    prior.means(7) = 0.3; // 0.3;
     precisions(7, 7) = 1e1;
 
     // b32
-    prior.means(8) = 0.3;
+    prior.means(8) = 0.3; // 0.3;
     precisions(8, 8) = 1e1;
 
     // b33
-    prior.means(9) = 3.0;
+    prior.means(9) = 3.0; // 3.0;
     precisions(9, 9) = 1e-1;
 
     if (infer_OEF)
@@ -337,3 +345,68 @@ void PhenomFwdModel::Evaluate(const ColumnVector &params, ColumnVector &result) 
     return;
 
 } // Evaluate
+
+// ------------------------------------------------------------------------------------------
+// --------         SetupARD                    ---------------------------------------------
+// ------------------------------------------------------------------------------------------
+void PhenomFwdModel::SetupARD(const MVNDist &theta, MVNDist &thetaPrior, double &Fard)
+{
+    if (doard)
+    {
+        Fard = 0;
+
+        // loop over 9 parameters in a hard-coded way
+        for (int ii = 1; ii < 10; ii++)
+        {
+            SymmetricMatrix PriorPrec;
+
+            PriorPrec = thetaPrior.GetPrecisions();
+
+            PriorPrec(ii, ii) = 1e-12; // non-informative
+
+            thetaPrior.SetPrecisions(PriorPrec);
+
+            thetaPrior.means(ii) = 0; // no mean
+
+            // calculate Free energy contribution
+            SymmetricMatrix PostCov = theta.GetCovariance();
+
+            double b = 2 / (theta.means(ii) * theta.means(ii) + PostCov(ii, ii));
+
+            Fard += -1.5 * (log(b) + digamma(0.5)) - 0.5 - gammaln(0.5) - 0.5 * log(b);
+
+        } // for (int ii = 1; ii < 10; ii++)
+    }
+    return;
+}
+
+// ------------------------------------------------------------------------------------------
+// --------         UpdateARD                   ---------------------------------------------
+// ------------------------------------------------------------------------------------------
+void PhenomFwdModel::UpdateARD(const MVNDist &theta, MVNDist &thetaPrior, double &Fard) const
+{
+    if (doard)
+        Fard = 0;
+    {
+
+        // loop over 9 parameters
+        for (int ii = 1; ii < 10; ii++)
+        {
+            SymmetricMatrix PriorCov;
+            SymmetricMatrix PostCov;
+
+            PriorCov = thetaPrior.GetCovariance();
+            PostCov = theta.GetCovariance();
+
+            PriorCov(ii, ii) = theta.means(ii) * theta.means(ii) + PostCov(ii, ii);
+
+            thetaPrior.SetCovariance(PriorCov);
+
+            // Calculate Free energy contribution
+            double b = 2 / (theta.means(ii) * theta.means(ii) + PostCov(ii, ii));
+            Fard += -1.5 * (log(b) + digamma(0.5)) - 0.5 - gammaln(0.5) - 0.5 * log(b);
+
+        } // for (int ii = 1; ii < 10; ii++)
+    }
+    return;
+}
