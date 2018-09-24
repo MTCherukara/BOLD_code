@@ -11,7 +11,7 @@ clear;
 vars = {'b11','b12','b13','b21','b22','b23','b31','b32','b33'};
 
 % Set number
-setnum = 113;
+setnum = 112;
 
 % Slices
 slicenum = 1:9;
@@ -24,19 +24,25 @@ resdir = '/Users/mattcher/Documents/DPhil/Data/Fabber_ModelFits/';
 fdname = dir([resdir,'fabber_',num2str(setnum),'_*']);
 fabdir = strcat(resdir,fdname.name,'/');
 
-% First, have a look at OEF estimation
-OEFslice = LoadSlice([fabdir,'mean_OEF.nii.gz'],slicenum);
-% DBVslice = LoadSlice([fabdir,'mean_DBV.nii.gz'],slicenum);
+% See if there is a mean_OEF file in the directory
+lst = dir([fabdir,'mean_OEF.nii.gz']);
 
-% Make a mask of all bad OEF voxels
-badOEF = (OEFslice > 1.0) + (OEFslice < 0.000001);
+if ~isempty(lst)
+    
+    OEFslice = LoadSlice([fabdir,'mean_OEF.nii.gz'],slicenum);
+    % DBVslice = LoadSlice([fabdir,'mean_DBV.nii.gz'],slicenum);
+    
+    % Make a mask of all bad OEF voxels
+    badOEF = (OEFslice > 1.0) + (OEFslice < 0.000001);
+    
+    % calculate average OEFs
+    OEFvalues = OEFslice.*(1-badOEF);
+    OEFav = sum(OEFvalues,2)./sum(OEFvalues~=0,2);
+    
+    % vectorize this, for later
+    badOEF = badOEF(:);
+end
 
-% calculate average OEFs
-OEFvalues = OEFslice.*(1-badOEF);
-OEFav = sum(OEFvalues,2)./sum(OEFvalues~=0,2);
-
-% vectorize this, for later
-badOEF = badOEF(:);
 
 % store all the B values in a single vector (for later analyis)
 bb = zeros(length(vars),1);
@@ -51,15 +57,24 @@ for vv = 1:length(vars)
     Datslice = LoadSlice([fabdir,'mean_',vname,'.nii.gz'],slicenum);
     Stdslice = LoadSlice([fabdir,'std_',vname,'.nii.gz'],slicenum);
 
-    % Remove bad voxels
+    % Vectorize
     Datslice = Datslice(:);
-    Datslice(badOEF ~= 0) = [];
-    
     Stdslice = Stdslice(:);
-    Stdslice(badOEF ~= 0) = [];
     
-    vmn = mean(Datslice);
-    vsd = mean(Stdslice);
+    % Remove bad voxels based on OEF
+    if ~isempty(lst)
+        Datslice(badOEF ~= 0) = [];
+        Stdslice(badOEF ~= 0) = [];
+    end
+    
+    % Remove bad voxels based on ridiculous values (none should be larger than
+    % 1e3)
+    Stdslice(abs(Datslice) > 1e3) = [];
+    Datslice(abs(Datslice) > 1e3) = [];
+    
+    % Average    
+    vmn = nanmedian(Datslice);
+    vsd = nanmean(Stdslice);
     vSR = abs(vmn)./vsd;
     
     % Average and display the results
