@@ -20,6 +20,8 @@
 using namespace std;
 using namespace NEWMAT;
 using MISCMATHS::digamma;
+
+
 // ------------------------------------------------------------------------------------------
 // --------         Generic Methods             ---------------------------------------------
 // ------------------------------------------------------------------------------------------
@@ -38,7 +40,7 @@ string PhenomFwdModel::GetDescription() const
 
 string PhenomFwdModel::ModelVersion() const
 {
-    return "0.1 - 2018-09-13";
+    return "0.2 - 2018-09-27";
 } // ModelVersion
 
 
@@ -51,9 +53,17 @@ void PhenomFwdModel::Initialize(ArgsType &args)
     // Decide on inference targets
     infer_OEF = args.ReadBool("inferOEF");
     infer_DBV = args.ReadBool("inferDBV");
+    infer_coefs = args.ReadBool("inferCoefficients");
+    infer_S0  = args.ReadBool("inferS0");
 
     // Decide on ARD
     doard = args.ReadBool("doard");
+
+    // We will only use ARD if we are inferring on the phenomenological coefficients
+    if (!infer_coefs)
+    {
+        doard = false;
+    }
 
     // Read tau values
 
@@ -121,6 +131,14 @@ void PhenomFwdModel::Initialize(ArgsType &args)
     {
         LOG << "    tau(" << ii << ") = " << taus(ii) << endl;
     }
+    if (infer_coefs)
+    {
+        LOG << "Inferring on 9 phenomenological model coefficients" << endl;
+    }
+    else
+    {
+        LOG << "Using fixed model coefficients" << endl;
+    }
     if (infer_OEF)
     {
         LOG << "Inferring on OEF " << endl;
@@ -136,6 +154,10 @@ void PhenomFwdModel::Initialize(ArgsType &args)
     else
     {
         LOG << "DBV fixed to " << fixedDBV << endl;
+    }
+    if (infer_S0)
+    {
+        LOG << "Inferring S0 (or M0) proton density surrogate" << endl;
     }
     if (doard)
     {
@@ -153,15 +175,18 @@ void PhenomFwdModel::NameParams(vector<string> &names) const
 {
     names.clear();
 
-    names.push_back("b11"); 
-    names.push_back("b12"); 
-    names.push_back("b13"); 
-    names.push_back("b21"); 
-    names.push_back("b22"); 
-    names.push_back("b23"); 
-    names.push_back("b31"); 
-    names.push_back("b32"); 
-    names.push_back("b33"); 
+    if (infer_coefs)
+    {
+        names.push_back("b11"); 
+        names.push_back("b12"); 
+        names.push_back("b13"); 
+        names.push_back("b21"); 
+        names.push_back("b22"); 
+        names.push_back("b23"); 
+        names.push_back("b31"); 
+        names.push_back("b32"); 
+        names.push_back("b33"); 
+    }
     if (infer_OEF)
     {
         names.push_back("OEF"); // parameter 1 - Oxygen Extraction Fraction
@@ -169,6 +194,10 @@ void PhenomFwdModel::NameParams(vector<string> &names) const
     if (infer_DBV)
     {
         names.push_back("DBV"); // parameter 2 - DBV
+    }
+    if (infer_S0)
+    {
+        names.push_back("S0"); // parameter 3 - S0 magnitude
     }
 
 } // NameParams
@@ -184,41 +213,45 @@ void PhenomFwdModel::HardcodedInitialDists(MVNDist &prior, MVNDist &posterior) c
     // create diagonal matrix to store precisions
     SymmetricMatrix precisions = IdentityMatrix(NumParams()) * 1e-3;
 
-    // b11
-    prior.means(1) = 55.0; // 55.0
-    precisions(1, 1) = 1e-2;
+    if (infer_coefs)
+    {
+            
+        // b11
+        prior.means(1) = 55.0; // 55.0
+        precisions(1, 1) = 1e-2;
 
-    // b12
-    prior.means(2) = 55.0; // 55.0
-    precisions(2, 2) = 1e-2;
+        // b12
+        prior.means(2) = 55.0; // 55.0
+        precisions(2, 2) = 1e-2;
 
-    // b13
-    prior.means(3) = -0.024; // -0.024
-    precisions(3, 3) = 1e2;
+        // b13
+        prior.means(3) = -0.024; // -0.024
+        precisions(3, 3) = 1e2;
 
-    // b21
-    prior.means(4) = 35.0; // 35.0
-    precisions(4, 4) = 1e-2;
+        // b21
+        prior.means(4) = 35.0; // 35.0
+        precisions(4, 4) = 1e-2;
 
-    // b22
-    prior.means(5) = 35.0; // 35.0
-    precisions(5, 5) = 1e-2;
+        // b22
+        prior.means(5) = 35.0; // 35.0
+        precisions(5, 5) = 1e-2;
 
-    // b23
-    prior.means(6) = -0.0034; // -0.0034;
-    precisions(6, 6) = 1e3;
+        // b23
+        prior.means(6) = -0.0034; // -0.0034;
+        precisions(6, 6) = 1e3;
 
-    // b31
-    prior.means(7) = 0.3; // 0.3;
-    precisions(7, 7) = 1e1;
+        // b31
+        prior.means(7) = 0.3; // 0.3;
+        precisions(7, 7) = 1e0;
 
-    // b32
-    prior.means(8) = 0.3; // 0.3;
-    precisions(8, 8) = 1e1;
+        // b32
+        prior.means(8) = 0.3; // 0.3;
+        precisions(8, 8) = 1e0;
 
-    // b33
-    prior.means(9) = 3.0; // 3.0;
-    precisions(9, 9) = 1e-1;
+        // b33
+        prior.means(9) = 3.0; // 3.0;
+        precisions(9, 9) = 1e-2;
+    }
 
     if (infer_OEF)
     {
@@ -229,6 +262,11 @@ void PhenomFwdModel::HardcodedInitialDists(MVNDist &prior, MVNDist &posterior) c
     {
         prior.means(DBV_index()) = 0.03;
         precisions(DBV_index(), DBV_index()) = 1e1;
+    }
+    if (infer_S0)
+    {
+        prior.means(S0_index()) = 100.0;
+        precisions(S0_index(), S0_index()) = 1e-6; // uninformative
     }
 
 
@@ -292,6 +330,8 @@ void PhenomFwdModel::Evaluate(const ColumnVector &params, ColumnVector &result) 
     double b32;
     double b33;
 
+    double S0;
+
     // physiological parameters
     double OEF;
     double DBV;
@@ -306,23 +346,46 @@ void PhenomFwdModel::Evaluate(const ColumnVector &params, ColumnVector &result) 
     }
     if (infer_DBV)
     {
-        DBV = abs(paramcpy(DBV_index()));
+        DBV = (paramcpy(DBV_index()));
     }
     else
     {
         DBV = fixedDBV;
     }
+    if (infer_S0)
+    {
+        S0 = paramcpy(S0_index());
+    }
+    else
+    {
+        S0 = 1.0;
+    }
 
     // assign values to parameters
-    b11 = paramcpy(1);
-    b12 = paramcpy(2);
-    b13 = paramcpy(3);
-    b21 = paramcpy(4);
-    b22 = paramcpy(5);
-    b23 = paramcpy(6);
-    b31 = paramcpy(7);
-    b32 = paramcpy(8);
-    b33 = paramcpy(9);
+    if (infer_coefs)
+    {
+        b11 = paramcpy(1);
+        b12 = paramcpy(2);
+        b13 = paramcpy(3);
+        b21 = paramcpy(4);
+        b22 = paramcpy(5);
+        b23 = paramcpy(6);
+        b31 = paramcpy(7);
+        b32 = paramcpy(8);
+        b33 = paramcpy(9);
+    }
+    else
+    {
+        b11 = 55.385;
+        b12 = 52.719;
+        b13 = -0.0242;
+        b21 = 35.314;
+        b22 = 34.989;
+        b23 = -0.0034;
+        b31 = 0.3172;
+        b32 = 0.3060;
+        b33 = 3.1187;
+    }
 
     // loop through taus
     result.ReSize(taus.Nrows());
@@ -337,8 +400,15 @@ void PhenomFwdModel::Evaluate(const ColumnVector &params, ColumnVector &result) 
 
         F = ( a1*(exp(-a2*abs(1000*tau)) - 1) ) + (a3*abs(1000*tau));
 
-        result(ii) = exp(-DBV*F);
-    
+        result(ii) = S0*exp(-DBV*F);
+
+        /*
+        // enforce b11 > b12, and b21 > b22
+        if (a1 < 0.0 || a2 < 0.0)
+        {
+            result(ii) = result(ii) + 10;
+        } 
+        */
 
     }
 
@@ -386,8 +456,8 @@ void PhenomFwdModel::SetupARD(const MVNDist &theta, MVNDist &thetaPrior, double 
 void PhenomFwdModel::UpdateARD(const MVNDist &theta, MVNDist &thetaPrior, double &Fard) const
 {
     if (doard)
-        Fard = 0;
     {
+        Fard = 0;
 
         // loop over 9 parameters
         for (int ii = 1; ii < 10; ii++)

@@ -94,8 +94,9 @@ function [sigTOT, tau, sigEV, sigIV]=generate_signal(p,storedPhase,varargin)
 		sigIV=calc_sigIV(p,r,TE,tau);
     end
 end
-	
-	function sigEV=calc_sig(Phase,p,r)
+
+
+function sigEV=calc_sig(Phase,p,r)
 
 		if length(p.R)==1
 			Suscscale=(p.deltaChi0.*r.Hct.*(1-r.Y).*p.B0)./(p.deltaChi0.*p.Hct.*(1-p.Y).*p.B0);
@@ -111,8 +112,10 @@ end
 		end
 		
 	return;
+end
+
 	
-	function sigIV=calc_sigIV(p,r,TE,tau)
+function sigIV=calc_sigIV(p,r,TE,tau)
 		
 		X0=0.27e-6;
 		rc=2.6; %micrometers
@@ -130,5 +133,5 @@ end
 		end
 		
 	return;
-
+end
 		

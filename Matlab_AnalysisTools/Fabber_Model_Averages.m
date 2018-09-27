@@ -11,7 +11,7 @@ clear;
 vars = {'b11','b12','b13','b21','b22','b23','b31','b32','b33'};
 
 % Set number
-setnum = 112;
+setnum = 115;
 
 % Slices
 slicenum = 1:9;
@@ -73,8 +73,9 @@ for vv = 1:length(vars)
     Datslice(abs(Datslice) > 1e3) = [];
     
     % Average    
-    vmn = nanmedian(Datslice);
+    vmn = nanmean(Datslice);
     vsd = nanmean(Stdslice);
+%     vsd = nanstd(Datslice);
     vSR = abs(vmn)./vsd;
     
     % Average and display the results

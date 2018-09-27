@@ -30,7 +30,7 @@ public:
     virtual void NameParams(vector<string> &names) const;
     virtual int NumParams() const 
     {
-        return 9 + (infer_OEF ? 1 : 0) + (infer_DBV ? 1 : 0);
+        return (infer_coefs ? 9 : 0 ) + (infer_OEF ? 1 : 0) + (infer_DBV ? 1 : 0) + (infer_S0 ? 1 : 0);
     }    
     virtual void HardcodedInitialDists(MVNDist &prior, MVNDist &posterior) const;
     virtual void Evaluate(const NEWMAT::ColumnVector &params, NEWMAT::ColumnVector &result) const;
@@ -55,19 +55,25 @@ protected:
     // indices of parametes
     int OEF_index() const
     {
-        return (infer_OEF ? 10 : 0);
+        return ( (infer_coefs ? 9 : 0 ) + (infer_OEF ? 1 : 0 ) );
     }
     int DBV_index() const
     {
-        return (infer_DBV ? (10 + (infer_OEF ? 1 : 0)) : 0 );
+        return ( OEF_index() + (infer_DBV ? 1 : 0 ) );
+    }
+    int S0_index() const
+    {
+        return ( DBV_index() + (infer_S0 ? 1 : 0 ) );
     }
 
     // vector indices for the parameters to experience ARD
     std::vector<int> ard_index;
 
-    // Do we want to infer on OEF and DBV
+    // What do we want to infer?
     bool infer_OEF;
     bool infer_DBV;
+    bool infer_coefs;
+    bool infer_S0;
 
     // Are we doing ARD?
     bool doard;

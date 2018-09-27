@@ -1,8 +1,10 @@
 % function figure_sharan(simdir,bids_dir)
 
-clear
+clear;
 
-simdir = '../../Data/';
+setFigureDefaults;
+
+simdir = '/Users/mattcher/Documents/DPhil/Data/vesselsim_data/';
 
 TE=80e-3;
 tauASE= (-28:4:64)./1000;
@@ -11,8 +13,8 @@ Ds=[5.6 15 30 45 90 180];
 Rs=Ds./2;
 
 Ya=1;
-E0=0.4;
-Yv=Ya.*(1-E0);
+OEF=0.4;
+Yv=Ya.*(1-OEF);
 k=0.4;
 Yc=Yv; % Ya*k+Yv*(1-k);
 Y=[Yc Yv Yv Yv Yv Yv];
@@ -37,10 +39,6 @@ sigASEtotn=sigASEtot./mean(sigASEtot(se-1:se+1));
 lc=lines(6);
 
 figure;
-% if exist([bids_dir '/derivatives/group_results.mat'])
-%     load([bids_dir '/derivatives/group_results.mat'],'tcn')
-%     plot(tauASE.*1000,tcn,'color',[0.5 0.5 0.5])
-% end
 hold on;
 plot(tauASE.*1000,sigASEtotn,'color',lc(2,:),'linewidth',3)
 xlim([min(tauASE.*1000) max(tauASE.*1000)]);
