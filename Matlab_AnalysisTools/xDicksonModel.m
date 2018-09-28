@@ -16,7 +16,7 @@ TE  = 80;   % ms
 tau = -28:1:64;
 
 % model parameters of importance
-zeta = 0.0397;
+zeta = 0.03;
 OEF  = 0.40;
 T2   = 87;   % ms
 
@@ -35,15 +35,15 @@ T2   = 87;   % ms
 % B32 =  0.3060;
 % B33 =  3.1187;
 
-B11 =  53.972;
-B12 =  51.039;
-B13 = -0.0261;
-B21 =  36.097;
-B22 =  34.904;
-B23 = -0.00355;
-B31 =  0.3588;
-B32 =  0.2819;
-B33 =  3.0961;
+% B11 =  53.972;
+% B12 =  51.039;
+% B13 = -0.0261;
+% B21 =  36.097;
+% B22 =  34.904;
+% B23 = -0.00355;
+% B31 =  0.3588;
+% B32 =  0.2819;
+% B33 =  3.0961;
 
 
 % Calculate second order coefficients
@@ -51,6 +51,7 @@ A1 = OEF*(B11 - (B12 * exp(-B13*OEF)));
 A2 = OEF*(B21 - (B22 * exp(-B23*OEF)));
 A3 = OEF*(B31 - (B32 * exp(-B33*OEF)));
 
+%%
 % Calculate F
 F = ( A1.*(exp(-A2.*abs(tau)) - 1) ) + (A3.*abs(tau));
 
@@ -62,9 +63,9 @@ ST = exp(-zeta.*F);
 
 % ST = log((ST)./max(ST));
 
-%% Plot ASE
+% Plot ASE
 
-figure(1);
+figure(3);
 plot(tau,ST,'-'); hold on;
 
 legend(['OEF=',num2str(100*OEF),'%, DBV=',num2str(100*zeta),'%'],...

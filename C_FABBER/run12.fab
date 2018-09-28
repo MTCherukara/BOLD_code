@@ -1,8 +1,8 @@
 # fabber run 12 - using the phenomenological model
 
 # Input Data
-data=../../Data/validation_sqbold/vs7/sub07_ASE_FLAIR_av_mc.nii.gz
-mask=../../Data/validation_sqbold/vs7/mask_flair.nii.gz
+data=../../Data/validation_sqbold/vs6/sub06_ASE_FLAIR_av_mc.nii.gz
+mask=../../Data/validation_sqbold/vs6/mask_flair.nii.gz
 
 # Run Options
 output=../../Data/Fabber_Results/
@@ -22,8 +22,8 @@ model=phenom
 inferOEF
 inferDBV
 inferS0
-#inferCoefficients
-#doard
+inferCoefficients
+doard
 
 # Scan Parameters (maybe I'll think of a better way of doing this...)
 

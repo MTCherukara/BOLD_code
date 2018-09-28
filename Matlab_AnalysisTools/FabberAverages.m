@@ -27,7 +27,7 @@ slicenum = 4:9;     % VS - instead of 3:10
 % slicenum = 1:6;   % TR = 2
 
 % Choose Data set
-setnum = 572;
+setnum = 579;
 subnum = 7;
 
 setnum = setnum + subnum - 1;

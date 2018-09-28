@@ -55,7 +55,11 @@ end
 % Stdslice = LoadSlice([fabdir,'std_',varname,'.nii.gz'],slices);
 
 % Define threshold
-thrsh = threshes(varname);
+if isKey(threshes,varname)
+    thrsh = threshes(varname);
+else
+    thrsh = 1e3;
+end
                     
 % Apply mask, take absolute values, vectorize
 Dataslice = Dataslice.*Maskslice;

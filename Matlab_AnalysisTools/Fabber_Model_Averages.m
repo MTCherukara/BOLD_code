@@ -73,9 +73,9 @@ for vv = 1:length(vars)
     Datslice(abs(Datslice) > 1e3) = [];
     
     % Average    
-    vmn = nanmean(Datslice);
-    vsd = nanmean(Stdslice);
-%     vsd = nanstd(Datslice);
+    vmn = nanmean(abs(Datslice));
+    vsd = nanmean(abs(Stdslice));
+%     vsd = nanstd(abs(Datslice));
     vSR = abs(vmn)./vsd;
     
     % Average and display the results
@@ -90,20 +90,16 @@ end
 FEnSlice = LoadSlice([fabdir,'freeEnergy.nii.gz'],slicenum);
 ResSlice = LoadSlice([fabdir,'residuals.nii.gz'],slicenum);
 
+% Vectorize
+FEnSlice = FEnSlice(:);
+ResSlice = ResSlice(:);
 
+% Remove bad voxels
+if ~isempty(lst)
+    FEnSlice(badOEF ~= 0) = [];
+    ResSlice(badOEF ~= 0) = [];
+end
 
-
-
-% [FEData,RData,MData] = MTC_LoadFreeEnergy(setnum,subnum,slicenum);
-% 5
-% % disp('   ');
-% % disp(['     Mean Residual : ',num2str(mean(RData),4)]);
-% % disp([' Absolute Residual : ',num2str(mean(abs(RData)),4)]);
-% % disp(['   Median Residual : ',num2str(median(RData),4)]);
-% % 
-% % disp('   ');
-% % disp(['      Modelfit SNR : ',num2str(mean(MData)./mean(abs(RData)),4)]);
-% 
-% disp('   ');
-% disp(['  Mean Free Energy : ',num2str(-mean(FEData),4)]);
-% disp(['Median Free Energy : ',num2str(-median(FEData),4)]);
+% Display
+disp('   ');
+disp(['Median Free Energy : ',num2str(median(-FEnSlice),4)]);

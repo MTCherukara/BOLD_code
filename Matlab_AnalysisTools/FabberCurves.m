@@ -58,9 +58,9 @@ for ii = 1:nt
     Dataslice(Dataslice == 0) = [];
     
     % Calculate signal averages
-    Sig_mean(ii) = mean(Dataslice);
-    Sig_std(ii)  = std(Dataslice);
-    Sig_med(ii)  = median(Dataslice);
+    Sig_mean(ii) = nanmean(Dataslice);
+    Sig_std(ii)  = nanstd(Dataslice);
+    Sig_med(ii)  = nanmedian(Dataslice);
     
     qnt = quantile(Dataslice,[0.75,0.25]);
     Sig_iqr(ii)  = (qnt(1) - qnt(2)) ./ 2;

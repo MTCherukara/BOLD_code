@@ -218,35 +218,35 @@ void PhenomFwdModel::HardcodedInitialDists(MVNDist &prior, MVNDist &posterior) c
             
         // b11
         prior.means(1) = 55.0; // 55.0
-        precisions(1, 1) = 1e-2;
+        precisions(1, 1) = 1e-3;
 
         // b12
-        prior.means(2) = 55.0; // 55.0
-        precisions(2, 2) = 1e-2;
+        prior.means(2) = 50.0; // 55.0
+        precisions(2, 2) = 1e-3;
 
         // b13
         prior.means(3) = -0.024; // -0.024
-        precisions(3, 3) = 1e2;
+        precisions(3, 3) = 1e1;
 
         // b21
         prior.means(4) = 35.0; // 35.0
-        precisions(4, 4) = 1e-2;
+        precisions(4, 4) = 1e-3;
 
         // b22
         prior.means(5) = 35.0; // 35.0
-        precisions(5, 5) = 1e-2;
+        precisions(5, 5) = 1e-3;
 
         // b23
         prior.means(6) = -0.0034; // -0.0034;
-        precisions(6, 6) = 1e3;
+        precisions(6, 6) = 1e2;
 
         // b31
         prior.means(7) = 0.3; // 0.3;
-        precisions(7, 7) = 1e0;
+        precisions(7, 7) = 1e-1;
 
         // b32
         prior.means(8) = 0.3; // 0.3;
-        precisions(8, 8) = 1e0;
+        precisions(8, 8) = 1e-1;
 
         // b33
         prior.means(9) = 3.0; // 3.0;
@@ -256,12 +256,12 @@ void PhenomFwdModel::HardcodedInitialDists(MVNDist &prior, MVNDist &posterior) c
     if (infer_OEF)
     {
         prior.means(OEF_index()) = 0.40;
-        precisions(OEF_index(), OEF_index()) = 1e-1;
+        precisions(OEF_index(), OEF_index()) = 1e-3;
     }
     if (infer_DBV)
     {
         prior.means(DBV_index()) = 0.03;
-        precisions(DBV_index(), DBV_index()) = 1e1;
+        precisions(DBV_index(), DBV_index()) = 1e-1;
     }
     if (infer_S0)
     {
@@ -364,24 +364,24 @@ void PhenomFwdModel::Evaluate(const ColumnVector &params, ColumnVector &result) 
     // assign values to parameters
     if (infer_coefs)
     {
-        b11 = paramcpy(1);
-        b12 = paramcpy(2);
-        b13 = paramcpy(3);
-        b21 = paramcpy(4);
-        b22 = paramcpy(5);
-        b23 = paramcpy(6);
-        b31 = paramcpy(7);
-        b32 = paramcpy(8);
-        b33 = paramcpy(9);
+        b11 = abs(paramcpy(1));
+        b12 = abs(paramcpy(2));
+        b13 = abs(paramcpy(3));
+        b21 = abs(paramcpy(4));
+        b22 = abs(paramcpy(5));
+        b23 = abs(paramcpy(6));
+        b31 = abs(paramcpy(7));
+        b32 = abs(paramcpy(8));
+        b33 = abs(paramcpy(9));
     }
     else
     {
         b11 = 55.385;
         b12 = 52.719;
-        b13 = -0.0242;
+        b13 = 0.0242;
         b21 = 35.314;
         b22 = 34.989;
-        b23 = -0.0034;
+        b23 = 0.0034;
         b31 = 0.3172;
         b32 = 0.3060;
         b33 = 3.1187;
@@ -394,8 +394,8 @@ void PhenomFwdModel::Evaluate(const ColumnVector &params, ColumnVector &result) 
     {
         double tau = taus(ii);
 
-        a1 = OEF*(b11 - (b12 * exp(-b13*OEF)));
-        a2 = OEF*(b21 - (b22 * exp(-b23*OEF)));
+        a1 = OEF*(b11 - (b12 * exp(b13*OEF)));
+        a2 = OEF*(b21 - (b22 * exp(b23*OEF)));
         a3 = OEF*(b31 - (b32 * exp(-b33*OEF)));
 
         F = ( a1*(exp(-a2*abs(1000*tau)) - 1) ) + (a3*abs(1000*tau));
@@ -403,8 +403,8 @@ void PhenomFwdModel::Evaluate(const ColumnVector &params, ColumnVector &result) 
         result(ii) = S0*exp(-DBV*F);
 
         /*
-        // enforce b11 > b12, and b21 > b22
-        if (a1 < 0.0 || a2 < 0.0)
+        // enforce A coefficients being positive
+        if (a1 < 0.0 || a2 < 0.0 || a3 < 0.0 )
         {
             result(ii) = result(ii) + 10;
         } 
