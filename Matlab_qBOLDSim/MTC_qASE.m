@@ -73,7 +73,7 @@ params.T1e  = 3.870;        % s         - CSF T1
 % analysis parameters
 params.tc_man = 0;          % BOOL      - should Tc be defined manually?
 params.tc_val = 0.0;        % s         - manual Tc (if tc_man = 1)
-params.asymp  = 0;          % BOOL      - should the asymptotic tissue model be used?
+params.asymp  = 1;          % BOOL      - should the asymptotic tissue model be used?
 params.calcDW = 1;          % BOOL      - should dw be recalculated based on OEF?
 
 % noise

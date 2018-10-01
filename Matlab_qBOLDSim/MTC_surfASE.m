@@ -51,7 +51,7 @@ params.T1e  = 3.870;        % s         - CSF T1
 % analysis parameters
 params.tc_man = 0;          % BOOL      - should Tc be defined manually?
 params.tc_val = 0.0;        % s         - manual Tc (if tc_man = 1)
-params.asymp  = 0;          % BOOL      - should the asymptotic tissue model be used?
+params.asymp  = 1;          % BOOL      - should the asymptotic tissue model be used?
 params.calcDW = 1;          % BOOL      - should dw be recalculated based on OEF?
 
 
@@ -60,7 +60,7 @@ params.calcDW = 1;          % BOOL      - should dw be recalculated based on OEF
 NS = 100; % number of points on surface (in each dimension)
 
 tau = (-28:4:64)/1000;
-par1 = linspace(  25,  80,NS);
+par1 = linspace(0.1875,0.6,NS);
 par2 = linspace(0.01,0.07,NS);
 
 NT = length(tau);   % number of points on surface, for loops
@@ -84,7 +84,7 @@ parfor i1 = 1:NS
     for i2 = 1:NS
         
         % Create and update a new PARAM object
-        inpars = updateParams(par22(i2),looppars,'dhb');
+        inpars = updateParams(par22(i2),looppars,'OEF');
         
         % Calculate Model
         S_mod = qASE_model(tau,params.TE,inpars);
@@ -112,7 +112,7 @@ save('ASE_SurfData','S0','tau','par1','par2','params');
 figure; hold on; box on;
 
 % Plot 2D grid search results
-surf(par2,par1,(S0(:,:,1)));
+surf(par2,par1,log(S0(:,:,1)));
 view(2); shading flat;
 c=colorbar;
 
