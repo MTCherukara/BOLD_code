@@ -65,6 +65,10 @@ function PARAMS = updateParams(VALUE,PARAMS,INFER)
         PARAMS.R2t = VALUE;
     elseif strcmp(INFER,'geom')
         PARAMS.geom = VALUE;
+    elseif strcmp(INFER,'dHb')
+        PARAMS.dHb = VALUE;
+    elseif strcmp(INFER,'dhb')
+        PARAMS.dhb = VALUE;
     else
         disp('----updateParams.m: Invalid parameter specified');
     end

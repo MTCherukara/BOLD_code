@@ -79,9 +79,9 @@ for jj = 1:nj
 
 
     % Choose parameters, their range, and the number of points each way:
-    pnames = { 'R2p'    ; 'zeta'     };
-    interv = [ 2.5, 6.5 ; 0.01, 0.07 ];
-    np     = [ 1000     ; 1000       ];
+%     pnames = { 'R2p'    ; 'zeta'     };
+%     interv = [ 2.5, 6.5 ; 0.01, 0.07 ];
+%     np     = [ 100     ; 100       ];
     
 %     pnames = { 'OEF'    ; 'zeta'     };
 %     interv = [ 0.2, 0.6 ; 0.01, 0.07 ];
@@ -89,6 +89,9 @@ for jj = 1:nj
 %     interv = [ 0, 0.1 ; 0.01, 0.05 ];
 %     np     = [  1000     ; 1000        ];
 
+    pnames = { 'dhb'    ; 'zeta'     };
+    interv = [ 0.8, 2.4   ; 0.01, 0.07 ];
+    np     = [ 100     ; 100       ];
 
     % Specifically for testing critical tau. 
     params.tc_man = 0;

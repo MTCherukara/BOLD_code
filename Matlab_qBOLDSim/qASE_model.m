@@ -59,7 +59,9 @@ function [S,PARAMS] = qASE_model(TAU,TE,PARAMS)
 
 % characteristic frequency - this will not be calculated if doing R2'-DBV inference
 if PARAMS.calcDW
-    PARAMS.dw   = (4/3)*pi*PARAMS.gam*PARAMS.dChi*PARAMS.Hct*PARAMS.OEF*PARAMS.B0;    
+%     PARAMS.dw   = (4/3)*pi*PARAMS.gam*PARAMS.B0*PARAMS.dChi*PARAMS.Hct*PARAMS.OEF;    
+%     dHb = PARAMS.dhb/PARAMS.zeta;
+    PARAMS.dw   = (4/3)*pi*PARAMS.gam*PARAMS.B0*PARAMS.dChi*PARAMS.kap*PARAMS.dHb;
 else
     % if we are inferring on R2', we want to change the order we do things
     % in slightly:

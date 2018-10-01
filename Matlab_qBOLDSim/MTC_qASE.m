@@ -39,15 +39,16 @@ clear;
 setFigureDefaults;
 
 plot_fig = 1;       
-save_data = 1;      % set to 1 in order to save out ASE data
+save_data = 0;      % set to 1 in order to save out ASE data
 
 
 %% Model Parameters
 
 % constants 
 params.B0   = 3.0;          % T         - static magnetic field
-params.dChi = 2.64e-7;      % parts     - susceptibility difference
+params.dChi = 0.264e-6;     % parts     - susceptibility difference
 params.gam  = 2.67513e8;    % rad/s/T   - gyromagnetic ratio
+params.kap  = 0.003;        % ?         - conversion between Hct and [Hb]
 
 % scan parameters 
 params.TE   = 0.074;        % s         - echo time
@@ -59,10 +60,12 @@ params.S0   = 100;          % a. units  - signal
 params.R2t  = 11.5;         % 1/s       - rate constant, tissue
 params.R2e  = 4;            % 1/s       - rate constant, extracellular
 params.dF   = 5;            % Hz        - frequency shift
-params.lam0 = 0.05;          % no units  - ISF/CSF signal contribution
+params.lam0 = 0.00;         % no units  - ISF/CSF signal contribution
 params.zeta = 0.03;         % no units  - deoxygenated blood volume
 params.OEF  = 0.40;         % no units  - oxygen extraction fraction
 params.Hct  = 0.400;        % no units  - fractional hematocrit
+params.dHb  = 53.3;         % g/L       - deoxyhaemoglobin concentration
+params.dhb  = 1.6;          % ?         - deoxyhaemoglobin CONTENT [dHb]*zeta
 params.T1t  = 1.200;        % s         - tissue T1
 params.T1b  = 1.580;        % s         - blood T1
 params.T1e  = 3.870;        % s         - CSF T1
