@@ -7,15 +7,15 @@
 % 2018-10-01
 
 clear;
-
+setFigureDefaults;
 
 % Load in two datasets
-load('../../Data/ASE_SurfData_OEFModel');
+load('../../Data/GridSearches/ASE_SurfData_OEFModel');
 S1 = S0;
 p1 = par1;
 p2 = par2;
 
-load('../../Data/ASE_SurfData_DHBModel');
+load('../../Data/GridSearches/ASE_SurfData_DHBModel');
 S2 = S0;
 
 % Calculate RMSE

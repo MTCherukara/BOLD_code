@@ -28,6 +28,10 @@ function [S,PARAMS] = qASE_model(TAU,TE,PARAMS)
     %
     % CHANGELOG:
     %
+    % 2018-10-01 (MTC). Added the option for calculating dw as a function of dHb
+    %       concentration, instead of using OEF and Hct. Requires a scaling
+    %       parameter kappa (0.03), and an assumtpion of [Hb] and/or Hct.
+    %
     % 2018-09-13 (MTC). Condensing the various compartment functions into the
     %       one script, and bringing nomenclature into line with fmriphysiology
     %       github.
@@ -59,9 +63,9 @@ function [S,PARAMS] = qASE_model(TAU,TE,PARAMS)
 
 % characteristic frequency - this will not be calculated if doing R2'-DBV inference
 if PARAMS.calcDW
-    PARAMS.dw   = (4/3)*pi*PARAMS.gam*PARAMS.B0*PARAMS.dChi*PARAMS.Hct*PARAMS.OEF;    
-%     dHb = PARAMS.dhb/PARAMS.zeta;
-%     PARAMS.dw   = (4/3)*pi*PARAMS.gam*PARAMS.B0*PARAMS.dChi*PARAMS.kap*dHb;
+%     PARAMS.dw   = (4/3)*pi*PARAMS.gam*PARAMS.B0*PARAMS.dChi*PARAMS.Hct*PARAMS.OEF;    
+%     PARAMS.dHb = PARAMS.dhb/PARAMS.zeta;
+    PARAMS.dw   = (4/3)*pi*PARAMS.gam*PARAMS.B0*PARAMS.dChi*PARAMS.kap*PARAMS.dHb;
 else
     % if we are inferring on R2', we want to change the order we do things
     % in slightly:

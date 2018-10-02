@@ -51,40 +51,46 @@ params.T1e  = 3.870;        % s         - CSF T1
 % analysis parameters
 params.tc_man = 0;          % BOOL      - should Tc be defined manually?
 params.tc_val = 0.0;        % s         - manual Tc (if tc_man = 1)
-params.asymp  = 1;          % BOOL      - should the asymptotic tissue model be used?
+params.asymp  = 0;          % BOOL      - should the asymptotic tissue model be used?
 params.calcDW = 1;          % BOOL      - should dw be recalculated based on OEF?
 
 
 %% Surface Parameters
 
-NS = 100; % number of points on surface (in each dimension)
+NS1 = 100; % number of points on surface (in each dimension)
+NS2 = 100;
 
 tau = (-28:4:64)/1000;
-par1 = linspace(0.1875,0.6,NS);
-par2 = linspace(0.01,0.07,NS);
+par1 = linspace(25,80,NS1);
+par2 = linspace(0.01,0.07,NS2);
 
 NT = length(tau);   % number of points on surface, for loops
 
 
 %% Generate Surface
-S0 = zeros(length(par1),length(par2),NT);
+S0 = zeros(NS1,NS2,NT);
+% DBV = zeros(NS1,NS2);
+% OEF = zeros(NS1,NS2);
 
 % Loop over first parameter
-parfor i1 = 1:NS
+parfor i1 = 1:NS1
     
     % Create and update a PARAM object
-    looppars = updateParams(par1(i1),params,'zeta');
+    looppars = updateParams(par1(i1),params,'dHb');
     
     % Pre-allocate a matrix to fill within the inner loop
-    S_in = zeros(length(par2),NT);
+    S_in = zeros(NS2,NT);
     
     par22 = par2; % to avoid using par2 as a broadcast variable
     
     % Loop over second parameter
-    for i2 = 1:NS
+    for i2 = 1:NS2
         
         % Create and update a new PARAM object
-        inpars = updateParams(par22(i2),looppars,'OEF');
+        inpars = updateParams(par22(i2),looppars,'zeta');
+        
+%         DBV(i1,i2) = par22(i2);
+%         OEF(i1,i2) = par1(i1);
         
         % Calculate Model
         S_mod = qASE_model(tau,params.TE,inpars);
@@ -95,11 +101,11 @@ parfor i1 = 1:NS
         % Insert into S0
         S_in(i2,:) = S_mod;
      
-    end %  for i2 = 1:length(par2)
+    end %  for i2 = 1:NS2
     
     S0(i1,:,:) = S_in;
     
-end % parfor i1 = 1:length(par)
+end % parfor i1 = 1:NS1
 
 toc;
 
@@ -112,7 +118,8 @@ save('ASE_SurfData','S0','tau','par1','par2','params');
 figure; hold on; box on;
 
 % Plot 2D grid search results
-surf(par2,par1,log(S0(:,:,1)));
+surf(par2,par1,log(S0(:,:,3)));
+% surf(par2,par1,OEF);
 view(2); shading flat;
 c=colorbar;
 
