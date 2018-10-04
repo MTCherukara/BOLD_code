@@ -1,25 +1,24 @@
-% simrun.m
+% Run_Simulation.m
 % 
-% Runs the vessel simulator, which models a brain voxel and the MRI signal
-% resulting from it by generating a universe filled with randomly
-% positioned and oriented cylinders (representing blood vessels) with
-% chosen radii and susceptibility, occupying a chosen fraction of the total
-% space, and then positions a single 'proton' in the centre of this
-% universe, and allows it to walk randomly throughout, at a rate governed
-% by the diffusion constant D, the proton accrues phase based on the
-% magnetic fields created by the vessels, which is recorded in specified
-% steps.
+% Wrapper script to run NP Blockley's simple vessel simulator, which models a 
+% brain voxel and the MRI signal resulting from it by generating a universe 
+% filled with randomly positioned and oriented cylinders (representing blood
+% vessels) with chosen radii and susceptibility, occupying a chosen fraction of
+% the total space, and then positions a single 'proton' in the centre of this 
+% universe, and allows it to walk randomly throughout, at a rate governed by the
+% diffusion constant D, the proton accrues phase based on the magnetic fields
+% created by the vessels, which is recorded in specified steps.
 %
 % The saved output is a matrix of phase values with dimensions of N repeats
 % by S steps. A structure p is also saved out containing all the relevant
 % variable information. 
 %
+% Requires vesselSim.m
+%
 % Created by NP Blockley, March 2016
-% 
-% Modifed by MT Cherukara, December 2016 and onwards
 %
 %
-%       Copyright (C) University of Oxford, 2016-2017
+%       Copyright (C) University of Oxford, 2016-2018
 %
 %
 % CHANGELOG:
@@ -56,23 +55,21 @@ p.universeScale = 50;      % Defines size of universe
 p.solidWalls = 0;
 
 % Varied Parameters
-p.R     = 5.0e-6;   % m     - Vessel radius
-p.Y     = 0.6;      % -     - (1-OEF)
-p.vesselFraction = 0.03;        % DBV
+p.R = [7.5,15.0].*1e-6;               % m     - Vessel radius
+p.Y = [0.6,0.6];                  % -     - (1-OEF)
+p.V = [0.15,0.15];                 % -     - Volume
 
 
 % Derived parameters
-p.Hct = p.Hct.*ones(1,length(p.R));
-p.deltaChi = p.deltaChi0.*p.Hct.*(1-p.Y); % calculate susceptibility difference
 
-[Phase,p] = MTC_vesselsim(p);
+[Phase,p] = vesselSim(p);
 
 toc;
 % save out data
 if save_data
-    dataname = ['newStoredPhase/Sdata_R_'  ,num2str(p.R*1e6),...
+    dataname = ['newStoredPhase/Sdata_R_'  ,num2str(p.R(1)*1e6),...
                                     '_OEF_',num2str(100*(1-p.Y)),...
-                                    '_DBV_',num2str(100*p.vesselFraction)];
+                                    '_DBV_',num2str(100*sum(p.V))];
     
     save(strcat(dataname,'.mat'),'Phase','p');
 end

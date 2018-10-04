@@ -1,20 +1,43 @@
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%     MTC_vesselsim                   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-function [storedProtonPhase, p] = MTC_vesselsim(p)
+% vesselSim NP Blockley's simple vessel simulator. Usage:
+%
+%       [storedPhase, p] = vesselSim(p)
+%
+% This is the workhorse of the simple vessel simulator, and should be called by
+% Run_Simulation.m 
+%
+% Created by NP Blockley, March 2016
+%
+%
+%       Copyright (C) University of Oxford, 2016-2018
+%
+%
+% CHANGELOG:
+%
+% 2018-10-04 (MTC). Simulation should allow for a range of different vessel
+%       radii (each with their own vessel fraction), but under the assumption
+%       that Hct is the same across them all.
+%
+% 2017-08-17 (MTC). Various changes, including moving significant portions of
+%       the code from Run_Simulation into this function
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%     vesselSim (main)                %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+function [storedPhase, p] = vesselSim(p)
 	
     % make sure there is at least 1 argument (the parameter structure p)
 	if nargin < 1
-		storedProtonPhase = [];
+		storedPhase = [];
 		p = [];
-		return;
+        return;
 	end
 	
-	% make sure that each p.R has a corresponding p.vesselFraction, p.Hct, p.Y
-	if (length(p.R)*length(p.vesselFraction)*length(p.Hct)*length(p.Y)) ~= length(p.R)^4
-		storedProtonPhase = [];
+	% make sure that each p.R has a corresponding p.V, p.Y
+    if (length(p.R)*length(p.V)*length(p.Y)) ~= length(p.R)^3
+		storedPhase = [];
 		p = [];
-		return;
+        return;
     end
 	
 % 	% set up random number generator - not necessary when running locally
@@ -25,43 +48,47 @@ function [storedProtonPhase, p] = MTC_vesselsim(p)
 % 	rng(p.seed); % use a random seed to avoid problems when running on a cluster
 	
 	% define parameters for simulation
-	p.HD = 10; % factor for higher density sampling near vessels
-	p.stdDev = sqrt(2*p.D*p.dt/p.HD);
-	p.universeSize = p.universeScale*min(p.R);
-	p.numSteps = round((p.TE*2)/p.dt);
-	p.ptsPerdt = round(p.deltaTE./p.dt); %pts per deltaTE
+	p.HD = 10;      % factor for higher density sampling near vessels
+    
+    % derived parameters
+	p.stdDev = sqrt(2*p.D*p.dt/p.HD);           % requisite standard deviation
+	p.universeSize = p.universeScale*min(p.R);  % universe size
+	p.numSteps = round((p.TE*2)/p.dt);          % total number of steps
+	p.ptsPerdt = round(p.deltaTE./p.dt);        % pts per deltaTE
     
     % pre-allocate storedProtonPhase
-    storedProtonPhase = zeros(p.numSteps/p.ptsPerdt,p.N);
+    storedPhase = zeros(p.numSteps/p.ptsPerdt,p.N);
 	
 	parfor k=1:p.N         % p.N = 10000, loop through points
 	
-		%set up universe
-		[vesselOrigins, vesselNormals, R, deltaChi, protonPosit, numVessels(k), vesselVolFrac(k)] = setupUniverse(p);
+		% set up universe
+		[vOrigin, vNormal, R, dChi, posit, numVessels(k), vesselV(k)] = setupUniverse(p);
 	
-		%generate random walk path
-		[protonPosits] = randomWalk(p,protonPosit);
+		% generate random walk path
+		[protonPosits] = randomWalk(p,posit);
 
-		% calculate field at each point - modify this to incorporate Y
-		[fieldAtProtonPosit, numStepsInVessel(k), numCloseApproaches(k), stepInLargeVessel(k)] = calculateField(p, protonPosits, vesselOrigins, vesselNormals, R, deltaChi, numVessels(k));
+		% calculate field at each point
+		[fieldAtP, nsVessel(k), nClose(k), nsLargeVessel(k)] = calculateField(p, protonPosits, vOrigin, vNormal, R, dChi, numVessels(k));
 	
-		%calculate phase at each point
-		storedProtonPhase(:,k) = sum(reshape(fieldAtProtonPosit,p.ptsPerdt,p.numSteps/p.ptsPerdt).*p.gamma.*p.dt,1)';
+		% calculate phase at each point
+		storedPhase(:,k) = sum(reshape(fieldAtP,p.ptsPerdt,p.numSteps/p.ptsPerdt).*p.gamma.*p.dt,1)';
 
 	end
 	
-	%record useful values
+	% record useful values
 	p.numVessels            = numVessels;
-	p.vesselVolFrac         = vesselVolFrac;
-	p.numStepsInVessel      = numStepsInVessel;
-	p.numCloseApproaches    = numCloseApproaches;
-	p.stepInLargeVessel     = stepInLargeVessel;
+	p.vesselVolFrac         = vesselV;
+	p.numStepsInVessel      = nsVessel;
+	p.numCloseApproaches    = nClose;
+	p.stepInLargeVessel     = nsLargeVessel;
+    
+    return;
 	
-return;
+end
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%     setupUniverse                   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%     setupUniverse                   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 function [vesselOrigins, vesselNormals, R, deltaChi, protonPosit, numVessels, vesselVolFrac] = setupUniverse(p)
     % Set up the universe of cylindrical vessels
     % Now includes vesselOxygens as an output
@@ -92,13 +119,13 @@ function [vesselOrigins, vesselNormals, R, deltaChi, protonPosit, numVessels, ve
     cutOff = 0;
     for k = 1:length(p.R)
     	R(cutOff+1:M,:)        = repmat(p.R(k),length(cutOff+1:M),1);
-        deltaChi(cutOff+1:M,:) = p.deltaChi0.*p.Hct(k).*(1-p.Y(k));
+        deltaChi(cutOff+1:M,:) = p.deltaChi0.*p.Hct.*(1-p.Y(k));
         
         
         % need to insert the calculation of DeltaChi in this section...
         
     	volSum = (cumsum(l.*pi.*R.^2));
-		cutOff = find(volSum<(volUniverse.*sum(p.vesselFraction(1:k))),1,'last');
+		cutOff = find(volSum<(volUniverse.*sum(p.V(1:k))),1,'last');
     end
     
     if cutOff==M
@@ -145,22 +172,22 @@ function [vesselOrigins, vesselNormals, R, deltaChi, protonPosit, numVessels, ve
     
     protonPosit = [0 0 0];
     
-return;
+end
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%     randomWalk                      %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%     randomWalk                      %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 function [protonPosits] = randomWalk(p,protonPosit)
 
 	protonPosits        = p.stdDev.*randn(p.numSteps*p.HD,3);   
 	protonPosits(1,:)   = protonPosit;
 	protonPosits        = cumsum(protonPosits);
 	
-return;
+end
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%     calculateField                  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%     calculateField                  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 function [totalField, numStepsInVessel, numCloseApproaches, stepInLargeVessel] = calculateField(p, protonPosits, vesselOrigins, vesselNormals, R, deltaChi, numVessels)
 	%calculate magnetic field at proton location
 
@@ -266,5 +293,5 @@ function [totalField, numStepsInVessel, numCloseApproaches, stepInLargeVessel] =
 		stepInLargeVessel=0;
 	end
 
-return;
+end
 

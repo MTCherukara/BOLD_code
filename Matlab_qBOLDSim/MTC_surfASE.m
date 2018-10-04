@@ -89,8 +89,8 @@ parfor i1 = 1:NS1
         % Create and update a new PARAM object
         inpars = updateParams(par22(i2),looppars,'zeta');
         
-%         DBV(i1,i2) = par22(i2);
-%         OEF(i1,i2) = par1(i1);
+        DBV(i1,i2) = par22(i2);
+        OEF(i1,i2) = par1(i1);
         
         % Calculate Model
         S_mod = qASE_model(tau,params.TE,inpars);
@@ -118,8 +118,8 @@ save('ASE_SurfData','S0','tau','par1','par2','params');
 figure; hold on; box on;
 
 % Plot 2D grid search results
-surf(par2,par1,log(S0(:,:,3)));
-% surf(par2,par1,OEF);
+% surf(par2,par1,log(S0(:,:,3)));
+surf(par2,par1,DBV);
 view(2); shading flat;
 c=colorbar;
 
