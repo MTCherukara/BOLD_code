@@ -14,8 +14,8 @@ tic;
 
 %% Initialization
 
-% Where the data is stored (Mac)
-simdir = '/Users/mattcher/Documents/DPhil/Data/vesselsim_data/';
+% Where the data is stored
+simdir = '../../Data/vesselsim_data/';
 
 % Options
 save_data = 1;
@@ -32,76 +32,103 @@ VF = [ 0.412, 0.113, 0.117, 0.116, 0.121, 0.121 ];
 % Array sizes
 nr = length(RR);    % number of different vessel radii
 nt = length(tau);   % number of tau values
-np = 10;           % number of different parameter values to generate
+np = 100;           % number of different parameter values to generate
 
 % Physiological Parameters
 OEFvals = linspace(0.1875,0.6,np);
 DBVvals = linspace(0.01,0.07,np);
 
-% Preallocate final array
-S0 = zeros(np,np,nt);
+% Preallocate arrays
+S_ev  = zeros(nt,np,np,nr);     % extravascular (tissue) signal
+S_iv  = zeros(nt,np,np,nr);     % intravascular (blood) signal
 
 
-% Loop over OEF
-for i1 = 1:np
+%% Generate signals for each radius
+
+% Loop over Radii
+for i1 = 1:nr
     
-    OEF = OEFvals(i1);
+    vrad = RR(i1);
+    volf = VF(i1);
     
-    % Oxygenation of each vessel, assuming arteries are 100% saturated
-    Y = repmat(1-OEF,1,nr);
+    disp(['Assembling dataset ',num2str(i1),' of ',num2str(nr),' (r = ',num2str(vrad),'um)']);
     
-    % Loop over DBV
-    for i2 = 1:length(DBVvals)
-        
-        DBV = DBVvals(i2);
-        
-        % Absolute vessel fractions. The factor of 0.793 accounts for the relative
-        % distributions of veins and capillaries 
-        vFractions = 0.793 .* DBV .* VF;
-
-        % Pre-allocate results arrays
-        sigASE   = zeros(nt,nr);
-        sigASEev = zeros(nt,nr);
-        sigASEiv = zeros(nt,nr);
-
-        % Loop through each radius in R
-        for i3 = 1:nr
-
-            % Load the appropriate data file
-            load([simdir 'single_vessel_radius_D1-0_sharan/simvessim_res' num2str(RR(i3)) '.mat']);
-
-            % Calculate the signal
-            [sigASE(:,i3), tau, sigASEev(:,i3), sigASEiv(:,i3)] = generate_signal(p,spp,'display',false,'Vf',vFractions(i3),'Y',Y(i3),'seq','ASE','includeIV',true,'T2EV',Inf,'T2b0',Inf,'TE',TE,'tau',tau);
-        end
-
-        % Total up the signal contributions
-        sigASEtot = (1-sum(vFractions)).*prod(sigASEev,2)+sum(bsxfun(@times,vFractions,sigASEiv),2);
-
-        % % Normalize to points around the spin echo
-        % se = find(tau==0);
-        % sigASEtotn = sigASEtot./mean(sigASEtot(se-1:se+1));
-
-        % Normalize to the spin echo
-        sigASEtotn = sigASEtot./max(sigASEtot);
-        
-        S0(i1,i2,:) = sigASEtotn;
-        
-    end % for i1 = 1:np
+    load([simdir 'single_vessel_radius_D1-0_sharan/simvessim_res' num2str(vrad) '.mat']);
     
-end % for i2 = 1:np
+    % Loop over OEF
+    parfor i2 = 1:np
+        
+        OEF = OEFvals(i2);
+        Y = 1-OEF;
+        
+        Vvals = DBVvals;    % to avoid using DBVvals as a broadcast variable
+        
+        % Compute T2 of blood
+        R2b = 4.5 + 16.4*p.Hct + (165.2*p.Hct + 55.7)*OEF^2;
 
+        % Pre-allocate some arrays to fill within the inner loop
+        Sin_EV  = zeros(nt,np);
+        Sin_IV  = zeros(nt,np);
+        
+        % Loop over DBV
+        for i3 = 1:np
+            
+            DBV = Vvals(i3);
+            
+            % Vessel fraction. The factor 0.793 should account for the relative
+            % contribution of capillaries to total DBV
+            vFrac = 0.793.*DBV.*volf;
+            
+            % Calculate signal
+            [~, ~, Sin_EV(:,i3), Sin_IV(:,i3)] = generate_signal(p,spp,...
+                'display',false,'Vf',vFrac,'Y',Y,'seq','ASE','includeIV',true,...
+                'T2EV',0.087,'T2b0',1/R2b,'TE',TE,'tau',tau);
+            
+        end % DBV loop
+        
+        % Fill the main arrays
+        S_ev(:,:,i2,i1) = Sin_EV;
+        S_iv(:,:,i2,i1) = Sin_IV;
+        
+    end % OEF loop
+   
+end % Radius loop
+
+
+%% Total up the signal contributions
+
+% Create matrix of effective Total DBV values
+DBVmat = repmat(0.793.*DBVvals,nt,1,np);
+
+% Total up the extravascular signals
+sig_EV = (1-DBVmat).*prod(S_ev,4);
+
+% Create a matrix of effective Radius-specific DBV values
+RVmat = repmat(DBVmat,1,1,1,nr) .* shiftdim(repmat(RR',1,nt,np,np),1);
+
+% Total up the intravascular signals
+sig_IV = sum(RVmat.*S_iv,4);
+
+% Total signal, and shuffle the dimensions so that they're consistent with the
+% other data
+S0 = shiftdim(sig_EV + sig_IV,1);
+
+% Normalize to the spin echo - we know that Tau=0 is at index 8
+S0 = S0./repmat(S0(:,:,8),1,1,24);
 
 toc;
 
 
 %% Save Data
 if save_data
-    save('vesselSimData.mat','S0','tau','TE','OEFvals','DBVvals');
+    save('vesselSimData.mat','S0','S_ev','S_iv','tau','TE','OEFvals','DBVvals');
 end
 
 
 %% Plot figure
 if plot_figure
+    
+    setFigureDefaults;
 
     figure; hold on; box on;
     
@@ -111,8 +138,13 @@ if plot_figure
     c=colorbar;
     
     axis([min(DBVvals),max(DBVvals),min(OEFvals),max(OEFvals)]);
-    xlabel('DBV');
-    ylabel('OEF');
+    xlabel('DBV (%)');
+    ylabel('OEF (%)');
+    
+    xticks(0.01:0.01:0.07);
+    xticklabels({'1','2','3','4','5','6','7'});
+    yticks(0.2:0.1:0.6);
+    yticklabels({'20','30','40','50','60'});
     
 end
 

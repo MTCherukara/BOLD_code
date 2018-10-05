@@ -4,7 +4,7 @@ clear;
 
 setFigureDefaults;
 
-simdir = '/Users/mattcher/Documents/DPhil/Data/vesselsim_data/';
+simdir = '../../Data/vesselsim_data/';
 
 TE=80e-3;
 tauASE= (-28:4:64)./1000;
