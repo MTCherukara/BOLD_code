@@ -36,7 +36,7 @@ VF = [ 0.412, 0.113, 0.117, 0.116, 0.121, 0.121 ];
 % Array sizes
 nr = length(RR);    % number of different vessel radii
 nt = length(tau);   % number of tau values
-np = 10;           % number of different parameter values to generate
+np = 100;           % number of different parameter values to generate
 
 % Physiological Parameters
 OEFvals = linspace(0.1875,0.6,np);
@@ -57,11 +57,12 @@ for i1 = rstart:rend
     vrad = RR(i1);
     volf = VF(i1);
     
-    disp(['Assembling dataset ',num2str(i1),' of ',num2str(rend-rstart+1),' (R = ',num2str(vrad),'um)']);
+    disp(['Assembling dataset ',num2str(i1),' of ',num2str(nr),' (R = ',num2str(vrad),'um)']);
     
     load([simdir,'single_vessel_radius_',dirname,'/simvessim_res',num2str(vrad),'.mat']);
     
-    % pre-allocate radius-level array
+    % pre-allocate radius-level array.
+    %       Dimensions: TIME, DBV, OEF
     S_ev = zeros(nt,np,np);
     S_iv = zeros(nt,np,np);
 
@@ -77,7 +78,8 @@ for i1 = rstart:rend
         % Compute T2 of blood
         R2b = 4.5 + 16.4*p.Hct + (165.2*p.Hct + 55.7)*OEF^2;
 
-        % Pre-allocate some arrays to fill within the inner loop
+        % Pre-allocate some arrays to fill within the inner loop,
+        %       Dimensions: TIME, DBV
         Sin_EV  = zeros(nt,np);
         Sin_IV  = zeros(nt,np);
         
@@ -97,14 +99,14 @@ for i1 = rstart:rend
             
         end % DBV loop
         
-        % Fill the main arrays
+        % Fill the main arrays (Dimensions: TIME, DBV, OEF)
         S_ev(:,:,i2) = Sin_EV;
         S_iv(:,:,i2) = Sin_IV;
         
     end % OEF loop
     
     % Save out data for each radius
-    sname = strcat(simdir,'vs_arrays/vsArray_',num2str(np),'_',distname,'_R_',num2str(vrad),'.mat');
+    sname = strcat(simdir,'vs_arrays/vsArray',num2str(np),'_',distname,'_R_',num2str(vrad),'.mat');
     save(sname,'S_ev','S_iv','tau','TE','OEFvals','DBVvals');
     
     % Timer

@@ -92,8 +92,12 @@ Ve = PARAMS.lam0;
 Vb = PARAMS.zeta;
 
 % calculate compartment weightings
-w_csf = (ne.*m_csf.*Ve) ./ ( (nt.*m_tis) + (ne.*m_csf.*Ve) - (nt.*m_tis.*Ve) );
-w_bld = m_bld.*nb.*(1-w_csf).*Vb;
+% w_csf = (ne.*m_csf.*Ve) ./ ( (nt.*m_tis) + (ne.*m_csf.*Ve) - (nt.*m_tis.*Ve) );
+% w_bld = m_bld.*nb.*(1-w_csf).*Vb;
+% w_tis = 1 - (w_csf + w_bld);
+
+w_csf = PARAMS.lam0;
+w_bld = PARAMS.zeta;
 w_tis = 1 - (w_csf + w_bld);
 
 % CALCULATE MODEL:

@@ -2,7 +2,7 @@
 
 clear;
 
-simdir = '../../Data/';
+simdir = '../../Data/vesselsim_data/';
 
 TE=80e-3;
 tauASE=[-28:4:64]./1000;
@@ -12,8 +12,11 @@ Rs=Ds./2;
 relVf=gevpdf(Rs,0.41,5.8,10.1);
 relVf=relVf./sum(relVf);
 
-%Rs=[Rs(Rs<=10) 20 30 40 50 60];
-%relVf=[relVf(Rs<10) sum(relVf(find((Rs>=10).*(Rs<15)))) sum(relVf(find((Rs>=15).*(Rs<25)))) sum(relVf(find((Rs>=25).*(Rs<35)))) sum(relVf(find((Rs>=35).*(Rs<45)))) sum(relVf(find((Rs>=45).*(Rs<55)))) sum(relVf(find((Rs>=55).*(Rs<65))))];
+% Rs=[Rs(Rs<=10) 20 30 40 50 60];
+% relVf=[relVf(Rs<10), sum(relVf(find((Rs>=10).*(Rs<15)))), ...
+%        sum(relVf(find((Rs>=15).*(Rs<25)))), sum(relVf(find((Rs>=25).*(Rs<35)))), ...
+%        sum(relVf(find((Rs>=35).*(Rs<45)))), sum(relVf(find((Rs>=45).*(Rs<55)))), ...
+%        sum(relVf(find((Rs>=55).*(Rs<65))))];
 
 Ya=1;
 E0=0.4;
@@ -27,7 +30,9 @@ Vf=relVf.*Vtot;
 
 for k=1:length(Rs)
     load([simdir,'single_vessel_radius_D1-0Vf3pc_dist/simvessim_res',num2str(Rs(k)),'.mat']);
-    [sigASE(:,k), tauASE, sigASEev(:,k), sigASEiv(:,k)]=generate_signal(p,spp,'display',false,'Vf',Vf(k),'Y',Yv,'seq','ASE','includeIV',true,'T2EV',Inf,'T2b0',Inf,'TE',TE,'tau',tauASE);
+    [sigASE(:,k), tauASE, sigASEev(:,k), sigASEiv(:,k)] = generate_signal(p,spp,...
+         'display',false,'Vf',Vf(k),'Y',Yv,'seq','ASE','includeIV',true,...
+         'T2EV',0.087,'T2b0',0.0327,'TE',TE,'tau',tauASE);
 end
 
 sigASEtot=(1-sum(Vf)).*prod(sigASEev,2)+sum(bsxfun(@times,Vf,sigASEiv),2);
@@ -42,7 +47,7 @@ figure;
 % 		plot(tauASE.*1000,tcn,'color',[0.5 0.5 0.5])
 % 	end
 hold on;
-plot(tauASE.*1000,sigASEtotn,'color',lc(2,:),'linewidth',3)
+plot(tauASE.*1000,sigASEtotn);
 xlim([min(tauASE.*1000) max(tauASE.*1000)]);
 ylim([0.8 1.02]);
 set(gca,'xtick',-28:14:56);
@@ -61,19 +66,19 @@ ylabel('Signal fraction (arb.)');
 %	xlabel('Vessel radius (/mum)');
 %	ylabel('Relative volume fraction');
 
-Ds=[0:2:200];
-Rs=Ds./2;
-relVf=gevpdf(Rs,0.41,5.8,10.1);
-relVf(Rs<3)=0;
-relVf=relVf./sum(relVf);
-
-% Plot vessel radii distribution
-figure;
-stairs(Rs,relVf);
-axis square;
-xlim([0 100])
-title('Multiple vessel relative volume fractions: Frechet');
-xlabel('Vessel radius (\mum)');
-ylabel('Relative volume fraction');
-grid on;
-	
+% Ds=[0:2:200];
+% Rs=Ds./2;
+% relVf=gevpdf(Rs,0.41,5.8,10.1);
+% relVf(Rs<3)=0;
+% relVf=relVf./sum(relVf);
+% 
+% % Plot vessel radii distribution
+% figure;
+% stairs(Rs,relVf);
+% axis square;
+% xlim([0 100])
+% title('Multiple vessel relative volume fractions: Frechet');
+% xlabel('Vessel radius (\mum)');
+% ylabel('Relative volume fraction');
+% grid on;
+% 	

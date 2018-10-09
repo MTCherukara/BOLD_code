@@ -45,6 +45,7 @@ nt = length(tau);   % number of tau values
 np = 10;           % number of different parameter values to generate
 
 % Preallocate arrays
+%       Dimensions: TIME, DBV, OEF, RADIUS
 S0_ev  = zeros(nt,np,np,nr);     % extravascular (tissue) signal
 S0_iv  = zeros(nt,np,np,nr);     % intravascular (blood) signal
 
@@ -57,9 +58,10 @@ for i1 = 1:nr
     vrad = RR(i1);
     
     % Load data
-    load([simdir,'vs_arrays/vsArray_',num2str(np),'_',distname,'_R_',num2str(vrad),'.mat']);
+    load([simdir,'vs_arrays/vsArray',num2str(np),'_',distname,'_R_',num2str(vrad),'.mat']);
     
     % Fill matrix
+    %       Dimensions: TIME, DBV, OEF, RADIUS
     S0_ev(:,:,:,i1) = S_ev;
     S0_iv(:,:,:,i1) = S_iv;
    
@@ -68,24 +70,52 @@ end % Radius loop
 
 %% Total up the signal contributions
 
-% Create matrix of effective Total DBV values
-DBVmat = repmat(0.793.*DBVvals,nt,1,np);
+% % Create matrix of effective Total DBV values
+% DBVmat = repmat(0.793.*DBVvals,nt,1,np);
+% 
+% % Total up the extravascular signals
+% sig_EV = (1-DBVmat).*prod(S0_ev,4);
+% 
+% % Create a matrix of effective Radius-specific DBV values
+% RVmat = repmat(DBVmat,1,1,1,nr) .* shiftdim(repmat(VF',1,nt,np,np),1);
+% 
+% % Total up the intravascular signals
+% sig_IV = sum(RVmat.*S0_iv,4);
+% 
+% % Total signal, and shuffle the dimensions so that they're consistent with the
+% % other data
+% S0 = shiftdim(sig_EV + sig_IV,1);
+% 
+% % Normalize to the spin echo - we know that Tau=0 is at index 8
+% S0 = S0./repmat(S0(:,:,8),1,1,24);
 
-% Total up the extravascular signals
-sig_EV = (1-DBVmat).*prod(S0_ev,4);
+% Preallocate S0 array
+%       Dimensions: DBV, OEF, TIME
+S0 = zeros(np,np,nt);
 
-% Create a matrix of effective Radius-specific DBV values
-RVmat = repmat(DBVmat,1,1,1,nr) .* shiftdim(repmat(RR',1,nt,np,np),1);
-
-% Total up the intravascular signals
-sig_IV = sum(RVmat.*S0_iv,4);
-
-% Total signal, and shuffle the dimensions so that they're consistent with the
-% other data
-S0 = shiftdim(sig_EV + sig_IV,1);
-
-% Normalize to the spin echo - we know that Tau=0 is at index 8
-S0 = S0./repmat(S0(:,:,8),1,1,24);
+% Crappy loop version - it would be better if this step was done using matrix
+% operations, but it doesn't matter that much, and at least it works this way...
+for i1 = 1:np
+    
+    for i2 = 1:np
+        
+        % S0_* dimensions:      TIME, DBV, OEF, RADIUS
+        % sigASE* dimensions:   TIME, RADIUS
+        sigASEev = squeeze(S0_ev(:,i2,i1,:));
+        sigASEiv = squeeze(S0_ev(:,i2,i1,:));
+        
+        vFrac = 0.793.*DBVvals(i2).*VF;
+        
+        % Stot dimensions:  TIME
+        Stot = (1-sum(vFrac)).*prod(sigASEev,2)+sum(bsxfun(@times,vFrac,sigASEiv),2);
+        Stot = Stot./Stot(8);
+        
+        % S0 dimensions:    DBV, OEF, TIME
+        S0(i1,i2,:) = Stot;
+        
+    end % DBV loop
+    
+end % OEF loop
 
 
 %% Save Data

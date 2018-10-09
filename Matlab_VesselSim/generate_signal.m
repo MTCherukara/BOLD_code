@@ -6,8 +6,8 @@ function [sigTOT, tau, sigEV, sigIV]=generate_signal(p,storedPhase,varargin)
 	addParameter(q,'Hct',p.Hct,@isnumeric); %target haematocrit
 	addParameter(q,'permeable',false,@islogical); %are vessels permeable
 	addParameter(q,'includeIV',false,@islogical); %include intravascular signal
-	addParameter(q,'display',true,@islogical); %display plot of results
-	addParameter(q,'T2EV',80e-3,@isnumeric); %extravascular T2
+	addParameter(q,'display',false,@islogical); %display plot of results
+	addParameter(q,'T2EV',87e-3,@isnumeric); %extravascular T2
 	addParameter(q,'T2b0',189e-3,@isnumeric); %intravascular T2
 	addParameter(q,'Vf',p.vesselFraction(1),@isnumeric);
 	addParameter(q,'seq','ASE'); %blood oxygenation saturation saturation to match tissue susceptibility

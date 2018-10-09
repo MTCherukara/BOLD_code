@@ -29,7 +29,7 @@ params.gam  = 2.67513e8;    % rad/s/T   - gyromagnetic ratio
 params.kap  = 0.003;        % ?         - conversion between Hct and [Hb]
 
 % scan parameters 
-params.TE   = 0.074;        % s         - echo time
+params.TE   = 0.072;        % s         - echo time
 params.TR   = 3.000;        % s         - repetition time
 params.TI   = 0;        % s         - FLAIR inversion time
 
@@ -51,7 +51,7 @@ params.T1e  = 3.870;        % s         - CSF T1
 % analysis parameters
 params.tc_man = 0;          % BOOL      - should Tc be defined manually?
 params.tc_val = 0.0;        % s         - manual Tc (if tc_man = 1)
-params.asymp  = 0;          % BOOL      - should the asymptotic tissue model be used?
+params.asymp  = 1;          % BOOL      - should the asymptotic tissue model be used?
 params.calcDW = 1;          % BOOL      - should dw be recalculated based on OEF?
 
 
@@ -61,7 +61,8 @@ NS1 = 100; % number of points on surface (in each dimension)
 NS2 = 100;
 
 tau = (-28:4:64)/1000;
-par1 = linspace(25,80,NS1);
+% par1 = linspace(25,80,NS1);         % dHb
+par1 = linspace(0.1875,0.60,NS1);   % OEF
 par2 = linspace(0.01,0.07,NS2);
 
 NT = length(tau);   % number of points on surface, for loops
@@ -76,7 +77,7 @@ S0 = zeros(NS1,NS2,NT);
 parfor i1 = 1:NS1
     
     % Create and update a PARAM object
-    looppars = updateParams(par1(i1),params,'dHb');
+    looppars = updateParams(par1(i1),params,'OEF');
     
     % Pre-allocate a matrix to fill within the inner loop
     S_in = zeros(NS2,NT);
@@ -118,8 +119,8 @@ save('ASE_SurfData','S0','tau','par1','par2','params');
 figure; hold on; box on;
 
 % Plot 2D grid search results
-% surf(par2,par1,log(S0(:,:,3)));
-surf(par2,par1,DBV);
+surf(par2,par1,log(S0(:,:,3)));
+% surf(par2,par1,DBV);
 view(2); shading flat;
 c=colorbar;
 

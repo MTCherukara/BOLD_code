@@ -73,7 +73,7 @@ params.T1e  = 3.870;        % s         - CSF T1
 % analysis parameters
 params.tc_man = 0;          % BOOL      - should Tc be defined manually?
 params.tc_val = 0.0;        % s         - manual Tc (if tc_man = 1)
-params.asymp  = 1;          % BOOL      - should the asymptotic tissue model be used?
+params.asymp  = 0;          % BOOL      - should the asymptotic tissue model be used?
 params.calcDW = 1;          % BOOL      - should dw be recalculated based on OEF?
 
 % noise
@@ -84,10 +84,6 @@ params.SNR = 100;
 
 % define tau values that we want to simulate
 tau = (-28:4:64)/1000; % for testing
-% tau = (-28:1:72)/1000;
-% tau = linspace(-0.028,0.064,1000); 
-% tau = [0:3:12,20:10:70]/1000;
-% tau = [-8,-4,0:6:30,40,50,60]/1000;
 % tau = linspace(-0.028,0.064,1000); % for visualising
 
 
@@ -96,13 +92,6 @@ np = length(tau);
 % call MTC_qASE_model
 [S_total,params] = qASE_model(tau,params.TE,params);
 
-
-% params.tc_man = 1;
-% params.tc_val = 0.026;
-% S_short = MTC_qASE_model2(tau,params.TE,params);
-% 
-% params.tc_val = 0.002;
-% S_long  = MTC_qASE_model2(tau,params.TE,params);
 
 
 %% Add Noise
@@ -122,17 +111,13 @@ if plot_fig
     
     % plot the signal
     S_log = ((S_total)./max(S_total));
-    l.s = plot(1000*tau,S_log,'-','Color',defColour(2));
-%     plot(1000*tau,log(S_sample),'kx');
+    l.s = plot(1000*tau,S_log,'-');
 %     ylim([-0.07,0]);
     xlim([(1000*min(tau))-4, (1000*max(tau))+4]);
-%     ylim([3.385, 3.435]);
     
     % labels on axes
     xlabel('Spin Echo Displacement \tau (ms)');
     ylabel('Log (Signal)');
-%     title('qBOLD Signal Measured Using ASE');
-%     legend('Full Model','Long-\tau Regime','Short-\tau Regime','Location','South')
 
 end % if plot_fig
 
