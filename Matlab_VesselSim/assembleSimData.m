@@ -42,7 +42,7 @@ end
 % Array sizes
 nr = length(RR);    % number of different vessel radii
 nt = length(tau);   % number of tau values
-np = 10;           % number of different parameter values to generate
+np = 100;           % number of different parameter values to generate
 
 % Preallocate arrays
 %       Dimensions: TIME, DBV, OEF, RADIUS
@@ -111,7 +111,7 @@ for i1 = 1:np
         Stot = Stot./Stot(8);
         
         % S0 dimensions:    DBV, OEF, TIME
-        S0(i1,i2,:) = Stot;
+        S0(i2,i1,:) = Stot;
         
     end % DBV loop
     

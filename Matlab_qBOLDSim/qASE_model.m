@@ -28,6 +28,11 @@ function [S,PARAMS] = qASE_model(TAU,TE,PARAMS)
     %
     % CHANGELOG:
     %
+    % 2018-10-10 (MTC). Added the option to specify which model to use in the
+    %       PARAMS structure, so that one doesn't have to keep coming into this
+    %       code and commenting section in and out. Also added an option to
+    %       include the T1 (steady-state-magnetization) contribution
+    %
     % 2018-10-01 (MTC). Added the option for calculating dw as a function of dHb
     %       concentration, instead of using OEF and Hct. Requires a scaling
     %       parameter kappa (0.03), and an assumtpion of [Hb] and/or Hct.
@@ -59,64 +64,107 @@ function [S,PARAMS] = qASE_model(TAU,TE,PARAMS)
     % 2016-05-27 (MTC). Updated the way the compartments were summed up.
    
     
-% RECALCULATE KEY PARAMETERS:
+%% Recalculate dw (or OEF) depending on what is being used to generate the contrast
 
-% characteristic frequency - this will not be calculated if doing R2'-DBV inference
-if PARAMS.calcDW
-    PARAMS.dw   = (4/3)*pi*PARAMS.gam*PARAMS.B0*PARAMS.dChi*PARAMS.Hct*PARAMS.OEF;    
-%     PARAMS.dHb = PARAMS.dhb/PARAMS.zeta;
-%     PARAMS.dw   = (4/3)*pi*PARAMS.gam*PARAMS.B0*PARAMS.dChi*PARAMS.kap*PARAMS.dHb;
-else
-    % if we are inferring on R2', we want to change the order we do things
-    % in slightly:
-    PARAMS.dw = PARAMS.R2p ./ PARAMS.zeta;
-    PARAMS.OEF = PARAMS.dw ./ ( (4/3)*pi*PARAMS.gam*PARAMS.dChi*PARAMS.Hct*PARAMS.B0 );
-end
+ctr = lower(PARAMS.contr);
 
-% spin densities
-nt = 0.723;
-ne = 0.070;
-nb = 0.723;    
+switch ctr
+    
+    case 'oef'
+        PARAMS.dw   = (4/3)*pi*PARAMS.gam*PARAMS.B0*PARAMS.dChi*PARAMS.Hct*PARAMS.OEF; 
+        PARAMS.R2p  = PARAMS.dw .* PARAMS.zeta;
+        
+    case 'r2p'
+        PARAMS.dw = PARAMS.R2p ./ PARAMS.zeta;
+        PARAMS.OEF = PARAMS.dw ./ ( (4/3)*pi*PARAMS.gam*PARAMS.dChi*PARAMS.Hct*PARAMS.B0 );
+        
+    case 'dhb'
+        PARAMS.dw   = (4/3)*pi*PARAMS.gam*PARAMS.B0*PARAMS.dChi*PARAMS.kap*PARAMS.dHb;
+        
+    otherwise
+        warning('No contrast source specified, using OEF');
+        PARAMS.dw   = (4/3)*pi*PARAMS.gam*PARAMS.B0*PARAMS.dChi*PARAMS.Hct*PARAMS.OEF; 
+        PARAMS.R2p  = PARAMS.dw .* PARAMS.zeta;
+    
+end % switch ctr
+
+
+%% Calculate important parameters
 
 % relaxation rate constant of blood
 PARAMS.R2b  =  4.5 + 16.4*PARAMS.Hct + (165.2*PARAMS.Hct + 55.7)*PARAMS.OEF^2;
 PARAMS.R2bp = 10.2 -  1.5*PARAMS.Hct + (136.9*PARAMS.Hct - 13.9)*PARAMS.OEF^2;
 
-% calculate compartment steady-state magnetization
-m_tis = calcMagnetization(TAU,TE,PARAMS.TR,PARAMS.T1t,1./PARAMS.R2t,PARAMS.TI);
-m_bld = calcMagnetization(TAU,TE,PARAMS.TR,PARAMS.T1b,1./PARAMS.R2b,PARAMS.TI);
-m_csf = calcMagnetization(TAU,TE,PARAMS.TR,PARAMS.T1e,1./PARAMS.R2e,PARAMS.TI);
-
-% pull out parameters
-Ve = PARAMS.lam0;
-Vb = PARAMS.zeta;
-
-% calculate compartment weightings
-% w_csf = (ne.*m_csf.*Ve) ./ ( (nt.*m_tis) + (ne.*m_csf.*Ve) - (nt.*m_tis.*Ve) );
-% w_bld = m_bld.*nb.*(1-w_csf).*Vb;
-% w_tis = 1 - (w_csf + w_bld);
-
-w_csf = PARAMS.lam0;
-w_bld = PARAMS.zeta;
-w_tis = 1 - (w_csf + w_bld);
-
-% CALCULATE MODEL:
-
-% tissue compartment
-if PARAMS.asymp
-    S_tis = w_tis.*calcTissueAsymp(TAU,TE,PARAMS);
+% compartment weightings
+if PARAMS.incT1
+    
+    % spin densities
+    nt = 0.723;
+    ne = 0.070;
+    nb = 0.723;    
+    
+    % calculate compartment steady-state magnetization
+    m_tis = calcMagnetization(TAU,TE,PARAMS.TR,PARAMS.T1t,1./PARAMS.R2t,PARAMS.TI);
+    m_bld = calcMagnetization(TAU,TE,PARAMS.TR,PARAMS.T1b,1./PARAMS.R2b,PARAMS.TI);
+    m_csf = calcMagnetization(TAU,TE,PARAMS.TR,PARAMS.T1e,1./PARAMS.R2e,PARAMS.TI);
+    
+    % pull out parameters
+    Ve = PARAMS.lam0;
+    Vb = PARAMS.zeta;
+    
+    % calculate compartment weightings
+    w_csf = (ne.*m_csf.*Ve) ./ ( (nt.*m_tis) + (ne.*m_csf.*Ve) - (nt.*m_tis.*Ve) );
+    w_bld = m_bld.*nb.*(1-w_csf).*Vb;
+    w_tis = 1 - (w_csf + w_bld);
+    
 else
-    S_tis = w_tis.*calcTissueCompartment(TAU,TE,PARAMS);
-%     S_tis = w_tis.*calcTissuePhenom(TAU,TE,PARAMS);
-end
+    
+    % Extract compartment weightings
+    w_csf = PARAMS.lam0;
+    w_bld = PARAMS.zeta;
+    w_tis = 1 - (w_csf + w_bld);
+    
+end % if PARAMS.incT1 ... else ...
 
-S_csf = w_csf.*calcExtraCompartment(TAU,TE,PARAMS);
-S_bld = w_bld.*calcBloodCompartment(TAU,TE,PARAMS);
 
-% add it all together:
-S = PARAMS.S0.*(S_tis + S_csf + S_bld);
+%% Calculate the model
 
-end
+mdl = lower(PARAMS.model);
+
+% Tissue Compartment - based on PARAMS.model choice
+switch mdl
+    
+    case 'full'
+        S_tis = calcTissueCompartment(TAU,TE,PARAMS);
+    case 'asymp'
+        S_tis = calcTissueAsymp(TAU,TE,PARAMS);
+    case 'phenom'
+        S_tis = calcTissuePhenom(TAU,TE,PARAMS);
+    otherwise
+        warning('No model specified, using Asymptotic qBOLD');
+        S_tis = w_tis.*calcTissueAsymp(TAU,TE,PARAMS);
+        
+end % switch mdl
+
+% Other compartments
+switch mdl
+    
+    case 'phenom'
+        % Don't include extracelluar or CSF compartments with this model
+        S = PARAMS.S0.*S_tis;
+        
+    otherwise
+        % Include and weight the other compartments
+        S_csf = w_csf.*calcExtraCompartment(TAU,TE,PARAMS);
+        S_bld = w_bld.*calcBloodCompartment(TAU,TE,PARAMS);
+        
+        % add it all together:
+        S = PARAMS.S0.*( (w_tis.*S_tis) + S_csf + S_bld);
+        
+end % switch mdl
+
+
+end % MAIN
 
 
 %% calcMagnetization function

@@ -12,6 +12,9 @@
 %
 % CHANGELOG:
 %
+% 2018-10-10 (MTC). Added the option to specify which model to use, and whether
+%       to include T1 effects (including FLAIR), as PARAMS
+%
 % 2018-04-05 (MTC). Added the option to set the critical time (TC) manually as a
 %       pair of parameters. Also changed MTC_ASE_tissue.m accordingly.
 %
@@ -73,8 +76,9 @@ params.T1e  = 3.870;        % s         - CSF T1
 % analysis parameters
 params.tc_man = 0;          % BOOL      - should Tc be defined manually?
 params.tc_val = 0.0;        % s         - manual Tc (if tc_man = 1)
-params.asymp  = 0;          % BOOL      - should the asymptotic tissue model be used?
-params.calcDW = 1;          % BOOL      - should dw be recalculated based on OEF?
+params.model  = 'Full';     % STRING    - model type: 'Full','Asymp','Phenom'
+params.contr  = 'OEF';      % STRING    - contrast source: 'OEF','R2p','dHb',...
+params.incT1  = 0;          % BOOL      - should T1 differences be considered?
 
 % noise
 params.SNR = 100;

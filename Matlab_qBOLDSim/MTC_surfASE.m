@@ -51,16 +51,18 @@ params.T1e  = 3.870;        % s         - CSF T1
 % analysis parameters
 params.tc_man = 0;          % BOOL      - should Tc be defined manually?
 params.tc_val = 0.0;        % s         - manual Tc (if tc_man = 1)
-params.asymp  = 1;          % BOOL      - should the asymptotic tissue model be used?
-params.calcDW = 1;          % BOOL      - should dw be recalculated based on OEF?
+params.model  = 'Full';     % STRING    - model type: 'Full','Asymp','Phenom'
+params.contr  = 'OEF';      % STRING    - contrast source: 'OEF','R2p','dHb',...
+params.incT1  = 0;          % BOOL      - should T1 differences be considered?
 
 
 %% Surface Parameters
 
-NS1 = 100; % number of points on surface (in each dimension)
-NS2 = 100;
+% number of points on surface (in each dimension)
+NS1 = 100;   % OEF
+NS2 = 100;   % DBV
 
-tau = (-28:4:64)/1000;
+tau = (-28:1:64)/1000;
 % par1 = linspace(25,80,NS1);         % dHb
 par1 = linspace(0.1875,0.60,NS1);   % OEF
 par2 = linspace(0.01,0.07,NS2);
@@ -69,9 +71,10 @@ NT = length(tau);   % number of points on surface, for loops
 
 
 %% Generate Surface
-S0 = zeros(NS1,NS2,NT);
-% DBV = zeros(NS1,NS2);
-% OEF = zeros(NS1,NS2);
+% Dimensions:   TIME, DBV, OEF
+S0 = zeros(NT,NS2,NS1);
+% DBV = zeros(NS2,NS1);
+% OEF = zeros(NS2,NS1);
 
 % Loop over first parameter
 parfor i1 = 1:NS1
@@ -80,7 +83,8 @@ parfor i1 = 1:NS1
     looppars = updateParams(par1(i1),params,'OEF');
     
     % Pre-allocate a matrix to fill within the inner loop
-    S_in = zeros(NS2,NT);
+    % Dimensions:   TIME, DBV
+    S_in = zeros(NT,NS2);
     
     par22 = par2; % to avoid using par2 as a broadcast variable
     
@@ -90,8 +94,8 @@ parfor i1 = 1:NS1
         % Create and update a new PARAM object
         inpars = updateParams(par22(i2),looppars,'zeta');
         
-        DBV(i1,i2) = par22(i2);
-        OEF(i1,i2) = par1(i1);
+        DBV(i2,i1) = par22(i2);
+        OEF(i2,i1) = par1(i1);
         
         % Calculate Model
         S_mod = qASE_model(tau,params.TE,inpars);
@@ -100,18 +104,21 @@ parfor i1 = 1:NS1
         S_mod = S_mod./max(S_mod);
         
         % Insert into S0
-        S_in(i2,:) = S_mod;
+        S_in(:,i2) = S_mod;
      
     end %  for i2 = 1:NS2
     
-    S0(i1,:,:) = S_in;
+    S0(:,:,i1) = S_in;
     
 end % parfor i1 = 1:NS1
+
+% Shift dimensions:     DBV, OEF, TIME
+S0 = shiftdim(S0,1);
 
 toc;
 
 %% Save out results
-save('ASE_SurfData','S0','tau','par1','par2','params');
+save('ASE_TauData','S0','tau','par1','par2','params');
 
 %% Plot a figure
 
@@ -119,10 +126,16 @@ save('ASE_SurfData','S0','tau','par1','par2','params');
 figure; hold on; box on;
 
 % Plot 2D grid search results
-surf(par2,par1,log(S0(:,:,3)));
+surf(par2,par1,log(S0(:,:,3))');
 % surf(par2,par1,DBV);
 view(2); shading flat;
 c=colorbar;
 
 axis([min(par2),max(par2),min(par1),max(par1)]);
+xlabel('DBV (%)');
+ylabel('OEF (%)');
 
+xticks(0.01:0.01:0.07);
+xticklabels({'1','2','3','4','5','6','7'});
+yticks(0.2:0.1:0.6);
+yticklabels({'20','30','40','50','60'});

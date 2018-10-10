@@ -14,7 +14,7 @@ global S_true param1 tau1;
 loc_param = param1;
 
 loc_param.zeta = DBV;   % update DBV
-loc_param.asymp  = 1;   % use only the asymptotic model, for the sake of time
+loc_param.asymp  = 0;   % use only the asymptotic model, for the sake of time
 
 % evaluate the model
 S_model = qASE_model(tau1,loc_param.TE,loc_param);
