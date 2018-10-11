@@ -12,14 +12,14 @@ setFigureDefaults;
 % Where the data is stored
 simdir = '../../Data/vesselsim_data/';
 
-vsd_name = 'sharan';    % Which distribution we want - 'sharan' or 'frechet'
-mod_name = 'OEF';       % Which analytical model we want - 'OEF' or 'AsyOEF'
+vsd_name = 'Sharan';    % Which distribution we want - 'sharan' or 'frechet'
+mod_name = 'Phenom';       % Which analytical model we want - 'OEF' or 'AsyOEF'
 
 % Load in two datasets
 load([simdir,'simulated_data/ASE_SurfData_',mod_name,'Model.mat']);
 S1 = S0;
 
-load([simdir,'vs_arrays/vsData_',vsd_name,'_100.mat']);
+load([simdir,'vs_arrays/vsData_',lower(vsd_name),'_100.mat']);
 S2 = S0;
 
 % Calculate RMSE
@@ -61,4 +61,4 @@ axis([-28,64,0.8,1.02]);
 xlabel('Spin Echo Displacement \tau');
 ylabel('Signal (a.u.)');
 title(['OEF = ',num2str(OEFvals(pickOEF)),', DBV = ',num2str(DBVvals(pickDBV))]);
-legend('Static Dephasing Model','Frechet Distribution','Location','SouthWest');
+legend('Phenomenological Model',strcat(vsd_name,' Distribution'),'Location','SouthWest');
