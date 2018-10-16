@@ -23,7 +23,7 @@ nt = length(cTaus);
 vsd_name = 'sharan';    
 
 % Which model do we want to compare to
-mod_name = 'Asymp';
+mod_name = 'Phenom';
 
 % Do we want to plot the DBV estimate?
 plot_DBV = 1;       % BOOL
@@ -32,7 +32,7 @@ plot_DBV = 1;       % BOOL
 SNR = 100;
 
 % Number of times to repeat the whole process
-nreps = 10;
+nreps = 1;
 
 % declare global variables
 global S_true param1 tau1;
@@ -43,8 +43,8 @@ global S_true param1 tau1;
 param1 = genParams;
 
 % Load the actual dataset we want to examine
-% load([simdir,'vs_arrays/vsData_',vsd_name,'_100.mat']);
-load([simdir,'simulated_data/ASE_TauData_FullModel.mat']);
+load([simdir,'vs_arrays/vsData_',vsd_name,'_100.mat']);
+% load([simdir,'simulated_data/ASE_TauData_FullModel.mat']);
 
 % Depending on the data type we might be using
 if ~exist('OEFvals','var')
@@ -65,6 +65,7 @@ tau1 = tauC;
 
 nDBV = length(DBVvals);
 nOEF = length(OEFvals);
+
 
 % if we have no noise, we don't need to do multiple repeats
 if SNR > 1e6
@@ -109,7 +110,7 @@ for ir = 1:nreps
         end % DBV Loop
 
     end % OEF Loop
-    
+  
 end % for ir = 1:nreps
 
 toc;
@@ -118,7 +119,6 @@ toc;
 
 av_DBV = mean(DBVs,3);
 av_err = median(abs(errs),3);    % Do we want to mean the absolute error? Prolly not
-
 
 
 %% Plot Actual DBV Estimate
@@ -152,7 +152,7 @@ view(2); shading flat;
 c=colorbar;
 
 % set the colorbar so that it is even around 0
-caxis([-0.01,0.01]);
+caxis([-0.05,0.05]);
 colormap(jet);
 
 axis([min(DBVvals),max(DBVvals),min(OEFvals),max(OEFvals)]);
