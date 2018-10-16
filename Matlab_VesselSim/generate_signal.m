@@ -42,9 +42,18 @@ function [sigTOT, tau, sigEV, sigIV]=generate_signal(p,storedPhase,varargin)
 		TE=repmat(r.TE,size(tau));
 		TEind=r.TE/p.deltaTE;
 		SEind=round((r.TE-tau)./(2.*p.deltaTE),0);
+        
+        % Pre-allocate
+        Phase = zeros(length(tau),size(storedPhase,2));
+        
+        % Pre-sum
+        cumPhase = cumsum(storedPhase,1);
 	
 		for k=1:length(tau)
-			Phase(k,:)=sum(storedPhase(1:SEind(k),:),1)-sum(storedPhase(SEind(k)+1:TEind,:),1);
+                
+            Phase(k,:) = cumPhase(SEind(k),:) - ( cumPhase(TEind,:)  - cumPhase(SEind(k)+1,:) );
+            
+% 			Phase(k,:)=sum(storedPhase(1:SEind(k),:),1)-sum(storedPhase(SEind(k)+1:TEind,:),1);
 		end	
 
 	elseif strcmp(r.seq,'GESSE')
