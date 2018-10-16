@@ -16,7 +16,7 @@ tic;
 simdir = '../../Data/vesselsim_data/';
 
 % Which tau values do we want to look at
-cTaus = (-10:7:64)./1000;
+cTaus = (-16:8:64)./1000;
 nt = length(cTaus);
 
 % Which distribution we want - 'sharan' or 'frechet'
@@ -24,6 +24,15 @@ vsd_name = 'sharan';
 
 % Which model do we want to compare to
 mod_name = 'Asymp';
+
+% Do we want to plot the DBV estimate?
+plot_DBV = 1;       % BOOL
+
+% Specify SNR of noise to be added. For no noise: SNR = inf; 
+SNR = 100;
+
+% Number of times to repeat the whole process
+nreps = 10;
 
 % declare global variables
 global S_true param1 tau1;
@@ -57,73 +66,93 @@ tau1 = tauC;
 nDBV = length(DBVvals);
 nOEF = length(OEFvals);
 
-% Add random gaussian noise to S0, with specified SNR
-SNR = 100;
-sigma = mean(S0(:))./SNR;
-S0 = S0 + sigma.*randn(nOEF,nDBV,nt);
+% if we have no noise, we don't need to do multiple repeats
+if SNR > 1e6
+    disp('Setting number of repetitions to 1');
+    nreps = 1;
+end
 
-% Pre-allocate results array
-% Dimensions:   OEF, DBV
-errs = zeros(nOEF,nDBV);
-DBVs = zeros(nOEF,nDBV);
+% pre-allocate error and DBV matrices
+% Dimensions:   OEF, DBV, REPS
+errs = zeros(nOEF,nDBV,nreps);
+DBVs = zeros(nOEF,nDBV,nreps);
 
-% Loop over OEF
-for i1 = 1:nOEF
+% Loop over repeats
+for ir = 1:nreps
     
-    % Loop over DBV
-    for i2 = 1:nDBV
-        
-        % Pull out the true signal
-        S_true = squeeze(S0(i2,i1,:))';
+    disp(['Calculating errors (run ',num2str(ir),' of ',num2str(nreps),')']);
 
-        % assign true value of parameter 1
-        param1.OEF = OEFvals(i1);
-        param1.model = mod_name;
+    % Add random gaussian noise to S0, with specified SNR
+    sigma = mean(S0(:))./SNR;
+    S0 = S0 + sigma.*randn(nOEF,nDBV,nt);
 
-        % find the optimum DBV
-        DBV = fminbnd(@DBV_loglikelihood,0.01,0.07);
-        
-        % Dimensions: OEF, DBV
-        DBVs(i1,i2) = DBV;      % we fill the matrix this way so that DBV is along the x axis
-        errs(i1,i2) = DBV - DBVvals(i2);
-        
-    end % DBV Loop
+    % Loop over OEF
+    for i1 = 1:nOEF
+
+        % Loop over DBV
+        for i2 = 1:nDBV
+
+            % Pull out the true signal
+            S_true = squeeze(S0(i2,i1,:))';
+
+            % assign true value of parameter 1
+            param1.OEF = OEFvals(i1);
+            param1.model = mod_name;
+
+            % find the optimum DBV
+            DBV = fminbnd(@DBV_loglikelihood,0.01,0.07);
+
+            % Dimensions: OEF, DBV
+            DBVs(i1,i2,ir) = DBV;      % we fill the matrix this way so that DBV is along the x axis
+            errs(i1,i2,ir) = DBV - DBVvals(i2);
+
+        end % DBV Loop
+
+    end % OEF Loop
     
-end % OEF Loop
+end % for ir = 1:nreps
 
 toc;
 
+%% Average over repeats
+
+av_DBV = mean(DBVs,3);
+av_err = median(abs(errs),3);    % Do we want to mean the absolute error? Prolly not
+
+
 
 %% Plot Actual DBV Estimate
-% figure; hold on; box on;
-% surf(DBVvals,OEFvals,DBVs);
-% view(2); shading flat;
-% c=colorbar;
-% set(c, 'ylim', [0.01,0.07]);
-% colormap(inferno);
-% 
-% 
-% axis([min(DBVvals),max(DBVvals),min(OEFvals),max(OEFvals)]);
-% axis square;
-% 
-% title(['DBV estimate (',mod_name,' model)']);
-% xlabel('DBV (%)');
-% xticks(0.01:0.01:0.07);
-% xticklabels({'1','2','3','4','5','6','7'});
-% ylabel('OEF (%)');
-% yticks(0.2:0.1:0.6);
-% yticklabels({'20','30','40','50','60'})
+if plot_DBV
+    
+    figure; hold on; box on;
+    surf(DBVvals,OEFvals,av_DBV);
+    view(2); shading flat;
+    c=colorbar;
+    set(c, 'ylim', [0.01,0.07]);
+    colormap(inferno);
 
+    axis([min(DBVvals),max(DBVvals),min(OEFvals),max(OEFvals)]);
+    axis square;
+
+    title(['DBV estimate (',mod_name,' model)']);
+    xlabel('DBV (%)');
+    xticks(0.01:0.01:0.07);
+    xticklabels({'1','2','3','4','5','6','7'});
+    ylabel('OEF (%)');
+    yticks(0.2:0.1:0.6);
+    yticklabels({'20','30','40','50','60'})
+    
+end % if plot_DBV
 
 %% Plot Error in DBV Estimate
 
 figure; hold on; box on;
-surf(DBVvals,OEFvals,errs);
+surf(DBVvals,OEFvals,av_err);
 view(2); shading flat;
 c=colorbar;
 
 % set the colorbar so that it is even around 0
-caxis([-0.0025,0.0025]);
+caxis([-0.01,0.01]);
 colormap(jet);
 
 axis([min(DBVvals),max(DBVvals),min(OEFvals),max(OEFvals)]);

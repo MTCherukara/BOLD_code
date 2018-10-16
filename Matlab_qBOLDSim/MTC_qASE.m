@@ -13,7 +13,9 @@
 % CHANGELOG:
 %
 % 2018-10-10 (MTC). Added the option to specify which model to use, and whether
-%       to include T1 effects (including FLAIR), as PARAMS
+%       to include T1 effects (including FLAIR), as PARAMS. Added genParams.m as
+%       a function to generate the PARAMS structure, rather than hard-coding it
+%       in this script
 %
 % 2018-04-05 (MTC). Added the option to set the critical time (TC) manually as a
 %       pair of parameters. Also changed MTC_ASE_tissue.m accordingly.
