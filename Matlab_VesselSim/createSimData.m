@@ -16,31 +16,41 @@ t0 = tic; % main timer
 % Where the data is stored
 simdir = '../../Data/vesselsim_data/';
 
+% Selet distribution 
+distname = 'frechet';
+
 % Fixed Parameters
 TE  = 0.072;
 tau = (-28:4:64)./1000;
 
-% Vessel Distribution (Sharan)
-distname = 'sharan';
-dirname  = 'D1-0_sharan';
-RR = [ 2.8  , 7.5  , 15.0 , 22.5 , 45.0 , 90.0  ];
-VF = [ 0.412, 0.113, 0.117, 0.116, 0.121, 0.121 ];
-
-% % Vessel Distribution (Frechet)
-% distname = 'frechet';
-% dirname  = 'D1-0Vf3pc_dist';
-% RR = 3:100;
-% VF = gevpdf(RR,0.41,5.8,10.1);
-% VF = VF./sum(VF);
+% Vessel Distribution
+switch lower(distname)
+    case 'sharan'
+        dirname  = 'D1-0_sharan';
+        RR = [ 2.8  , 7.5  , 15.0 , 22.5 , 45.0 , 90.0  ];
+        VF = [ 0.412, 0.113, 0.117, 0.116, 0.121, 0.121 ];
+        
+    case 'frechet'
+        dirname  = 'D1-0Vf3pc_dist';
+        RR = 3:100;
+        VF = gevpdf(RR,0.41,5.8,10.1);
+        VF = VF./sum(VF);
+        
+    otherwise
+        disp('Invalid distribution');
+end
 
 % Array sizes
 nr = length(RR);    % number of different vessel radii
 nt = length(tau);   % number of tau values
-np = 100;           % number of different parameter values to generate
+np = 1;           % number of different parameter values to generate
 
 % Physiological Parameters
-OEFvals = linspace(0.1875,0.6,np);
-DBVvals = linspace(0.01,0.07,np);
+% OEFvals = linspace(0.1875,0.6,np);
+% DBVvals = linspace(0.01,0.07,np);
+
+OEFvals = 0.4;
+DBVvals = 0.05;
 
 % Decide on which radii to calculate
 rstart = 1;
@@ -68,7 +78,7 @@ for i1 = rstart:rend
 
     
     % Loop over OEF
-    parfor i2 = 1:np
+    for i2 = 1:np
         
         OEF = OEFvals(i2);
         Y = 1-OEF;

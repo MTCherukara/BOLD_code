@@ -28,15 +28,18 @@ TE  = 0.072;
 tau = (-28:4:64)./1000;
 
 % Vessel Distribution
-if strcmp(distname,'sharan')
-    RR = [ 2.8  , 7.5  , 15.0 , 22.5 , 45.0 , 90.0  ];
-    VF = [ 0.412, 0.113, 0.117, 0.116, 0.121, 0.121 ];
-    
-elseif strcmp(distname,'frechet')
-    RR = 3:100;
-    VF = gevpdf(RR,0.41,5.8,10.1);
-    VF = VF./sum(VF);
-    
+switch lower(distname)
+    case 'sharan'
+        RR = [ 2.8  , 7.5  , 15.0 , 22.5 , 45.0 , 90.0  ];
+        VF = [ 0.412, 0.113, 0.117, 0.116, 0.121, 0.121 ];
+        
+    case 'frechet'
+        RR = 3:100;
+        VF = gevpdf(RR,0.41,5.8,10.1);
+        VF = VF./sum(VF);
+        
+    otherwise
+        disp('Invalid distribution');
 end
 
 % Array sizes
@@ -70,25 +73,6 @@ end % Radius loop
 
 %% Total up the signal contributions
 
-% % Create matrix of effective Total DBV values
-% DBVmat = repmat(0.793.*DBVvals,nt,1,np);
-% 
-% % Total up the extravascular signals
-% sig_EV = (1-DBVmat).*prod(S0_ev,4);
-% 
-% % Create a matrix of effective Radius-specific DBV values
-% RVmat = repmat(DBVmat,1,1,1,nr) .* shiftdim(repmat(VF',1,nt,np,np),1);
-% 
-% % Total up the intravascular signals
-% sig_IV = sum(RVmat.*S0_iv,4);
-% 
-% % Total signal, and shuffle the dimensions so that they're consistent with the
-% % other data
-% S0 = shiftdim(sig_EV + sig_IV,1);
-% 
-% % Normalize to the spin echo - we know that Tau=0 is at index 8
-% S0 = S0./repmat(S0(:,:,8),1,1,24);
-
 % Preallocate S0 array
 %       Dimensions: DBV, OEF, TIME
 S0 = zeros(np,np,nt);
@@ -102,7 +86,7 @@ for i1 = 1:np
         % S0_* dimensions:      TIME, DBV, OEF, RADIUS
         % sigASE* dimensions:   TIME, RADIUS
         sigASEev = squeeze(S0_ev(:,i2,i1,:));
-        sigASEiv = squeeze(S0_ev(:,i2,i1,:));
+        sigASEiv = squeeze(S0_iv(:,i2,i1,:));
         
         vFrac = 0.793.*DBVvals(i2).*VF;
         
@@ -119,7 +103,7 @@ end % OEF loop
 
 
 %% Save Data
-sname = strcat(simdir,'vs_arrays/vsData_',distname,'_',num2str(np),'.mat');
+sname = strcat(simdir,'vs_arrays/TEST_vsData_',distname,'_',num2str(np),'.mat');
 save(sname,'S0','S_ev','S_iv','tau','TE','OEFvals','DBVvals');
     
 

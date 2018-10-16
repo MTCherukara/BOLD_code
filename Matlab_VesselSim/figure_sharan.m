@@ -6,7 +6,7 @@ setFigureDefaults;
 
 simdir = '../../Data/vesselsim_data/';
 
-TE=80e-3;
+TE=72e-3;
 tauASE= (-28:4:64)./1000;
 
 Ds=[5.6 15 30 45 90 180];
@@ -39,7 +39,7 @@ sigASEtotn=sigASEtot./mean(sigASEtot(se-1:se+1));
 
 lc=lines(6);
 
-figure;
+figure(1);
 hold on;
 plot(tauASE.*1000,sigASEtotn)
 xlim([min(tauASE.*1000) max(tauASE.*1000)]);

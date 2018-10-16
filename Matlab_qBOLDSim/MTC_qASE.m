@@ -68,11 +68,13 @@ params.incT1  = 0;          % BOOL      - should T1 differences be considered?
 % noise
 params.SNR = 100;
 
+params.OEF = 0.3 .* params.OEF;
+
 
 %% Compute Model
 
 % define tau values that we want to simulate
-tau = (-28:4:64)/1000; % for testing
+tau = (-28:1:64)/1000; % for testing
 % tau = linspace(-0.028,0.064,1000); % for visualising
 
 

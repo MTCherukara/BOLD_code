@@ -3,12 +3,12 @@
 clear;
 
 simdir = '../../Data/vesselsim_data/';
+tic;
 
-TE=80e-3;
-tauASE=[-28:4:64]./1000;
+TE=72e-3;
+tauASE=(-28:4:64)./1000;
 
-Ds=[6:2:200];
-Rs=Ds./2;
+Rs=3:1:100;
 relVf=gevpdf(Rs,0.41,5.8,10.1);
 relVf=relVf./sum(relVf);
 
@@ -39,13 +39,10 @@ sigASEtot=(1-sum(Vf)).*prod(sigASEev,2)+sum(bsxfun(@times,Vf,sigASEiv),2);
 se=find(tauASE==0);
 sigASEtotn=sigASEtot./mean(sigASEtot(se-1:se+1));
 
-lc=lines(6);
+toc;
 
-figure;
-% 	if exist([bids_dir '/derivatives/group_results.mat'])
-% 		load([bids_dir '/derivatives/group_results.mat'],'tcn')
-% 		plot(tauASE.*1000,tcn,'color',[0.5 0.5 0.5])
-% 	end
+
+figure(1);
 hold on;
 plot(tauASE.*1000,sigASEtotn);
 xlim([min(tauASE.*1000) max(tauASE.*1000)]);
@@ -57,6 +54,7 @@ axis square;
 title('Multiple vessel scale simulations: Frechet');
 xlabel('Spin echo displacement time, \tau (ms)');
 ylabel('Signal fraction (arb.)');
+
 
 %	figure;
 %	bar(Rs,relVf);

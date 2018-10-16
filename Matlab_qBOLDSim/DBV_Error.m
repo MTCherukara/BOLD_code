@@ -16,14 +16,14 @@ tic;
 simdir = '../../Data/vesselsim_data/';
 
 % Which tau values do we want to look at
-cTaus = (-10:7:64)./1000;
+cTaus = (-28:4:64)./1000;
 nt = length(cTaus);
 
 % Which distribution we want - 'sharan' or 'frechet'
 vsd_name = 'sharan';    
 
 % Which model do we want to compare to
-mod_name = 'Asymp';
+mod_name = 'Phenom';
 
 % declare global variables
 global S_true param1 tau1;
@@ -34,8 +34,8 @@ global S_true param1 tau1;
 param1 = genParams;
 
 % Load the actual dataset we want to examine
-% load([simdir,'vs_arrays/vsData_',vsd_name,'_100.mat']);
-load([simdir,'simulated_data/ASE_TauData_FullModel.mat']);
+load([simdir,'vs_arrays/vsData_',vsd_name,'_100.mat']);
+% load([simdir,'simulated_data/ASE_TauData_FullModel.mat']);
 
 % Depending on the data type we might be using
 if ~exist('OEFvals','var')
@@ -58,7 +58,7 @@ nDBV = length(DBVvals);
 nOEF = length(OEFvals);
 
 % Add random gaussian noise to S0, with specified SNR
-SNR = 100;
+SNR = inf;
 sigma = mean(S0(:))./SNR;
 S0 = S0 + sigma.*randn(nOEF,nDBV,nt);
 
@@ -77,7 +77,7 @@ for i1 = 1:nOEF
         S_true = squeeze(S0(i2,i1,:))';
 
         % assign true value of parameter 1
-        param1.OEF = OEFvals(i1);
+        param1.OEF = 0.7 .* OEFvals(i1);
         param1.model = mod_name;
 
         % find the optimum DBV
@@ -95,24 +95,24 @@ toc;
 
 
 %% Plot Actual DBV Estimate
-% figure; hold on; box on;
-% surf(DBVvals,OEFvals,DBVs);
-% view(2); shading flat;
-% c=colorbar;
-% set(c, 'ylim', [0.01,0.07]);
-% colormap(inferno);
-% 
-% 
-% axis([min(DBVvals),max(DBVvals),min(OEFvals),max(OEFvals)]);
-% axis square;
-% 
-% title(['DBV estimate (',mod_name,' model)']);
-% xlabel('DBV (%)');
-% xticks(0.01:0.01:0.07);
-% xticklabels({'1','2','3','4','5','6','7'});
-% ylabel('OEF (%)');
-% yticks(0.2:0.1:0.6);
-% yticklabels({'20','30','40','50','60'})
+figure; hold on; box on;
+surf(DBVvals,OEFvals,DBVs);
+view(2); shading flat;
+c=colorbar;
+set(c, 'ylim', [0.01,0.07]);
+colormap(inferno);
+
+
+axis([min(DBVvals),max(DBVvals),min(OEFvals),max(OEFvals)]);
+axis square;
+
+title(['DBV estimate (',mod_name,' model)']);
+xlabel('DBV (%)');
+xticks(0.01:0.01:0.07);
+xticklabels({'1','2','3','4','5','6','7'});
+ylabel('OEF (%)');
+yticks(0.2:0.1:0.6);
+yticklabels({'20','30','40','50','60'})
 
 
 %% Plot Error in DBV Estimate
@@ -123,7 +123,7 @@ view(2); shading flat;
 c=colorbar;
 
 % set the colorbar so that it is even around 0
-caxis([-0.0025,0.0025]);
+caxis([-0.05,0.05]);
 colormap(jet);
 
 axis([min(DBVvals),max(DBVvals),min(OEFvals),max(OEFvals)]);
