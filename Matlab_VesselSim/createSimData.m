@@ -43,17 +43,17 @@ end
 % Array sizes
 nr = length(RR);    % number of different vessel radii
 nt = length(tau);   % number of tau values
-np = 1;           % number of different parameter values to generate
+np = 100;           % number of different parameter values to generate
 
 % Physiological Parameters
-% OEFvals = linspace(0.1875,0.6,np);
-% DBVvals = linspace(0.01,0.07,np);
+OEFvals = linspace(0.1875,0.6,np);
+DBVvals = linspace(0.01,0.07,np);
 
-OEFvals = 0.4;
-DBVvals = 0.05;
+% OEFvals = 0.4;
+% DBVvals = 0.05;
 
 % Decide on which radii to calculate
-rstart = 1;
+rstart = 28;
 rend   = nr;
 
 
@@ -78,7 +78,7 @@ for i1 = rstart:rend
 
     
     % Loop over OEF
-    for i2 = 1:np
+    parfor i2 = 1:np
         
         OEF = OEFvals(i2);
         Y = 1-OEF;
