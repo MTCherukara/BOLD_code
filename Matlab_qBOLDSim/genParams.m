@@ -23,6 +23,7 @@ addParameter(q, 'dHb'   , 53.3  , @isnumeric);      % Deoxyhaemoglobin conc.
 addParameter(q, 'vCSF'  , 0.00  , @isnumeric);      % CSF volume
 addParameter(q, 'SNR'   , inf   , @isnumeric);      % Signal to noise ratio
 addParameter(q, 'Model' , 'Full' );                 % Simulated qBOLD model
+addParameter(q, 'incIV' , true  , @islogical);      % Include Blood compartment
 
 parse(q,varargin{:});
 r = q.Results;
@@ -65,4 +66,5 @@ params.contr  = 'OEF';      % STRING    - contrast source: 'OEF','R2p','dHb',...
 params.tc_man = 0;          % BOOL      - should Tc be defined manually?
 params.tc_val = 0.0;        % s         - manual Tc (if tc_man = 1)
 params.incT1  = 0;          % BOOL      - should T1 differences be considered?
+params.incIV  = r.incIV;    % BOOL      - should the blood compartment be added?
 

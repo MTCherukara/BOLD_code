@@ -88,6 +88,11 @@ switch ctr
     
 end % switch ctr
 
+%% Check whether incIV is specified or not, if not, add it in
+if ~isfield(PARAMS,'incIV')
+    PARAMS.incIV = 1;
+end
+
 
 %% Calculate important parameters
 
@@ -140,6 +145,7 @@ switch mdl
         S_tis = calcTissueAsymp(TAU,TE,PARAMS);
     case 'phenom'
         S_tis = calcTissuePhenom(TAU,TE,PARAMS);
+        PARAMS.incIV = 0;       % we never want to include the IV compartment with this model
     otherwise
         warning('No model specified, using Asymptotic qBOLD');
         S_tis = w_tis.*calcTissueAsymp(TAU,TE,PARAMS);
@@ -147,21 +153,20 @@ switch mdl
 end % switch mdl
 
 % Other compartments
-switch mdl
+if PARAMS.incIV
     
-    case 'phenom'
-        % Don't include extracelluar or CSF compartments with this model
-        S = PARAMS.S0.*S_tis;
-        
-    otherwise
-        % Include and weight the other compartments
-        S_csf = w_csf.*calcExtraCompartment(TAU,TE,PARAMS);
-        S_bld = w_bld.*calcBloodCompartment(TAU,TE,PARAMS);
-        
-        % add it all together:
-        S = PARAMS.S0.*( (w_tis.*S_tis) + S_csf + S_bld);
-        
-end % switch mdl
+    % Include and weight the other compartments
+    S_csf = w_csf.*calcExtraCompartment(TAU,TE,PARAMS);
+    S_bld = w_bld.*calcBloodCompartment(TAU,TE,PARAMS);
+    
+    % add it all together:
+    S = PARAMS.S0.*( (w_tis.*S_tis) + S_csf + S_bld);
+else
+    
+    S = PARAMS.S0.*S_tis;
+    
+end % if PARAMS.incIV
+      
 
 
 end % MAIN

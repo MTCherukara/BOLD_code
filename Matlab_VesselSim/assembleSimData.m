@@ -91,7 +91,8 @@ for i1 = 1:np
         vFrac = 0.793.*DBVvals(i2).*VF;
         
         % Stot dimensions:  TIME
-        Stot = (1-sum(vFrac)).*prod(sigASEev,2)+sum(bsxfun(@times,vFrac,sigASEiv),2);
+%         Stot = (1-sum(vFrac)).*prod(sigASEev,2)+sum(bsxfun(@times,vFrac,sigASEiv),2);
+        Stot = (1-sum(vFrac)).*prod(sigASEev,2);        % EV only
         Stot = Stot./Stot(8);
         
         % S0 dimensions:    DBV, OEF, TIME

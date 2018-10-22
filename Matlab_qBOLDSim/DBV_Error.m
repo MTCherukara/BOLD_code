@@ -16,23 +16,29 @@ tic;
 simdir = '../../Data/vesselsim_data/';
 
 % Which tau values do we want to look at
-cTaus = (-16:8:64)./1000;
+cTaus = (-28:4:64)./1000;
 nt = length(cTaus);
 
 % Which distribution we want - 'sharan' or 'frechet'
 vsd_name = 'sharan';    
 
 % Which model do we want to compare to
-mod_name = 'Phenom';
+mod_name = 'Asymp';
 
 % Do we want to plot the DBV estimate?
 plot_DBV = 1;       % BOOL
 
+% DO we want to plot the relative error?
+plot_rError = 1;    % BOOL
+
 % Specify SNR of noise to be added. For no noise: SNR = inf; 
-SNR = 100;
+SNR = Inf;
 
 % Number of times to repeat the whole process
 nreps = 1;
+
+% Random OEF scaling constant
+scaleOEF = 1.0;
 
 % declare global variables
 global S_true param1 tau1;
@@ -42,8 +48,11 @@ global S_true param1 tau1;
 % generate a params structure
 param1 = genParams;
 
+% ignore the blood compartment
+param1.incIV = 0;
+
 % Load the actual dataset we want to examine
-load([simdir,'vs_arrays/vsData_',vsd_name,'_100.mat']);
+load([simdir,'vs_arrays/TEST_vsData_',vsd_name,'_100.mat']);
 % load([simdir,'simulated_data/ASE_TauData_FullModel.mat']);
 
 % Depending on the data type we might be using
@@ -97,7 +106,7 @@ for ir = 1:nreps
             S_true = squeeze(S0(i2,i1,:))';
 
             % assign true value of parameter 1
-            param1.OEF = OEFvals(i1);
+            param1.OEF = scaleOEF * OEFvals(i1);
             param1.model = mod_name;
 
             % find the optimum DBV
@@ -118,7 +127,7 @@ toc;
 %% Average over repeats
 
 av_DBV = mean(DBVs,3);
-av_err = median(abs(errs),3);    % Do we want to mean the absolute error? Prolly not
+av_err = mean((errs),3);    % Do we want to mean the absolute error? Prolly not
 
 
 %% Plot Actual DBV Estimate
@@ -128,7 +137,7 @@ if plot_DBV
     surf(DBVvals,OEFvals,av_DBV);
     view(2); shading flat;
     c=colorbar;
-    set(c, 'ylim', [0.01,0.07]);
+    caxis([0.01,0.07]);
     colormap(inferno);
 
     axis([min(DBVvals),max(DBVvals),min(OEFvals),max(OEFvals)]);
@@ -145,6 +154,7 @@ if plot_DBV
 end % if plot_DBV
 
 %% Plot Error in DBV Estimate
+
 
 figure; hold on; box on;
 surf(DBVvals,OEFvals,av_err);
@@ -165,3 +175,34 @@ xticklabels({'1','2','3','4','5','6','7'});
 ylabel('OEF (%)');
 yticks(0.2:0.1:0.6);
 yticklabels({'20','30','40','50','60'})
+
+
+%% Plot relative DBV error
+
+if plot_rError
+    
+    % calculate relative error
+    rel_err = av_err./repmat(DBVvals,nOEF,1);
+
+
+    figure; hold on; box on;
+    surf(DBVvals,OEFvals,100.*rel_err);
+    view(2); shading flat;
+    c=colorbar;
+
+    % set the colorbar so that it is even around 0
+    caxis([-100,100]);
+    colormap(jet);
+
+    axis([min(DBVvals),max(DBVvals),min(OEFvals),max(OEFvals)]);
+    axis square;
+
+    title(['Relative Error in DBV estimate (%)']);
+    xlabel('DBV (%)');
+    xticks(0.01:0.01:0.07);
+    xticklabels({'1','2','3','4','5','6','7'});
+    ylabel('OEF (%)');
+    yticks(0.2:0.1:0.6);
+    yticklabels({'20','30','40','50','60'})
+    
+end

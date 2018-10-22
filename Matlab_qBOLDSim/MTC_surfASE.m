@@ -37,10 +37,10 @@ params.OEF  = 0.40;         % no units  - oxygen extraction fraction
 params.dHb  = 53.3;         % g/L       - deoxyhaemoglobin concentration
 
 % Simulation
-params.model  = 'Full';     % STRING    - model type: 'Full','Asymp','Phenom'
+params.model  = 'Phenom';     % STRING    - model type: 'Full','Asymp','Phenom'
 params.contr  = 'OEF';      % STRING    - contrast source: 'OEF','R2p','dHb',...
 params.incT1  = 0;          % BOOL      - should T1 differences be considered?
-
+params.incIV  = 0;          % BOOL      - should the blood compartment be included?
 
 %% Surface Parameters
 
@@ -48,7 +48,7 @@ params.incT1  = 0;          % BOOL      - should T1 differences be considered?
 NS1 = 100;   % OEF
 NS2 = 100;   % DBV
 
-tau = (-28:1:64)/1000;
+tau = (-28:4:64)/1000;
 % par1 = linspace(25,80,NS1);         % dHb
 par1 = linspace(0.1875,0.60,NS1);   % OEF
 par2 = linspace(0.01,0.07,NS2);     % DBV
@@ -59,8 +59,8 @@ NT = length(tau);   % number of points on surface, for loops
 %% Generate Surface
 % Dimensions:   TIME, DBV, OEF
 S0 = zeros(NT,NS2,NS1);
-% DBV = zeros(NS2,NS1);
-% OEF = zeros(NS2,NS1);
+DBV = zeros(NS2,NS1);
+OEF = zeros(NS2,NS1);
 
 % Loop over first parameter
 parfor i1 = 1:NS1
@@ -104,7 +104,7 @@ S0 = shiftdim(S0,1);
 toc;
 
 %% Save out results
-save('ASE_SurfData','S0','tau','par1','par2','params');
+save('ASE_EVSurfData','S0','tau','par1','par2','params');
 
 %% Plot a figure
 

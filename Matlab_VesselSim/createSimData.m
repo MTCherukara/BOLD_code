@@ -6,6 +6,8 @@
 %
 % Separated into this file, and assembleSimData.m
 
+% TRY RUNNING IT WITHOUT THE INTRAVASCULAR SIGNAL - THIS MAY BE THROWING US OFF,
+% AND IS NOT NECESSARY AT THIS STAGE...
 
 clear;
 
@@ -53,7 +55,7 @@ DBVvals = linspace(0.01,0.07,np);
 % DBVvals = 0.05;
 
 % Decide on which radii to calculate
-rstart = 28;
+rstart = 69;
 rend   = nr;
 
 
@@ -104,7 +106,7 @@ for i1 = rstart:rend
             
             % Calculate signal
             [~, ~, Sin_EV(:,i3), Sin_IV(:,i3)] = generate_signal(p,spp,...
-                'display',false,'Vf',vFrac,'Y',Y,'seq','ASE','includeIV',true,...
+                'display',false,'Vf',vFrac,'Y',Y,'seq','ASE','includeIV',false,...
                 'T2EV',0.087,'T2b0',1/R2b,'TE',TE,'tau',tau);
             
         end % DBV loop
