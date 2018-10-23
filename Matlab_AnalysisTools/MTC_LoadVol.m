@@ -25,7 +25,7 @@ if ~exist('slices','var')
 end
 
 threshes = containers.Map({'R2p', 'DBV', 'OEF', 'VC', 'DF', 'lambda', 'Ax' },...
-                          [ 20  ,   1  ,   1  ,  1  ,  15 ,   1     ,  30  ]);  
+                          [ 30  ,   1  ,   1  ,  1  ,  15 ,   1     ,  30  ]);  
 
 
 % Find the right folder
@@ -36,6 +36,7 @@ fabdir = strcat(resdir,fdname.name,'/');
 % Load the Data
 Dataslice = LoadSlice([fabdir,'mean_',varname,'.nii.gz'],slices);
 
+
 % Determine which type of mask to load and load it
 if strfind(fdname.name,'_vs')
     
@@ -45,9 +46,16 @@ if strfind(fdname.name,'_vs')
 
 else
     
+    % Zero-pad the subject number
+    if subnum < 10
+        s_subnum = strcat('0',num2str(subnum));
+    else
+        s_subnum = num2str(subnum);
+    end
+    
     % Load Mask from CSF set
-    Maskslice = LoadSlice(['/Users/mattcher/Documents/DPhil/Data/subject_0',...
-                            num2str(subnum),'/mask_FLAIR_GM.nii.gz'],slices);
+    Maskslice = LoadSlice(['/Users/mattcher/Documents/DPhil/Data/subject_',...
+                            s_subnum,'/mask_GM_96_nonFLAIR.nii.gz'],slices);
     
 end
 
