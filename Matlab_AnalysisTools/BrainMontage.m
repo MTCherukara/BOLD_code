@@ -33,7 +33,7 @@ end
 % Check whether slices have been specified, if not, default to 3:10
 if ~exist('slices','var')
 %     slices = 3:8;       % VS
-    slices = 3:6;       % CSF
+    slices = 3:14;       % CSF
 end
 ns = length(slices); % number of slices
 
@@ -44,10 +44,10 @@ ns = length(slices); % number of slices
         threshold = 0.15;
         cmp = magma;
     elseif strfind(lower(niname),'r2p')
-        threshold = 8;
+        threshold = 15;
         cmp = viridis;
     elseif strfind(lower(niname),'oef')
-        threshold = 0.5;
+        threshold = 0.8;
         cmp = parula;
     elseif strfind(lower(niname),'df')
         threshold = 15;
@@ -144,10 +144,13 @@ montage_image = fliplr(montage_image);
 
 %% DISPLAY FIGURE
 
+% cmp(1,:) = [0,0,0];
+
 figure; hold on;
 imagesc(montage_image);
 colormap(cmp);
-% colorbar;
 axis equal
+
+% colorbar;
 set(gca,'Visible','off')
 set(gca,'LooseInset',get(gca,'TightInset'));

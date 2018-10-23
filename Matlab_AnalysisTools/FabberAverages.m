@@ -19,16 +19,20 @@ clear;
 clc;
 
 % Choose Variables
-vars = {'DBV','OEF'};
+vars = {'R2p','DBV','OEF'};
 
 % Choose the slices we want
-slicenum = 4:9;     % VS - instead of 3:10
+% slicenum = 4:9;     % VS - instead of 3:10
 % slicenum = 3:8;     % CSF + patient data
-% slicenum = 1:6;   % TR = 2
+% slicenum = 1:6;     % sub 11 FLAIR
+slicenum = 5:10;    % sub 11 nonFLAIR
+
+% do Free energy?
+do_FE = 0;
 
 % Choose Data set
-setnum = 579;
-subnum = 7;
+setnum = 612 - 10;
+subnum = 11;
 
 setnum = setnum + subnum - 1;
 
@@ -71,16 +75,18 @@ end
 
 %% Free Energy
 
-[FEData,RData,MData] = MTC_LoadFreeEnergy(setnum,subnum,slicenum);
+if do_FE
+    [FEData,RData,MData] = MTC_LoadFreeEnergy(setnum,subnum,slicenum);
 
-disp('   ');
-% disp(['     Mean Residual : ',num2str(mean(RData),4)]);
-disp([' Absolute Residual : ',num2str(mean(abs(RData)),4)]);
-% disp(['   Median Residual : ',num2str(median(RData),4)]);
-% 
-% disp('   ');
-disp(['      Modelfit SNR : ',num2str(mean(MData)./mean(abs(RData)),4)]);
+    disp('   ');
+    % disp(['     Mean Residual : ',num2str(mean(RData),4)]);
+    disp([' Absolute Residual : ',num2str(mean(abs(RData)),4)]);
+    % disp(['   Median Residual : ',num2str(median(RData),4)]);
+    % 
+    % disp('   ');
+    disp(['      Modelfit SNR : ',num2str(mean(MData)./mean(abs(RData)),4)]);
 
-disp('   ');
-% disp(['  Mean Free Energy : ',num2str(-mean(FEData),4)]);
-disp(['Median Free Energy : ',num2str(-median(FEData),4)]);
+    disp('   ');
+    % disp(['  Mean Free Energy : ',num2str(-mean(FEData),4)]);
+    disp(['Median Free Energy : ',num2str(-median(FEData),4)]);
+end

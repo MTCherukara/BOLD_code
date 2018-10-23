@@ -63,20 +63,20 @@ params.zeta = 0.05;         % no units  - deoxygenated blood volume
 params.OEF  = 0.40;         % no units  - oxygen extraction fraction
 
 % Simulation
-params.model  = 'Full';     % STRING    - model type: 'Full','Asymp','Phenom'
+params.model  = 'Asymp';     % STRING    - model type: 'Full','Asymp','Phenom'
 params.contr  = 'OEF';      % STRING    - contrast source: 'OEF','R2p','dHb',...
 params.incT1  = 0;          % BOOL      - should T1 differences be considered?
 
 % noise
 params.SNR = 100;
 
-params.OEF = 0.3 .* params.OEF;
+params.OEF = params.OEF;
 
 
 %% Compute Model
 
 % define tau values that we want to simulate
-tau = (-28:1:64)/1000; % for testing
+tau = (-28:4:64)/1000; % for testing
 % tau = linspace(-0.028,0.064,1000); % for visualising
 
 
@@ -103,7 +103,7 @@ if plot_fig
     figure(1); hold on; box on;
     
     % plot the signal
-    S_log = ((S_total)./max(S_total));
+    S_log = log((S_total)./max(S_total));
     l.s = plot(1000*tau,S_log,'-');
 %     ylim([-0.07,0]);
     xlim([(1000*min(tau))-4, (1000*max(tau))+4]);

@@ -46,7 +46,7 @@ global S_true param1 tau1;
 % S0 dimensions:    DBV, OEF, TIME
 
 % generate a params structure
-param1 = genParams;
+param1 = genParams;s
 
 % ignore the blood compartment
 param1.incIV = 0;

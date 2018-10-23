@@ -28,6 +28,13 @@ function [S,PARAMS] = qASE_model(TAU,TE,PARAMS)
     %
     % CHANGELOG:
     %
+    % 2018-10-23 (MTC). Re-wrote the Asymptotic model such that it depends on
+    %       R2', rather than dw, in its actual calculations. This makes no
+    %       actual difference to the calculation, but makes it more intiutive
+    %       when seeing what R2' actually does. This will also allow for
+    %       arbitrary scaling of R2', as part of adapting the model to suit
+    %       simulated data.
+    %
     % 2018-10-10 (MTC). Added the option to specify which model to use in the
     %       PARAMS structure, so that one doesn't have to keep coming into this
     %       code and commenting section in and out. Also added an option to
@@ -283,6 +290,7 @@ function ST = calcTissueAsymp(TAU,TE,PARAMS)
     dw   = PARAMS.dw;
     zeta = PARAMS.zeta;
     R2t  = PARAMS.R2t;
+    R2p  = PARAMS.R2p;
     
     % define the regime boundary
     if PARAMS.tc_man
@@ -301,10 +309,10 @@ function ST = calcTissueAsymp(TAU,TE,PARAMS)
 
         if abs(TAU(ii)) < tc
             % short tau regime
-            ST(ii) = exp(-(0.3*zeta*(dw.*TAU(ii)).^2));
+            ST(ii) = exp(-(0.3*(R2p.*TAU(ii)).^2)./zeta);
         else
             % long tau regime
-            ST(ii) = exp(zeta-(zeta*dw*abs(TAU(ii))));
+            ST(ii) = exp(0.52*zeta-(0.52*R2p*abs(TAU(ii))));
         end
     end
 
