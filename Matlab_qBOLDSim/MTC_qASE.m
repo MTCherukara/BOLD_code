@@ -63,7 +63,7 @@ params.zeta = 0.05;         % no units  - deoxygenated blood volume
 params.OEF  = 0.40;         % no units  - oxygen extraction fraction
 
 % Simulation
-params.model  = 'Full';     % STRING    - model type: 'Full','Asymp','Phenom'
+params.model  = 'Asymp';     % STRING    - model type: 'Full','Asymp','Phenom'
 params.contr  = 'OEF';      % STRING    - contrast source: 'OEF','R2p','dHb',...
 params.incT1  = 0;          % BOOL      - should T1 differences be considered?
 
