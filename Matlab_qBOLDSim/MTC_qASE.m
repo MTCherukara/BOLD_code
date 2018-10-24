@@ -44,7 +44,7 @@ clear;
 setFigureDefaults;
 
 plot_fig = 1;       
-save_data = 0;      % set to 1 in order to save out ASE data
+save_data = 1;      % set to 1 in order to save out ASE data
 
 
 %% Model Parameters
@@ -59,24 +59,24 @@ params.TE   = 0.072;        % s         - echo time
 
 % Physiology
 params.lam0 = 0.00;         % no units  - ISF/CSF signal contribution
-params.zeta = 0.05;         % no units  - deoxygenated blood volume
+params.zeta = 0.03;         % no units  - deoxygenated blood volume
 params.OEF  = 0.40;         % no units  - oxygen extraction fraction
 
 % Simulation
 params.model  = 'Asymp';     % STRING    - model type: 'Full','Asymp','Phenom'
 params.contr  = 'OEF';      % STRING    - contrast source: 'OEF','R2p','dHb',...
 params.incT1  = 0;          % BOOL      - should T1 differences be considered?
+params.incT2  = 0;          % BOOL      - should T2 differences be considered?
+params.incIV  = 0;          % BOOL      - should blood compartment be included?
 
 % noise
-params.SNR = 100;
-
-params.OEF = params.OEF;
+params.SNR = inf;
 
 
 %% Compute Model
 
 % define tau values that we want to simulate
-tau = (-28:4:64)/1000; % for testing
+tau = (-28:1:64)/1000; % for testing
 % tau = linspace(-0.028,0.064,1000); % for visualising
 
 
@@ -85,12 +85,14 @@ np = length(tau);
 % call MTC_qASE_model
 [S_total,params] = qASE_model(tau,params.TE,params);
 
+% Normalize to the spin-echo
+SEind = find(tau > -1e-9,1);
+S_total = S_total./S_total(SEind);
+% S_total = S_total./mean(S_total(SEind-1:SEind+1));      % alternative normalization method
 
-
-%% Add Noise
-S_sample = S_total + (S_total.*randn(1,np)./params.SNR);
+%% Optionally add noise 
+S_sample = S_total + (randn(1,np)./params.SNR);
 S_sample(S_sample < 0) = 0;
-S_sample = S_sample./max(S_total);
 
 % calculate maximum data standard deviaton
 params.sig = min(S_sample)/params.SNR;
@@ -103,7 +105,7 @@ if plot_fig
     figure(1); hold on; box on;
     
     % plot the signal
-    S_log = log((S_total)./max(S_total));
+    S_log = log(S_sample);
     l.s = plot(1000*tau,S_log,'-');
 %     ylim([-0.07,0]);
     xlim([(1000*min(tau))-4, (1000*max(tau))+4]);

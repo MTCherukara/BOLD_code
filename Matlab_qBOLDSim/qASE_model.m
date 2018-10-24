@@ -38,7 +38,8 @@ function [S,PARAMS] = qASE_model(TAU,TE,PARAMS)
     % 2018-10-10 (MTC). Added the option to specify which model to use in the
     %       PARAMS structure, so that one doesn't have to keep coming into this
     %       code and commenting section in and out. Also added an option to
-    %       include the T1 (steady-state-magnetization) contribution
+    %       include the T1 (steady-state-magnetization) contribution, and 
+    %       whether to include T2 effects.
     %
     % 2018-10-01 (MTC). Added the option for calculating dw as a function of dHb
     %       concentration, instead of using OEF and Hct. Requires a scaling
@@ -95,11 +96,14 @@ switch ctr
     
 end % switch ctr
 
-%% Check whether incIV is specified or not, if not, add it in
+%% Check whether incIV and incT2 are specified or not, if not, add them in 
 if ~isfield(PARAMS,'incIV')
-    PARAMS.incIV = 1;
+    PARAMS.incIV = 1;   % included by default
 end
 
+if ~isfield(PARAMS,'incT2')
+    PARAMS.incT2 = 1;   % included by default
+end
 
 %% Calculate important parameters
 
@@ -109,6 +113,9 @@ PARAMS.R2bp = 10.2 -  1.5*PARAMS.Hct + (136.9*PARAMS.Hct - 13.9)*PARAMS.OEF^2;
 
 % compartment weightings
 if PARAMS.incT1
+    
+    % If we're including T1, we definitely need to include T2 as well
+    PARAMS.incT2 = 1;
     
     % spin densities
     nt = 0.723;
@@ -205,7 +212,6 @@ function ST = calcTissueCompartment(TAU,TE,PARAMS)
     % pull out constants
     dw   = PARAMS.dw;
     zeta = PARAMS.zeta;
-    R2t  = PARAMS.R2t;
 
     % check whether one TE, or a vector, is supplied
     if length(TE) ~= length(TAU)
@@ -223,8 +229,14 @@ function ST = calcTissueCompartment(TAU,TE,PARAMS)
 
     end
 
-    ST = exp(-zeta.*fint./3) .* exp(-TE.*R2t);
-end
+    ST = exp(-zeta.*fint./3);
+    
+    % add T2 effect
+    if PARAMS.incT2
+        ST = ST .* exp(-TE.*PARAMS.R2t);
+    end
+    
+end % function ST = calcTissueCompartment(TAU,TE,PARAMS)
 
 
 %% calcBloodCompartment function
@@ -237,7 +249,6 @@ function SB = calcBloodCompartment(TAU,TE,PARAMS)
     Hct = PARAMS.Hct;
     OEF = PARAMS.OEF;
     B0  = PARAMS.B0;
-    R2b = PARAMS.R2b;
 
     % assign constants
     td = 0.0045067;     % diffusion time
@@ -254,13 +265,16 @@ function SB = calcBloodCompartment(TAU,TE,PARAMS)
     end
 
     % calculate model
-    S  = exp(-kk.*( (TE./td) + sqrt(0.25 + (TE./td)) + 1.5 - ...
+    SB  = exp(-kk.*( (TE./td) + sqrt(0.25 + (TE./td)) + 1.5 - ...
                     (2.*sqrt( 0.25 + ( ((TE + TAU).^2) ./ td ) ) ) - ...
                     (2.*sqrt( 0.25 + ( ((TE - TAU).^2) ./ td ) ) ) ) );
 
-    SB = S.*exp(-R2b.*TE);
-
-end
+    % add T2 effect
+    if PARAMS.incT2
+        SB = SB.*exp(-PARAMS.R2b.*TE);
+    end
+    
+end % function SB = calcBloodCompartment(TAU,TE,PARAMS)
 
 
 %% calcExtraCompartment function
@@ -275,10 +289,14 @@ function SE = calcExtraCompartment(TAU,TE,PARAMS)
     end
 
     % calculate signal
-    SE = exp( -PARAMS.R2e.*TE) .* exp(- 2i.*pi.*PARAMS.dF.*abs(TAU));
-    SE = real(SE);
+    SE = real(exp(- 2i.*pi.*PARAMS.dF.*abs(TAU)));
     
-end
+    % add T2 effect
+    if PARAMS.incT2
+        SE = SE .* exp( -PARAMS.R2e.*TE);
+    end
+    
+end % function SE = calcExtraCompartment(TAU,TE,PARAMS)
 
 
 %% calcTissueAsymp function
@@ -289,7 +307,6 @@ function ST = calcTissueAsymp(TAU,TE,PARAMS)
     % pull out constants
     dw   = PARAMS.dw;
     zeta = PARAMS.zeta;
-    R2t  = PARAMS.R2t;
     R2p  = PARAMS.R2p;
     
     % define the regime boundary
@@ -298,8 +315,6 @@ function ST = calcTissueAsymp(TAU,TE,PARAMS)
     else
         tc = 1.7/dw;
     end
-
-    % tc = tc/dw;
 
     % pre-allocate
     ST = zeros(1,length(TAU)); 
@@ -312,13 +327,16 @@ function ST = calcTissueAsymp(TAU,TE,PARAMS)
             ST(ii) = exp(-(0.3*(R2p.*TAU(ii)).^2)./zeta);
         else
             % long tau regime
-            ST(ii) = exp(0.52*zeta-(0.52*R2p*abs(TAU(ii))));
+            ST(ii) = exp(zeta-(R2p*abs(TAU(ii))));
         end
     end
-
+    
     % add T2 effect
-    ST = ST.*exp(-R2t.*TE);
-end
+    if PARAMS.incT2
+        ST = ST .* exp(-PARAMS.R2t.*TE);
+    end
+    
+end % function ST = calcTissueAsymp(TAU,TE,PARAMS)
 
 
 %% calcTissuePhenom function
@@ -341,7 +359,6 @@ function ST = calcTissuePhenom(TAU,TE,PARAMS)
     % model parameters of importance
     zeta = PARAMS.zeta;
     OEF  = PARAMS.OEF;
-    R2t  = PARAMS.R2t;
 
     % Calculate second order coefficients
     A1 = OEF*(B11 - (B12 * exp(-B13*OEF)));
@@ -355,6 +372,8 @@ function ST = calcTissuePhenom(TAU,TE,PARAMS)
     ST = exp(-zeta.*F);
     
     % add T2 effect
-    ST = ST.*exp(-R2t.*TE);
+    if PARAMS.incT2
+        ST = ST .* exp(-PARAMS.R2t.*TE);
+    end
     
-end
+end % function ST = calcTissuePhenom(TAU,TE,PARAMS)

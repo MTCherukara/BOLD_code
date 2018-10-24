@@ -1,4 +1,4 @@
-% DBV_Error.m
+% ErrorPlot_DBV.m
 %
 % Calculate the error in estimates of DBV obtained by using the various qBOLD
 % models
@@ -46,7 +46,7 @@ global S_true param1 tau1;
 % S0 dimensions:    DBV, OEF, TIME
 
 % generate a params structure
-param1 = genParams;s
+param1 = genParams;
 
 % ignore the blood compartment
 param1.incIV = 0;

@@ -6,19 +6,20 @@
 %
 % The algorithm is based on that presented in Metropolis et al., 1953, with
 % further refinements in Gelman, Roberts, and Gilks, 1996. This code is based on
-% MTC_ASE_MH.m, which is in turn based on a DTC lecture example given by Saad
-% Jbabdi, Michaelmas Term 2015.
+% a DTC lecture example given by Saad Jbabdi, Michaelmas Term 2015.
 %
 % 
-%       Copyright (C) University of Oxford, 2016-2018
+%       Copyright (C) University of Oxford, 2015-2018
 %
 % 
 % Created by MT Cherukara, 16 January 2018
 %
 % CHANGELOG:
 %
-% 2018-09-13 (MTC). NB: THIS SCRIPT NEEDS TO BE UPDATED TO REFLECT CHANGES TO
-%       THE MODEL CALCULATION FUNCTIONS!!
+% 2018-10-24 (MTC). Updated to reflect changes in the way the model is
+%       calculated. It's still not really working correctly. Need to sort out
+%       the jump sizes and acceptance rate, possibly, and present the results in
+%       a scatter plot.
 %
 % 2018-02-05 (MTC). Came up with a better, more extensible, method for
 %       displaying the results.
@@ -50,20 +51,17 @@ save_figures = 0;
 
 % Load Data
 % load('ASE_Data/Data_MultiTE_180208_SNR_200.mat');
-load('ASE_Data/Data_180412_DBV_5.mat');
+load('ASE_Data/Data_181024_40_3_noNoise.mat');
 params_true = params;
-
-params.tc_man = 0;
-params.tc_val = 0.03;
+m_params = params;      % this will be the struct that we actually change
 
 % Parameter Values
-p_names = { 'OEF'; 'R2p'; 'zeta'; 'R2t' ; 'geom' };
-p_infer = [   0  ,   1  ,   1   ,   0   ,  0     ];
-p_inits = [  0.5 ,  4.0 ,  0.05,   10.0 ,  0.3   ];
-p_range = [  0.2 ,  1.0 ,  0.01 ,   5.0 ,  0.1    ;...
-             0.6 , 15.0 ,  0.15 ,  15.0 ,  0.5   ];
+p_names = {  'OEF' ; 'R2p'; 'zeta' ; 'R2t' ; 'lam0' };
+p_infer = [    0   ,   1  ,   1    ,   0   ,   0    ];
+p_inits = [  0.500 ,  4.0 ,  0.050 ,  10.0 ,  0.10  ];
+p_range = [  0.001 ,  1.0 ,  0.001 ,   5.0 ,  0.00   ;...
+             1.000 , 15.0 ,  0.200 ,  15.0 ,  1.00  ];
 
-% true R2p
 
 % cut parameters down to size
 p_name = p_names(p_infer == 1);
@@ -72,10 +70,9 @@ p_rng  = p_range(:,p_infer == 1);
 
 % are we inferring on R2p?
 if p_infer(2) == 1
-    infer_R2p = 1;
-    params_true.R2p = params_true.zeta*params_true.dw;
+    m_params.contr = 'R2p';
 else
-    infer_R2p = 0;
+    m_params.contr = 'OEF';
 end
 
 % how many parameters?
@@ -107,11 +104,11 @@ X0 = p_init;
 
 % set parameter values to their initial guesses
 for pp = 1:np
-    params = param_update(X0(pp),params,p_name{pp});
+    m_params = updateParams(X0(pp),m_params,p_name{pp});
 end
 
 % evaluate model at its initial parameter values
-S_mod = MTC_qASE_model(T_sample,TE_sample,params,infer_R2p);
+S_mod = qASE_model(T_sample,TE_sample,m_params);
 
 % calculate difference between data and generated sample
 L0 = norm(S_sample-S_mod);
@@ -146,12 +143,16 @@ for ii = 1:(j_brn+j_run)
         
     else
         % otherwise, evaluate the model
+        
+        % first, update the parameters
         for pp = 1:np
-            params = param_update(X1(pp),params,p_name{pp});
+            m_params = updateParams(X1(pp),m_params,p_name{pp});
         end
         
-        S_mod = MTC_qASE_model(T_sample,TE_sample,params,infer_R2p);
+        % calculate the model
+        S_mod = qASE_model(T_sample,TE_sample,m_params);
         
+        % Evaluate the norm
         L1 = norm(S_sample-S_mod);
         
         % the new norm L1 should be smaller than the old one, if it is,
@@ -219,23 +220,23 @@ if plot_results
 
     % resolutions
     hres = 25;
-    cres = 40;
+    cres = 25;
 
-%     % individual parameter histograms
-%     for pp = 1:np
-% 
-%         figure; hold on; box on;
-%         histogram(sample_results(pp,:),hres);
-%         xlabel(p_name{pp});
-%         xlim(p_rng(:,pp));
-%         
-%         if save_figures
-%             ftitle = strcat('temp_plots/MH_',date,'_Hist_',p_name{pp});
-%             export_fig([ftitle,'.pdf']);
-% %             print(gcf,ftitle,'-dpdf');
-%         end
-% 
-%     end
+    % individual parameter histograms
+    for pp = 1:np
+
+        figure; hold on; box on;
+        histogram(sample_results(pp,:),hres);
+        xlabel(p_name{pp});
+        xlim(p_rng(:,pp));
+        
+        if save_figures
+            ftitle = strcat('temp_plots/MH_',date,'_Hist_',p_name{pp});
+            export_fig([ftitle,'.pdf']);
+%             print(gcf,ftitle,'-dpdf');
+        end
+
+    end
 
     p_pairs = combnk(1:np,2);
 

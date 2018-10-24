@@ -1,7 +1,7 @@
 # fabber run 9, AMICI Protocol Testing
 # Input Data
-data=../../Data/subject_11/ASE_WE_80mat_nonFLAIR.nii.gz
-mask=../../Data/subject_11/mask_80_nonFLAIR.nii.gz
+data=../../Data/subject_11/ASE_96mat_FLAIR.nii.gz
+mask=../../Data/subject_11/mask_96_FLAIR.nii.gz
 
 # Run Options
 output=../../Data/Fabber_Results/
@@ -16,7 +16,7 @@ max-iterations=10
 allow-bad-voxels
 
 # Spatial VB Information (remove this if method!=spatialvb)
-param-spatial-priors=NNNN
+param-spatial-priors=NNN
 #image-prior4=../../Data/subject_11/CSF_80_T2w.nii.gz
 
 
@@ -25,16 +25,15 @@ model=qboldR2p
 inferS0
 inferR2p
 inferDBV
-inferlam
 
 #single_compartment
 motional_narrowing
-#infpriors
+infpriors
 
 # Scan Parameters
 TE=0.084
 TR=2.000
-TI=2.000
+TI=0.870
 
 tau1=-0.016
 tau2=-0.008

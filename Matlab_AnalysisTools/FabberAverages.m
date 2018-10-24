@@ -24,14 +24,14 @@ vars = {'R2p','DBV','OEF'};
 % Choose the slices we want
 % slicenum = 4:9;     % VS - instead of 3:10
 % slicenum = 3:8;     % CSF + patient data
-% slicenum = 1:6;     % sub 11 FLAIR
-slicenum = 5:10;    % sub 11 nonFLAIR
+slicenum = 1:6;     % sub 11 FLAIR
+% slicenum = 5:10;    % sub 11 nonFLAIR
 
 % do Free energy?
 do_FE = 0;
 
 % Choose Data set
-setnum = 612 - 10;
+setnum = 616 - 10;
 subnum = 11;
 
 setnum = setnum + subnum - 1;
