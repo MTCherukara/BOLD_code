@@ -25,20 +25,19 @@ vsd_name = 'sharan';
 % Which model do we want to compare to
 mod_name = 'Asymp';
 
-% Do we want to plot the DBV estimate?
-plot_DBV = 1;       % BOOL
+% Do we want to plot estimates or true values
+plot_est = 1;
+plot_tru = 0;
 
-% DO we want to plot the relative error?
-plot_rError = 1;    % BOOL
+% Do we want to plot the relative error?
+plot_err = 0;
+plot_rel = 1;
 
 % Specify SNR of noise to be added. For no noise: SNR = inf; 
 SNR = Inf;
 
 % Number of times to repeat the whole process
 nreps = 1;
-
-% Random OEF scaling constant
-scaleOEF = 1.0;
 
 % declare global variables
 global S_true param1 tau1;
@@ -75,6 +74,8 @@ tau1 = tauC;
 nDBV = length(DBVvals);
 nOEF = length(OEFvals);
 
+trus = repmat(DBVvals,nOEF,1);
+
 
 % if we have no noise, we don't need to do multiple repeats
 if SNR > 1e6
@@ -85,7 +86,7 @@ end
 % pre-allocate error and DBV matrices
 % Dimensions:   OEF, DBV, REPS
 errs = zeros(nOEF,nDBV,nreps);
-DBVs = zeros(nOEF,nDBV,nreps);
+ests = zeros(nOEF,nDBV,nreps);
 
 % Loop over repeats
 for ir = 1:nreps
@@ -106,14 +107,14 @@ for ir = 1:nreps
             S_true = squeeze(S0(i2,i1,:))';
 
             % assign true value of parameter 1
-            param1.OEF = scaleOEF * OEFvals(i1);
+            param1.OEF = OEFvals(i1);
             param1.model = mod_name;
 
             % find the optimum DBV
             DBV = fminbnd(@DBV_loglikelihood,0.01,0.07);
 
             % Dimensions: OEF, DBV
-            DBVs(i1,i2,ir) = DBV;      % we fill the matrix this way so that DBV is along the x axis
+            ests(i1,i2,ir) = DBV;      % we fill the matrix this way so that DBV is along the x axis
             errs(i1,i2,ir) = DBV - DBVvals(i2);
 
         end % DBV Loop
@@ -124,85 +125,53 @@ end % for ir = 1:nreps
 
 toc;
 
+
 %% Average over repeats
 
-av_DBV = mean(DBVs,3);
-av_err = mean((errs),3);    % Do we want to mean the absolute error? Prolly not
+ests = mean(ests,3);
+
+% calculate errors
+errs = trus - ests;
+rel_err = abs(errs) ./ trus;
 
 
-%% Plot Actual DBV Estimate
-if plot_DBV
+%% Plots
+
+% True value
+if plot_tru
     
-    figure; hold on; box on;
-    surf(DBVvals,OEFvals,av_DBV);
-    view(2); shading flat;
-    c=colorbar;
-    caxis([0.01,0.07]);
-    colormap(inferno);
-
-    axis([min(DBVvals),max(DBVvals),min(OEFvals),max(OEFvals)]);
-    axis square;
-
-    title(['DBV estimate (',mod_name,' model)']);
-    xlabel('DBV (%)');
-    xticks(0.01:0.01:0.07);
-    xticklabels({'1','2','3','4','5','6','7'});
-    ylabel('OEF (%)');
-    yticks(0.2:0.1:0.6);
-    yticklabels({'20','30','40','50','60'})
+    h_tru = plotGrid(100.*trus,DBVvals,OEFvals,...
+                     'cvals',[0,10],...
+                     'title','True DBV (%)',...
+                     'cmap',inferno);
     
-end % if plot_DBV
+end % if plot_tru
 
-%% Plot Error in DBV Estimate
-
-
-figure; hold on; box on;
-surf(DBVvals,OEFvals,av_err);
-view(2); shading flat;
-c=colorbar;
-
-% set the colorbar so that it is even around 0
-caxis([-0.05,0.05]);
-colormap(jet);
-
-axis([min(DBVvals),max(DBVvals),min(OEFvals),max(OEFvals)]);
-axis square;
-
-title(['Error in DBV estimate (',mod_name,' model)']);
-xlabel('DBV (%)');
-xticks(0.01:0.01:0.07);
-xticklabels({'1','2','3','4','5','6','7'});
-ylabel('OEF (%)');
-yticks(0.2:0.1:0.6);
-yticklabels({'20','30','40','50','60'})
-
-
-%% Plot relative DBV error
-
-if plot_rError
+% Estimate
+if plot_est
     
-    % calculate relative error
-    rel_err = av_err./repmat(DBVvals,nOEF,1);
+    h_est = plotGrid(100.*ests,DBVvals,OEFvals,...
+                     'cvals',[0,10],...
+                     'title','Estimated DBV (%)',...
+                     'cmap',inferno);
+    
+end % if plot_estD
 
+% Error
+if plot_err
 
-    figure; hold on; box on;
-    surf(DBVvals,OEFvals,100.*rel_err);
-    view(2); shading flat;
-    c=colorbar;
+    h_err = plotGrid(100.*errs,DBVvals,OEFvals,...
+                     'cvals',[-10,10],...
+                     'title','Error in DBV (%)');
 
-    % set the colorbar so that it is even around 0
-    caxis([-100,100]);
-    colormap(jet);
+end % if plot_err
 
-    axis([min(DBVvals),max(DBVvals),min(OEFvals),max(OEFvals)]);
-    axis square;
-
-    title(['Relative Error in DBV estimate (%)']);
-    xlabel('DBV (%)');
-    xticks(0.01:0.01:0.07);
-    xticklabels({'1','2','3','4','5','6','7'});
-    ylabel('OEF (%)');
-    yticks(0.2:0.1:0.6);
-    yticklabels({'20','30','40','50','60'})
+% Relative Error
+if plot_rel
+    
+    h_rel = plotGrid(100.*rel_err,DBVvals,OEFvals,...
+                     'cvals',[0,100],...
+                     'title','Relative Error in DBV (%)',...
+                     'cmap',flipud(magma));
     
 end

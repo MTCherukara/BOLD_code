@@ -6,8 +6,9 @@ setFigureDefaults;
 
 simdir = '../../Data/vesselsim_data/';
 
-TE=72e-3;
-tauASE= (-28:4:64)./1000;
+TE=108e-3;
+tauASE = (-28:4:64)./1000;    % For TE = 72ms or 108ms
+% tauASE = (-12:4:32)./1000;      % For TE = 36ms
 
 Ds=[5.6 15 30 45 90 180];
 Rs=Ds./2;
@@ -30,7 +31,7 @@ Vf=relVf.*Vtot;
 
 for k=1:length(Rs)
     load([simdir 'single_vessel_radius_D1-0_sharan/simvessim_res' num2str(Rs(k)) '.mat']);
-    [sigASE(:,k), tauASE, sigASEev(:,k), sigASEiv(:,k)]=generate_signal(p,spp,'display',false,'Vf',Vf(k),'Y',Y(k),'seq','ASE','includeIV',true,'T2EV',Inf,'T2b0',Inf,'TE',TE,'tau',tauASE);
+    [sigASE(:,k), tauASE, sigASEev(:,k), sigASEiv(:,k)]=generate_signal(p,spp,'display',false,'Vf',Vf(k),'Y',Y(k),'seq','ASE','includeIV',false,'T2EV',Inf,'T2b0',Inf,'TE',TE,'tau',tauASE);
 end
 
 sigASEtot=(1-sum(Vf)).*prod(sigASEev,2)+sum(bsxfun(@times,Vf,sigASEiv),2);

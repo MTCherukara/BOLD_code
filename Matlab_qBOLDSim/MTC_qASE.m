@@ -44,7 +44,7 @@ clear;
 setFigureDefaults;
 
 plot_fig = 1;       
-save_data = 1;      % set to 1 in order to save out ASE data
+save_data = 0;      % set to 1 in order to save out ASE data
 
 
 %% Model Parameters

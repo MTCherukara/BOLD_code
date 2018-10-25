@@ -3,7 +3,7 @@ function params = genParams(varargin)
 % used in MTC_qASE.m, and derived qBOLD model scripts. Allows the user to
 % specify the following parameters as name-value pair arguments:
 %
-%       OEF, DBV, dHb, vCSF, TE, SNR, Model
+%       OEF, DBV, dHb, vCSF, TE, SNR, Model, incIV, incT2
 %
 % Other parameters can be changed manually after the PARAMS structure has been
 % created

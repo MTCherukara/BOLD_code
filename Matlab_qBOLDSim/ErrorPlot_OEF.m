@@ -26,8 +26,8 @@ vsd_name = 'sharan';
 mod_name = 'Asymp';
 
 % Do we want to plot estimates or true values
-plot_est = 1;
-plot_tru = 1;
+plot_est = 0;
+plot_tru = 0;
 
 % Do we want to plot the relative error?
 plot_err = 0;
@@ -40,11 +40,8 @@ global S_true param1 tau1;
 % S0 dimensions:    DBV, OEF, TIME
 
 % generate a params structure
-param1 = genParams;
-
-% specific parameters
-param1.incIV = 0;
-param1.model = mod_name;
+param1 = genParams('incIV',false,'incT2',false,...
+                   'Model',mod_name);
 
 % Load the actual dataset we want to examine
 load([simdir,'vs_arrays/TEST_vsData_',vsd_name,'_100.mat']);
@@ -104,25 +101,10 @@ toc;
 %% Plot True Parameter Value
 if plot_tru
     
-    % True values
-    figure; hold on; box on;
-    surf(DBVvals,OEFvals,100.*trus);
-    
-    view(2); shading flat;
-    colorbar;
-    axis([min(DBVvals),max(DBVvals),min(OEFvals),max(OEFvals)]);
-    axis square;
-    
-    caxis([0,100]);
-    title('True OEF (%)');
-    colormap(parula);
-    
-    xlabel('DBV (%)');
-    xticks(0.01:0.01:0.07);
-    xticklabels({'1','2','3','4','5','6','7'});
-    ylabel('OEF (%)');
-    yticks(0.2:0.1:0.6);
-    yticklabels({'20','30','40','50','60'})
+    h_tru = plotGrid(100.*trus,DBVvals,OEFvals,...
+                     'cvals',[0,100],...
+                     'title','True OEF (%)',...
+                     'cmap','parula');
     
 end % if plot_tru
 
@@ -130,24 +112,10 @@ end % if plot_tru
 %% Plot Parameter Estimate
 if plot_est
     
-    figure; hold on; box on;
-    surf(DBVvals,OEFvals,100.*ests);
-    
-    view(2); shading flat;
-    colorbar;
-    axis([min(DBVvals),max(DBVvals),min(OEFvals),max(OEFvals)]);
-    axis square;
-    
-    caxis([0,100]);
-    title('Estimated OEF (%)');
-    colormap(parula);
-    
-    xlabel('DBV (%)');
-    xticks(0.01:0.01:0.07);
-    xticklabels({'1','2','3','4','5','6','7'});
-    ylabel('OEF (%)');
-    yticks(0.2:0.1:0.6);
-    yticklabels({'20','30','40','50','60'})
+    h_est = plotGrid(100.*ests,DBVvals,OEFvals,...
+                     'cvals',[0,100],...
+                     'title','Estimated OEF (%)',...
+                     'cmap',parula);
     
 end % if plot_estD
 
@@ -161,25 +129,10 @@ errs = trus - ests;
 
 if plot_err
 
-    figure; hold on; box on;
-    surf(DBVvals,OEFvals,100.*errs);
+    h_err = plotGrid(100.*errs,DBVvals,OEFvals,...
+                     'cvals',[-60,60],...
+                     'title','Error in OEF (%)');
 
-    view(2); shading flat;
-    colorbar;
-    colormap(jet);
-    axis([min(DBVvals),max(DBVvals),min(OEFvals),max(OEFvals)]);
-    axis square;
-
-    caxis([-60,60]);
-    title('Error in OEF (%)');
-
-    xlabel('DBV (%)');
-    xticks(0.01:0.01:0.07);
-    xticklabels({'1','2','3','4','5','6','7'});
-    ylabel('OEF (%)');
-    yticks(0.2:0.1:0.6);
-    yticklabels({'20','30','40','50','60'})
-    
 end % if plot_err
 
 
@@ -189,24 +142,11 @@ if plot_rel
     
     % calculate relative error
     %       Dimensions: OEF, DBV
-    rel_err = errs ./ trus;
-
-    figure; hold on; box on;
-    surf(DBVvals,OEFvals,100.*rel_err);
+    rel_err = abs(errs) ./ trus;
     
-    view(2); shading flat;
-    colorbar;
-    caxis([-50,50]);
-    colormap(jet);
-    axis([min(DBVvals),max(DBVvals),min(OEFvals),max(OEFvals)]);
-    axis square;
-    
-    title('Relative Error in OEF (%)');
-    xlabel('DBV (%)');
-    xticks(0.01:0.01:0.07);
-    xticklabels({'1','2','3','4','5','6','7'});
-    ylabel('OEF (%)');
-    yticks(0.2:0.1:0.6);
-    yticklabels({'20','30','40','50','60'})
+    h_rel = plotGrid(100.*rel_err,DBVvals,OEFvals,...
+                     'cvals',[0,50],...
+                     'title','Relative Error in OEF (%)',...
+                     'cmap',flipud(magma));
     
 end

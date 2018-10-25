@@ -19,10 +19,10 @@ t0 = tic; % main timer
 simdir = '../../Data/vesselsim_data/';
 
 % Selet distribution 
-distname = 'frechet';
+distname = 'sharan';
 
 % Fixed Parameters
-TE  = 0.072;
+TE  = 0.108;
 tau = (-28:4:64)./1000;
 
 % Vessel Distribution
@@ -118,7 +118,7 @@ for i1 = rstart:rend
     end % OEF loop
     
     % Save out data for each radius
-    sname = strcat(simdir,'vs_arrays/vsArray',num2str(np),'_',distname,'_R_',num2str(vrad),'.mat');
+    sname = strcat(simdir,'vs_arrays/vsArray',num2str(np),'_',distname,'_TE_108_R_',num2str(vrad),'.mat');
     save(sname,'S_ev','S_iv','tau','TE','OEFvals','DBVvals');
     
     % Timer
