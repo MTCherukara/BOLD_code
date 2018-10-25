@@ -1,4 +1,4 @@
-function ests = xR2p_optimization
+% function ests = xR2p_optimization
     % To optimize the value of a scaling factor applied to R2' in the asmypototic
     % SDR qBOLD model
     %
@@ -26,7 +26,7 @@ tau1 = tau;
 
 % create a parameters structure with the right params
 param1 = genParams('incIV',false,'incT2',false,...
-                   'Model','Asymp');
+                   'Model','Asymp','TE',TE);
                
 nDBV = length(DBVvals);
 nOEF = length(OEFvals);
@@ -49,7 +49,7 @@ for i1 = 1:nOEF
         param1.OEF  = OEFvals(i1);
         
         % find the optimum R2' scaling factor
-        Scale_factor = fminbnd(@optim_scaling,0,3);
+        Scale_factor = fminbnd(@optimScaling,0,3);
         
         % Fill in ests matrix
         ests(i1,i2) = Scale_factor;
@@ -66,24 +66,9 @@ plotGrid(ests,DBVvals,OEFvals,...
           'cvals',[0,1],...
           'title','Optimized R2'' Scaling Factor');
 
-end
+% Key datapoints for comparing
+% OEF(52): 40 %    	OEF(88): 55 %       OEF(16): 25   %
+% DBV(67):  5 %     DBV(18):  2 %       DBV(92):  6.5 % 
 
-
-%% Cost function
-function LL = optim_scaling(Scale)
-
-    global S_dist param1 tau1
-    
-    loc_param = param1;
-    
-    loc_param.R2p = Scale .* loc_param.dw .* loc_param.zeta;
-    loc_param.contr = 'R2p';
-    
-    S_model = qASE_model(tau1,0.072,loc_param);
-    S_model = S_model./max(S_model);
-    
-    LL = log(sum((S_dist-S_model).^2));
-    
-end
 
 

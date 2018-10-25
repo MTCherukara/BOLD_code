@@ -307,8 +307,8 @@ function ST = calcTissueAsymp(TAU,TE,PARAMS)
     % pull out constants
     dw   = PARAMS.dw;
     zeta = PARAMS.zeta;
-    R2p  = (1.14.*PARAMS.OEF + 0.1).*PARAMS.R2p;
-%     R2p = 0.56*PARAMS.R2p;
+%     R2p  = (1.14.*PARAMS.OEF + 0.1).*PARAMS.R2p;
+    R2p = PARAMS.R2p;
     
     % define the regime boundary
     if PARAMS.tc_man

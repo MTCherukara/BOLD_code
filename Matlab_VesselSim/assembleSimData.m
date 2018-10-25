@@ -24,8 +24,9 @@ distname = 'sharan';
 plot_figure = 1;
 
 % Fixed Parameters
-TE  = 0.072;
-tau = (-28:4:64)./1000;
+TE  = 0.036;
+% tau = (-28:4:64)./1000;    % For TE = 72ms or 108ms
+tau = (-12:4:32)./1000;      % For TE = 36ms
 
 % Vessel Distribution
 switch lower(distname)
@@ -61,7 +62,8 @@ for i1 = 1:nr
     vrad = RR(i1);
     
     % Load data
-    load([simdir,'vs_arrays/vsArray',num2str(np),'_',distname,'_R_',num2str(vrad),'.mat']);
+    load([simdir,'vs_arrays/vsArray',num2str(np),'_',distname,...
+                 '_TE_',num2str(1000*TE),'_R_',num2str(vrad),'.mat']);
     
     % Fill matrix
     %       Dimensions: TIME, DBV, OEF, RADIUS
@@ -93,7 +95,8 @@ for i1 = 1:np
         % Stot dimensions:  TIME
 %         Stot = (1-sum(vFrac)).*prod(sigASEev,2)+sum(bsxfun(@times,vFrac,sigASEiv),2);
         Stot = (1-sum(vFrac)).*prod(sigASEev,2);        % EV only
-        Stot = Stot./Stot(8);
+        SEind = find(tau > -1e-9,1);
+        Stot = Stot./Stot(SEind);
         
         % S0 dimensions:    DBV, OEF, TIME
         S0(i2,i1,:) = Stot;
@@ -104,7 +107,7 @@ end % OEF loop
 
 
 %% Save Data
-sname = strcat(simdir,'vs_arrays/TEST_vsData_',distname,'_',num2str(np),'.mat');
+sname = strcat(simdir,'vs_arrays/TE036_vsData_',distname,'_',num2str(np),'.mat');
 save(sname,'S0','S_ev','S_iv','tau','TE','OEFvals','DBVvals');
     
 

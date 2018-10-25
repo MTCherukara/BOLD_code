@@ -22,8 +22,9 @@ simdir = '../../Data/vesselsim_data/';
 distname = 'sharan';
 
 % Fixed Parameters
-TE  = 0.108;
-tau = (-28:4:64)./1000;
+TE  = 0.036;
+% tau = (-28:4:64)./1000;    % For TE = 72ms or 108ms
+tau = (-12:4:32)./1000;      % For TE = 36ms
 
 % Vessel Distribution
 switch lower(distname)
@@ -55,7 +56,7 @@ DBVvals = linspace(0.01,0.07,np);
 % DBVvals = 0.05;
 
 % Decide on which radii to calculate
-rstart = 69;
+rstart = 1;
 rend   = nr;
 
 
@@ -118,7 +119,8 @@ for i1 = rstart:rend
     end % OEF loop
     
     % Save out data for each radius
-    sname = strcat(simdir,'vs_arrays/vsArray',num2str(np),'_',distname,'_TE_108_R_',num2str(vrad),'.mat');
+    sname = strcat(simdir,'vs_arrays/vsArray',num2str(np),'_',distname,...
+                   '_TE_',num2str(1000*TE),'_R_',num2str(vrad),'.mat');
     save(sname,'S_ev','S_iv','tau','TE','OEFvals','DBVvals');
     
     % Timer
