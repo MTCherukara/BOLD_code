@@ -55,6 +55,7 @@ params.dHb  = r.dHb;        % g/L       - deoxyhaemoglobin concentration
 params.Hct  = 0.400;        % no units  - fractional hematocrit
 params.kap  = 0.003;        % ?         - conversion between Hct and [Hb]
 params.S0   = 100;          % a. units  - signal
+params.SR   = 1.0;          % no units  - scaling factor for R2'
 
 % CSF Compartment-specific parameters
 params.lam0 = r.vCSF;       % no units  - ISF/CSF signal contribution

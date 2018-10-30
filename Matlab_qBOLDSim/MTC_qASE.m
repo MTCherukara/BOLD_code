@@ -63,11 +63,14 @@ params.zeta = 0.03;         % no units  - deoxygenated blood volume
 params.OEF  = 0.40;         % no units  - oxygen extraction fraction
 
 % Simulation
-params.model  = 'Asymp';     % STRING    - model type: 'Full','Asymp','Phenom'
+params.model  = 'Kiselev';     % STRING    - model type: 'Full','Asymp','Phenom','Kiselev'
 params.contr  = 'OEF';      % STRING    - contrast source: 'OEF','R2p','dHb',...
 params.incT1  = 0;          % BOOL      - should T1 differences be considered?
 params.incT2  = 0;          % BOOL      - should T2 differences be considered?
 params.incIV  = 0;          % BOOL      - should blood compartment be included?
+
+% Scaling
+% params.SR   = 0.548;        % no units  - scaling factor for R2'
 
 % noise
 params.SNR = inf;
@@ -105,7 +108,7 @@ if plot_fig
     figure(1); hold on; box on;
     
     % plot the signal
-    S_log = log(S_sample);
+    S_log = log(S_total);
     l.s = plot(1000*tau,S_log,'-');
 %     ylim([-0.07,0]);
     xlim([(1000*min(tau))-4, (1000*max(tau))+4]);

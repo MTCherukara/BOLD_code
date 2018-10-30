@@ -24,9 +24,9 @@ distname = 'sharan';
 plot_figure = 1;
 
 % Fixed Parameters
-TE  = 0.036;
-% tau = (-28:4:64)./1000;    % For TE = 72ms or 108ms
-tau = (-12:4:32)./1000;      % For TE = 36ms
+TE  = 0.084;
+tau = (-28:4:64)./1000;    % For TE = 72ms or 108ms
+% tau = (-12:4:32)./1000;      % For TE = 36ms
 
 % Vessel Distribution
 switch lower(distname)
@@ -107,7 +107,7 @@ end % OEF loop
 
 
 %% Save Data
-sname = strcat(simdir,'vs_arrays/TE036_vsData_',distname,'_',num2str(np),'.mat');
+sname = strcat(simdir,'vs_arrays/TE',num2str(1000*TE),'_vsData_',distname,'_',num2str(np),'.mat');
 save(sname,'S0','S_ev','S_iv','tau','TE','OEFvals','DBVvals');
     
 

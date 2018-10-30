@@ -79,8 +79,11 @@ ctr = lower(PARAMS.contr);
 switch ctr
     
     case 'oef'
+        if ~isfield(PARAMS,'SR')
+            PARAMS.SR = 1.0;
+        end
         PARAMS.dw   = (4/3)*pi*PARAMS.gam*PARAMS.B0*PARAMS.dChi*PARAMS.Hct*PARAMS.OEF; 
-        PARAMS.R2p  = PARAMS.dw .* PARAMS.zeta;
+        PARAMS.R2p  = PARAMS.SR .* PARAMS.dw .* PARAMS.zeta;
         
     case 'r2p'
         PARAMS.dw = PARAMS.R2p ./ PARAMS.zeta;
@@ -160,6 +163,8 @@ switch mdl
     case 'phenom'
         S_tis = calcTissuePhenom(TAU,TE,PARAMS);
         PARAMS.incIV = 0;       % we never want to include the IV compartment with this model
+    case 'kiselev'
+        S_tis = calcTissueKiselev(TAU,TE,PARAMS);
     otherwise
         warning('No model specified, using Asymptotic qBOLD');
         S_tis = w_tis.*calcTissueAsymp(TAU,TE,PARAMS);
@@ -308,6 +313,7 @@ function ST = calcTissueAsymp(TAU,TE,PARAMS)
     dw   = PARAMS.dw;
     zeta = PARAMS.zeta;
 %     R2p  = (1.14.*PARAMS.OEF + 0.1).*PARAMS.R2p;
+%     R2p = 2.*PARAMS.OEF.*exp(-4.7.*TE).*PARAMS.R2p;
     R2p = PARAMS.R2p;
     
     % define the regime boundary
@@ -378,3 +384,60 @@ function ST = calcTissuePhenom(TAU,TE,PARAMS)
     end
     
 end % function ST = calcTissuePhenom(TAU,TE,PARAMS)
+
+
+%% calcTissueKiselev function
+function ST = calcTissueKiselev(TAU,TE,PARAMS)
+    % Calculate the diffusion-based qBOLD model from Kiselev & Posse, 1999,
+    % assuming the Sharan distribution of vessels.
+    
+    % Sharan dist
+    RR = [ 2.8  , 7.5  , 15.0 , 22.5 , 45.0 , 90.0  ]*1e-6;
+    VF = [ 0.412, 0.113, 0.117, 0.116, 0.121, 0.121 ];
+    DD = 1e-9;
+    
+    % pull out 
+    dw   = 2*pi*PARAMS.gam*PARAMS.B0*PARAMS.dChi*PARAMS.Hct*PARAMS.OEF;
+    DBV  = PARAMS.zeta;
+    tc   = 1.75/dw;
+    
+    % determine which taus are long and which are short
+    lg_ind = ( abs(TAU) - tc ) > 0;
+    
+    % separate the tau values, and make them absolute
+    T_long = abs(TAU(lg_ind));
+    T_shrt = abs(TAU(~lg_ind));
+    
+    % pre-allocate F array
+    F_all = zeros(length(TAU),length(RR));
+    
+    
+    % loop over R
+    for i1 = 1:length(RR)
+        
+        % pull out radius and square it
+        rad = RR(i1).^2;
+        
+        % calculate long tau F
+        F_Long = ((2/3).*dw.*T_long) + (1.66.*DD.*T_long./rad) - 1;
+        
+        % calculate short tau F
+        F_Shrt = ((2/15).*(dw.^2).*(T_shrt.^2)) .* (1 + (2.*DD.*T_shrt./rad));
+        
+        % fill in F array
+        F_all(lg_ind,i1) = F_Long;
+        F_all(~lg_ind,i1) = F_Shrt;
+        
+    end % radius loop
+
+    % Multiply all F by the appropriate VF, and then sum across R
+    F_sum = sum( (F_all .* repmat(0.01*VF./DBV,length(TAU),1)), 2);
+    
+    ST = exp(-F_sum);
+    
+    % add T2 effect
+    if PARAMS.incT2
+        ST = ST .* exp(-PARAMS.R2t.*TE);
+    end
+
+end % function ST = calcTissueKiselev(TAU,TE,PARAMS)

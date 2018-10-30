@@ -8,13 +8,13 @@ clear;
 setFigureDefaults;
 
 % Load the first error
-load('Grid_Results/ErrDBV_Uncorrected.mat');
+load('Grid_Results/ErrOEF_84_LinearCorr.mat');
 err_1 = errs;
 est_1 = ests;
 rel_1 = rel_err;
 
 % Load the second error
-load('Grid_Results/ErrDBV_LinearCorr.mat');
+load('Grid_Results/ErrOEF_84_ExpCorr.mat');
 err_2 = errs;
 est_2 = ests;
 rel_2 = rel_err;

@@ -22,9 +22,9 @@ simdir = '../../Data/vesselsim_data/';
 distname = 'sharan';
 
 % Fixed Parameters
-TE  = 0.036;
-% tau = (-28:4:64)./1000;    % For TE = 72ms or 108ms
-tau = (-12:4:32)./1000;      % For TE = 36ms
+TE  = 0.084;
+tau = (-28:4:64)./1000;    % For TE = 72ms or 108ms or 84 ms
+% tau = (-12:4:32)./1000;      % For TE = 36ms or 56 ms
 
 % Vessel Distribution
 switch lower(distname)

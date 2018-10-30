@@ -26,8 +26,8 @@ vsd_name = 'sharan';
 mod_name = 'Asymp';
 
 % Do we want to plot estimates or true values
-plot_est = 1;
-plot_tru = 1;
+plot_est = 0;
+plot_tru = 0;
 
 % Do we want to plot the relative error?
 plot_err = 0;
@@ -44,7 +44,7 @@ param1 = genParams('incIV',false,'incT2',false,...
                    'Model',mod_name);
 
 % Load the actual dataset we want to examine
-load([simdir,'vs_arrays/TE108_vsData_',vsd_name,'_100.mat']);
+load([simdir,'vs_arrays/TE84_vsData_',vsd_name,'_100.mat']);
 % load([simdir,'simulated_data/ASE_TauData_FullModel.mat']);
 
 % Depending on the data type we might be using
