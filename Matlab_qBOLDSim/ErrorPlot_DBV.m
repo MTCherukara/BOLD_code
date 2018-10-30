@@ -25,12 +25,15 @@ vsd_name = 'sharan';
 % Which model do we want to compare to
 mod_name = 'Asymp';
 
+% What TE value do we want to use (36, 72, 84, 108 ms)
+TE = 0.072;
+
 % Do we want to plot estimates or true values
-plot_est = 1;
+plot_est = 0;
 plot_tru = 0;
 
 % Do we want to plot the relative error?
-plot_err = 0;
+plot_err = 1;
 plot_rel = 1;
 
 % Specify SNR of noise to be added. For no noise: SNR = inf; 
@@ -45,13 +48,14 @@ global S_true param1 tau1;
 % S0 dimensions:    DBV, OEF, TIME
 
 % generate a params structure
-param1 = genParams;
-
-% ignore the blood compartment
-param1.incIV = 0;
+param1 = genParams('incIV',false,'incT2',false,...
+                   'Model',mod_name,'TE',TE,...
+                   'SR',0.548,...
+                   'Voff',0.0042);
+               
 
 % Load the actual dataset we want to examine
-load([simdir,'vs_arrays/TEST_vsData_',vsd_name,'_100.mat']);
+load([simdir,'vs_arrays/TE',num2str(1000*TE),'_vsData_',vsd_name,'_100.mat']);
 % load([simdir,'simulated_data/ASE_TauData_FullModel.mat']);
 
 % Depending on the data type we might be using
@@ -108,7 +112,6 @@ for ir = 1:nreps
 
             % assign true value of parameter 1
             param1.OEF = OEFvals(i1);
-            param1.model = mod_name;
 
             % find the optimum DBV
             DBV = fminbnd(@DBV_loglikelihood,0.01,0.07);
@@ -132,7 +135,7 @@ ests = mean(ests,3);
 
 % calculate errors
 errs = trus - ests;
-rel_err = abs(errs) ./ trus;
+rel_err = errs ./ trus;
 
 
 %% Plots
@@ -170,8 +173,8 @@ end % if plot_err
 if plot_rel
     
     h_rel = plotGrid(100.*rel_err,DBVvals,OEFvals,...
-                     'cvals',[0,100],...
+                     'cvals',[-100,100],...
                      'title','Relative Error in DBV (%)',...
-                     'cmap',flipud(magma));
+                     'cmap',jet);
     
 end

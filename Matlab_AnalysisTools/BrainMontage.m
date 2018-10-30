@@ -33,7 +33,8 @@ end
 % Check whether slices have been specified, if not, default to 3:10
 if ~exist('slices','var')
 %     slices = 3:8;       % VS
-    slices = 3:14;       % CSF
+%     slices = 3:14;       % CSF
+    slices = 1:6;       % s11 FLAIR
 end
 ns = length(slices); % number of slices
 

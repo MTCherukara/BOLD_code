@@ -115,6 +115,9 @@ void R2primeFwdModel::Initialize(ArgsType &args)
     TR = convertTo<double>(args.ReadWithDefault("TR","3.000"));
     TI = convertTo<double>(args.ReadWithDefault("TI","3.000"));
 
+    // read SR
+    SR = convertTo<double>(args.ReadWithDefault("SR","1.0"));
+
     // add information to the log
     LOG << "Inference using development model" << endl;
     LOG << "Using TR = " << TR << "s, and TI = " << TI << "s" << endl;
@@ -411,6 +414,8 @@ void R2primeFwdModel::Evaluate(const ColumnVector &params, ColumnVector &result)
     double mt;
     double me;
     double mb;
+    double SR2p;        // for arbitary R2' scaling
+    double SRb;
 
     // parameters
     double OEF;
@@ -541,6 +546,12 @@ void R2primeFwdModel::Evaluate(const ColumnVector &params, ColumnVector &result)
     double nt = 0.723;
     double ne = 0.075;
     double nb = 0.723;
+
+    // multiply R2p by its arbitrary scaling factor
+    SRb = 4.71;
+    SR2p = 2.0*OEF*exp(-SRb*TEvals(1));
+
+    R2p *= SR2p;
 
 
     // loop through taus

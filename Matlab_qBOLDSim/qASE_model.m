@@ -28,6 +28,9 @@ function [S,PARAMS] = qASE_model(TAU,TE,PARAMS)
     %
     % CHANGELOG:
     %
+    % 2018-10-30 (MTC). Added in a parameter for short-tau DBV offset (referred
+    %       to in my notes as beta), and for linear R2' scaling factor SR
+    %
     % 2018-10-23 (MTC). Re-wrote the Asymptotic model such that it depends on
     %       R2', rather than dw, in its actual calculations. This makes no
     %       actual difference to the calculation, but makes it more intiutive
@@ -79,11 +82,8 @@ ctr = lower(PARAMS.contr);
 switch ctr
     
     case 'oef'
-        if ~isfield(PARAMS,'SR')
-            PARAMS.SR = 1.0;
-        end
         PARAMS.dw   = (4/3)*pi*PARAMS.gam*PARAMS.B0*PARAMS.dChi*PARAMS.Hct*PARAMS.OEF; 
-        PARAMS.R2p  = PARAMS.SR .* PARAMS.dw .* PARAMS.zeta;
+        PARAMS.R2p  = PARAMS.dw .* PARAMS.zeta;
         
     case 'r2p'
         PARAMS.dw = PARAMS.R2p ./ PARAMS.zeta;
@@ -99,13 +99,23 @@ switch ctr
     
 end % switch ctr
 
-%% Check whether incIV and incT2 are specified or not, if not, add them in 
+%% Check Parameters
+% Check whether recently added parameters (e.g. incIV and incT2) are specified
+% or not, if not, add them in 
 if ~isfield(PARAMS,'incIV')
     PARAMS.incIV = 1;   % included by default
 end
 
 if ~isfield(PARAMS,'incT2')
     PARAMS.incT2 = 1;   % included by default
+end
+
+if ~isfield(PARAMS,'Voff')
+    PARAMS.Voff = 0;
+end
+
+if ~isfield(PARAMS,'SR')
+    PARAMS.SR = 1;
 end
 
 %% Calculate important parameters
@@ -312,9 +322,11 @@ function ST = calcTissueAsymp(TAU,TE,PARAMS)
     % pull out constants
     dw   = PARAMS.dw;
     zeta = PARAMS.zeta;
+    beta = PARAMS.Voff;         % the short-tau DBV offset
 %     R2p  = (1.14.*PARAMS.OEF + 0.1).*PARAMS.R2p;
-%     R2p = 2.*PARAMS.OEF.*exp(-4.7.*TE).*PARAMS.R2p;
-    R2p = PARAMS.R2p;
+%     BB = 6.26.*(1-exp(-3.49.*PARAMS.OEF));
+%     R2p = 2.*PARAMS.OEF.*exp(-BB.*TE).*PARAMS.R2p;
+    R2p = PARAMS.SR.*PARAMS.R2p;
     
     % define the regime boundary
     if PARAMS.tc_man
@@ -331,7 +343,7 @@ function ST = calcTissueAsymp(TAU,TE,PARAMS)
 
         if abs(TAU(ii)) < tc
             % short tau regime
-            ST(ii) = exp(-(0.3*(R2p.*TAU(ii)).^2)./zeta);
+            ST(ii) = exp(beta-(0.3*(R2p.*TAU(ii)).^2)./zeta);
         else
             % long tau regime
             ST(ii) = exp(zeta-(R2p*abs(TAU(ii))));
@@ -398,6 +410,7 @@ function ST = calcTissueKiselev(TAU,TE,PARAMS)
     
     % pull out 
     dw   = 2*pi*PARAMS.gam*PARAMS.B0*PARAMS.dChi*PARAMS.Hct*PARAMS.OEF;
+
     DBV  = PARAMS.zeta;
     tc   = 1.75/dw;
     
@@ -431,7 +444,7 @@ function ST = calcTissueKiselev(TAU,TE,PARAMS)
     end % radius loop
 
     % Multiply all F by the appropriate VF, and then sum across R
-    F_sum = sum( (F_all .* repmat(0.01*VF./DBV,length(TAU),1)), 2);
+    F_sum = sum( (F_all .* repmat(0.0001*VF./DBV,length(TAU),1)), 2);
     
     ST = exp(-F_sum);
     

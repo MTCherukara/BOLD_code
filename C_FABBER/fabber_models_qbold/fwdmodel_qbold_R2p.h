@@ -44,6 +44,9 @@ protected:
     NEWMAT::ColumnVector taus;
     NEWMAT::ColumnVector TEvals;
 
+    // Model parameters
+    double SR;      // this is a scaling factor for R2', applied in the asymptotic model
+
     // Lookup starting indices of parameters
     int OEF_index() const
     {

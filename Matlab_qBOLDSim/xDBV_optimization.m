@@ -1,13 +1,7 @@
-% function ests = xR2p_optimization
-    % To optimize the value of a scaling factor applied to R2' in the asmypototic
-    % SDR qBOLD model
-    %
-    % MT Cherukara
-    % 2018-10-24
-    %
-    % CHANGELOG:
-    % 
-    % 2018-10-25 (MTC). Make it loop around all OEF and DBV.
+% DBV offset optimization. Derived from xR2p_optimization.m
+%
+% MT Cherukara
+% 2018-10-30
 
 clear;
 close all;
@@ -19,13 +13,29 @@ tic;
 % Choose TE (train on 0.072, test on 0.084, also 0.108 and 0.036)
 TE = 0.072;
 
+% Where the data is stored
+simdir = '../../Data/vesselsim_data/';
+
+% Which distribution we want - 'sharan' or 'frechet'
+vsd_name = 'sharan';    
+
 % Load data
 %   Dimensions of S0:     DBV, OEF, TIME
 load([simdir,'vs_arrays/TE',num2str(1000*TE),'_vsData_',vsd_name,'_100.mat']);
 
 % declare global variables
 global S_dist param1 tau1
-tau1 = tau;
+
+% only use tau values >= 20ms
+cInd = find(tau >= -0.20);
+tauC = tau(cInd);
+
+% reduce S0 to only include the taus we want
+%   Dimensions:     DBV, OEF, TIME
+S0 = S0(:,:,cInd);
+
+% assign global variable
+tau1 = tauC;
 
 % create a parameters structure with the right params
 param1 = genParams('incIV',false,'incT2',false,...
@@ -52,10 +62,10 @@ for i1 = 1:nOEF
         param1.OEF  = OEFvals(i1);
         
         % find the optimum R2' scaling factor
-        Scale_factor = fminbnd(@optimScaling,0,3);
+        Offset = fminbnd(@optimOffset,-2,2);
         
         % Fill in ests matrix
-        ests(i1,i2) = Scale_factor;
+        ests(i1,i2) = Offset;
         
     end % DBV Loop
     
@@ -63,11 +73,13 @@ end % OEF Loop
 
 toc;
 
+md = max(abs(ests(:)));
+
 % plot the results
 plotGrid(ests,DBVvals,OEFvals,...
-          'cmap',inferno,...
-          'cvals',[0,1],...
-          'title','Optimized R2'' Scaling Factor');
+          'cmap',jet,...
+          'cvals',[-md,md],...
+          'title','Optimized DBV Offset \beta');
 
 % Key datapoints for comparing
 % OEF(52): 40 %    	OEF(88): 55 %       OEF(16): 25   %

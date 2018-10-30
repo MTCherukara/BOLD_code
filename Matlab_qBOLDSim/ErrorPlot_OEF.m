@@ -25,12 +25,15 @@ vsd_name = 'sharan';
 % Which model do we want to compare to
 mod_name = 'Asymp';
 
+% What TE value do we want to use (36, 72, 84, 108 ms)
+TE = 0.072;
+
 % Do we want to plot estimates or true values
 plot_est = 0;
 plot_tru = 0;
 
 % Do we want to plot the relative error?
-plot_err = 0;
+plot_err = 1;
 plot_rel = 1;
 
 
@@ -41,10 +44,11 @@ global S_true param1 tau1;
 
 % generate a params structure
 param1 = genParams('incIV',false,'incT2',false,...
-                   'Model',mod_name);
+                   'Model',mod_name,...
+                   'SR',1);
 
 % Load the actual dataset we want to examine
-load([simdir,'vs_arrays/TE84_vsData_',vsd_name,'_100.mat']);
+load([simdir,'vs_arrays/TE',num2str(1000*TE),'_vsData_',vsd_name,'_100.mat']);
 % load([simdir,'simulated_data/ASE_TauData_FullModel.mat']);
 
 % Depending on the data type we might be using
@@ -64,6 +68,8 @@ S0 = S0(:,:,cInd);
 % assign global variables
 tau1 = tauC;
 param1.TE = TE;
+param1.contr = 'OEF';
+param1.SR = 0.548;
 
 nDBV = length(DBVvals);
 nOEF = length(OEFvals);
@@ -84,7 +90,7 @@ for i1 = 1:nOEF
         % Pull out the true signal
         S_true = squeeze(S0(i2,i1,:))';
         
-        % assign true value of parameter 1
+        % assign true value of DBV
         param1.zeta = DBVvals(i2);
         
         % find the optimum OEF
@@ -143,11 +149,11 @@ if plot_rel
     
     % calculate relative error
     %       Dimensions: OEF, DBV
-    rel_err = abs(errs) ./ trus;
+    rel_err = (errs) ./ trus;
     
     h_rel = plotGrid(100.*rel_err,DBVvals,OEFvals,...
-                     'cvals',[0,50],...
+                     'cvals',[-50,50],...
                      'title','Relative Error in OEF (%)',...
-                     'cmap',flipud(magma));
+                     'cmap',jet);
     
 end

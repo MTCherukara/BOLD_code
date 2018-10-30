@@ -10,7 +10,7 @@
 
 clear;
 setFigureDefaults;
-close all;
+% close all;
 
 tic;
 
@@ -20,19 +20,25 @@ simdir = '../../Data/vesselsim_data/';
 % Which distribution we want - 'sharan' or 'frechet'
 vsd_name = 'sharan';    
 
-% Which parameter do we want to plot - 'R2p' or 'D'
-plot_par = 'R2p';
+% Which model do we want to compare to
+mod_name = 'Asymp';
 
-% Do we want to plot the D estimates/true values?
-plot_estD = 1;      % BOOL
-plot_truD = 1;      % BOOL
+% Which parameter do we want to plot - 'R2p' or 'D'
+plot_par = 'D';
+
+% What TE value do we want to use (36, 72, 84, 108 ms)
+TE = 0.072;
+
+% Do we want to plot estimates or true values
+plot_est = 1;
+plot_tru = 1;
 
 % Do we want to plot the relative error?
-plot_rError = 1;    % BOOL
+plot_err = 1;
+plot_rel = 1;
 
-% Random scaling constants
-scaleOEF = 1.0;
-scaleR2p = 1/(1-0.61);
+% Random R2' scaling
+SR = 1;
 
 % Content scaling constant
 kappa = 0.03;
@@ -43,13 +49,12 @@ global S_true tau1;
 % S0 dimensions:    DBV, OEF, TIME
 
 % generate a params structure
-param1 = genParams;
+param1 = genParams('incIV',false,'incT2',false,...
+                   'Model',mod_name);
 
-% ignore the blood compartment
-param1.incIV = 0;
 
 % Load the actual dataset we want to examine
-load([simdir,'vs_arrays/TEST_vsData_',vsd_name,'_100.mat']);
+load([simdir,'vs_arrays/TE',num2str(1000*TE),'_vsData_',vsd_name,'_100.mat']);
 % load([simdir,'simulated_data/ASE_TauData_FullModel.mat']);
 
 % Depending on the data type we might be using
@@ -68,15 +73,15 @@ S0 = S0(:,:,cInd);
 
 % assign global variable
 tau1 = tauC;
+param1.TE = TE;
 
 nDBV = length(DBVvals);
 nOEF = length(OEFvals);
 
-% pre-allocate error and DBV matrices
+% pre-allocate true and estimate matrices
 % Dimensions:   OEF, DBV
-errs = zeros(nOEF,nDBV);
-oDs = zeros(nOEF,nDBV);
-tDs = zeros(nOEF,nDBV);
+ests = zeros(nOEF,nDBV);
+trus = zeros(nOEF,nDBV);
 
 % Loop over OEF
 for i1 = 1:nOEF
@@ -85,7 +90,7 @@ for i1 = 1:nOEF
     for i2 = 1:nDBV
         
         % Calculate true values
-        tOEF = scaleOEF .* OEFvals(i1);
+        tOEF = OEFvals(i1);
         tDBV = DBVvals(i2);
         
         tR2p = (4/3) * pi * param1.gam * param1.B0 * param1.dChi * param1.Hct * tOEF * tDBV;
@@ -95,23 +100,23 @@ for i1 = 1:nOEF
         % Pull out the true signal
         S_true = log(squeeze(S0(i2,i1,:))');
         
-        % find the optimum R2'
-        oR2p = fminbnd(@R2p_loglikelihood,0,15);
+        % find the estimated R2'
+        eR2p = fminbnd(@R2p_loglikelihood,0,30);
         
-        % scale R2p by some factor
-        oR2p = scaleR2p .* oR2p;
+        % scale R2p
+        eR2p = eR2p./SR;
         
-        % calculate optimum D
-        oD = (3/4) * oR2p / (pi * param1.gam * param1.B0 * param1.dChi * kappa);
+        % calculate estimated D
+        eD = (3/4) * eR2p / (pi * param1.gam * param1.B0 * param1.dChi * kappa);
  
         if strcmp(plot_par,'R2p')
             % Dimensions: OEF, DBV
-            oDs(i1,i2) = oR2p;
-            tDs(i1,i2) = tR2p;
+            ests(i1,i2) = eR2p;
+            trus(i1,i2) = tR2p;
         else
            % Dimensions: OEF, DBV
-            oDs(i1,i2) = oD;
-            tDs(i1,i2) = tD;
+            ests(i1,i2) = eD;
+            trus(i1,i2) = tD;
         end
         
     end % DBV Loop
@@ -120,120 +125,59 @@ end % OEF Loop
 
 toc;
 
+% Max D value
+md = max(max(trus(:)),max(ests(:)));
+
 
 %% Plot True Parameter Value
-if plot_truD
+if plot_tru
     
-    % True values
-    figure; hold on; box on;
-    surf(DBVvals,OEFvals,tDs);
+    h_tru = plotGrid(trus,DBVvals,OEFvals,...
+                     'cvals',[0,md],...
+                     'title','True dHb Content',...
+                     'cmap',flipud(magma));
     
-    view(2); shading flat;
-    colorbar;
-    axis([min(DBVvals),max(DBVvals),min(OEFvals),max(OEFvals)]);
-    axis square;
-    
-    if strcmp(plot_par,'R2p')
-        caxis([0,15]);
-        title('True R_2'' (s^-^1)');
-        colormap(viridis);
-    else
-        title('^ True dHb Content_ ');
-        colormap(inferno);
-    end
-    
-    xlabel('DBV (%)');
-    xticks(0.01:0.01:0.07);
-    xticklabels({'1','2','3','4','5','6','7'});
-    ylabel('OEF (%)');
-    yticks(0.2:0.1:0.6);
-    yticklabels({'20','30','40','50','60'})
-    
-end % if plot_truD
+end % if plot_tru
 
 
 %% Plot Parameter Estimate
-if plot_estD
+if plot_est
     
-    figure; hold on; box on;
-    surf(DBVvals,OEFvals,oDs);
-    
-    view(2); shading flat;
-    colorbar;
-    axis([min(DBVvals),max(DBVvals),min(OEFvals),max(OEFvals)]);
-    axis square;
-    
-    if strcmp(plot_par,'R2p')
-        caxis([0,15]);
-        title('Estimated R_2'' (s^-^1)');
-        colormap(viridis);
-    else
-        title('^ Estimated dHb Content_ ');
-        colormap(inferno);
-    end
-
-    xlabel('DBV (%)');
-    xticks(0.01:0.01:0.07);
-    xticklabels({'1','2','3','4','5','6','7'});
-    ylabel('OEF (%)');
-    yticks(0.2:0.1:0.6);
-    yticklabels({'20','30','40','50','60'})
+    h_est = plotGrid(ests,DBVvals,OEFvals,...
+                     'cvals',[0,md],...
+                     'title','Estimated dHb Content',...
+                     'cmap',flipud(magma));
     
 end % if plot_estD
 
 
-%% Plot Error in DBV Estimate
+%% Plot Error in OEF Estimate
 
-errs = tDs - oDs; 
-
-figure; hold on; box on;
-surf(DBVvals,OEFvals,errs);
-
-view(2); shading flat;
-colorbar;
-colormap(jet);
-axis([min(DBVvals),max(DBVvals),min(OEFvals),max(OEFvals)]);
-axis square;
-
-if strcmp(plot_par,'R2p')
-    caxis([-10,10]);
-    title('Error in R_2'' (s^-^1)');
-else
-    title('^ Error in dHb Content_ ');
-end
-
-xlabel('DBV (%)');
-xticks(0.01:0.01:0.07);
-xticklabels({'1','2','3','4','5','6','7'});
-ylabel('OEF (%)');
-yticks(0.2:0.1:0.6);
-yticklabels({'20','30','40','50','60'})
+% Calculate error
+%   Dimensions:   OEF, DBV
+errs = trus - ests;
 
 
-%% Plot relative DBV error
+if plot_err
 
-if plot_rError
+    h_err = plotGrid(errs,DBVvals,OEFvals,...
+                     'cvals',[-md,md],...
+                     'title','Error in dHb Content');
+
+end % if plot_err
+
+
+%% Plot relative error
+
+if plot_rel
     
     % calculate relative error
     %       Dimensions: OEF, DBV
-    rel_err = errs ./ tDs;
-
-    figure; hold on; box on;
-    surf(DBVvals,OEFvals,100.*rel_err);
+    rel_err = (errs) ./ trus;
     
-    view(2); shading flat;
-    colorbar;
-    caxis([-100,100]);
-    colormap(jet);
-    axis([min(DBVvals),max(DBVvals),min(OEFvals),max(OEFvals)]);
-    axis square;
-    
-    title('^ Relative Error (%)_ ');
-    xlabel('DBV (%)');
-    xticks(0.01:0.01:0.07);
-    xticklabels({'1','2','3','4','5','6','7'});
-    ylabel('OEF (%)');
-    yticks(0.2:0.1:0.6);
-    yticklabels({'20','30','40','50','60'})
+    h_rel = plotGrid(100.*rel_err,DBVvals,OEFvals,...
+                     'cvals',[-100,100],...
+                     'title','Relative Error in dHb Content (%)',...
+                     'cmap',jet);
     
 end

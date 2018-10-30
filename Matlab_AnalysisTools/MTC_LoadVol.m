@@ -55,7 +55,7 @@ else
     
     % Load Mask from CSF set
     Maskslice = LoadSlice(['/Users/mattcher/Documents/DPhil/Data/subject_',...
-                            s_subnum,'/mask_GM_96_FLAIR.nii.gz'],slices);
+                            s_subnum,'/mask_GM_80_FLAIR.nii.gz'],slices);
     
 end
 
