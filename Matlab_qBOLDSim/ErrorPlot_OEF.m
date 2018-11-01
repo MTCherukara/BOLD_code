@@ -44,8 +44,7 @@ global S_true param1 tau1;
 
 % generate a params structure
 param1 = genParams('incIV',false,'incT2',false,...
-                   'Model',mod_name,...
-                   'SR',1);
+                   'Model',mod_name,'TE',TE);
 
 % Load the actual dataset we want to examine
 load([simdir,'vs_arrays/TE',num2str(1000*TE),'_vsData_',vsd_name,'_100.mat']);
@@ -67,9 +66,8 @@ S0 = S0(:,:,cInd);
 
 % assign global variables
 tau1 = tauC;
-param1.TE = TE;
-param1.contr = 'OEF';
-param1.SR = 0.548;
+param1.SR = 1;    % 0.808
+param1.beta = 1.20;  % 1.20
 
 nDBV = length(DBVvals);
 nOEF = length(OEFvals);

@@ -8,11 +8,12 @@ function LL = solveDHB(xx)
 global KK arrDHB arrTAU arrS0
 
 % extract the two parameters
-kappa = xx(1);
-beta  = xx(2);
+beta  = xx(1);
+kappa = xx(2);
+% kappa = 1;
 
 % calculate model (normalized to log(S) = DBV)
-S_model = (1 - KK.*kappa.*((arrDHB).^beta).*arrTAU);
+S_model = (1 - KK.*((arrDHB./kappa).^beta).*arrTAU);
 
 % compare models
 ssd = (S_model-arrS0).^2;

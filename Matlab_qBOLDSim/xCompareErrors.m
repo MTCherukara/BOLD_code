@@ -8,16 +8,16 @@ clear;
 setFigureDefaults;
 
 % Load the first error
-load('Grid_Results/ErrDBV_Offset.mat');
-err_1 = errs;
+load('Grid_Results/ErrOEF_72_Uncorrected.mat');
+err_1 = abs(errs);
 est_1 = ests;
-rel_1 = rel_err;
+rel_1 = abs(rel_err);
 
 % Load the second error
-load('Grid_Results/ErrDBV_ScaleCorr.mat');
-err_2 = errs;
+load('Grid_Results/ErrOEF_72_fB_funcSR_2.mat');
+err_2 = abs(errs);
 est_2 = ests;
-rel_2 = rel_err;
+rel_2 = abs(rel_err);
 
 rdiff = rel_2 - rel_1;
 

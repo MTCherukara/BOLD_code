@@ -24,7 +24,7 @@ distname = 'sharan';
 plot_figure = 1;
 
 % Fixed Parameters
-TEv  = 0.108;
+TEv  = 0.072;
 tau = (-28:4:64)./1000;    % For TE = 72ms or 108ms
 % tau = (-12:4:32)./1000;      % For TE = 36ms
 

@@ -29,7 +29,8 @@ function [S,PARAMS] = qASE_model(TAU,TE,PARAMS)
     % CHANGELOG:
     %
     % 2018-10-30 (MTC). Added in a parameter for short-tau DBV offset (referred
-    %       to in my notes as beta), and for linear R2' scaling factor SR
+    %       to in my notes as beta), and for linear R2' scaling factor SR, and
+    %       for [dHb] exponent beta (a.k.a. gamma from Ogawa)
     %
     % 2018-10-23 (MTC). Re-wrote the Asymptotic model such that it depends on
     %       R2', rather than dw, in its actual calculations. This makes no
@@ -75,30 +76,6 @@ function [S,PARAMS] = qASE_model(TAU,TE,PARAMS)
     % 2016-05-27 (MTC). Updated the way the compartments were summed up.
    
     
-%% Recalculate dw (or OEF) depending on what is being used to generate the contrast
-
-ctr = lower(PARAMS.contr);
-
-switch ctr
-    
-    case 'oef'
-        PARAMS.dw   = (4/3)*pi*PARAMS.gam*PARAMS.B0*PARAMS.dChi*PARAMS.Hct*PARAMS.OEF; 
-        PARAMS.R2p  = PARAMS.dw .* PARAMS.zeta;
-        
-    case 'r2p'
-        PARAMS.dw = PARAMS.R2p ./ PARAMS.zeta;
-        PARAMS.OEF = PARAMS.dw ./ ( (4/3)*pi*PARAMS.gam*PARAMS.dChi*PARAMS.Hct*PARAMS.B0 );
-        
-    case 'dhb'
-        PARAMS.dw   = (4/3)*pi*PARAMS.gam*PARAMS.B0*PARAMS.dChi*PARAMS.kap*PARAMS.dHb;
-        
-    otherwise
-        warning('No contrast source specified, using OEF');
-        PARAMS.dw   = (4/3)*pi*PARAMS.gam*PARAMS.B0*PARAMS.dChi*PARAMS.Hct*PARAMS.OEF; 
-        PARAMS.R2p  = PARAMS.dw .* PARAMS.zeta;
-    
-end % switch ctr
-
 %% Check Parameters
 % Check whether recently added parameters (e.g. incIV and incT2) are specified
 % or not, if not, add them in 
@@ -117,6 +94,36 @@ end
 if ~isfield(PARAMS,'SR')
     PARAMS.SR = 1;
 end
+
+if ~isfield(PARAMS,'beta')
+    PARAMS.beta = 1;
+end
+
+    
+%% Recalculate dw (or OEF) depending on what is being used to generate the contrast
+
+ctr = lower(PARAMS.contr);
+
+switch ctr
+    
+    case 'oef'
+        PARAMS.dw   = (4/3)*pi*PARAMS.gam*PARAMS.B0*PARAMS.dChi*(PARAMS.Hct*PARAMS.OEF)^PARAMS.beta;
+        PARAMS.R2p  = PARAMS.dw .* PARAMS.zeta;
+        
+    case 'r2p'
+        PARAMS.dw = PARAMS.R2p ./ PARAMS.zeta;
+        PARAMS.OEF = PARAMS.dw ./ ( (4/3)*pi*PARAMS.gam*PARAMS.dChi*PARAMS.Hct*PARAMS.B0 );
+        
+    case 'dhb'
+        PARAMS.dw   = (4/3)*pi*PARAMS.gam*PARAMS.B0*PARAMS.dChi*PARAMS.kap*PARAMS.dHb;
+        
+    otherwise
+        warning('No contrast source specified, using OEF');
+        PARAMS.dw   = (4/3)*pi*PARAMS.gam*PARAMS.B0*PARAMS.dChi*PARAMS.Hct*PARAMS.OEF; 
+        PARAMS.R2p  = PARAMS.dw .* PARAMS.zeta;
+    
+end % switch ctr
+
 
 %% Calculate important parameters
 
@@ -323,10 +330,9 @@ function ST = calcTissueAsymp(TAU,TE,PARAMS)
     dw   = PARAMS.dw;
     zeta = PARAMS.zeta;
     beta = PARAMS.Voff;         % the short-tau DBV offset
-%     R2p  = (1.14.*PARAMS.OEF + 0.1).*PARAMS.R2p;
-%     BB = 6.26.*(1-exp(-3.49.*PARAMS.OEF));
-%     R2p = 2.*PARAMS.OEF.*exp(-BB.*TE).*PARAMS.R2p;
-    R2p = PARAMS.SR.*PARAMS.R2p;
+    BB = 6.263*(1-exp(-3.477*PARAMS.OEF));
+    R2p = 2.76.*PARAMS.OEF.*exp(-BB.*TE).*PARAMS.R2p;
+%     R2p = PARAMS.SR.*PARAMS.R2p;
     
     % define the regime boundary
     if PARAMS.tc_man

@@ -12,58 +12,67 @@ setFigureDefaults;
 
 tic;
 
+% Choose TE
+
+% Choose TE (train on 0.072, test on 0.084, also 0.108 and 0.036)
+TE = 0.072;
+
+% Load data
+%   Dimensions of S0:     DBV, OEF, TIME
+load(['../../Data/vesselsim_data/vs_arrays/TE',num2str(1000*TE),'_vsData_sharan_100.mat']);
+
 % declare global variables
-global KK arrDBV arrDHB arrTAU arrS0
+global S_dist param1 tau1
+tau1 = tau;
 
-% Load some data
-VSdata = load('..\..\Data\vesselsim_data\vs_arrays\TE72_vsData_sharan_100.mat');
-
-% Pull out data
-tau = VSdata.tau;
-TE = VSdata.TE;
-OEFvals = VSdata.OEFvals;
-DBVvals = VSdata.DBVvals;
-
-% Do we include the R2' scaling correction?
-SR = 0.7574*exp(-4.551*TE);
-% SR = 1;
-
-% Log-transform and normalize S0 (assume that tau=0 is the at element 8)
-%   Dimensions:     DBV, OEF, TIME
-S0 = log(VSdata.S0+1);
-S0 = S0./repmat(squeeze(S0(:,:,8)),1,1,length(tau));
-
-% Extract the long-tau values
-tauC = tau(12:end);
-arrS0 = S0(:,:,12:end);
-
-% Array sizes
+% create a parameters structure with the right params
+param1 = genParams('incIV',false,'incT2',false,...
+                   'Model','Asymp','TE',TE);
+               
+% lengths
 nDBV = length(DBVvals);
 nOEF = length(OEFvals);
-nt = length(tauC);
 
-% generate a params structure
-param1 = genParams('incIV',false,'incT2',false,...
-                   'Model','Asymp',...
-                   'SR',1,...
-                   'TE',TE);
+% pre-allocate estimate matrix
+% Dimensions:   OEF, DBV
+est_SR = zeros(nOEF,nDBV);
+est_bt = zeros(nOEF,nDBV);
 
 
-% define constant
-KK = (4/3)*pi*SR*param1.gam*param1.B0*param1.dChi;
-
-% generate revelant arrays
-%   Dimensions:     DBV, OEF, TIME
-arrDBV = repmat(DBVvals',1,nOEF,nt);
-arrDHB = repmat(OEFvals,nDBV,1,nt).*param1.Hct;
-arrTAU = shiftdim(repmat(tauC',1,nDBV,nOEF),1);
-
-% Solver starting points
-xx = [0.03,1.0];
-x1 = fminsearch(@solveDHB,xx);
+% Loop over OEF
+for i1 = 1:nOEF
+    
+    % Loop over DBV
+    for i2 = 1:nDBV
+        
+        % pull out the true signal
+        S_dist = squeeze(S0(i2,i1,:))';
+        
+        % assign parameter values
+        param1.zeta = DBVvals(i2);
+        param1.OEF  = OEFvals(i1);
+        
+        % find the optimum R2' scaling factor
+        x1 = fminsearch(@optimPowerScale,[1,1]);
+        
+        % Fill in ests matrix
+        est_SR(i1,i2) = x1(1);
+        est_bt(i1,i2) = x1(2);
+        
+    end % DBV Loop
+    
+end % OEF Loop
 
 toc;
 
-% Print results
-disp(['Optimized kappa = ',num2str(x1(1))]);
-disp(['Optimized beta  = ',num2str(x1(2))]);
+% plot the results
+plotGrid(est_SR,DBVvals,OEFvals,...
+          'cmap',inferno,...
+          'cvals',[0.5,1.5],...
+          'title','Optimized R2'' Scaling');
+      
+% plot the results
+plotGrid(est_bt,DBVvals,OEFvals,...
+          'cmap',inferno,...
+          'cvals',[0.5,1.5],...
+          'title','Optimized [dHb] Exponent \beta');

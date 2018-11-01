@@ -17,11 +17,14 @@ setFigureDefaults;
 tic;
 
 % Choose TE (train on 0.072, test on 0.084, also 0.108 and 0.036)
-TE = 0.072;
+TE = 0.036;
+
+% Vessel Type
+vsd_name = 'sharan';
 
 % Load data
 %   Dimensions of S0:     DBV, OEF, TIME
-load([simdir,'vs_arrays/TE',num2str(1000*TE),'_vsData_',vsd_name,'_100.mat']);
+load(['../../Data/vesselsim_data/vs_arrays/TE',num2str(1000*TE),'_vsData_',vsd_name,'_100.mat']);
 
 % declare global variables
 global S_dist param1 tau1
@@ -29,7 +32,8 @@ tau1 = tau;
 
 % create a parameters structure with the right params
 param1 = genParams('incIV',false,'incT2',false,...
-                   'Model','Asymp','TE',TE);
+                   'Model','Asymp','TE',TE,...
+                   'beta',1.20);
                
 nDBV = length(DBVvals);
 nOEF = length(OEFvals);
