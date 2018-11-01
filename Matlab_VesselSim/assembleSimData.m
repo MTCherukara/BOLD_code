@@ -24,7 +24,7 @@ distname = 'sharan';
 plot_figure = 1;
 
 % Fixed Parameters
-TE  = 0.084;
+TEv  = 0.108;
 tau = (-28:4:64)./1000;    % For TE = 72ms or 108ms
 % tau = (-12:4:32)./1000;      % For TE = 36ms
 
@@ -63,7 +63,7 @@ for i1 = 1:nr
     
     % Load data
     load([simdir,'vs_arrays/vsArray',num2str(np),'_',distname,...
-                 '_TE_',num2str(1000*TE),'_R_',num2str(vrad),'.mat']);
+                 '_TE_',num2str(1000*TEv),'_R_',num2str(vrad),'.mat']);
     
     % Fill matrix
     %       Dimensions: TIME, DBV, OEF, RADIUS
@@ -107,7 +107,8 @@ end % OEF loop
 
 
 %% Save Data
-sname = strcat(simdir,'vs_arrays/TE',num2str(1000*TE),'_vsData_',distname,'_',num2str(np),'.mat');
+sname = strcat(simdir,'vs_arrays/TE',num2str(1000*TEv),'_vsData_',distname,'_',num2str(np),'.mat');
+TE = TEv;
 save(sname,'S0','S_ev','S_iv','tau','TE','OEFvals','DBVvals');
     
 
