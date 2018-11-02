@@ -330,9 +330,9 @@ function ST = calcTissueAsymp(TAU,TE,PARAMS)
     dw   = PARAMS.dw;
     zeta = PARAMS.zeta;
     beta = PARAMS.Voff;         % the short-tau DBV offset
-    BB = 6.263*(1-exp(-3.477*PARAMS.OEF));
-    R2p = 2.76.*PARAMS.OEF.*exp(-BB.*TE).*PARAMS.R2p;
-%     R2p = PARAMS.SR.*PARAMS.R2p;
+%     BB = 6.263*(1-exp(-3.477*PARAMS.OEF));
+%     R2p = 2.76.*PARAMS.OEF.*exp(-BB.*TE).*PARAMS.R2p;
+    R2p = PARAMS.SR.*PARAMS.R2p;
     
     % define the regime boundary
     if PARAMS.tc_man

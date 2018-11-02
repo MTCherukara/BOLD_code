@@ -1,10 +1,10 @@
-function LL = OEF_loglikelihood(OEF)
+function LL = qBOLD_loglikelihood(XX)
 % Calculate the log likelihood that a looked-up set of data has a given value of
-% OEF. For use within the FMINBND (or similar) script only. Requires
+% OEF and DBV. For use with FMINSEARCH (or similar) script only. Requires
 % qASE_model.m. Derived from DBV_loglikelihood.m
 %
 % MT Cherukara
-% 2018-10-24
+% 2018-11-02
 
 % declare global variables
 global S_true param1 tau1;
@@ -12,7 +12,12 @@ global S_true param1 tau1;
 % create local, editable, version of param1
 loc_param = param1;
 
-loc_param.OEF = OEF;   % update DBV
+OEF = XX(1);
+DBV = XX(2);
+
+loc_param.OEF  = OEF;   % update OEF
+loc_param.zeta = DBV;   % update DBV
+
 % loc_param.SR = 0.96 - (0.38*OEF);
 % loc_param.beta = 1.086 + (0.282*OEF);
 

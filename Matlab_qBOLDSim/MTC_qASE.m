@@ -55,12 +55,12 @@ params = genParams;
 % Assign specific parameters
 
 % Scan
-params.TE   = 0.072;        % s         - echo time
+params.TE   = 0.084;        % s         - echo time
 
 % Physiology
 params.lam0 = 0.00;         % no units  - ISF/CSF signal contribution
-params.zeta = 0.03;         % no units  - deoxygenated blood volume
-params.OEF  = 0.40;         % no units  - oxygen extraction fraction
+params.zeta = 0.067;         % no units  - deoxygenated blood volume
+params.OEF  = 0.24;         % no units  - oxygen extraction fraction
 
 % Simulation
 params.model  = 'Full';     % STRING    - model type: 'Full','Asymp','Phenom','Kiselev'
@@ -79,7 +79,7 @@ params.SNR = inf;
 %% Compute Model
 
 % define tau values that we want to simulate
-tau = (-28:1:64)/1000; % for testing
+tau = (-16:1:64)/1000; % for testing
 % tau = linspace(-0.028,0.064,1000); % for visualising
 
 

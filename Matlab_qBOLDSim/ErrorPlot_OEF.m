@@ -15,10 +15,6 @@ tic;
 % Where the data is stored
 simdir = '../../Data/vesselsim_data/';
 
-% Which tau values do we want to look at
-cTaus = (-28:4:64)./1000;
-nt = length(cTaus);
-
 % Which distribution we want - 'sharan' or 'frechet'
 vsd_name = 'sharan';    
 
@@ -27,6 +23,12 @@ mod_name = 'Asymp';
 
 % What TE value do we want to use (36, 72, 84, 108 ms)
 TE = 0.072;
+
+% Which tau values do we want to look at
+cTaus = (-28:4:64)./1000;      % For longer TEs
+% cTaus = (-12:4:32)./1000;      % For TE = 36ms
+
+nt = length(cTaus);
 
 % Do we want to plot estimates or true values
 plot_est = 0;
@@ -66,18 +68,19 @@ S0 = S0(:,:,cInd);
 
 % assign global variables
 tau1 = tauC;
-param1.SR = 1;    % 0.808
+param1.SR = 0.808;    % 0.808
 param1.beta = 1.20;  % 1.20
 
 nDBV = length(DBVvals);
 nOEF = length(OEFvals);
 
 trus = repmat(OEFvals',1,nDBV);
+tru2 = repmat(DBVvals,nOEF,1);
 
 % pre-allocate OEF estimate matrix
 % Dimensions:   OEF, DBV
 ests = zeros(nOEF,nDBV);
-
+est2 = zeros(nOEF,nDBV);
 
 % Loop over OEF
 for i1 = 1:nOEF
@@ -92,16 +95,41 @@ for i1 = 1:nOEF
         param1.zeta = DBVvals(i2);
         
         % find the optimum OEF
-        OEF = fminbnd(@OEF_loglikelihood,0,1);
+%         X1 = fminbnd(@OEF_loglikelihood,0,1);
+        X1 = fminsearch(@qBOLD_loglikelihood,[0.5,0.05]);
         
         % Dimensions: OEF, DBV
-        ests(i1,i2) = OEF;      
+        ests(i1,i2) = X1(1);
+        est2(i1,i2) = X1(2);
         
     end % DBV Loop
     
 end % OEF Loop
   
 toc;
+
+% Calculate error
+%   Dimensions:   OEF, DBV
+errs    = trus - ests;
+rel_err = (errs) ./ trus;
+
+
+% Display Errors
+disp('  OEF Error:');
+disp(['Mean Rel. Error:  ',round2str(100*mean(abs(rel_err(:))),2)]);
+disp([' OEF 40, DBV 5  : ',round2str(100*rel_err(52,67),2)]);
+disp([' OEF 55, DBV 2  : ',round2str(100*rel_err(88,18),2)]);
+disp([' OEF 25, DBV 6.5: ',round2str(100*rel_err(16,92),2)]);
+
+
+% %  For DBV analyses
+rel_err2 = (tru2 - est2) ./ tru2;
+disp(' ');
+disp('  DBV Error:');
+disp(['Mean Rel. Error:  ',round2str(100*mean(abs(rel_err2(:))),2)]);
+disp([' OEF 40, DBV 5  : ',round2str(100*rel_err2(52,67),2)]);
+disp([' OEF 55, DBV 2  : ',round2str(100*rel_err2(88,18),2)]);
+disp([' OEF 25, DBV 6.5: ',round2str(100*rel_err2(16,92),2)]);
 
 %% Plot True Parameter Value
 if plot_tru
@@ -127,15 +155,10 @@ end % if plot_estD
 
 %% Plot Error in OEF Estimate
 
-% Calculate error
-%   Dimensions:   OEF, DBV
-errs = trus - ests;
-
-
 if plot_err
 
     h_err = plotGrid(100.*errs,DBVvals,OEFvals,...
-                     'cvals',[-60,60],...
+                     'cvals',[-50,50],...
                      'title','Error in OEF (%)');
 
 end % if plot_err
@@ -145,12 +168,8 @@ end % if plot_err
 
 if plot_rel
     
-    % calculate relative error
-    %       Dimensions: OEF, DBV
-    rel_err = (errs) ./ trus;
-    
     h_rel = plotGrid(100.*rel_err,DBVvals,OEFvals,...
-                     'cvals',[-50,50],...
+                     'cvals',[-100,100],...
                      'title','Relative Error in OEF (%)',...
                      'cmap',jet);
     

@@ -31,7 +31,7 @@ slicenum = 1:6;     % sub 11 FLAIR
 do_FE = 0;
 
 % Choose Data set
-setnum = 619 - 10;
+setnum = 625 - 10;
 subnum = 11;
 
 setnum = setnum + subnum - 1;

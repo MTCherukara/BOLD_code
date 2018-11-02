@@ -60,7 +60,7 @@ else
 end
 
 % Load Standard Deviation Data
-% Stdslice = LoadSlice([fabdir,'std_',varname,'.nii.gz'],slices);
+Stdslice = LoadSlice([fabdir,'std_',varname,'.nii.gz'],slices);
 
 % Define threshold
 if isKey(threshes,varname)
@@ -72,21 +72,21 @@ end
 % Apply mask, take absolute values, vectorize
 Dataslice = Dataslice.*Maskslice;
 Dataslice = abs(Dataslice(:));
-% Stdslice = Stdslice.*Maskslice;
-% Stdslice = Stdslice(:);
+Stdslice = Stdslice.*Maskslice;
+Stdslice = Stdslice(:);
 
 % Create a mask of values to remove
 Badslice = (Dataslice == 0) + ~isfinite(Dataslice) + (Dataslice > thrsh);
-% Badslice = Badslice + ~isfinite(Stdslice) + (Stdslice > thrsh) + (Stdslice < (thrsh.*1e-3));
+Badslice = Badslice + ~isfinite(Stdslice) + (Stdslice > thrsh) + (Stdslice < (thrsh.*1e-3));
 
 % Remove bad values
 Dataslice(Badslice ~= 0) = [];
-% Stdslice(Badslice ~= 0) = [];
+Stdslice(Badslice ~= 0) = [];
 
 % % Apply upper threshold
 % Dataslice(Dataslice > thrsh) = thrsh;
 
 % Output
 volData = Dataslice;
-% volStd  = Stdslice;
-volStd = [];
+volStd  = Stdslice;
+% volStd = [];

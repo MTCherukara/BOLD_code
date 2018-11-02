@@ -115,8 +115,9 @@ void R2primeFwdModel::Initialize(ArgsType &args)
     TR = convertTo<double>(args.ReadWithDefault("TR","3.000"));
     TI = convertTo<double>(args.ReadWithDefault("TI","3.000"));
 
-    // read SR
-    SR = convertTo<double>(args.ReadWithDefault("SR","1.0"));
+    // read SR and beta
+    SR   = convertTo<double>(args.ReadWithDefault("SR","1.0"));
+    beta = convertTo<double>(args.ReadWithDefault("beta","1.0"));
 
     // add information to the log
     LOG << "Inference using development model" << endl;
@@ -432,14 +433,6 @@ void R2primeFwdModel::Evaluate(const ColumnVector &params, ColumnVector &result)
 
 
     // assign values to parameters
-    if (infer_R2p)
-    {
-        R2p = (paramcpy(R2p_index()));
-    }
-    else
-    {
-        R2p = 2.5;
-    }
     if (infer_DBV)
     {
         DBV = abs(paramcpy(DBV_index()));
@@ -505,22 +498,35 @@ void R2primeFwdModel::Evaluate(const ColumnVector &params, ColumnVector &result)
         Ax = 0.0;
     }
 
-
     // this one is a little bit different
     if (infer_OEF)
     {
         OEF = (paramcpy(OEF_index()));
-        dw = 887.4082*Hct*OEF;
-        R2p = dw*DBV;
+        dw = 887.4082*pow(Hct*OEF,beta);
+        R2p = dw*DBV*SR;
     }
     else if (infer_R2p)
     {
-        dw = R2p/DBV;
-        OEF = R2p/(887.4082*Hct*DBV);
+        R2p = abs(paramcpy(R2p_index()));
+        OEF = pow(R2p/(887.4082*DBV),1/beta)/Hct;
+        if (OEF < 0.01)
+        {
+            OEF = 0.01;
+        }
+        dw = 887.4082*pow(Hct*OEF,beta);
+
+         SRb = 6.263*(1-exp(-3.477*OEF));
+        // SRb = 4.7;
+         SR2p = 2.76*OEF*exp(-SRb*TEvals(1));
+        // SR2p = SR;
+
+        R2p = dw*DBV*SR2p;
+
     }
     else
     {
         OEF = 0.3;
+        R2p = 2.5;
     }
 
     // calculate tc and threshold it if necessary
@@ -547,11 +553,6 @@ void R2primeFwdModel::Evaluate(const ColumnVector &params, ColumnVector &result)
     double ne = 0.075;
     double nb = 0.723;
 
-    // multiply R2p by its arbitrary scaling factor
-    SRb = 4.71;
-    SR2p = 2.0*OEF*exp(-SRb*TEvals(1));
-
-    R2p *= SR2p;
 
 
     // loop through taus

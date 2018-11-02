@@ -26,12 +26,13 @@ inferS0
 inferR2p
 inferDBV
 
-#single_compartment
+single_compartment
 motional_narrowing
 #infpriors
 
 # Model Parameters
-SR=0.548
+SR=0.8
+beta=1.2
 
 # Scan Parameters
 TE=0.084

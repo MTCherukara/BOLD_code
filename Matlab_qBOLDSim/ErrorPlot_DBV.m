@@ -15,10 +15,6 @@ tic;
 % Where the data is stored
 simdir = '../../Data/vesselsim_data/';
 
-% Which tau values do we want to look at
-cTaus = (-28:4:64)./1000;
-nt = length(cTaus);
-
 % Which distribution we want - 'sharan' or 'frechet'
 vsd_name = 'sharan';    
 
@@ -27,6 +23,11 @@ mod_name = 'Asymp';
 
 % What TE value do we want to use (36, 72, 84, 108 ms)
 TE = 0.072;
+
+% Which tau values do we want to look at
+cTaus = (-28:4:64)./1000;
+% cTaus = (-12:4:32)./1000;      % For TE = 36ms
+nt = length(cTaus);
 
 % Do we want to plot estimates or true values
 plot_est = 0;
@@ -49,9 +50,7 @@ global S_true param1 tau1;
 
 % generate a params structure
 param1 = genParams('incIV',false,'incT2',false,...
-                   'Model',mod_name,'TE',TE,...
-                   'SR',0.548,...
-                   'Voff',0.0042);
+                   'Model',mod_name,'TE',TE);
                
 
 % Load the actual dataset we want to examine
@@ -74,6 +73,8 @@ S0 = S0(:,:,cInd);
 
 % assign global variables
 tau1 = tauC;
+param1.SR = 0.808;    % 0.808
+param1.beta = 1.20;  % 1.20
 
 nDBV = length(DBVvals);
 nOEF = length(OEFvals);
@@ -136,6 +137,12 @@ ests = mean(ests,3);
 % calculate errors
 errs = trus - ests;
 rel_err = errs ./ trus;
+
+% Display Errors
+disp(['Mean Rel. Error:  ',round2str(100*mean(abs(rel_err(:))),2)]);
+disp([' OEF 40, DBV 5  : ',round2str(100*rel_err(52,67),2)]);
+disp([' OEF 55, DBV 2  : ',round2str(100*rel_err(88,18),2)]);
+disp([' OEF 25, DBV 6.5: ',round2str(100*rel_err(16,92),2)]);
 
 
 %% Plots

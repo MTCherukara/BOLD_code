@@ -11,16 +11,16 @@ clear;
 clc;
 % close all;
 
-CSF_data = 1;
+CSF_data = 0;
 
 
 %% Choosing Stuff
 % Choose which datasets and variables we want to compare
-vname = 'DBV';              % variable name
-fsets = [541, 546, 456, 466];    % FABBER datasets of interest
-subnum = 5;                 % subject number
+vname = 'R2p';              % variable name
+fsets = [621, 622, 623, 624];    % FABBER datasets of interest
+subnum = 11;                 % subject number
 nsets = length(fsets);      % number of sets
-fsets = fsets + subnum - 1;     % automatically adjust the set numbers
+% fsets = fsets + subnum - 1;     % automatically adjust the set numbers
 
     
 % Specific things depending on the data-set
@@ -33,7 +33,9 @@ if CSF_data
     subnum = CSF_subs(subnum);     
     
 else
-    slices = 3:10;
+%     slices = 3:10;
+    slices = 1:6;     % sub 11 FLAIR
+
 end
 
 
@@ -91,7 +93,7 @@ aStd  = mean(volStd);
 daC = multcompare(daStats,'display','off');
 
 % Pick the comparisons we want 
-grps = {[1,2];[1,3];[3,4];[2,4]};
+grps = {[1,2];[1,3];[1,4]};
 
 % Pre-allocate p-value array
 pvls = zeros(length(grps),1);
@@ -121,13 +123,15 @@ axis([0.5,nsets+0.5,0,yMax(vname)]);
 xticks(1:nsets);
 ylabel(vname);
 title(['Subject ',num2str(subnum)]);
+% yticklabels({'0','10','20','30','40','50','60','70'});      % for OEF
 
 % label the data
 if CSF_data
 %     xticklabels({'FLAIR','R_2'' fit','T_1 seg.','T_2 seg.','T_2 biexp.'});
     xticklabels({'FP R2e=4','NF R2e=4','FP R2e=0.5','NF R2e=0.5'});
 else
-    xticklabels({'L. Model','1C. Model','2C. Model'});
+%     xticklabels({'L. Model','1C. Model','2C. Model'});
+    xticklabels({'Uncorrected','Constant \alpha','Constant \alpha,\beta','\alpha(OEF), Constant \beta'});
 end
 
 % Add Significance Information

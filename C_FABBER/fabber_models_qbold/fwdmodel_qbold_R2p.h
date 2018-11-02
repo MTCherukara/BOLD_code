@@ -46,6 +46,7 @@ protected:
 
     // Model parameters
     double SR;      // this is a scaling factor for R2', applied in the asymptotic model
+    double beta;    // this is a power that is applied to OEF*Hct in calculating DW
 
     // Lookup starting indices of parameters
     int OEF_index() const

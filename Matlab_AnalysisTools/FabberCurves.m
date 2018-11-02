@@ -6,14 +6,18 @@
 % 
 % Actively used as of 2018-09-19
 
+
 clear;
 % close all;
 
 setFigureDefaults;
 
 % Parameters
-slices = 4:9;
-save_plot = 0;
+% slices = 4:9;       % VS data
+slices = 1:6;       % s11 FLAIR data
+
+% Subject number
+subnum = 11;
 
 %% Load the data
 
@@ -21,13 +25,22 @@ save_plot = 0;
 % modelfit, or residual
 [dname, ddir] = uigetfile('*.nii.gz','Select NIFTY Data to load...');
 
-% Extract the VS number from the chosen directory's name
-C = strsplit(ddir,'vs');
-VSnum = C{2}(1);
+% % Extract the VS number from the chosen directory's name
+% C = strsplit(ddir,'vs');
+% VSnum = C{2}(1);
+% 
+% % Load the appropriate grey-matter mask
+% Maskslice = LoadSlice(['/Users/mattcher/Documents/DPhil/Data/validation_sqbold/vs',...
+%                        VSnum,'/mask_gm_60.nii.gz'],slices);
 
-% Load the appropriate grey-matter mask
-Maskslice = LoadSlice(['/Users/mattcher/Documents/DPhil/Data/validation_sqbold/vs',...
-                       VSnum,'/mask_gm_60.nii.gz'],slices);
+if subnum < 10
+    s_subnum = strcat('0',num2str(subnum));
+else
+    s_subnum = num2str(subnum);
+end
+
+Maskslice = LoadSlice(['/Users/mattcher/Documents/DPhil/Data/subject_',...
+                       s_subnum,'/mask_GM_80_FLAIR.nii.gz'],slices);
 
 
 % Load the data
@@ -75,23 +88,25 @@ if nt == 24
     taus = (-28:4:64)./1000; % VS
 elseif nt == 14
     taus = [-28, -20, -12, -4, 0, 4, 8, 16, 24, 32, 40, 48, 56, 64]./1000;
+elseif nt == 11
+    taus = (-16:8:64)./1000; % AMICI Protocol
 else
     taus = (1:1:nt)./1000;
 end
 
+% Normalize to values around the spin echo
+SEind = find(abs(taus) < 1e-6,1);
+Sig_medN  = Sig_med./mean(Sig_med(SEind-1:SEind+1));
+Sig_meanN = Sig_mean./mean(Sig_med(SEind-1:SEind+1));
 
-figure(1);
+
+figure();
 hold on; box on;
-plot(1000*taus,log(Sig_med),'-');
+plot(1000*taus,log(Sig_mean),'-');
 
 xlabel('Spin echo displacement \tau (ms)')
 ylabel('ASE Signal');
-title(['Subject vs',VSnum,' (GM average)']);
+% title(['Subject vs',VSnum,' (GM average)']);
 
-xlim([-32,68]);
-% ylim([4.69,5.01]);
-
-if save_plot
-    export_fig(strcat('GM_Average_Subject_',VSnum,'.pdf'));
-end
+% xlim([-32,68]);
 
