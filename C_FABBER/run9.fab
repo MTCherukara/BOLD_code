@@ -16,7 +16,7 @@ max-iterations=10
 allow-bad-voxels
 
 # Spatial VB Information (remove this if method!=spatialvb)
-param-spatial-priors=NNN
+param-spatial-priors=MMM
 #image-prior4=../../Data/subject_11/CSF_80_T2w.nii.gz
 
 
@@ -31,7 +31,7 @@ motional_narrowing
 #infpriors
 
 # Model Parameters
-SR=0.8
+SR=0.80
 beta=1.2
 
 # Scan Parameters

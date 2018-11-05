@@ -12,8 +12,9 @@ global S_true param1 tau1;
 % create local, editable, version of param1
 loc_param = param1;
 
-loc_param.OEF = OEF;   % update DBV
-% loc_param.SR = 0.96 - (0.38*OEF);
+loc_param.OEF = OEF;   % update OEF
+% loc_param.SR = 1.55*OEF;
+% loc_param.SR = 2.76*OEF*exp(-(6.26*(1-exp(-3.48*OEF)))*param1.TE);
 % loc_param.beta = 1.086 + (0.282*OEF);
 
 % evaluate the model

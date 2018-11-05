@@ -35,7 +35,7 @@ plot_est = 0;
 plot_tru = 0;
 
 % Do we want to plot the relative error?
-plot_err = 1;
+plot_err = 0;
 plot_rel = 1;
 
 
@@ -69,7 +69,7 @@ S0 = S0(:,:,cInd);
 % assign global variables
 tau1 = tauC;
 param1.SR = 0.808;    % 0.808
-param1.beta = 1.20;  % 1.20
+param1.beta = 1.2;  % 1.20
 
 nDBV = length(DBVvals);
 nOEF = length(OEFvals);
@@ -88,19 +88,24 @@ for i1 = 1:nOEF
     % Loop over DBV
     for i2 = 1:nDBV
         
+        tDBV = DBVvals(i2);
+        
         % Pull out the true signal
         S_true = squeeze(S0(i2,i1,:))';
         
         % assign true value of DBV
-        param1.zeta = DBVvals(i2);
+        param1.zeta = tDBV;
+        
+        % assign values of scaling parameters
+%         param1.SR = (0.0046/tDBV) + 0.39;
         
         % find the optimum OEF
-%         X1 = fminbnd(@OEF_loglikelihood,0,1);
-        X1 = fminsearch(@qBOLD_loglikelihood,[0.5,0.05]);
+        X1 = fminbnd(@OEF_loglikelihood,0,1);
+%         X1 = fminsearch(@qBOLD_loglikelihood,[0.5,0.05]);
         
         % Dimensions: OEF, DBV
         ests(i1,i2) = X1(1);
-        est2(i1,i2) = X1(2);
+%         est2(i1,i2) = X1(2);
         
     end % DBV Loop
     
@@ -118,18 +123,18 @@ rel_err = (errs) ./ trus;
 disp('  OEF Error:');
 disp(['Mean Rel. Error:  ',round2str(100*mean(abs(rel_err(:))),2)]);
 disp([' OEF 40, DBV 5  : ',round2str(100*rel_err(52,67),2)]);
-disp([' OEF 55, DBV 2  : ',round2str(100*rel_err(88,18),2)]);
-disp([' OEF 25, DBV 6.5: ',round2str(100*rel_err(16,92),2)]);
+% disp([' OEF 55, DBV 2  : ',round2str(100*rel_err(88,18),2)]);
+% disp([' OEF 25, DBV 6.5: ',round2str(100*rel_err(16,92),2)]);
 
 
-% %  For DBV analyses
-rel_err2 = (tru2 - est2) ./ tru2;
-disp(' ');
-disp('  DBV Error:');
-disp(['Mean Rel. Error:  ',round2str(100*mean(abs(rel_err2(:))),2)]);
-disp([' OEF 40, DBV 5  : ',round2str(100*rel_err2(52,67),2)]);
-disp([' OEF 55, DBV 2  : ',round2str(100*rel_err2(88,18),2)]);
-disp([' OEF 25, DBV 6.5: ',round2str(100*rel_err2(16,92),2)]);
+% % %  For DBV analyses
+% rel_err2 = (tru2 - est2) ./ tru2;
+% disp(' ');
+% disp('  DBV Error:');
+% disp(['Mean Rel. Error:  ',round2str(100*mean(abs(rel_err2(:))),2)]);
+% disp([' OEF 40, DBV 5  : ',round2str(100*rel_err2(52,67),2)]);
+% disp([' OEF 55, DBV 2  : ',round2str(100*rel_err2(88,18),2)]);
+% disp([' OEF 25, DBV 6.5: ',round2str(100*rel_err2(16,92),2)]);
 
 %% Plot True Parameter Value
 if plot_tru

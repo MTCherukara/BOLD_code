@@ -45,9 +45,16 @@ if strfind(fdname.name,'_vs')
 
 else
     
+    % Zero-pad the subject number
+    if subnum < 10
+        s_subnum = strcat('0',num2str(subnum));
+    else
+        s_subnum = num2str(subnum);
+    end
+    
     % Load Mask from CSF set
-    Maskslice = LoadSlice(['/Users/mattcher/Documents/DPhil/Data/subject_0',...
-                            num2str(subnum),'/mask_FLAIR_GM.nii.gz'],slices);
+    Maskslice = LoadSlice(['/Users/mattcher/Documents/DPhil/Data/subject_',...
+                            s_subnum,'/mask_GM_80_FLAIR.nii.gz'],slices);
     
 end
 

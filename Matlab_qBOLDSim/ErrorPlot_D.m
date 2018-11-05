@@ -30,18 +30,19 @@ plot_par = 'D';
 TE = 0.072;
 
 % Do we want to plot estimates or true values
-plot_est = 1;
-plot_tru = 1;
+plot_est = 0;
+plot_tru = 0;
 
 % Do we want to plot the relative error?
-plot_err = 1;
+plot_err = 0;
 plot_rel = 1;
 
 % Random R2' scaling
-SR = 1;
+SR = 0.808;
 
 % Content scaling constant
 kappa = 0.03;
+
 
 % declare global variables
 global S_true tau1;
@@ -50,7 +51,7 @@ global S_true tau1;
 
 % generate a params structure
 param1 = genParams('incIV',false,'incT2',false,...
-                   'Model',mod_name);
+                   'Model',mod_name,'TE',TE);
 
 
 % Load the actual dataset we want to examine
@@ -73,7 +74,6 @@ S0 = S0(:,:,cInd);
 
 % assign global variable
 tau1 = tauC;
-param1.TE = TE;
 
 nDBV = length(DBVvals);
 nOEF = length(OEFvals);
@@ -93,12 +93,15 @@ for i1 = 1:nOEF
         tOEF = OEFvals(i1);
         tDBV = DBVvals(i2);
         
-        tR2p = (4/3) * pi * param1.gam * param1.B0 * param1.dChi * param1.Hct * tOEF * tDBV;
+        tR2p = (4/3) * pi * param1.gam * param1.B0 * param1.dChi * (param1.Hct * tOEF)^1.2 * tDBV;
         tD = param1.Hct .* tOEF .* tDBV ./ kappa;
+        
+        % parametric SR
+%         SR = (0.00462/tDBV) + 0.3906;
  
         
         % Pull out the true signal
-        S_true = log(squeeze(S0(i2,i1,:))');
+        S_true = squeeze(S0(i2,i1,:))';
         
         % find the estimated R2'
         eR2p = fminbnd(@R2p_loglikelihood,0,30);
@@ -128,6 +131,16 @@ toc;
 % Max D value
 md = max(max(trus(:)),max(ests(:)));
 
+% Calculate error
+%   Dimensions:   OEF, DBV
+errs = trus - ests;
+rel_err = (errs) ./ trus;
+
+% Display Errors
+disp('  dHb Content Error:');
+disp(['Mean Rel. Error:  ',round2str(100*mean(abs(rel_err(:))),2)]);
+disp([' OEF 40, DBV 5  : ',round2str(100*rel_err(52,67),2)]);
+
 
 %% Plot True Parameter Value
 if plot_tru
@@ -153,11 +166,6 @@ end % if plot_estD
 
 %% Plot Error in OEF Estimate
 
-% Calculate error
-%   Dimensions:   OEF, DBV
-errs = trus - ests;
-
-
 if plot_err
 
     h_err = plotGrid(errs,DBVvals,OEFvals,...
@@ -170,10 +178,6 @@ end % if plot_err
 %% Plot relative error
 
 if plot_rel
-    
-    % calculate relative error
-    %       Dimensions: OEF, DBV
-    rel_err = (errs) ./ trus;
     
     h_rel = plotGrid(100.*rel_err,DBVvals,OEFvals,...
                      'cvals',[-100,100],...

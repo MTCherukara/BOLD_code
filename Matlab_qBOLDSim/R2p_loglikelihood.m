@@ -10,10 +10,10 @@ function LL = R2p_loglikelihood(RR)
 
 
 % declare global variables
-global S_true tau1;
+global S_true tau1 param1;
 
 % caluclate signal given RR
-S_new = -RR.*tau1;
+S_new = exp(param1.zeta-(RR.*tau1));
 
 % evaluate log likelihood (sum of square differences), since we're trying
 % maximise the log-likelihood, we want a function which is the negation of it to

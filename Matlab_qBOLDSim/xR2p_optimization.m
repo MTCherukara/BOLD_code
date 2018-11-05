@@ -17,7 +17,7 @@ setFigureDefaults;
 tic;
 
 % Choose TE (train on 0.072, test on 0.084, also 0.108 and 0.036)
-TE = 0.036;
+TE = 0.072;
 
 % Vessel Type
 vsd_name = 'sharan';
@@ -33,7 +33,7 @@ tau1 = tau;
 % create a parameters structure with the right params
 param1 = genParams('incIV',false,'incT2',false,...
                    'Model','Asymp','TE',TE,...
-                   'beta',1.20);
+                   'beta',1.2);
                
 nDBV = length(DBVvals);
 nOEF = length(OEFvals);
@@ -41,6 +41,7 @@ nOEF = length(OEFvals);
 % pre-allocate estimate matrix
 % Dimensions:   OEF, DBV
 ests = zeros(nOEF,nDBV);
+est2 = zeros(nOEF,nDBV);
 
 % Loop over OEF
 for i1 = 1:nOEF
@@ -56,10 +57,12 @@ for i1 = 1:nOEF
         param1.OEF  = OEFvals(i1);
         
         % find the optimum R2' scaling factor
-        Scale_factor = fminbnd(@optimScaling,0,3);
+%         Scale_factor = fminbnd(@optimScaling,0,3);
+        X1 = fminsearch(@optimScaling,[2.0,0]);
         
         % Fill in ests matrix
-        ests(i1,i2) = Scale_factor;
+        ests(i1,i2) = X1(1);
+        est2(i1,i2) = X1(2);
         
     end % DBV Loop
     
@@ -67,10 +70,21 @@ end % OEF Loop
 
 toc;
 
+% Display Errors
+disp('  Scaling Factor:');
+disp(['Mean A    :  ',round2str(mean(ests(:)),4)]);
+disp(['Mean B    :  ',round2str(mean(est2(:)),4)]);
+
+
 % plot the results
 plotGrid(ests,DBVvals,OEFvals,...
           'cmap',inferno,...
-          'cvals',[0,1],...
+          'cvals',[0,3],...
+          'title','Optimized R2'' Scaling Factor');
+      
+plotGrid(est2,DBVvals,OEFvals,...
+          'cmap',inferno,...
+          'cvals',[-1,1],...
           'title','Optimized R2'' Scaling Factor');
 
 % Key datapoints for comparing

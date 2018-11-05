@@ -34,7 +34,7 @@ plot_est = 0;
 plot_tru = 0;
 
 % Do we want to plot the relative error?
-plot_err = 1;
+plot_err = 0;
 plot_rel = 1;
 
 % Specify SNR of noise to be added. For no noise: SNR = inf; 
@@ -74,7 +74,7 @@ S0 = S0(:,:,cInd);
 % assign global variables
 tau1 = tauC;
 param1.SR = 0.808;    % 0.808
-param1.beta = 1.20;  % 1.20
+param1.beta = 1.2;  % 1.20
 
 nDBV = length(DBVvals);
 nOEF = length(OEFvals);
@@ -104,15 +104,22 @@ for ir = 1:nreps
 
     % Loop over OEF
     for i1 = 1:nOEF
+        
+        % pull out true OEF value
+        tOEF = OEFvals(i1);
+        
+        % assign true value of parameter 1
+        param1.OEF = tOEF;
+        
+        % Scaling parameters based on OEF
+%         param1.SR = 0.96 - (0.38*tOEF);
+%         param1.beta = 1.086 + (0.282*tOEF);
 
         % Loop over DBV
         for i2 = 1:nDBV
 
             % Pull out the true signal
             S_true = squeeze(S0(i2,i1,:))';
-
-            % assign true value of parameter 1
-            param1.OEF = OEFvals(i1);
 
             % find the optimum DBV
             DBV = fminbnd(@DBV_loglikelihood,0.01,0.07);
@@ -141,8 +148,8 @@ rel_err = errs ./ trus;
 % Display Errors
 disp(['Mean Rel. Error:  ',round2str(100*mean(abs(rel_err(:))),2)]);
 disp([' OEF 40, DBV 5  : ',round2str(100*rel_err(52,67),2)]);
-disp([' OEF 55, DBV 2  : ',round2str(100*rel_err(88,18),2)]);
-disp([' OEF 25, DBV 6.5: ',round2str(100*rel_err(16,92),2)]);
+% disp([' OEF 55, DBV 2  : ',round2str(100*rel_err(88,18),2)]);
+% disp([' OEF 25, DBV 6.5: ',round2str(100*rel_err(16,92),2)]);
 
 
 %% Plots

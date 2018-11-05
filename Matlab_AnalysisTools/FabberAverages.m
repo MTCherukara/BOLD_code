@@ -19,7 +19,7 @@ clear;
 clc;
 
 % Choose Variables
-vars = {'R2p','DBV','OEF'};
+vars = {'OEF'};
 
 % Choose the slices we want
 % slicenum = 4:9;     % VS - instead of 3:10
@@ -31,7 +31,7 @@ slicenum = 1:6;     % sub 11 FLAIR
 do_FE = 0;
 
 % Choose Data set
-setnum = 625 - 10;
+setnum = 627 - 10;
 subnum = 11;
 
 setnum = setnum + subnum - 1;
@@ -87,6 +87,6 @@ if do_FE
     disp(['      Modelfit SNR : ',num2str(mean(MData)./mean(abs(RData)),4)]);
 
     disp('   ');
-    % disp(['  Mean Free Energy : ',num2str(-mean(FEData),4)]);
+    disp(['  Mean Free Energy : ',num2str(-mean(FEData),4)]);
     disp(['Median Free Energy : ',num2str(-median(FEData),4)]);
 end

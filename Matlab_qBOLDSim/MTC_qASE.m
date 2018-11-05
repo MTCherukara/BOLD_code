@@ -59,8 +59,8 @@ params.TE   = 0.084;        % s         - echo time
 
 % Physiology
 params.lam0 = 0.00;         % no units  - ISF/CSF signal contribution
-params.zeta = 0.067;         % no units  - deoxygenated blood volume
-params.OEF  = 0.24;         % no units  - oxygen extraction fraction
+params.zeta = 0.05;         % no units  - deoxygenated blood volume
+params.OEF  = 0.4;         % no units  - oxygen extraction fraction
 
 % Simulation
 params.model  = 'Full';     % STRING    - model type: 'Full','Asymp','Phenom','Kiselev'

@@ -1,8 +1,10 @@
-function LL = optimScaling(Scale)
+function LL = optimScaling(X1)
 
     global S_dist param1 tau1
     
     loc_param = param1;
+    
+    Scale = (X1(1)*loc_param.OEF) + X1(2);
     
     loc_param.R2p = Scale .* loc_param.dw .* loc_param.zeta;
     loc_param.contr = 'R2p';
