@@ -53,9 +53,12 @@ else
         s_subnum = num2str(subnum);
     end
     
+%     MaskName = 'mask_GM_80_FLAIR.nii.gz';
+    MaskName = 'mask_FLAIR_GM.nii.gz';
+    
     % Load Mask from CSF set
     Maskslice = LoadSlice(['/Users/mattcher/Documents/DPhil/Data/subject_',...
-                            s_subnum,'/mask_GM_80_FLAIR.nii.gz'],slices);
+                            s_subnum,'/',MaskName],slices);
     
 end
 

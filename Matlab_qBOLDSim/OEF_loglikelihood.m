@@ -16,6 +16,7 @@ loc_param.OEF = OEF;   % update OEF
 % loc_param.SR = 1.55*OEF;
 % loc_param.SR = 2.76*OEF*exp(-(6.26*(1-exp(-3.48*OEF)))*param1.TE);
 % loc_param.beta = 1.086 + (0.282*OEF);
+% loc_param.SR = 0.96-(0.38*OEF);
 
 % evaluate the model
 S_model = qASE_model(tau1,loc_param.TE,loc_param);

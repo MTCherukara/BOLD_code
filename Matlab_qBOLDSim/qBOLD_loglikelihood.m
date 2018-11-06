@@ -20,6 +20,7 @@ loc_param.zeta = DBV;   % update DBV
 
 % loc_param.SR = 0.96 - (0.38*OEF);
 % loc_param.beta = 1.086 + (0.282*OEF);
+% loc_param.SR = 2.76*OEF*exp(-4.7*loc_param.TE);
 
 % evaluate the model
 S_model = qASE_model(tau1,loc_param.TE,loc_param);

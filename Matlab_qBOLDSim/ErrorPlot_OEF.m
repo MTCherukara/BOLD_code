@@ -1,5 +1,7 @@
 % ErrorPlot_OEF.m
 %
+% OBSOLETE as of 2018-11-06 (use ErrorPlot.m)
+%
 % Calculate the error in estimates of OEF obtained by using the various qBOLD
 % models. Derived from ErrorPlot_DBV.m
 %
@@ -175,7 +177,7 @@ if plot_rel
     
     h_rel = plotGrid(100.*rel_err,DBVvals,OEFvals,...
                      'cvals',[-100,100],...
-                     'title','Relative Error in OEF (%)',...
+                     'title','',...
                      'cmap',jet);
     
 end

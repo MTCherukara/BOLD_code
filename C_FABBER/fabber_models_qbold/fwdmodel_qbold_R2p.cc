@@ -508,6 +508,10 @@ void R2primeFwdModel::Evaluate(const ColumnVector &params, ColumnVector &result)
     else if (infer_R2p)
     {
         R2p = abs(paramcpy(R2p_index()));
+        if (DBV < 0.001)
+        {
+            DBV = 0.001;
+        }
         OEF = pow(R2p/(887.4082*DBV),1/beta)/Hct;
         if (OEF < 0.01)
         {
@@ -516,8 +520,13 @@ void R2primeFwdModel::Evaluate(const ColumnVector &params, ColumnVector &result)
         dw = 887.4082*pow(Hct*OEF,beta);
 
         // SRb = 6.263*(1-exp(-3.477*OEF));
-         SRb = 4.7;
-         SR2p = 2.76*OEF*exp(-SRb*TEvals(1));
+        // SRb = 4.7;
+        // SR2p = 2.76*OEF*exp(-SRb*TEvals(1));
+        SR2p = 0.96 - (0.38*OEF);
+        if (SR2p < 0.01)
+        {
+            SR2p = 0.01;
+        }
         // SR2p = SR;
 
         R2p = dw*DBV*SR2p;

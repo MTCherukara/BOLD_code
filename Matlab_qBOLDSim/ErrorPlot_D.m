@@ -39,13 +39,14 @@ plot_rel = 1;
 
 % Random R2' scaling
 SR = 0.808;
+beta = 1.2;
 
 % Content scaling constant
 kappa = 0.03;
 
 
 % declare global variables
-global S_true tau1;
+global S_true tau1 param1;
 
 % S0 dimensions:    DBV, OEF, TIME
 
@@ -93,7 +94,9 @@ for i1 = 1:nOEF
         tOEF = OEFvals(i1);
         tDBV = DBVvals(i2);
         
-        tR2p = (4/3) * pi * param1.gam * param1.B0 * param1.dChi * (param1.Hct * tOEF)^1.2 * tDBV;
+        SR = 0.96-(0.38*tOEF);
+        
+        tR2p = (4/3) * pi * param1.gam * param1.B0 * param1.dChi * (param1.Hct * tOEF)^beta * tDBV;
         tD = param1.Hct .* tOEF .* tDBV ./ kappa;
         
         % parametric SR
@@ -104,7 +107,7 @@ for i1 = 1:nOEF
         S_true = squeeze(S0(i2,i1,:))';
         
         % find the estimated R2'
-        eR2p = fminbnd(@R2p_loglikelihood,0,30);
+        eR2p = fminbnd(@R2p_loglikelihood,0,200);
         
         % scale R2p
         eR2p = eR2p./SR;
@@ -180,8 +183,9 @@ end % if plot_err
 if plot_rel
     
     h_rel = plotGrid(100.*rel_err,DBVvals,OEFvals,...
-                     'cvals',[-100,100],...
+                     'cvals',[-60,60],...
                      'title','Relative Error in dHb Content (%)',...
                      'cmap',jet);
+    title('');
     
 end

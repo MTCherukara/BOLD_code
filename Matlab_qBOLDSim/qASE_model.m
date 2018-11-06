@@ -115,7 +115,9 @@ switch ctr
         PARAMS.OEF = PARAMS.dw ./ ( (4/3)*pi*PARAMS.gam*PARAMS.dChi*PARAMS.Hct*PARAMS.B0 );
         
     case 'dhb'
-        PARAMS.dw   = (4/3)*pi*PARAMS.gam*PARAMS.B0*PARAMS.dChi*PARAMS.kap*PARAMS.dHb;
+        PARAMS.zeta = (PARAMS.dHb*PARAMS.kap)/(PARAMS.OEF*PARAMS.Hct);
+        PARAMS.dw   = (4/3)*pi*PARAMS.gam*PARAMS.B0*PARAMS.dChi*(PARAMS.kap*PARAMS.dHb./PARAMS.zeta)^PARAMS.beta;
+        PARAMS.R2p  = (4/3)*pi*PARAMS.gam*PARAMS.B0*PARAMS.dChi*(PARAMS.kap*PARAMS.dHb)^PARAMS.beta;
         
     otherwise
         warning('No contrast source specified, using OEF');

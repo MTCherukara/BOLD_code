@@ -19,26 +19,26 @@ clear;
 clc;
 
 % Choose Variables
-vars = {'OEF'};
+vars = {'R2p','DBV','OEF'};
 
 % Choose the slices we want
 % slicenum = 4:9;     % VS - instead of 3:10
-% slicenum = 3:8;     % CSF + patient data
-slicenum = 1:6;     % sub 11 FLAIR
+slicenum = 3:8;     % CSF + patient data
+% slicenum = 1:6;     % sub 11 FLAIR
 % slicenum = 5:10;    % sub 11 nonFLAIR
 
 % do Free energy?
 do_FE = 0;
 
 % Choose Data set
-setnum = 627 - 10;
-subnum = 11;
+setnum = 670;
+subnum = 1;
 
 setnum = setnum + subnum - 1;
 
 CSF_subs = containers.Map([ 1, 2, 3, 4, 5 ], ...
-                          [ 3, 4, 6, 8, 9 ]);
-% subnum = CSF_subs(subnum);     
+                          [ 3, 4, 6, 8, 9 ]);       
+subnum = CSF_subs(subnum);     
 
 % Title
 disp(['Data from Fabber Set ',num2str(setnum),'. Subject ',num2str(subnum)]);
@@ -62,14 +62,14 @@ for vv = 1:length(vars)
     iqr = qnt(1) - qnt(2) ./ 2;
     
 %     Display results
-    disp('   ');
-    disp(['Median ',vname,': ',num2str(median(volData),4)]);
-    disp(['   IQR ',vname,': ',num2str(iqr,4)]);
+%     disp('   ');
+%     disp(['Median ',vname,': ',num2str(median(volData),4)]);
+%     disp(['   IQR ',vname,': ',num2str(iqr,4)]);
     
     disp('   ');
     disp(['Mean ',vname,'   : ',num2str(mean(volData),4)]);
-%     disp(['    Std ',vname,': ',num2str(mean(volStdv),4)]);
-    disp(['    Std ',vname,': ',num2str(std(volData),4)]);
+    disp(['    Std ',vname,': ',num2str(mean(volStdv),4)]);
+%     disp(['    Std ',vname,': ',num2str(std(volData),4)]);
 
 end
 
