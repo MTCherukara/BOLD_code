@@ -1,7 +1,7 @@
 % xContent_optimization.m
 %
 % To find an optimal scaling factor SR for R2' that optimises estimates of dHb
-% contentration, using only long-tau ASE data, basd on xR2p_optimization.m
+% contentration, using only long-tau ASE data, based on xR2p_optimization.m
 %
 % MT Cherukara
 % 2018-11-05
@@ -27,7 +27,7 @@ load(['../../Data/vesselsim_data/vs_arrays/TE',num2str(1000*TE),'_vsData_',vsd_n
 global tau1 S_true param1
 
 % only use tau values >= 15ms
-cInd = find(tau >= 0.020);
+cInd = find(tau >= 0.019);
 tau1 = tau(cInd);
 
 % reduce S0 to only include the taus we want
@@ -52,23 +52,14 @@ for i1 = 1:nOEF
     % Loop over DBV
     for i2 = 1:nDBV
         
-        tOEF = OEFvals(i1);
-        tDBV = DBVvals(i2);
+        param1.OEF  = OEFvals(i1);
+        param1.zeta = DBVvals(i2);
         
         % pull out the true signal
         S_true = squeeze(S0(i2,i1,:))';
-           
-        % calculate R2' of S_dist
-        eR2p = fminbnd(@R2p_loglikelihood,0,30);
         
-        % calculate true R2p
-        tR2p = (4/3) * pi * param1.gam * param1.B0 * param1.dChi * (param1.Hct * tOEF)^1.2 * tDBV;
-
-        % define a difference minimizing function
-        fdiff = @(x) abs((tR2p*x*tOEF) - eR2p);
-        
-        % minimize the function
-        Scale_factor = fminbnd(fdiff,0,3);
+        % Minimize the function
+        Scale_factor = fminbnd(@optimScaling,0,3);
         
         % Fill in ests matrix
         ests(i1,i2) = Scale_factor;

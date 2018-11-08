@@ -8,19 +8,16 @@ function LL = logLikelihoodDHB(D)
 % declare global variables
 global S_true param1 tau1;
 
-% create local, editable, version of param1
+% create local, editable, version of param1 and of the true data
 loc_param = param1;
+S_local = S_true;
 
-loc_param.contr = 'dhb';
-loc_param.dHb = D; % update D
+% calculate long tau model
+S_model = exp(-(D^loc_param.beta).*tau1./loc_param.SR);
 
-% evaluate the model
-S_model = qASE_model(tau1,loc_param.TE,loc_param);
-
-
-% normalize
-SEind = find(tau1 > -1e-9,1);
-S_model = S_model./S_model(SEind);
+% align data
+diffS = S_model(1) - S_local(1);
+S_local = S_local + diffS;
 
 % evaluate log likelihood (sum of square differences)
-LL = log(sum((S_true-S_model).^2));
+LL = log(sum((S_local-S_model).^2));

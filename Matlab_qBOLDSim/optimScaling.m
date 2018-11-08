@@ -1,17 +1,22 @@
 function LL = optimScaling(X1)
+    % long tau only version - for use in xContent_optimization.m, for other
+    % uses, revert back to previous version (from 2018-11-06)
 
-    global S_dist param1 tau1
+    global S_true param1 tau1
     
     loc_param = param1;
+    S_local = S_true;
     
-    Scale = (X1(1)*loc_param.OEF) + X1(2);
+    % calculate content
+    DD = ( loc_param.Hct * loc_param.OEF * loc_param.zeta / loc_param.kap )^loc_param.beta;
     
-    loc_param.R2p = Scale .* loc_param.dw .* loc_param.zeta;
-    loc_param.contr = 'R2p';
+    S_model = exp(-DD.*tau1./X1);
     
-    S_model = qASE_model(tau1,param1.TE,loc_param);
-    S_model = S_model./max(S_model);
-    
-    LL = log(sum((S_dist-S_model).^2));
+    % align data
+    diffS = S_model(1) - S_local(1);
+    S_local = S_local + diffS;
+
+    % evaluate log likelihood (sum of square differences)
+    LL = log(sum((S_local-S_model).^2));
     
 end

@@ -20,19 +20,19 @@ tic;
 
 %% User-Selected Inputs
 
-var_name = 'DHB';               % Variable to test - 'OEF', 'DBV', or 'DHB'
+var_name = 'OEF';               % Variable to test - 'OEF', 'DBV', or 'DHB'
 vsd_name = 'sharan';            % Distribution to use - 'sharan' or 'frechet'
 mod_name = 'Asymp';             % Model to test - DON'T CHANGE
 
 TE = 0.072;                     % TE value to use - 36, 72, 84, 108
 cTaus = (-28:4:64)./1000;       % Tau values to use - DON'T CHANGE
 
-kappa = 1;                    % Scalar correction to R2'
+kappa = 0.553;                    % Scalar correction to R2'
 beta = 1;                     % Scalar power of [dHb]
 
-plot_est = 1;                   % Plot options
-plot_tru = 1;
-plot_err = 1;
+plot_est = 0;                   % Plot options
+plot_tru = 0;
+plot_err = 0;
 plot_rel = 1;
 
 SNR = Inf;                      % Noise SNR. For no noise: SNR = inf;
@@ -68,9 +68,9 @@ if ~exist('OEFvals','var')
 end
 
 % pull out the right tau values
-if strcmp(var_name,'notDHB')
+if strcmp(var_name,'DHB')
     % Long-tau only in this case
-    cInd = find(tau >= 0.020);
+    cInd = find(tau >= 0.019);
     tauC = tau(cInd);
 else
     % All taus
@@ -148,7 +148,7 @@ for ir = 1:nreps
                 % case when there's a BETA correction, so we have to do this in
                 % a more sensible way. 
                 
-                    optval = fminbnd(@logLikelihoodDHB,0,500);
+                    optval = fminbnd(@logLikelihoodDHB,0,20);
                     truval = param1.Hct * tOEF * tDBV / param1.kap;
                 
                     
@@ -191,7 +191,8 @@ disp([' OEF 40, DBV 5  : ',round2str(100*rel_err(52,67),2)]);
 
 %% Plots
 
-mvt = max(max(trus(:)),max(ests(:)));
+% mvt = max(max(trus(:)),max(ests(:)));
+mvt = 8;
 
 % True value
 if plot_tru
@@ -226,7 +227,7 @@ end % if plot_err
 if plot_rel
     
     h_rel = plotGrid(100.*rel_err,DBVvals,OEFvals,...
-                     'cvals',[-100,100],...
+                     'cvals',[-60,60],...
                      'title',['Relative error in ',var_name,' (%)'],...
                      'cmap',jet);
 	title('');
