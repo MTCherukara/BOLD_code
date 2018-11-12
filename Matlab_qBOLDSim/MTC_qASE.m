@@ -59,8 +59,8 @@ params.TE   = 0.084;        % s         - echo time
 
 % Physiology
 params.lam0 = 0.00;         % no units  - ISF/CSF signal contribution
-params.zeta = 0.05;         % no units  - deoxygenated blood volume
-params.OEF  = 0.4;         % no units  - oxygen extraction fraction
+params.zeta = 0.03;         % no units  - deoxygenated blood volume
+params.OEF  = 0.6;         % no units  - oxygen extraction fraction
 
 % Simulation
 params.model  = 'Full';     % STRING    - model type: 'Full','Asymp','Phenom','Kiselev'
@@ -105,13 +105,13 @@ params.sig = min(S_sample)/params.SNR;
 if plot_fig
     
     % create a figure
-    figure(2); hold on; box on;
+    figure(1); hold on; box on;
     
     % plot the signal
     S_log = log(S_total);
-    l.s = plot(1000*tau,S_log,'-');
+    l.s = plot(1000*tau,S_log,'-','Color',defColour(7));
 %     ylim([-0.07,0]);
-    xlim([(1000*min(tau))-4, (1000*max(tau))+4]);
+    xlim([(1000*min(tau)), (1000*max(tau))]);
     
     % labels on axes
     xlabel('Spin Echo Displacement \tau (ms)');

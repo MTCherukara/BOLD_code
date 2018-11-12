@@ -20,14 +20,15 @@ tic;
 
 %% User-Selected Inputs
 
-var_name = 'OEF';               % Variable to test - 'OEF', 'DBV', or 'DHB'
+var_name = 'DHB';               % Variable to test - 'OEF', 'DBV', or 'DHB'
 vsd_name = 'sharan';            % Distribution to use - 'sharan' or 'frechet'
 mod_name = 'Asymp';             % Model to test - DON'T CHANGE
 
-TE = 0.072;                     % TE value to use - 36, 72, 84, 108
+TE = 0.084;                     % TE value to use - 36, 72, 84, 108
 cTaus = (-28:4:64)./1000;       % Tau values to use - DON'T CHANGE
+% cTaus = (-12:4:32)./1000;      % For TE = 36ms
 
-kappa = 0.553;                    % Scalar correction to R2'
+kappa = 0.69;                    % Scalar correction to R2'
 beta = 1;                     % Scalar power of [dHb]
 
 plot_est = 0;                   % Plot options
@@ -182,6 +183,7 @@ ests = mean(ests,3);
 errs = trus - ests;
 rel_err = errs ./ trus;
 
+
 % Display Errors
 disp(['Mean Rel. Error:  ',round2str(100*mean(abs(rel_err(:))),2)]);
 disp([' OEF 40, DBV 5  : ',round2str(100*rel_err(52,67),2)]);
@@ -200,7 +202,7 @@ if plot_tru
     h_tru = plotGrid(trus,DBVvals,OEFvals,...
                      'cvals',[0,mvt],...
                      'title',['True ',var_name],...
-                     'cmap',inferno);
+                     'cmap',parula);
     
 end % if plot_tru
 
@@ -210,7 +212,7 @@ if plot_est
     h_est = plotGrid(ests,DBVvals,OEFvals,...
                      'cvals',[0,mvt],...
                      'title',['Estimated ',var_name],...
-                     'cmap',inferno);
+                     'cmap',parula);
     
 end % if plot_estD
 

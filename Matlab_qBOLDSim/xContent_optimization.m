@@ -17,7 +17,8 @@ tic;
 TE = 0.072;
 
 % Vessel Type
-vsd_name = 'sharan';
+vsd_name = 'frechet
+';
 
 % Load data
 %   Dimensions of S0:     DBV, OEF, TIME
