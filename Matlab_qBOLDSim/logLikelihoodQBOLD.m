@@ -1,4 +1,4 @@
-function LL = qBOLD_loglikelihood(XX)
+function LL = logLikelihoodQBOLD(XX)
 % Calculate the log likelihood that a looked-up set of data has a given value of
 % OEF and DBV. For use with FMINSEARCH (or similar) script only. Requires
 % qASE_model.m. Derived from DBV_loglikelihood.m

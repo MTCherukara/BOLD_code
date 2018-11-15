@@ -1,4 +1,4 @@
-function LL = DBV_loglikelihood(DBV)
+function LL = logLikelihoodDBV(DBV)
 % Calculate the log likelihood that a looked-up set of data has a value of
 % deoxygenated blood volume DBV. For use within the FMINBND (or similar) script
 % only. Will have to have a lot of hard-coded stuff that it looks up. Requires

@@ -1,4 +1,6 @@
 function LL = optimPowerScale(xx)
+    % Optimization objective function for a scaling factor SR and a power beta.
+    % For use within FMINSEARCH (or similar) only.
 
     global S_dist param1 tau1
     

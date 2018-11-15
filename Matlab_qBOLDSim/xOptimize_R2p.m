@@ -1,13 +1,13 @@
-% function ests = xR2p_optimization
-    % To optimize the value of a scaling factor applied to R2' in the asmypototic
-    % SDR qBOLD model
-    %
-    % MT Cherukara
-    % 2018-10-24
-    %
-    % CHANGELOG:
-    % 
-    % 2018-10-25 (MTC). Make it loop around all OEF and DBV.
+% xOptimize_R2p.m
+% To optimize the value of a scaling factor applied to R2' in the asmyptotic SDR
+% qBOLD model
+%
+% MT Cherukara
+% 2018-10-24
+%
+% CHANGELOG:
+%
+% 2018-10-25 (MTC). Make it loop around all OEF and DBV.
 
 clear;
 close all;
@@ -57,12 +57,12 @@ for i1 = 1:nOEF
         param1.OEF  = OEFvals(i1);
         
         % find the optimum R2' scaling factor
-%         Scale_factor = fminbnd(@optimScaling,0,3);
-        X1 = fminsearch(@optimScaling,[2.0,0]);
+        X1 = fminbnd(@optimScaling,0,3);
+%         X1 = fminsearch(@optimPowerScale,[1.0,1.0]);
         
         % Fill in ests matrix
         ests(i1,i2) = X1(1);
-        est2(i1,i2) = X1(2);
+%         est2(i1,i2) = X1(2);
         
     end % DBV Loop
     

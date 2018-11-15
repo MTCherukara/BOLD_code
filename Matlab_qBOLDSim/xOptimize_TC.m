@@ -1,4 +1,4 @@
-% xTC_Optimization
+% xOptimize_TC.m
 
 % To optimize the value of Tc (the point of transition between the linear-
 % exponential and quadratic-exponential regimes in the asymptotic qBOLD model).

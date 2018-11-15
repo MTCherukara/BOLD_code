@@ -1,4 +1,4 @@
-% xDHB_correction.m
+% xOptimize_ContentPower.m
 
 % Attempting to fit a power-law function to [dHb]
 

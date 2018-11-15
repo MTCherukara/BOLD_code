@@ -1,4 +1,6 @@
 function LL = optimContent(Scale)
+    % Optimization objective function for a scaling factor SR in the long-tau
+    % calcuation of R2' only; for use within FMINBND (or similar) only.
 
     global S_dist param1 tau1
     

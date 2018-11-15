@@ -1,4 +1,4 @@
-% xR2p_singleOptim.m
+% xOptimizeSet_R2pScaling.m
 %
 % Optimize the value of a scaling factor applied to R2' in the asmypototic
 % SDR qBOLD model, but for a single dataset. Derived from xR2p_optimization.m

@@ -136,11 +136,11 @@ for ir = 1:nreps
             % find the optimum value for specific parameter that we care about
             switch var_name
                 case 'OEF'
-                    optval = fminbnd(@OEF_loglikelihood,0,1);
+                    optval = fminbnd(@logLikelihoodOEF,0,1);
                     truval = tOEF;
                     
                 case 'DBV'
-                    optval = fminbnd(@DBV_loglikelihood,0.0001,0.2);
+                    optval = fminbnd(@logLikelihoodDBV,0.0001,0.2);
                     truval = tDBV;
                     
                 case 'DHB'

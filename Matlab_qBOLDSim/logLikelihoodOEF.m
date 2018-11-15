@@ -1,4 +1,4 @@
-function LL = OEF_loglikelihood(OEF)
+function LL = logLikelihoodOEF(OEF)
 % Calculate the log likelihood that a looked-up set of data has a given value of
 % OEF. For use within the FMINBND (or similar) script only. Requires
 % qASE_model.m. Derived from DBV_loglikelihood.m

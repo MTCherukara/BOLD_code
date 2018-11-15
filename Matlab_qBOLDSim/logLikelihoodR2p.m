@@ -1,4 +1,4 @@
-function LL = R2p_loglikelihood(RR)
+function LL = logLikelihoodR2p(RR)
 % Calculate the log likelihood that a looked-up set of data has a value of R2'
 % (reversible transverse relaxation rate) RR. For use within the FMINBND (or
 % similar) script only.

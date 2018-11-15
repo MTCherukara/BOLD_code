@@ -1,4 +1,4 @@
-% xContent_optimization.m
+% xOptimize_ContentScaling.m
 %
 % To find an optimal scaling factor SR for R2' that optimises estimates of dHb
 % contentration, using only long-tau ASE data, based on xR2p_optimization.m
@@ -17,8 +17,7 @@ tic;
 TE = 0.072;
 
 % Vessel Type
-vsd_name = 'frechet
-';
+vsd_name = 'frechet';
 
 % Load data
 %   Dimensions of S0:     DBV, OEF, TIME

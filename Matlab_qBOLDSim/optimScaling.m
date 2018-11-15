@@ -1,22 +1,19 @@
-function LL = optimScaling(X1)
-    % long tau only version - for use in xContent_optimization.m, for other
-    % uses, revert back to previous version (from 2018-11-06)
-
-    global S_true param1 tau1
+function LL = optimScaling(xx)
+    % Optimization objective function for a scaling factor SR. For use within
+    % FMINBND (or similar) only
+    
+    global S_dist param1 tau1
     
     loc_param = param1;
-    S_local = S_true;
     
-    % calculate content
-    DD = ( loc_param.Hct * loc_param.OEF * loc_param.zeta / loc_param.kap )^loc_param.beta;
+    loc_param.SR   = xx(1);
     
-    S_model = exp(-DD.*tau1./X1);
+    S_model = qASE_model(tau1,param1.TE,loc_param);
+    S_model = S_model./max(S_model);
     
-    % align data
-    diffS = S_model(1) - S_local(1);
-    S_local = S_local + diffS;
-
-    % evaluate log likelihood (sum of square differences)
-    LL = log(sum((S_local-S_model).^2));
+    S_mlong = S_model(1:end);
+    S_dlong = S_dist(1:end);
+    
+    LL = log(sum((S_dlong-S_mlong).^2));
     
 end
