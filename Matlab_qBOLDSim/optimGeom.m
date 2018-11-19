@@ -1,12 +1,12 @@
-function LL = optimScaling(xx)
-    % Optimization objective function for a scaling factor SR, applied to the
-    % whole range of tau values. For use within FMINBND (or similar) only
-    
+function LL = optimGeom(sgeo)
+    % Optimization objective function for a short-tau geometric scaling constant
+    % SGEO; for use within FMINBND (or similar) only.
+
     global S_dist param1 tau1
     
     loc_param = param1;
     
-    loc_param.SR   = xx(1);
+    loc_param.sgeo = sgeo;
     
     S_model = qASE_model(tau1,param1.TE,loc_param);
     S_model = S_model./max(S_model);

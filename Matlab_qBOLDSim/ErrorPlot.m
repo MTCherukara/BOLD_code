@@ -20,15 +20,17 @@ tic;
 
 %% User-Selected Inputs
 
-var_name = 'DHB';               % Variable to test - 'OEF', 'DBV', or 'DHB'
+var_name = 'DBV';               % Variable to test - 'OEF', 'DBV', or 'DHB'
 vsd_name = 'sharan';            % Distribution to use - 'sharan' or 'frechet'
 mod_name = 'Asymp';             % Model to test - DON'T CHANGE
 
-TE = 0.084;                     % TE value to use - 36, 72, 84, 108
+TE = 0.036;                     % TE value to use - 36, 72, 84, 108
 cTaus = (-28:4:64)./1000;       % Tau values to use - DON'T CHANGE
 % cTaus = (-12:4:32)./1000;      % For TE = 36ms
 
-kappa = 0.69;                    % Scalar correction to R2'
+% kappa = 1;                    % Scalar correction to R2'
+% kappa = 28.5*(TE.^2) + 0.54; 
+kappa = 0.77 - (2.78*TE);
 beta = 1;                     % Scalar power of [dHb]
 
 plot_est = 0;                   % Plot options
@@ -56,7 +58,7 @@ global S_true param1 tau1;
 param1 = genParams('incIV',false,'incT2',false,...
                    'Model',mod_name,'TE',TE,...
                    'SR',kappa,'beta',beta);
-               
+                              
 
 % Load the actual dataset we want to examine
 load([simdir,'vs_arrays/TE',num2str(1000*TE),'_vsData_',vsd_name,'_100.mat']);

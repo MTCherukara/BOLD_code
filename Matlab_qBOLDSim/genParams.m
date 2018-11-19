@@ -60,6 +60,7 @@ params.kap  = 0.003;        % ?         - conversion between Hct and [Hb]
 params.S0   = 100;          % a. units  - signal
 params.SR   = r.SR;         % no units  - scaling factor for R2'
 params.beta = r.beta;       % no units  - [dHb] exponent
+params.sgeo = 0.3;          % no units  - short-tau geometric factor (3/10) 
 
 % CSF Compartment-specific parameters
 params.lam0 = r.vCSF;       % no units  - ISF/CSF signal contribution

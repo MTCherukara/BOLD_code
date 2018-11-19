@@ -6,9 +6,6 @@
 %
 % Separated into this file, and assembleSimData.m
 
-% TRY RUNNING IT WITHOUT THE INTRAVASCULAR SIGNAL - THIS MAY BE THROWING US OFF,
-% AND IS NOT NECESSARY AT THIS STAGE...
-
 clear;
 
 t0 = tic; % main timer
@@ -37,6 +34,13 @@ switch lower(distname)
         dirname  = 'D1-0Vf3pc_dist';
         RR = 3:100;
         VF = gevpdf(RR,0.41,5.8,10.1);
+        VF = VF./sum(VF);
+        
+    case 'lauwers'
+        dirname = 'D1-0Vf3pc_dist';
+        RR = 3:100;
+        DT = 1./sqrt(2*RR);
+        VF = normpdf(DT,0.38,0.07);
         VF = VF./sum(VF);
         
     otherwise

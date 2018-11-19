@@ -1,7 +1,7 @@
 function LL = logLikelihoodR2p(RR)
 % Calculate the log likelihood that a looked-up set of data has a value of R2'
 % (reversible transverse relaxation rate) RR. For use within the FMINBND (or
-% similar) script only.
+% similar) script only. Requires normalized data in the long-tau regime only.
 % 
 % Modified from DBV_loglikelihood.m
 %
@@ -10,7 +10,7 @@ function LL = logLikelihoodR2p(RR)
 
 
 % declare global variables
-global S_true tau1 param1;
+global S_true param1 tau1;
 
 % caluclate signal given RR
 S_new = exp(param1.zeta-(RR.*tau1));

@@ -1,6 +1,8 @@
 function LL = logLikelihoodDHB(D)
 % Calculate the log likelihood that a looked-up set of data has a given value of
-% dHb content D
+% dHb content D.
+%
+% How is this different from logLikelihoodR2p?
 %
 % MT Cherukara
 % 2018-11-06

@@ -1,5 +1,5 @@
-function LL = optimContent(Scale)
-    % Optimization objective function for a scaling factor SR in the long-tau
+function LL = optimContent(Kappa)
+    % Optimization objective function for a scaling factor Kappa in the long-tau
     % calcuation of R2' only; for use within FMINBND (or similar) only.
 
     global S_dist param1 tau1
@@ -10,9 +10,9 @@ function LL = optimContent(Scale)
     tR2p = (4/3)*pi*loc_param.gam*loc_param.B0*loc_param.dChi*loc_param.Hct*loc_param.OEF*loc_param.zeta;
     
     % apply some scaling to it
-    sR2p = Scale .* tR2p;
+    sR2p = Kappa .* tR2p;
     
-    % generate a signal
+    % generate a (log) signal 
     S_model = loc_param.zeta-sR2p.*tau1;
     
     % normalize the signals in some way?
