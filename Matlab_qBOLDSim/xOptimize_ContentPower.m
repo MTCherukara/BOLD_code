@@ -15,7 +15,7 @@ tic;
 % Choose TE
 
 % Choose TE (train on 0.072, test on 0.084, also 0.108 and 0.036)
-TE = 0.108;
+TE = 0.072;
 
 % Load data
 %   Dimensions of S0:     DBV, OEF, TIME

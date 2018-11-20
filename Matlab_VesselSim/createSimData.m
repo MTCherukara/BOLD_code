@@ -16,10 +16,10 @@ t0 = tic; % main timer
 simdir = '../../Data/vesselsim_data/';
 
 % Selet distribution 
-distname = 'sharan';
+distname = 'lauwers';
 
 % Fixed Parameters
-TE  = 0.084;
+TE  = 0.072;
 tau = (-28:4:64)./1000;    % For TE = 72ms or 108ms or 84 ms
 % tau = (-12:4:32)./1000;      % For TE = 36ms or 56 ms
 
@@ -60,7 +60,7 @@ DBVvals = linspace(0.01,0.07,np);
 % DBVvals = 0.05;
 
 % Decide on which radii to calculate
-rstart = 1;
+rstart = 84;
 rend   = nr;
 
 

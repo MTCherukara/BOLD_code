@@ -522,7 +522,10 @@ void R2primeFwdModel::Evaluate(const ColumnVector &params, ColumnVector &result)
         // SRb = 6.263*(1-exp(-3.477*OEF));
         // SRb = 4.7;
         // SR2p = 2.76*OEF*exp(-SRb*TEvals(1));
-        SR2p = 0.96 - (0.38*OEF);
+        // SR2p = 0.96 - (0.38*OEF);
+        SR2p = 0.77 - 2.78*TEvals(1);
+
+
         if (SR2p < 0.01)
         {
             SR2p = 0.01;

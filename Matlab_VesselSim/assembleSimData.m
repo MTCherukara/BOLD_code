@@ -35,6 +35,12 @@ switch lower(distname)
         VF = gevpdf(RR,0.41,5.8,10.1);
         VF = VF./sum(VF);
         
+    case 'lauwers'
+        RR = 3:100;
+        DT = 1./sqrt(2*RR);
+        VF = normpdf(DT,0.38,0.07);
+        VF = VF./sum(VF);
+        
     otherwise
         disp('Invalid distribution');
 end
@@ -58,9 +64,10 @@ for i1 = 1:nr
     vrad = RR(i1);
     
     % Load data
+%     load([simdir,'vs_arrays/vsArray',num2str(np),'_',distname,...
+%                  '_TE_',num2str(1000*TEv),'_R_',num2str(vrad),'.mat']);
     load([simdir,'vs_arrays/vsArray',num2str(np),'_',distname,...
-                 '_TE_',num2str(1000*TEv),'_R_',num2str(vrad),'.mat']);
-    
+                 '_R_',num2str(vrad),'.mat']);
     % Fill matrix
     %       Dimensions: TIME, DBV, OEF, RADIUS
     S0_ev(:,:,:,i1) = S_ev;

@@ -31,8 +31,8 @@ motional_narrowing
 #infpriors
 
 # Model Parameters
-SR=0.80
-beta=1.2
+SR=1
+beta=1
 
 # Scan Parameters
 TE=0.084
