@@ -14,7 +14,7 @@ clear;
 simdir = '../../Data/vesselsim_data/';
 
 % Which distribution we want - 'sharan' or 'frechet'
-distname = 'sharan';
+distname = 'lauwers';
 
 % Options
 plot_figure = 1;
@@ -64,10 +64,10 @@ for i1 = 1:nr
     vrad = RR(i1);
     
     % Load data
-%     load([simdir,'vs_arrays/vsArray',num2str(np),'_',distname,...
-%                  '_TE_',num2str(1000*TEv),'_R_',num2str(vrad),'.mat']);
     load([simdir,'vs_arrays/vsArray',num2str(np),'_',distname,...
-                 '_R_',num2str(vrad),'.mat']);
+                 '_TE_',num2str(1000*TEv),'_R_',num2str(vrad),'.mat']);
+%     load([simdir,'vs_arrays/vsArray',num2str(np),'_',distname,...
+%                  '_R_',num2str(vrad),'.mat']);
     % Fill matrix
     %       Dimensions: TIME, DBV, OEF, RADIUS
     S0_ev(:,:,:,i1) = S_ev;

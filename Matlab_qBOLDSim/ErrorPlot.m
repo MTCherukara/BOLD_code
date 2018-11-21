@@ -21,7 +21,7 @@ tic;
 %% User-Selected Inputs
 
 var_name = 'DBV';               % Variable to test - 'OEF', 'DBV', or 'DHB'
-vsd_name = 'sharan';            % Distribution to use - 'sharan' or 'frechet'
+vsd_name = 'sharan';            % Distribution to use - 'sharan', 'frechet', 'lauwers'
 mod_name = 'Asymp';             % Model to test - DON'T CHANGE
 
 TE = 0.036;                     % TE value to use - 36, 72, 84, 108
