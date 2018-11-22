@@ -2,7 +2,11 @@
 """This function takes an ASE nifti file and performs slice averaging,
 it's based on a C-shell script by Alan Stone.
 
-Matthew Cherukara, 2017, Oxford."""
+Matthew Cherukara, 2017, Oxford.
+
+CHANGELOG:
+
+2018-07-10 (MTC). Latest version."""
 
 # Imports
 import sys

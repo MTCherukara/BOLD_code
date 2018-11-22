@@ -31,5 +31,7 @@
         "type_traits": "cpp"
     },
     "editor.minimap.enabled": false,
-    "python.pythonPath": "/Users/mattcher/anaconda3/bin/python3"
+    "python.pythonPath": "/Users/mattcher/anaconda3/bin/python3",
+    "python.jediEnabled": false,
+    "python.linting.pylintEnabled": true
 }

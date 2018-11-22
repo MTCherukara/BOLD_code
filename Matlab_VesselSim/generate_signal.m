@@ -54,7 +54,7 @@ function [sigTOT, tau, sigEV, sigIV]=generate_signal(p,storedPhase,varargin)
             % FIRST ATTEMPT 
 %             Phase(k,:) = cumPhase(SEind(k),:) - ( cumPhase(TEind,:)  - cumPhase(SEind(k)+1,:) );
 
-            % SECOND ATTEMPT
+            % SECOND ATTEMPT - appears to be working?
             Phase(k,:) = cumPhase(SEind(k),:) - ( cumPhase(TEind,:)  - cumPhase(SEind(k),:) );
 
             % OLD VERSION - SLOW

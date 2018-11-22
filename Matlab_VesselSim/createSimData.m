@@ -60,8 +60,8 @@ DBVvals = linspace(0.01,0.07,np);
 % DBVvals = 0.05;
 
 % Decide on which radii to calculate
-rstart = 84;
-rend   = nr;
+rstart = 88;
+rend   = 88;
 
 
 %% Generate signals for each radius
@@ -124,7 +124,7 @@ for i1 = rstart:rend
     
     % Save out data for each radius
     sname = strcat(simdir,'vs_arrays/vsArray',num2str(np),'_',distname,...
-                   '_TE_',num2str(1000*TE),'_R_',num2str(vrad),'.mat');
+                   '_TE_',num2str(1000*TE),'_R_',num2str(vrad),'test.mat');
     save(sname,'S_ev','S_iv','tau','TE','OEFvals','DBVvals');
     
     % Timer
