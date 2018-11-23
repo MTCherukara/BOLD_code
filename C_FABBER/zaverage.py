@@ -140,5 +140,5 @@ if __name__ == "__main__":
     # Delete the directory
     print("Cleaning up...")
     remove_temp_dir(TEMPDIR)
-    print("...Done!")
+    print("...Done Slice Averaging!")
     
