@@ -1,0 +1,54 @@
+# fabber run 13 - AMICI stroke data (BIDS format)
+
+# Input Data
+data=/Users/mattcher/Documents/BIDS_Data/qbold_stroke/sourcedata/sub-104/ses-001/func-ase/ASE_FLAIR_mc_av.nii.gz
+mask=/Users/mattcher/Documents/BIDS_Data/qbold_stroke/sourcedata/sub-104/ses-001/func-ase/ASE_FLAIR_mask.nii.gz
+
+# Run Options
+output=../../Data/Fabber_Results/
+save-residuals
+save-model-fit
+print-free-energy
+
+# Method Information
+method=spatialvb
+noise=white
+max-iterations=10
+allow-bad-voxels
+
+# Inference Model 
+model=qboldR2p
+inferS0
+inferR2p
+inferDBV
+
+#single_compartment
+motional_narrowing
+
+#infpriors
+
+# Model Parameters
+#SR=0.542
+beta=1
+
+# Spatial VB Information (remove all of this if method!=spatialvb)
+param-spatial-priors=NNN
+#image-prior4=../../Data/subject_04/CSF_T1w.nii.gz
+
+# Scan Parameters
+TE=0.082
+TR=3.000
+TI=1.210
+
+tau1=-0.016
+tau2=-0.008
+tau3=0.000
+tau4=0.008
+tau5=0.016
+tau6=0.024
+tau7=0.032
+tau8=0.040
+tau9=0.048
+tau10=0.056
+tau11=0.064
+

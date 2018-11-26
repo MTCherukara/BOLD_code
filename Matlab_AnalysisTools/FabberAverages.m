@@ -6,55 +6,122 @@
     %
     % Changelog:
     %
-    % 3 July 2018 (MTC). Modularized to use MTC_LoadVol (which calls LoadSlice)
+    % 2018-11-26 (MTC). Removed the use of MTC_LoadVol.m (now this script just
+    %       calls LoadSlice.m directly, in order that it can be generalized to
+    %       using masks (etc) from a range of datasets.
+    %
+    % 2018-07-03 (MTC). Modularized to use MTC_LoadVol (which calls LoadSlice)
     %       to get rid of a bunch of repeated stuff here. Also changed the way
     %       the upper parameter threshold works, so that we now remove voxels
     %       whose values are too high, rather than setting them to an arbitrary
     %       value.
     %
-    % 12 March 2018 (MTC). Generalization, enabling selection of variables to
-    %       plot in a more generic and extensible way.
+    % 2018-03-12 (MTC). Generalization, enabling selection of variables to plot
+    %       in a more generic and extensible way.
+
+    
 
 clear; 
 clc;
 
+%% User To Select Fabber Data To Display
+
 % Choose Variables
 vars = {'R2p','DBV','OEF'};
 
-% Choose the slices we want
-% slicenum = 4:9;     % VS - instead of 3:10
-slicenum = 3:8;     % CSF + patient data
-% slicenum = 1:6;     % sub 11 FLAIR
-% slicenum = 5:10;    % sub 11 nonFLAIR
+% Choose Data set
+setnum = 675;
 
-% do Free energy?
+% Which set of subjects is this from?
+setname = 'AMICI';          % 'VS', 'gen', or 'AMICI'
+
+% do Free energy? - LEAVE THIS AS 0 FOR NOW!!
 do_FE = 0;
 
-% Choose Data set
-setnum = 670;
-subnum = 1;
 
-setnum = setnum + subnum - 1;
+%% Initial Stuff
 
-CSF_subs = containers.Map([ 1, 2, 3, 4, 5 ], ...
-                          [ 3, 4, 6, 8, 9 ]);       
-subnum = CSF_subs(subnum);     
+% Results directory
+resdir = '/Users/mattcher/Documents/DPhil/Data/Fabber_Results/';
+
+% Figure out the results directory we want to load from
+fdname = dir([resdir,'fabber_',num2str(setnum),'_*']);
+fabdir = strcat(resdir,fdname.name,'/');
+
+% Figure out subject and mask number, and such
+switch setname
+    
+    case 'VS'
+        
+        slicenum = 4:9;
+        maskname = 'mask_gm_60.nii.gz';
+        CC = strsplit(fabdir,'_vs');
+        subnum = CC{2}(1);
+        maskdir = ['/Users/mattcher/Documents/DPhil/Data/validation_sqbold/vs',subnum,'/'];
+       
+    case 'AMICI'
+        
+        slicenum = 3:8;
+        maskname = 'mask_GM.nii.gz';
+        CC = strsplit(fabdir,'_p');     % need a 3-digit subject number
+        subnum = CC{2}(1:3);            
+        C2 = strsplit(CC{2},'ses');     % also need a Session Number (1,5)
+        sesnum = C2{2}(1);
+        maskdir = ['/Users/mattcher/Documents/BIDS_Data/qbold_stroke/sourcedata/sub-',...
+                   subnum,'/ses-00',sesnum,'/func-ase/'];
+        
+    otherwise 
+        
+         slicenum = 1:6;     % new AMICI protocol FLAIR
+%          slicenum = 5:10;    % new AMICI protocol nonFLAIR
+        maskname = 'mask_FLAIR_GM.nii.gz';
+        subnum = '01';
+        maskdir = ['/Users/mattcher/Documents/DPhil/Data/subject_',subnum,'/'];
+        
+end
+
+% Threshold values
+threshes = containers.Map({'R2p', 'DBV', 'OEF', 'VC', 'DF', 'lambda', 'Ax' },...
+                          [ 30  ,   1  ,   1  ,  1  ,  15 ,   1     ,  30  ]);  
 
 % Title
-disp(['Data from Fabber Set ',num2str(setnum),'. Subject ',num2str(subnum)]);
+disp(['Data from Fabber Set ',num2str(setnum),'. ',setname, ' Subject ',num2str(subnum)]);
+
+
+%% Loop Through Variables, Displaying Averages:
 
 for vv = 1:length(vars)
     
     % Identify Variable
     vname = vars{vv};
     
-    % Load the Data and do all the masking and thresholding
-    [volData, volStdv] = MTC_LoadVol(setnum,subnum,vname,slicenum);
+    % Pull out threshold value
+    thrsh = threshes(vname); 
+        
+    % Load the data
+    volData = LoadSlice([fabdir,'mean_',vname,'.nii.gz'],slicenum);
+    stdData = LoadSlice([fabdir,'std_' ,vname,'.nii.gz'],slicenum);
+    
+    % Load the mask
+    mskData = LoadSlice([maskdir,maskname],slicenum);
+    
+    % Apply Mask and Threshold
+    volData = abs(volData(:).*mskData(:));
+    stdData = abs(stdData(:).*mskData(:));
+    
+    % Create a mask of values to remove
+    badData = (volData == 0) + ~isfinite(volData) + (volData > thrsh);
+    badData = badData + ~isfinite(stdData) + (stdData > thrsh) + (stdData < (thrsh.*1e-3));
+    
+    % Remove bad values
+    volData(badData ~= 0) = [];
+    stdData(badData ~= 0) = [];
+    
    
     % convert certain params to percentages
     if strcmp(vname,'DBV') || strcmp(vname,'OEF') || strcmp(vname,'VC') || strcmp(vname,'lambda')
         volData = volData.*100;
-        volStdv = volStdv.*100;
+        stdData = stdData.*100;
     end
     
     % calculate IQR
@@ -68,7 +135,7 @@ for vv = 1:length(vars)
     
     disp('   ');
     disp(['Mean ',vname,'   : ',num2str(mean(volData),4)]);
-    disp(['    Std ',vname,': ',num2str(mean(volStdv),4)]);
+    disp(['    Std ',vname,': ',num2str(mean(stdData),4)]);
 %     disp(['    Std ',vname,': ',num2str(std(volData),4)]);
 
 end

@@ -20,21 +20,21 @@ tic;
 
 %% User-Selected Inputs
 
-var_name = 'OEF';               % Variable to test - 'OEF', 'DBV', or 'DHB'
-vsd_name = 'lauwers';            % Distribution to use - 'sharan', 'frechet', 'lauwers'
+var_name = 'DBV';               % Variable to test - 'OEF', 'DBV', or 'DHB'
+vsd_name = 'sharan';            % Distribution to use - 'sharan', 'frechet', 'lauwers'
 mod_name = 'Asymp';             % Model to test - DON'T CHANGE
 
-TE = 0.072;                     % TE value to use - 36, 72, 84, 108
-cTaus = (-28:4:64)./1000;       % Tau values to use - DON'T CHANGE
-% cTaus = (-12:4:32)./1000;      % For TE = 36ms
+TE = 0.036;                     % TE value to use - 36, 72, 84, 108
+% cTaus = (-28:4:64)./1000;       % Tau values to use - DON'T CHANGE
+cTaus = (-12:4:32)./1000;      % For TE = 36ms
 
-% kappa = 1;                    % Scalar correction to R2'
+kappa = 1;                    % Scalar correction to R2'
 % kappa = 28.5*(TE.^2) + 0.54; 
-kappa = 0.77 - (2.78*TE);
+% kappa = 0.77 - (2.78*TE);
 beta = 1;                     % Scalar power of [dHb]
 
-plot_est = 1;                   % Plot options
-plot_tru = 1;
+plot_est = 0;                   % Plot options
+plot_tru = 0;
 plot_err = 0;
 plot_rel = 1;
 

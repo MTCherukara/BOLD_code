@@ -4,8 +4,7 @@ function [volData,volStd] = MTC_LoadVol(fabberset,subnum,varname,slices)
     %       [volData,volStd] = MTC_LoadVol(fabberset,subnum,varname)
     %
     % Loads data from a specific volume of FABBER results designated by
-    % FABBERSET and VARNAME, and applies a subject-specific grey-matter mask
-    % based no SUBNUM. Returns the volume data as a vector VOLDATA and its
+    % FABBERSET and VARNAME. Returns the volume data as a vector VOLDATA and its
     % standard devations (calculated by FABBER) as VOLSTD. Requires the function
     % LoadSlice.m in order to work. 
     %
@@ -18,6 +17,10 @@ function [volData,volStd] = MTC_LoadVol(fabberset,subnum,varname,slices)
     % Created by MT Cherukara, 2 July 2018
     %
     % CHANGELOG:
+    %
+    % 26-11-2018 (MTC). This function is now obsolete. The FabberAverages.m
+    %       script, which calls LoadSlice.m, now contains everything that this
+    %       function does, but in a more generalizable way.
     
 % hardcoded parameters
 if ~exist('slices','var')
