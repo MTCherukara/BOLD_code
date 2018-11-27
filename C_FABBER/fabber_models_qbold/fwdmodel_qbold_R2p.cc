@@ -270,7 +270,7 @@ void R2primeFwdModel::HardcodedInitialDists(MVNDist &prior, MVNDist &posterior) 
         }
         else
         {
-            precisions(DBV_index(), DBV_index()) = 1e0; // 1e0
+            precisions(DBV_index(), DBV_index()) = 1e1; // 1e0
         }
     }
 
@@ -307,7 +307,7 @@ void R2primeFwdModel::HardcodedInitialDists(MVNDist &prior, MVNDist &posterior) 
     if (infer_lam)
     {
         prior.means(lam_index()) = 0.1;
-        precisions(lam_index(), lam_index()) = 1e2; // 1e1
+        precisions(lam_index(), lam_index()) = 1e0; // 1e1
     }
 
     if (infer_Ax)
@@ -373,7 +373,7 @@ void R2primeFwdModel::HardcodedInitialDists(MVNDist &prior, MVNDist &posterior) 
     if (infer_lam)
     {
         posterior.means(lam_index()) = 0.1;
-        precisions(lam_index(), lam_index()) = 1e2; // 1e1
+        precisions(lam_index(), lam_index()) = 1e0; // 1e1
     } 
 
     if (infer_Ax)
@@ -508,9 +508,9 @@ void R2primeFwdModel::Evaluate(const ColumnVector &params, ColumnVector &result)
     else if (infer_R2p)
     {
         R2p = abs(paramcpy(R2p_index()));
-        if (DBV < 0.001)
+        if (DBV < 0.0001)
         {
-            DBV = 0.001;
+            DBV = 0.0001;
         }
         OEF = pow(R2p/(887.4082*DBV),1/beta)/Hct;
         if (OEF < 0.01)

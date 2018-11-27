@@ -30,10 +30,10 @@ clc;
 vars = {'R2p','DBV','OEF'};
 
 % Choose Data set
-setnum = 675;
+setnum = 685;
 
 % Which set of subjects is this from?
-setname = 'AMICI';          % 'VS', 'gen', or 'AMICI'
+setname = 'genNF';          % 'VS', 'genF', 'genNF', or 'AMICI'
 
 % do Free energy? - LEAVE THIS AS 0 FOR NOW!!
 do_FE = 0;
@@ -69,13 +69,21 @@ switch setname
         sesnum = C2{2}(1);
         maskdir = ['/Users/mattcher/Documents/BIDS_Data/qbold_stroke/sourcedata/sub-',...
                    subnum,'/ses-00',sesnum,'/func-ase/'];
+               
+    case 'genF'
+        
+        slicenum = 1:6;     % new AMICI protocol FLAIR
+        maskname = 'mask_gm_96_FLAIR.nii.gz';
+        CC = strsplit(fabdir,'_s');     % need a 2-digit subject number
+        subnum = CC{2}(1:2);
+        maskdir = ['/Users/mattcher/Documents/DPhil/Data/subject_',subnum,'/'];
         
     otherwise 
         
-         slicenum = 1:6;     % new AMICI protocol FLAIR
-%          slicenum = 5:10;    % new AMICI protocol nonFLAIR
-        maskname = 'mask_FLAIR_GM.nii.gz';
-        subnum = '01';
+        slicenum = 5:10;    % new AMICI protocol nonFLAIR
+        maskname = 'mask_gm_96_nonFLAIR.nii.gz';
+        CC = strsplit(fabdir,'_s');     % need a 2-digit subject number
+        subnum = CC{2}(1:2);
         maskdir = ['/Users/mattcher/Documents/DPhil/Data/subject_',subnum,'/'];
         
 end
@@ -86,6 +94,9 @@ threshes = containers.Map({'R2p', 'DBV', 'OEF', 'VC', 'DF', 'lambda', 'Ax' },...
 
 % Title
 disp(['Data from Fabber Set ',num2str(setnum),'. ',setname, ' Subject ',num2str(subnum)]);
+
+% Load mask data
+mskData = LoadSlice([maskdir,maskname],slicenum);
 
 
 %% Loop Through Variables, Displaying Averages:
@@ -102,8 +113,7 @@ for vv = 1:length(vars)
     volData = LoadSlice([fabdir,'mean_',vname,'.nii.gz'],slicenum);
     stdData = LoadSlice([fabdir,'std_' ,vname,'.nii.gz'],slicenum);
     
-    % Load the mask
-    mskData = LoadSlice([maskdir,maskname],slicenum);
+    
     
     % Apply Mask and Threshold
     volData = abs(volData(:).*mskData(:));
