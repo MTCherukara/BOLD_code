@@ -113,13 +113,13 @@ def do_brainextract(dirname, filename, outdir="0", outname="Anat_Brain", f=0.5):
     print("     Performing brain extraction...")
     if outdir == "0":
         outdir = dirname
-    subprocess.check_call(["bet", (dirname + filename), (outdir + outname), "-f", str(f)])
+    #subprocess.check_call(["bet", (dirname + filename), (outdir + outname), "-f", str(f)])
     return outname
 
 def do_fastsegment(dirname, filename):
     """Use FAST to segment the T1w anatomical into 3 compartments"""
     print("     Segmenting the brain...")
-    subprocess.check_call(["fast", (dirname + filename), "-o", (dirname + filename)])
+    #subprocess.check_call(["fast", (dirname + filename), "-o", (dirname + filename)])
 
 def do_registration(ase_dir, ase_file, anat_dir, anat_file, brain_dir, brain_file, outname="ASE_high"):
     """Use EPI_REG (part of FLIRT) to register the ASE data to the anatomical"""
@@ -159,7 +159,7 @@ if __name__ == "__main__":
     CURR_FILE = do_zaveraging(FILE_DIR, CURR_FILE)
 
     # Motion correction using MCFLIRT - ideally referrenced to the spin echo volume
-    CURR_FILE = do_mocorr(FILE_DIR, CURR_FILE)
+    CURR_FILE = do_mocorr(FILE_DIR, CURR_FILE, SEvol=3)
 
     # Subvoxel smoothing, based on the image voxel size
     CURR_FILE = do_smoothing(FILE_DIR, CURR_FILE) 

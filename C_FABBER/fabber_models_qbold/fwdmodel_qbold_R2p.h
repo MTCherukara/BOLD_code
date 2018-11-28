@@ -114,6 +114,7 @@ protected:
     bool single_comp;
     bool motion_narr;
     bool inf_priors;
+    bool inf_lam;
 
 private:
     static FactoryRegistration<FwdModelFactory, R2primeFwdModel> registration;

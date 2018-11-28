@@ -61,6 +61,7 @@ void R2primeFwdModel::Initialize(ArgsType &args)
     single_comp = args.ReadBool("single_compartment");
     motion_narr = args.ReadBool("motional_narrowing");
     inf_priors  = args.ReadBool("infpriors");
+    inf_lam     = args.ReadBool("inflam");
 
     // since we can't do both, OEF will take precidence over R2p
     if (infer_OEF)
@@ -253,11 +254,11 @@ void R2primeFwdModel::HardcodedInitialDists(MVNDist &prior, MVNDist &posterior) 
         prior.means(R2p_index()) = 2.6;
         if (inf_priors)
         {
-            precisions(R2p_index(), R2p_index()) = 1e-2; // 1e-1
+            precisions(R2p_index(), R2p_index()) = 1e-1; // 1e-1
         }
         else
         {
-            precisions(R2p_index(), R2p_index()) = 1e-3; // 1e-2
+            precisions(R2p_index(), R2p_index()) = 1e-2; // 1e-2
         }
     }
 
@@ -306,8 +307,15 @@ void R2primeFwdModel::HardcodedInitialDists(MVNDist &prior, MVNDist &posterior) 
 
     if (infer_lam)
     {
-        prior.means(lam_index()) = 0.1;
-        precisions(lam_index(), lam_index()) = 1e0; // 1e1
+        prior.means(lam_index()) = 0.05;
+        if (inf_lam)
+        {
+            precisions(lam_index(), lam_index()) = 1e3; // 1e3
+        }
+        else
+        {
+            precisions(lam_index(), lam_index()) = 1e-1; // 1e-1
+        }
     }
 
     if (infer_Ax)
@@ -373,7 +381,7 @@ void R2primeFwdModel::HardcodedInitialDists(MVNDist &prior, MVNDist &posterior) 
     if (infer_lam)
     {
         posterior.means(lam_index()) = 0.1;
-        precisions(lam_index(), lam_index()) = 1e0; // 1e1
+        precisions(lam_index(), lam_index()) = 1e-1; // 1e1
     } 
 
     if (infer_Ax)
@@ -471,7 +479,7 @@ void R2primeFwdModel::Evaluate(const ColumnVector &params, ColumnVector &result)
     }
     else
     {
-        R2e = 4.0;
+        R2e = 1.0;
     }
     if (infer_dF)
     {
@@ -508,15 +516,15 @@ void R2primeFwdModel::Evaluate(const ColumnVector &params, ColumnVector &result)
     else if (infer_R2p)
     {
         R2p = abs(paramcpy(R2p_index()));
-        if (DBV < 0.0001)
+        /*if (DBV < 0.0001)
         {
             DBV = 0.0001;
-        }
+        }*/
         OEF = pow(R2p/(887.4082*DBV),1/beta)/Hct;
-        if (OEF < 0.01)
+        /*if (OEF < 0.01)
         {
             OEF = 0.01;
-        }
+        }*/
         dw = 887.4082*pow(Hct*OEF,beta);
 
         // SRb = 6.263*(1-exp(-3.477*OEF));
@@ -525,13 +533,14 @@ void R2primeFwdModel::Evaluate(const ColumnVector &params, ColumnVector &result)
         // SR2p = 0.96 - (0.38*OEF);
         // SR2p = 0.77 - 2.78*TEvals(1);
 
-
+        /*
         if (SR2p < 0.01)
         {
             SR2p = 0.01;
-        }
-        SR2p = SR;
+        } */ 
 
+        SR2p = SR;
+       
         R2p = dw*DBV*SR2p;
 
     }

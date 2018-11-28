@@ -30,7 +30,7 @@ clc;
 vars = {'R2p','DBV','OEF'};
 
 % Choose Data set
-setnum = 685;
+setnum = 699;
 
 % Which set of subjects is this from?
 setname = 'genNF';          % 'VS', 'genF', 'genNF', or 'AMICI'
@@ -73,7 +73,7 @@ switch setname
     case 'genF'
         
         slicenum = 1:6;     % new AMICI protocol FLAIR
-        maskname = 'mask_gm_96_FLAIR.nii.gz';
+        maskname = 'mask_gm_80_FLAIR.nii.gz';
         CC = strsplit(fabdir,'_s');     % need a 2-digit subject number
         subnum = CC{2}(1:2);
         maskdir = ['/Users/mattcher/Documents/DPhil/Data/subject_',subnum,'/'];
@@ -81,7 +81,7 @@ switch setname
     otherwise 
         
         slicenum = 5:10;    % new AMICI protocol nonFLAIR
-        maskname = 'mask_gm_96_nonFLAIR.nii.gz';
+        maskname = 'mask_gm_80_nonFLAIR.nii.gz';
         CC = strsplit(fabdir,'_s');     % need a 2-digit subject number
         subnum = CC{2}(1:2);
         maskdir = ['/Users/mattcher/Documents/DPhil/Data/subject_',subnum,'/'];
