@@ -258,7 +258,7 @@ void R2primeFwdModel::HardcodedInitialDists(MVNDist &prior, MVNDist &posterior) 
         }
         else
         {
-            precisions(R2p_index(), R2p_index()) = 1e-2; // 1e-2
+            precisions(R2p_index(), R2p_index()) = 1e-3; // 1e-2
         }
     }
 
@@ -271,7 +271,7 @@ void R2primeFwdModel::HardcodedInitialDists(MVNDist &prior, MVNDist &posterior) 
         }
         else
         {
-            precisions(DBV_index(), DBV_index()) = 1e1; // 1e0
+            precisions(DBV_index(), DBV_index()) = 1e0; // 1e0
         }
     }
 
@@ -284,7 +284,7 @@ void R2primeFwdModel::HardcodedInitialDists(MVNDist &prior, MVNDist &posterior) 
     if (infer_S0)
     {
         prior.means(S0_index()) = 500.0;
-        precisions(S0_index(), S0_index()) = 1e-5; // 1e-5 - always imprecise
+        precisions(S0_index(), S0_index()) = 1e-6; // 1e-5 - always imprecise
     }
 
     if (infer_Hct)
@@ -345,7 +345,7 @@ void R2primeFwdModel::HardcodedInitialDists(MVNDist &prior, MVNDist &posterior) 
     if (infer_DBV)
     {
         posterior.means(DBV_index()) = 0.036;
-        precisions(DBV_index(), DBV_index()) = 1e3; 
+        precisions(DBV_index(), DBV_index()) = 1e0; 
     }
 
     if (infer_R2t)

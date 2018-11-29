@@ -1,12 +1,17 @@
 #!/usr/bin/env python3
 """This function will perform all of the FSL-related pre-processing steps on an input NIFTI file
-containing qBOLD ASE data. It's based on some shell scripts by Alan Stone.
+containing qBOLD ASE data. It's based on some shell scripts by Alan Stone. Currently, certain lines
+ought to be commented out if running repeated analyses on the same subject (e.g., it is not
+necessary to brain-extract and segment the anatomcial image each time). Eventually, we should work
+in something that will automatically check whether these have been done, and skip them.
 
 Matthew Cherukara, 2018, Oxford.
 
 CHANGELOG: 
 
-2018-11-23 (MTC). Original version."""
+2018-11-23 (MTC). Original version. Processes ASE data (slice average, motion correction, sub-
+            voxel smoothing) and anatomical imaging (brain extraction, segmentation, registration
+            to ASE space)."""
 
 # Imports
 import sys
@@ -60,7 +65,7 @@ def apply_transform(dirname, inname, refname, txname, outname="PVE_GM"):
                            "--super", "--superlevel=4", "--interp=trilinear"])
     return outname
 
-def apply_threshold(dirname, filename, threshold=0.5, outname="mask_GM"):
+def apply_threshold(dirname, filename, threshold=0.5, outname="mask_gm"):
     """Apply a binary threshold to a file"""
     subprocess.check_call(["fslmaths", (dirname + filename), "-thr", str(threshold), \
                            "-sub", str(1), "-uthr", str(threshold-1), "-add", str(1), \
@@ -128,14 +133,14 @@ def do_registration(ase_dir, ase_file, anat_dir, anat_file, brain_dir, brain_fil
                            ("--t1brain=" + brain_dir + brain_file), ("--out=" + ase_dir + outname)])
     return outname
 
-def do_flirtreg(dirname, filename, refname, outname="ASE_high", txname="ASE_low_tx.mat"):
-    """Use FLIRT to register the ASE data to the anatomical"""
+def do_flirtreg(dirname, filename, refname, tx_h2l="tx_high_to_low.mat", tx_l2h="tx_low_to_high.mat"):
+    """Use FLIRT to register the ASE data to the anatomical. This now outputs the transformation
+    matrices from high to low resolution and vice versa, as these are what we actually want."""
     print("     Registering ASE data to anatomical space...")
     subprocess.check_call(["flirt", "-in", (dirname + filename), "-ref", (dirname + refname), \
-                           "-out", (dirname + outname), "-omat", (dirname + outname + "_tx.mat")])
-    subprocess.check_call(["convert_xfm", "-omat", (dirname + txname), "-inverse", \
-                           (dirname + outname + "_tx.mat")])
-    return outname, txname
+                           "-out", (dirname + filename + "_txed"), "-omat", (dirname + tx_l2h)])
+    subprocess.check_call(["convert_xfm", "-omat", (dirname + tx_h2l) , "-inverse", (dirname + tx_l2h) ]) 
+    return tx_h2l, tx_l2h
 
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -186,11 +191,11 @@ if __name__ == "__main__":
         do_fastsegment(FILE_DIR, BRAIN_FILE)
 
         # generate an ANAT-to-ASE transformation matrix using FLIRT
-        TX_ASE,TX_LOW_MAT = do_flirtreg(FILE_DIR, SE_FILE, BRAIN_FILE)
+        TX_H2L,TX_L2H = do_flirtreg(FILE_DIR, SE_FILE, BRAIN_FILE)
 
         # transform the grey-matter PVE map from ANAT to ASE space
         print("     Creating a grey-matter mask...")
-        GM_MAP = apply_transform(FILE_DIR, (BRAIN_FILE + "_pve_1"), SE_FILE, TX_LOW_MAT)
+        GM_MAP = apply_transform(FILE_DIR, (BRAIN_FILE + "_pve_1"), SE_FILE, TX_H2L)
 
         # threshold the GM PVE map
         GM_MASK = apply_threshold(FILE_DIR, GM_MAP)
