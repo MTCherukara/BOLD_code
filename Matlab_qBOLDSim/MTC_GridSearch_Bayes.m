@@ -50,21 +50,51 @@ clear;
 
 % Options
 plot_fig = 1;
+save_data = 0;
+
+% Add noise?
+SNR = 50;              % For no noise: SNR = inf;
+
+% For looping over multiple datasets:
+OEFs = 20:20:80;
+DBVs = 1:2:9;
+[gOEF,gDBV] = meshgrid(OEFs,DBVs);
+
+% Parameters
+% pnames = { 'R2p'    ; 'zeta'     };
+% interv = [ 0.01, 26 ; 0.005, 0.115 ];
+% np     = [ 1000     ; 1000       ];
+
+pnames = { 'OEF'    ; 'zeta'     };
+interv = [ 0.1, 0.9 ; 0.005, 0.115 ];
+np     = [ 1000     ; 1000       ];
+
+% pnames = { 'OEF'    ; 'zeta'     };
+% interv = [ 0, 0.1 ; 0.01, 0.05 ];
+% np     = [  1000     ; 1000        ];
+
+% pnames = { 'dhb'    ; 'zeta'     };
+% interv = [ 0.8, 2.4   ; 0.01, 0.07 ];
+% np     = [ 100     ; 100       ];
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%    Initialization          %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-nj = 1;
+nj = length(OEFs)*length(DBVs);
 maxes = zeros(2,nj);
-for jj = 1:nj
+for jj = 1:5%:nj
 
     tic;
     
-    load('ASE_Data/Data_180921_40_3_SNR_100.mat');
-
-%     % Load the Data:
-%     load(['ASE_Data/Data_180726_40_4_SNR_100_',num2str(jj),'.mat']);
+    % Load the Data: 
+    load('ASE_Data/Data_181204_40_3_1C.mat');
+    
+    
+%     vOEF = num2str(gOEF(jj));     % only useful when looping over things
+%     vDBV = num2str(gDBV(jj));
+%
+%     load(['ASE_Data/Data_181204_',vOEF,'_',vDBV,'_SNR_50.mat']);
 %     disp(['Analysing Dataset ',num2str(jj), ' of ',num2str(nj)]);
 % 
 %     % Choose which tau values we want
@@ -78,31 +108,26 @@ for jj = 1:nj
 %     S_sample  = S_sample(samps);
 
 
-    % Choose parameters, their range, and the number of points each way:
-%     pnames = { 'R2p'    ; 'zeta'     };
-%     interv = [ 2.5, 6.5 ; 0.01, 0.07 ];
-%     np     = [ 100     ; 100       ];
+    ns = length(S_sample); % number of data points
+    if ~exist('S_total','var')
+        S_total = S_sample;
+    end
     
-%     pnames = { 'OEF'    ; 'zeta'     };
-%     interv = [ 0.2, 0.6 ; 0.01, 0.07 ];
-%     np     = [ 1000     ; 1000       ];
-%     interv = [ 0, 0.1 ; 0.01, 0.05 ];
-%     np     = [  1000     ; 1000        ];
+    % Add Random Gaussian Noise
+    sigma = mean(S_total)./SNR;
+    S_total = S_total + sigma.*randn(1,ns);
+    S_sample = S_total ./ max(S_total);
 
-    pnames = { 'dhb'    ; 'zeta'     };
-    interv = [ 0.8, 2.4   ; 0.01, 0.07 ];
-    np     = [ 100     ; 100       ];
 
     % Specifically for testing critical tau. 
     params.tc_man = 0;
     params.tc_val = 0.024;
     
     % Model selection
-    params.asymp = 0;  % should the asymptotic tissue model be used?
+    params.model = 'Asymp';  % should the asymptotic tissue model be used?
+    params.incIV = 0;
 
     % extract relevant parameters
-    sigma = mean(params.sig);   % real std of noise
-    ns = length(S_sample); % number of data points
     params.R2p = params.dw.*params.zeta;
 
     % fill in TE if necessary
@@ -113,9 +138,9 @@ for jj = 1:nj
 
     % are we inferring on R2'?
     if any(strcmp(pnames,'R2p'))
-        params.calcDW = 0; % this changes what happens in MTC_qASE_model.m
+        params.contr = 'R2p';
     else
-        params.calcDW = 1;
+        params.contr = 'OEF';
     end
 
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -195,6 +220,7 @@ for jj = 1:nj
         % Plot 2D grid search results
         surf(pv2,pv1,exp(pos));
         view(2); shading flat;
+        axis square;
         c=colorbar;
         colormap(flipud(magma));
         plot3([trv(2),trv(2)],[  0, 1000],[1e40,1e40],'k-');
@@ -205,9 +231,27 @@ for jj = 1:nj
         plot3([pv2(end),pv2(end)],[pv1(  1),pv1(end)],[1,1],'k-','LineWidth',0.75);
         plot3([pv2(  1),pv2(end)],[pv1(  1),pv1(  1)],[1,1],'k-','LineWidth',0.75);
         plot3([pv2(  1),pv2(end)],[pv1(end),pv1(end)],[1,1],'k-','LineWidth',0.75);
-
-        xlabel(pn2);
-        ylabel(pn1);
+        
+        % x axis - DBV
+        if strcmp(pn2,'zeta')
+            xticks(0.01:0.02:0.11);
+            xticklabels({'1','3','5','7','9','11'});
+            xlabel('DBV (%)');
+        else
+            xlabel(pn2);
+        end
+        
+        % y axis - OEF
+        if strcmp(pn1,'OEF')
+            yticks(0.2:0.2:0.8);
+            yticklabels({'20','40','60','80'});
+            ylabel('OEF (%)');
+        elseif strcmp(pn1,'R2p')
+            ylabel('R_2'' (s^-^1)');
+        else
+            ylabel(pn1);
+        end
+        
         ylabel(c,'Posterior Probability Density');
         axis([min(pv2),max(pv2),min(pv1),max(pv1)]);
         set(gca,'YDir','normal');
@@ -233,8 +277,16 @@ for jj = 1:nj
     %     ', DBV = ',num2str(100*params.zeta)]);
     % disp(['  Maximum ',pnames{1},': ',num2str(V1G(mi),4)]);
     % disp(['  Maximum ',pnames{2},': ',num2str(100*V2G(mi),4)]);
-
-end
+    
+    
+    %% Save Data
+    if save_data
+        sddir = '../../Data/GridSearches/';
+        sdname = strcat('TEST_GridSearch_OEF_',vOEF,'_DBV_',vDBV,'.mat');
+        save([sddir,sdname],'params','pos','pv1','pv2','S_sample','T_sample','TE_sample');
+    end
+    
+end % for jj = 1:nj
 
 % save('GridMaxima_1.mat','taus','maxes','params');
 

@@ -16,7 +16,7 @@ function [S,PARAMS] = qASE_model(TAU,TE,PARAMS)
     % Output: S      - A vector of signal values of same size as T.
     %         PARAMS - [OPTIONAL] The modified parameter structure.
     %
-    % For use in qASE.m, MTC_GridSearch_Bayes.m, etc. ses the method described
+    % For use in qASE.m, MTC_GridSearch_Bayes.m, etc. uses the method described
     % by Yablonskiy & Haacke (1994), and He & Yablonskiy (2007), with additional
     % components as described by Berman & Pike (2017) and Simon et al. (2016)
     %
