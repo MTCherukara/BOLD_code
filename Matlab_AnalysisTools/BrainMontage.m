@@ -17,6 +17,7 @@
 clear;
 setFigureDefaults;
 
+slices = 1;
 
 % SQ-LS    SQ-VB   1C-VBS  1C-VBTC 1C-VBI  1C-VB-TCI  2C-VB   2C-VBI  2C-VB-TC  2C-VB-TCI
 % '101'  , '250' , '330' , '264' , '257' , '316'    , '201' , '236' , '281'   , '309' ;...   % subject vs1
@@ -39,16 +40,16 @@ end
 ns = length(slices); % number of slices
 
 % Set threshold based on the type of variable we're looking at
-% if ~exist('threshold','var')
+if ~exist('threshold','var')
 
     if strfind(lower(niname),'dbv')
-        threshold = 0.15;
+        threshold = 0.2;
         cmp = magma;
     elseif strfind(lower(niname),'r2p')
         threshold = 15;
         cmp = viridis;
     elseif strfind(lower(niname),'oef')
-        threshold = 0.8;
+        threshold = 1.0;
         cmp = parula;
     elseif strfind(lower(niname),'df')
         threshold = 15;
@@ -58,7 +59,7 @@ ns = length(slices); % number of slices
         cmp = gray;
     end
 
-% end
+end
 
 
 %% LOAD AND THRESHOLD DATA
@@ -83,8 +84,11 @@ voldata(voldata > threshold) = threshold;
 % remove some of the empty voxels from around the sides, so that the brains are
 % closer together in the montage
 
-sh_sds = 12;        % sides
-sh_top = 5;         % top and bottom
+% sh_sds = 12;        % sides
+% sh_top = 5;         % top and bottom
+
+sh_sds = 0;
+sh_top = 0;
 
 voldata = voldata(1+sh_sds:end-sh_sds,1+sh_top:end-sh_top,:);
 

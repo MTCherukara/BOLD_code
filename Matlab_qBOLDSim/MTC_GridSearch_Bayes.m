@@ -12,6 +12,10 @@
 %
 % CHANGELOG:
 %
+% 2018-12-04 (MTC). Added functionality to loop over the same dataset, adding
+%       noise and recalculating multiple times. And added stuff for saving out
+%       the results more comprehensively.
+%
 % 2018-07-16 (MTC). Parallelized using parfor, on a 6-core i5, this achieves a
 %       greater than four-fold speed-up. On a dual-core i5 (MacBook Pro), this
 %       is roughly a 50% speed-up. Functionality for 1D and ND grid search has
