@@ -37,7 +37,7 @@ params.incIV  = 0;          % BOOL      - should blood compartment be included?
 params.TE     = TE;         % s         - Echo time
 
 % noise
-SNR = 50;
+SNR = 100;
 
 %% Loop over values, computing the model
 

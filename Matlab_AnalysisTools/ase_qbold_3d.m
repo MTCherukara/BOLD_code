@@ -5,8 +5,8 @@ function [r2p, dbv, oef, dhb] = ase_qbold_3d(nii_name)
 % set end_tau [ms] ... value of tau for last volume
 % nii_out ... output nifti's and save figs? 1=Yes,0=No 
 
-start_tau = -28;
-delta_tau = 4;
+start_tau = -16;
+delta_tau = 8;
 end_tau = 64;
 
 if ~exist('nii_name','var')
