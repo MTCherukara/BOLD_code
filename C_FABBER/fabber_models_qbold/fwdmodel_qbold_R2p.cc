@@ -264,7 +264,7 @@ void R2primeFwdModel::HardcodedInitialDists(MVNDist &prior, MVNDist &posterior) 
 
     if (infer_DBV)
     {
-        prior.means(DBV_index()) = 0.036;
+        prior.means(DBV_index()) = 0.036; // 0.036
         if (inf_priors)
         {
             precisions(DBV_index(), DBV_index()) = 1e2; // 1e3
@@ -451,7 +451,7 @@ void R2primeFwdModel::Evaluate(const ColumnVector &params, ColumnVector &result)
     }
     if (infer_R2t)
     {
-        R2t = abs(paramcpy(R2t_index()));
+        R2t = (paramcpy(R2t_index()));
     }
     else
     {
@@ -467,7 +467,7 @@ void R2primeFwdModel::Evaluate(const ColumnVector &params, ColumnVector &result)
     }
     if (infer_Hct)
     {
-        Hct = abs(paramcpy(Hct_index()));
+        Hct = (paramcpy(Hct_index()));
     }
     else
     {
@@ -475,7 +475,7 @@ void R2primeFwdModel::Evaluate(const ColumnVector &params, ColumnVector &result)
     }
     if (infer_R2e)
     {
-        R2e = abs(paramcpy(R2e_index()));
+        R2e = (paramcpy(R2e_index()));
     }
     else
     {
@@ -483,7 +483,7 @@ void R2primeFwdModel::Evaluate(const ColumnVector &params, ColumnVector &result)
     }
     if (infer_dF)
     {
-        dF = abs(paramcpy(dF_index()));
+        dF = (paramcpy(dF_index()));
     }
     else
     {
@@ -491,7 +491,7 @@ void R2primeFwdModel::Evaluate(const ColumnVector &params, ColumnVector &result)
     }
     if (infer_lam)
     {
-        lam = abs(paramcpy(lam_index()));
+        lam = (paramcpy(lam_index()));
     }
     else
     {
@@ -499,7 +499,7 @@ void R2primeFwdModel::Evaluate(const ColumnVector &params, ColumnVector &result)
     }
     if (infer_Ax)
     {
-        Ax = abs(paramcpy(Ax_index()));
+        Ax = (paramcpy(Ax_index()));
     }
     else
     {
@@ -515,7 +515,7 @@ void R2primeFwdModel::Evaluate(const ColumnVector &params, ColumnVector &result)
     }
     else if (infer_R2p)
     {
-        R2p = abs(paramcpy(R2p_index()));
+        R2p = (paramcpy(R2p_index()));
         /*if (DBV < 0.0001)
         {
             DBV = 0.0001;

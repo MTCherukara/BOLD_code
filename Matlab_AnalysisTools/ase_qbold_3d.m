@@ -1,9 +1,11 @@
-function [r2p, dbv, oef, dhb] = ase_qbold_3d(nii_name)
+% function [r2p, dbv, oef, dhb] = ase_qbold_3d(nii_name)
 % nii_name: Z-averaged ASE dataset
 % start_tau [ms] value of tau for first volume
 % delta_tau [ms] tau step size
 % set end_tau [ms] ... value of tau for last volume
 % nii_out ... output nifti's and save figs? 1=Yes,0=No 
+
+clear;
 
 start_tau = -16;
 delta_tau = 8;
@@ -103,4 +105,4 @@ dhb = r2p./(dbv.*gamma.*(4./3).*pi.*dChi0.*B0.*k);
    
 
 end
-end
+% end

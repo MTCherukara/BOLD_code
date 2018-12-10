@@ -33,11 +33,11 @@ params.model  = 'Full';     % STRING    - model type: 'Full','Asymp','Phenom','K
 params.contr  = 'OEF';      % STRING    - contrast source: 'OEF','R2p','dHb',...
 params.incT1  = 1;          % BOOL      - should T1 differences be considered?
 params.incT2  = 1;          % BOOL      - should T2 differences be considered?
-params.incIV  = 0;          % BOOL      - should blood compartment be included?
+params.incIV  = 1;          % BOOL      - should blood compartment be included?
 params.TE     = TE;         % s         - Echo time
 
-% noise
-SNR = 100;
+% noise 
+SNR = 500;
 
 %% Loop over values, computing the model
 
@@ -81,7 +81,7 @@ end % OEF loop
 
 
 %% Save out data
-dname = strcat('ASE_Grid_',num2str(no),'x',num2str(nv),'_SNR_',num2str(SNR));
+dname = strcat('ASE_Grid_2C_',num2str(no),'x',num2str(nv),'_SNR_',num2str(SNR));
 save([dname,'.mat'],'ase_data','ase_model','tau','TE','params','OEFvals','DBVvals');
 save_avw(100.*ase_data,[dname,'.nii.gz'],'d',[1,1,1,3]);
 % save_avw(OEF_grid,[dname,'_OEF.nii.gz'],'d',[1,1,1,3]);

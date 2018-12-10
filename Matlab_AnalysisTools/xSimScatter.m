@@ -9,15 +9,20 @@ clear;
 close all;
 setFigureDefaults;
 
+clc;
+
 % Choose variables
 vars = {'OEF','DBV'};
 
 % Do we have STD data?
-do_std = 1;
+do_std = 0;
+
+% Do we want a figure?
+plot_fig = 0;
 
 % Data directory
 resdir = '/Users/mattcher/Documents/DPhil/Data/Fabber_ModelFits/';
-setnum = 133;
+setnum = 161;
 
 % Figure out the results directory we want to load from
 fdname = dir([resdir,'fabber_',num2str(setnum),'_*']);
@@ -29,10 +34,18 @@ disp(['Opening dataset ',fdname.name,':']);
 % Ground truth data is stored here
 gnddir = '/Users/mattcher/Documents/DPhil/Data/qboldsim_data/';
 
+% Load ground truth data for both OEF and DBV
+oefData = LoadSlice([gnddir,'ASE_Grid_30x30_OEF.nii.gz'],1);
+dbvData = LoadSlice([gnddir,'ASE_Grid_30x30_DBV.nii.gz'],1);
+
+gndMat = [oefData(:),dbvData(:)];
+
 % Pre-allocate some result arrays
 corrs = zeros(length(vars),2);
 RMSE  = zeros(length(vars),1);
 WMSE  = zeros(length(vars),1);      % weighted root mean square error
+
+% Load the arrays of true OEF and DBV values
 
 % Loop through variables
 for vv = 1:length(vars)
@@ -46,15 +59,15 @@ for vv = 1:length(vars)
         stdData = LoadSlice([fabdir,'std_' ,vname,'.nii.gz'],1);
     end
     
-    % Load the ground truth data
-    gndData = LoadSlice([gnddir,'ASE_Grid_30x30_',vname,'.nii.gz'],1);
-    
     % Take Absolute Values and Vectorize, also, scale up to a percentage
     volVec = 100*abs(volData(:));
-    gndVec = 100*abs(gndData(:));
     if do_std
         stdVec = 100*abs(stdData(:));
     end
+    
+    % Extract ground truth data, and the other data, for scaling
+    gndVec = 100*gndMat(:,vv);
+    sclVec = gndMat(:,length(vars)+1-vv);
     
     % Limits, for plotting
     minV = gndVec(1);
@@ -68,6 +81,8 @@ for vv = 1:length(vars)
     else
         ln_std = [0,0,0];
     end
+    
+    shades = sclVec;
     
     % Calculate correlations
     [R,P] = corrcoef(gndVec,volVec);
@@ -83,22 +98,24 @@ for vv = 1:length(vars)
     end
     
     % Plot a figure;
-    figure; hold on; box on;
-    plot([minV,maxV],[minV,maxV],'Color',defColour(2));
-    colormap(gray);
-    scatter(gndVec,volVec,[],ln_std,'filled');
-    xlabel(['Simulated ',vname,' (%)']);
-    ylabel(['Estimated ',vname,' (%)']);
-    axis([minV,maxV,minV,maxV]);    % always go from 0% to 100% in the figure
+    if plot_fig
+        figure; hold on; box on;
+        plot([minV,maxV],[minV,maxV],'Color',defColour(2));
+        colormap(parula);
+        scatter(gndVec,volVec,[],shades,'filled');
+        xlabel(['Simulated ',vname,' (%)']);
+        ylabel(['Estimated ',vname,' (%)']);
+        axis([minV,maxV,minV,maxV]);    % always go from 0% to 100% in the figure
+    end
     
     % Display some results
     disp([vname,' Correlation: ',num2str(R(1,2),3)]);
     if P(1,2) > 0.05
         disp(['    Not Significant (p = ',num2str(P(1,2),2),')']);
     end
-    disp(['  RMS Error: ',round2str(RMSE(vv),1),' %']);
+    disp(['  RMS Error: ',num2str(RMSE(vv),3),' %']);
     if do_std
-        disp(['  Weighted Error: ',round2str(WMSE(vv),1),' %']);
+        disp(['  Weighted Error: ',num2str(WMSE(vv),3),' %']);
     end
     
 end % for vv = 1:length(vars)
