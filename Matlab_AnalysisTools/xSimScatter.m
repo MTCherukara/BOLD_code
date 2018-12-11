@@ -6,7 +6,7 @@
 % 5 December 2018
 
 clear;
-close all;
+% close all;
 setFigureDefaults;
 
 clc;
@@ -18,11 +18,11 @@ vars = {'OEF','DBV'};
 do_std = 0;
 
 % Do we want a figure?
-plot_fig = 0;
+plot_fig = 1;
 
 % Data directory
 resdir = '/Users/mattcher/Documents/DPhil/Data/Fabber_ModelFits/';
-setnum = 161;
+setnum = 180;
 
 % Figure out the results directory we want to load from
 fdname = dir([resdir,'fabber_',num2str(setnum),'_*']);
