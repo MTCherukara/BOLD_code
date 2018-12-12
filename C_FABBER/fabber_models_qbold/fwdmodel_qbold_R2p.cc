@@ -571,8 +571,8 @@ void R2primeFwdModel::Evaluate(const ColumnVector &params, ColumnVector &result)
     double T1b = 1.58;
 
     double nt = 0.723;
-    double ne = 0.075;
-    double nb = 0.723;
+    double ne = 1.000;
+    double nb = 0.775;
 
 
 
@@ -640,12 +640,18 @@ void R2primeFwdModel::Evaluate(const ColumnVector &params, ColumnVector &result)
             Se = real(Sec);
 
             // calculate steady state magnetization values, for tissue, blood, and CSF
+            mt = 1.0 - (2.0*exp(-TI/T1t)) + exp(-TR/T1t);
+            mb = 1.0 - (2.0*exp(-TI/T1b)) + exp(-TR/T1b);
+            me = 1.0 - (2.0*exp(-TI/T1e)) + exp(-TR/T1e);
+
+            /* OLD VERSION
             mt = exp(-(TE-tau)*R2t) * ( 1 - ( 1 + (2*exp((TE-tau)/(2*T1t))) ) 
                                         * ( 2 - exp(-(TR-TI)/T1t)) * exp(-TI/T1t)  );
             mb = exp(-(TE-tau)*R2b) * ( 1 - ( 1 + (2*exp((TE-tau)/(2*T1b))) ) 
                                         * ( 2 - exp(-(TR-TI)/T1b)) * exp(-TI/T1b)  );
-            mt = exp(-(TE-tau)*R2e) * ( 1 - ( 1 + (2*exp((TE-tau)/(2*T1e))) ) 
+            me = exp(-(TE-tau)*R2e) * ( 1 - ( 1 + (2*exp((TE-tau)/(2*T1e))) ) 
                                         * ( 2 - exp(-(TR-TI)/T1e)) * exp(-TI/T1e)  );
+            */
             
             // calculate tissue compartment weightings
             lam0 = (ne*me*lam) / ( (nt*mt*(1-lam)) + (ne*me*lam) );

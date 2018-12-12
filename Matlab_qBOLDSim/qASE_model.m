@@ -145,8 +145,8 @@ if PARAMS.incT1
     
     % spin densities
     nt = 0.723;
-    ne = 0.070;
-    nb = 0.723;    
+    ne = 1.000;
+    nb = 0.775;    
     
     % calculate compartment steady-state magnetization
     m_tis = calcMagnetization(TAU,TE,PARAMS.TR,PARAMS.T1t,1./PARAMS.R2t,PARAMS.TI);
@@ -227,7 +227,8 @@ function M = calcMagnetization(tau,TE,TR,T1,T2,TI)
     termt = exp(-expT2);
 
     % put it all together
-    M = ( 1 - (terme.*termf) ) .* termt;
+%     M = ( 1 - (terme.*termf) ) .* termt;
+    M = 1 - (2*exp(-TI./T1)) + exp(-TR./T1);
     
 end
 
@@ -317,7 +318,7 @@ function SE = calcExtraCompartment(TAU,TE,PARAMS)
     end
 
     % calculate signal
-    SE = real(exp(- 2i.*pi.*PARAMS.dF.*abs(TAU)));
+    SE = abs(exp(- 2i.*pi.*PARAMS.dF.*abs(TAU)));
     
     % add T2 effect
     if PARAMS.incT2

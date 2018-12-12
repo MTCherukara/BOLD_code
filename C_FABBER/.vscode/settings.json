@@ -28,7 +28,8 @@
         "cstdio": "cpp",
         "cwchar": "cpp",
         "cwctype": "cpp",
-        "type_traits": "cpp"
+        "type_traits": "cpp",
+        "algorithm": "cpp"
     },
     "editor.minimap.enabled": false,
     "python.pythonPath": "/Users/mattcher/anaconda3/bin/python3",

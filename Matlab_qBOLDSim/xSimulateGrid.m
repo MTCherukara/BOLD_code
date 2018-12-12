@@ -18,8 +18,12 @@ tau = (-16:8:64)/1000;
 SEind = 3; % in this case
 
 % 30x30 data
-OEFvals = 0.10:0.025:0.825;
-DBVvals = 0.009:0.003:0.096;
+% OEFvals = 0.10:0.025:0.825;
+% DBVvals = 0.009:0.003:0.096;
+
+% 50x50 narrower range
+OEFvals = 0.21:0.01:0.70;
+DBVvals = 0.003:0.003:0.15;
 
 % % 4x4 data
 % OEFvals = 0.2:0.2:0.8;
@@ -37,7 +41,7 @@ params.incIV  = 1;          % BOOL      - should blood compartment be included?
 params.TE     = TE;         % s         - Echo time
 
 % noise 
-SNR = 500;
+SNR = 5;
 
 %% Loop over values, computing the model
 

@@ -33,7 +33,7 @@ motional_narrowing
 
 TE=0.084
 TR=3.000
-TI=3.0
+TI=0.0
 #TI=1.210
 
 tau1=-0.016

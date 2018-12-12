@@ -9,7 +9,7 @@ clear;
 % close all;
 setFigureDefaults;
 
-clc;
+% clc;
 
 % Choose variables
 vars = {'OEF','DBV','R2p'};
@@ -22,7 +22,7 @@ plot_fig = 1;
 
 % Data directory
 resdir = '/Users/mattcher/Documents/DPhil/Data/Fabber_ModelFits/';
-setnum = 185;
+setnum = 204;
 
 % Figure out the results directory we want to load from
 fdname = dir([resdir,'fabber_',num2str(setnum),'_*']);
