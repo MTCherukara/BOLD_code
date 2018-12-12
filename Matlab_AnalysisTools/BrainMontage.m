@@ -43,10 +43,10 @@ ns = length(slices); % number of slices
 if ~exist('threshold','var')
 
     if strfind(lower(niname),'dbv')
-        threshold = 0.2;
+        threshold = 0.15;
         cmp = magma;
     elseif strfind(lower(niname),'r2p')
-        threshold = 15;
+        threshold = 25;
         cmp = viridis;
     elseif strfind(lower(niname),'oef')
         threshold = 1.0;
@@ -152,7 +152,7 @@ montage_image = fliplr(montage_image);
 % cmp(1,:) = [0,0,0];
 
 figure; hold on;
-imagesc(montage_image);
+imagesc(montage_image,[0,threshold]);
 colormap(cmp);
 axis equal
 

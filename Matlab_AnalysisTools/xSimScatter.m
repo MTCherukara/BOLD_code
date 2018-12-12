@@ -12,7 +12,7 @@ setFigureDefaults;
 clc;
 
 % Choose variables
-vars = {'OEF','DBV'};
+vars = {'OEF','DBV','R2p'};
 
 % Do we have STD data?
 do_std = 0;
@@ -22,7 +22,7 @@ plot_fig = 1;
 
 % Data directory
 resdir = '/Users/mattcher/Documents/DPhil/Data/Fabber_ModelFits/';
-setnum = 180;
+setnum = 185;
 
 % Figure out the results directory we want to load from
 fdname = dir([resdir,'fabber_',num2str(setnum),'_*']);
@@ -37,8 +37,9 @@ gnddir = '/Users/mattcher/Documents/DPhil/Data/qboldsim_data/';
 % Load ground truth data for both OEF and DBV
 oefData = LoadSlice([gnddir,'ASE_Grid_30x30_OEF.nii.gz'],1);
 dbvData = LoadSlice([gnddir,'ASE_Grid_30x30_DBV.nii.gz'],1);
+r2pData = LoadSlice([gnddir,'ASE_Grid_30x30_R2p.nii.gz'],1);
 
-gndMat = [oefData(:),dbvData(:)];
+gndMat = [oefData(:),dbvData(:),r2pData(:)];
 
 % Pre-allocate some result arrays
 corrs = zeros(length(vars),2);
@@ -59,15 +60,25 @@ for vv = 1:length(vars)
         stdData = LoadSlice([fabdir,'std_' ,vname,'.nii.gz'],1);
     end
     
+   
+    
     % Take Absolute Values and Vectorize, also, scale up to a percentage
-    volVec = 100*abs(volData(:));
+    volVec = abs(volData(:));
     if do_std
-        stdVec = 100*abs(stdData(:));
+        stdVec = abs(stdData(:));
     end
     
     % Extract ground truth data, and the other data, for scaling
-    gndVec = 100*gndMat(:,vv);
+    gndVec = gndMat(:,vv);
     sclVec = gndMat(:,length(vars)+1-vv);
+    
+     if strcmp(vname,'DBV') || strcmp(vname,'OEF')
+        volVec = volVec.*100;
+        gndVec = gndVec.*100;
+        if do_std
+            stdVec = stdVec.*100;
+        end
+    end
     
     % Limits, for plotting
     minV = gndVec(1);
@@ -82,7 +93,9 @@ for vv = 1:length(vars)
         ln_std = [0,0,0];
     end
     
-    shades = sclVec;
+%     shades = sclVec;
+    shades = [0,0,0];
+%     shades = nm_std;
     
     % Calculate correlations
     [R,P] = corrcoef(gndVec,volVec);
