@@ -60,7 +60,6 @@ void R2primeFwdModel::Initialize(ArgsType &args)
     infer_Ax  = args.ReadBool("inferAx");
     single_comp = args.ReadBool("single_compartment");
     motion_narr = args.ReadBool("motional_narrowing");
-    inf_priors  = args.ReadBool("infpriors");
     inf_lam     = args.ReadBool("inflam");
 
     // since we can't do both, OEF will take precidence over R2p
@@ -72,6 +71,10 @@ void R2primeFwdModel::Initialize(ArgsType &args)
     // temporary holders for input values
     string tau_temp;
     string TE_temp; 
+
+    // allow for manual entry of prior precisions
+    prec_R2p = convertTo<double>(args.ReadWithDefault("precR2p","1e-2"));
+    prec_DBV = convertTo<double>(args.ReadWithDefault("precDBV","1e0"));
 
     // First read tau values, since these will always be specified
 
@@ -167,10 +170,6 @@ void R2primeFwdModel::Initialize(ArgsType &args)
     {
         LOG << "Inferring on quadratic exponential long tau model" << endl;
     }
-    if (inf_priors)
-    {
-        LOG << "Using informative priors" << endl;
-    }
     
 } // Initialize
 
@@ -239,40 +238,19 @@ void R2primeFwdModel::HardcodedInitialDists(MVNDist &prior, MVNDist &posterior) 
     if (infer_OEF)
     {
         prior.means(OEF_index()) = 0.2;
-        if (inf_priors)
-        {
-            precisions(OEF_index(), OEF_index()) = 1e1; // 1e1
-        }
-        else
-        {
-            precisions(OEF_index(), OEF_index()) = 1e1; // 1e-1
-        }
+        precisions(OEF_index(), OEF_index()) = 1e-1; // 1e-1
     }
     
     if (infer_R2p)
     {
         prior.means(R2p_index()) = 2.6;
-        if (inf_priors)
-        {
-            precisions(R2p_index(), R2p_index()) = 1e-1; // 1e-1
-        }
-        else
-        {
-            precisions(R2p_index(), R2p_index()) = 1e-2; // 1e-2
-        }
+        precisions(R2p_index(), R2p_index()) = prec_R2p;
     }
 
     if (infer_DBV)
     {
         prior.means(DBV_index()) = 0.036; // 0.036
-        if (inf_priors)
-        {
-            precisions(DBV_index(), DBV_index()) = 1e2; // 1e3
-        }
-        else
-        {
-            precisions(DBV_index(), DBV_index()) = 1e0; // 1e0
-        }
+        precisions(DBV_index(), DBV_index()) = prec_DBV;
     }
 
     if (infer_R2t)
@@ -345,7 +323,7 @@ void R2primeFwdModel::HardcodedInitialDists(MVNDist &prior, MVNDist &posterior) 
     if (infer_DBV)
     {
         posterior.means(DBV_index()) = 0.036;
-        precisions(DBV_index(), DBV_index()) = 1e0; 
+        precisions(DBV_index(), DBV_index()) = 1e-1; 
     }
 
     if (infer_R2t)

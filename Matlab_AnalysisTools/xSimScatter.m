@@ -7,9 +7,9 @@
 
 clear;
 % close all;
-setFigureDefaults;
+% setFigureDefaults;
 
-% clc;
+clc;
 
 % Choose variables
 vars = {'OEF','DBV','R2p'};
@@ -18,11 +18,11 @@ vars = {'OEF','DBV','R2p'};
 do_std = 0;
 
 % Do we want a figure?
-plot_fig = 1;
+plot_fig = 0;
 
 % Data directory
 resdir = '/Users/mattcher/Documents/DPhil/Data/Fabber_ModelFits/';
-setnum = 204;
+setnum = 262;
 
 % Figure out the results directory we want to load from
 fdname = dir([resdir,'fabber_',num2str(setnum),'_*']);
@@ -35,11 +35,12 @@ disp(['Opening dataset ',fdname.name,':']);
 gnddir = '/Users/mattcher/Documents/DPhil/Data/qboldsim_data/';
 
 % Load ground truth data for both OEF and DBV
-oefData = LoadSlice([gnddir,'ASE_Grid_30x30_OEF.nii.gz'],1);
-dbvData = LoadSlice([gnddir,'ASE_Grid_30x30_DBV.nii.gz'],1);
-r2pData = LoadSlice([gnddir,'ASE_Grid_30x30_R2p.nii.gz'],1);
+oefData = LoadSlice([gnddir,'ASE_Grid_50x50_OEF.nii.gz'],1);
+dbvData = LoadSlice([gnddir,'ASE_Grid_50x50_DBV.nii.gz'],1);
+r2pData = LoadSlice([gnddir,'ASE_Grid_50x50_R2p.nii.gz'],1);
 
 gndMat = [oefData(:),dbvData(:),r2pData(:)];
+sclMat = [dbvData(:),oefData(:),r2pData(:)];
 
 % Pre-allocate some result arrays
 corrs = zeros(length(vars),2);
@@ -70,7 +71,7 @@ for vv = 1:length(vars)
     
     % Extract ground truth data, and the other data, for scaling
     gndVec = gndMat(:,vv);
-    sclVec = gndMat(:,length(vars)+1-vv);
+    sclVec = sclMat(:,vv);
     
      if strcmp(vname,'DBV') || strcmp(vname,'OEF')
         volVec = volVec.*100;
@@ -93,8 +94,8 @@ for vv = 1:length(vars)
         ln_std = [0,0,0];
     end
     
-%     shades = sclVec;
-    shades = [0,0,0];
+    shades = sclVec;
+%     shades = [0,0,0];
 %     shades = nm_std;
     
     % Calculate correlations
@@ -133,5 +134,12 @@ for vv = 1:length(vars)
     
 end % for vv = 1:length(vars)
     
-    
-    
+% Also do Free Energy
+thFE = 1e6;
+volFE = LoadSlice([fabdir,'freeEnergy.nii.gz'],1);
+vecFE = volFE(:);
+vecFE(abs(vecFE) > thFE) = [];
+
+disp(' ');
+disp(['Free Energy (Mean)  : ',num2str(-mean(vecFE),3)]);
+disp(['Free Energy (Median): ',num2str(-median(vecFE),3)]);

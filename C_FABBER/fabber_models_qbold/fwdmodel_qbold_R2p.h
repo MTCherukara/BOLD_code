@@ -44,6 +44,10 @@ protected:
     NEWMAT::ColumnVector taus;
     NEWMAT::ColumnVector TEvals;
 
+    // Bayesian inference parameters
+    double prec_R2p;
+    double prec_DBV;
+
     // Model parameters
     double SR;      // this is a scaling factor for R2', applied in the asymptotic model
     double beta;    // this is a power that is applied to OEF*Hct in calculating DW
@@ -113,7 +117,6 @@ protected:
     bool infer_Ax;
     bool single_comp;
     bool motion_narr;
-    bool inf_priors;
     bool inf_lam;
 
 private:
