@@ -20,7 +20,6 @@
     %       in a more generic and extensible way.
 
     
-
 clear; 
 clc;
 
@@ -30,7 +29,7 @@ clc;
 vars = {'R2p','DBV','OEF'};
 
 % Choose Data set
-setnum = 732;
+setnum = 747;
 
 % Which set of subjects is this from?
 setname = 'genNF';          % 'VS', 'genF', 'genNF', or 'AMICI'

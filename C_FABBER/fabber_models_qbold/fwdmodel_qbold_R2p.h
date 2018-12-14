@@ -47,6 +47,7 @@ protected:
     // Bayesian inference parameters
     double prec_R2p;
     double prec_DBV;
+    double prec_CSF;
 
     // Model parameters
     double SR;      // this is a scaling factor for R2', applied in the asymptotic model
@@ -117,7 +118,8 @@ protected:
     bool infer_Ax;
     bool single_comp;
     bool motion_narr;
-    bool inf_lam;
+    bool inc_intra;
+    bool inc_csf;
 
 private:
     static FactoryRegistration<FwdModelFactory, R2primeFwdModel> registration;

@@ -57,15 +57,26 @@ void R2primeFwdModel::Initialize(ArgsType &args)
     infer_R2e = args.ReadBool("inferR2e");
     infer_dF  = args.ReadBool("inferdF");
     infer_lam = args.ReadBool("inferlam");
-    infer_Ax  = args.ReadBool("inferAx");
-    single_comp = args.ReadBool("single_compartment");
+
+    inc_intra = args.ReadBool("include_intra");
+    inc_csf = args.ReadBool("include_csf");
+
     motion_narr = args.ReadBool("motional_narrowing");
-    inf_lam     = args.ReadBool("inflam");
 
     // since we can't do both, OEF will take precidence over R2p
     if (infer_OEF)
     {
         infer_R2p = false;
+    }
+
+    if (motion_narr)
+    {
+        inc_intra = true;
+    }
+
+    if (infer_lam)
+    {
+        inc_csf = true;
     }
 
     // temporary holders for input values
@@ -75,6 +86,7 @@ void R2primeFwdModel::Initialize(ArgsType &args)
     // allow for manual entry of prior precisions
     prec_R2p = convertTo<double>(args.ReadWithDefault("precR2p","1e-2"));
     prec_DBV = convertTo<double>(args.ReadWithDefault("precDBV","1e0"));
+    prec_CSF = convertTo<double>(args.ReadWithDefault("precCSF","1e-1"));
 
     // First read tau values, since these will always be specified
 
@@ -130,6 +142,21 @@ void R2primeFwdModel::Initialize(ArgsType &args)
     {
         LOG << "    TE(" << ii << ") = " << TEvals(ii) << "    tau(" << ii << ") = " << taus(ii) << endl;
     }
+    if (inc_intra)
+    {
+        if (motion_narr)
+        {
+            LOG << "Using two-compartment model with motion narrowing intravascular signal " << endl;
+        }
+        else
+        {
+            LOG << "Using two-compartment model with static (powder) intravascular signal " << endl;
+        }
+    }
+    else
+    {
+        LOG << "Using single-compartment model (ignoring intravascular signal) " << endl;
+    }
     if (infer_OEF)
     {
         LOG << "Inferring on OEF " << endl;
@@ -144,32 +171,29 @@ void R2primeFwdModel::Initialize(ArgsType &args)
     }
     if (infer_R2t)
     {
-        LOG << "Inferring on R2/T2 of tissue" << endl;
+        LOG << "Inferring on R2/T2 of tissue " << endl;
     }
     if (infer_S0)
     {
-        LOG << "Inferring on scaling parameter S0" << endl;
+        LOG << "Inferring on scaling parameter S0 " << endl;
     }
     if (infer_Hct)
     {
-        LOG << "Inferring on fractional hematocrit" << endl;
+        LOG << "Inferring on fractional hematocrit " << endl;
     }
     if (infer_R2e)
     {
-        LOG << "Inferring on R2 of CSF" << endl;
+        LOG << "Inferring on R2 of CSF " << endl;
     }
     if (infer_dF)
     {
-        LOG << "Inferring on CSF frequency shift dF" << endl;
+        LOG << "Inferring on CSF frequency shift dF " << endl;
     }
     if (infer_lam)
     {
-        LOG << "Inferring on CSF volume fraction lambda" << endl;
+        LOG << "Inferring on CSF volume fraction lambda " << endl;
     }
-    if (infer_Ax)
-    {
-        LOG << "Inferring on quadratic exponential long tau model" << endl;
-    }
+
     
 } // Initialize
 
@@ -217,10 +241,6 @@ void R2primeFwdModel::NameParams(vector<string> &names) const
     if (infer_lam)
     {
         names.push_back("VC");  // parameter 7 - CSF volume fraction
-    }
-    if (infer_Ax)
-    {
-        names.push_back("Ax");  // parameter 9 - Quadratic long tau factor
     }
 } // NameParams
 
@@ -286,21 +306,8 @@ void R2primeFwdModel::HardcodedInitialDists(MVNDist &prior, MVNDist &posterior) 
     if (infer_lam)
     {
         prior.means(lam_index()) = 0.05;
-        if (inf_lam)
-        {
-            precisions(lam_index(), lam_index()) = 1e3; // 1e3
-        }
-        else
-        {
-            precisions(lam_index(), lam_index()) = 1e-1; // 1e-1
-        }
+        precisions(lam_index(), lam_index()) = prec_CSF; // 1e-1
     }
-
-    if (infer_Ax)
-    {
-        prior.means(Ax_index()) = 5.0;
-        precisions(Ax_index(), Ax_index()) = 1e-2; // 1e-3
-    } 
 
     prior.SetPrecisions(precisions);
 
@@ -362,12 +369,6 @@ void R2primeFwdModel::HardcodedInitialDists(MVNDist &prior, MVNDist &posterior) 
         precisions(lam_index(), lam_index()) = 1e-1; // 1e1
     } 
 
-    if (infer_Ax)
-    {
-        posterior.means(Ax_index()) = 5.0;
-        precisions(Ax_index(), Ax_index()) = 1e-1;
-    } 
-
     
     posterior.SetPrecisions(precisions);
 
@@ -415,7 +416,6 @@ void R2primeFwdModel::Evaluate(const ColumnVector &params, ColumnVector &result)
     double dF;
     double lam;
     double CBV;
-    double Ax;
 
 
     // assign values to parameters
@@ -469,19 +469,11 @@ void R2primeFwdModel::Evaluate(const ColumnVector &params, ColumnVector &result)
     }
     if (infer_lam)
     {
-        lam = (paramcpy(lam_index()));
+        lam = abs(paramcpy(lam_index()));
     }
     else
     {
         lam = 0.0;
-    }
-    if (infer_Ax)
-    {
-        Ax = (paramcpy(Ax_index()));
-    }
-    else
-    {
-        Ax = 0.0;
     }
 
     // this one is a little bit different
@@ -552,7 +544,25 @@ void R2primeFwdModel::Evaluate(const ColumnVector &params, ColumnVector &result)
     double ne = 1.000;
     double nb = 0.775;
 
+    // we can do the magnetization stuff outside the loop, since they are not affected by tau
 
+    // calculate steady state magnetization values, for tissue, blood, and CSF
+    mt = 1.0 - (2.0*exp(-TI/T1t)) + exp(-TR/T1t);
+    mb = 1.0 - (2.0*exp(-TI/T1b)) + exp(-TR/T1b);
+    me = 1.0 - (2.0*exp(-TI/T1e)) + exp(-TR/T1e);
+
+    /* OLD VERSION
+    mt = exp(-(TE-tau)*R2t) * ( 1 - ( 1 + (2*exp((TE-tau)/(2*T1t))) ) 
+                                * ( 2 - exp(-(TR-TI)/T1t)) * exp(-TI/T1t)  );
+    mb = exp(-(TE-tau)*R2b) * ( 1 - ( 1 + (2*exp((TE-tau)/(2*T1b))) ) 
+                                * ( 2 - exp(-(TR-TI)/T1b)) * exp(-TI/T1b)  );
+    me = exp(-(TE-tau)*R2e) * ( 1 - ( 1 + (2*exp((TE-tau)/(2*T1e))) ) 
+                                * ( 2 - exp(-(TR-TI)/T1e)) * exp(-TI/T1e)  );
+    */
+
+    // calculate tissue compartment weightings
+    lam0 = (ne*me*lam) / ( (nt*mt*(1-lam)) + (ne*me*lam) );
+    CBV = nb*mb*(1-lam0)*DBV;
 
     // loop through taus
     result.ReSize(taus.Nrows());
@@ -565,80 +575,64 @@ void R2primeFwdModel::Evaluate(const ColumnVector &params, ColumnVector &result)
         // calculate tissue signal
         if (tau < -tc)
         {
-            St = exp(DBV + (R2p*tau) - (Ax*pow(tau,2.0)));
+            St = exp(DBV + (R2p*tau));
         }
         else if (tau > tc)
         {
-            St = exp(DBV - (R2p*tau) - (Ax*pow(tau,2.0)));
+            St = exp(DBV - (R2p*tau));
         }
         else
         {
             St = exp(-0.3*pow(R2p*tau,2.0)/DBV);
         }
- 
-        // compartments
-        if (single_comp)
+
+        // add T2 effect to tissue compartment
+        St *= exp(-R2t*TE);
+
+        // calculate intravascular signal
+        if (motion_narr)
         {
-            // total signal is tissue signal only
-            result(ii) = S0*St;
+            // parameters
+            double td   = 0.0045067;       // (based on rc=2.6 um and D=1.5 um^2 / ms)
+            double gm   = 2.67513e8;
+            double dChi = (((-0.736 + (0.264*OEF))*Hct) + (0.722*(1-Hct)))*1e-6;
+            double G0   = (4/45)*Hct*(1-Hct)*pow((dChi*3.0),2.0);
+            double kk   = 0.5*pow(gm,2.0)*G0*pow(td,2.0);
+
+            // motion narrowing model
+            Sb = exp(-kk* ( (TE/td) + pow((0.25 + (TE/td)),0.5) + 1.5 - 
+                            (2*pow((0.25 + (pow((TE+tau),2.0)/td) ),0.5)) - 
+                            (2*pow((0.25 + (pow((TE-tau),2.0)/td) ),0.5)) ) );
+
+            // T2 effect 
+            Sb *= exp(-R2b*TE); 
+
+        } // if (motion_narr)
+        else if (inc_intra)
+        {
+            // linear model
+            Sb = exp(-R2b*TE)*exp(-R2bp*abs(tau));
+
+        } // if (motion_narr) ... else if (inc_intra)
+        else
+        {
+            Sb = 0.0;
+
+        } // if (motion_narr) ... else if (inc_intra) ... else ...
+
+        // calculate CSF signal
+        if (inc_csf)
+        {
+            Sec = exp(-R2e*TE)*exp(-2.0*i*M_PI*dF*abs(tau));
+            Se = abs(Sec);
         }
         else
         {
-            // apply T2 effect to tissue compartment
-            St *= exp(-R2t*TE);
+            Se = 0.0;
+        }
 
-            // add blood compartment
-            if (motion_narr)
-            {
-                // parameters
-                double td   = 0.0045067;       // (based on rc=2.6 um and D=1.5 um^2 / ms)
-                double gm   = 2.67513e8;
-                double dChi = (((-0.736 + (0.264*OEF))*Hct) + (0.722*(1-Hct)))*1e-6;
-                double G0   = (4/45)*Hct*(1-Hct)*pow((dChi*3.0),2.0);
-                double kk   = 0.5*pow(gm,2.0)*G0*pow(td,2.0);
-
-                // motion narrowing model
-                Sb = exp(-kk* ( (TE/td) + pow((0.25 + (TE/td)),0.5) + 1.5 - 
-                                (2*pow((0.25 + (pow((TE+tau),2.0)/td) ),0.5)) - 
-                                (2*pow((0.25 + (pow((TE-tau),2.0)/td) ),0.5)) ) );
-
-                // T2 effect 
-                Sb *= exp(-R2b*TE);    
-
-            } // if (motion_narr)
-            else 
-            {
-                // linear model
-                Sb = exp(-R2b*TE)*exp(-R2bp*abs(tau));
-
-            } // if (motion_narr) ... else
-
-            // add extracellular compartment
-            Sec = exp(-R2e*TE)*exp(-2.0*i*M_PI*dF*abs(tau));
-            Se = real(Sec);
-
-            // calculate steady state magnetization values, for tissue, blood, and CSF
-            mt = 1.0 - (2.0*exp(-TI/T1t)) + exp(-TR/T1t);
-            mb = 1.0 - (2.0*exp(-TI/T1b)) + exp(-TR/T1b);
-            me = 1.0 - (2.0*exp(-TI/T1e)) + exp(-TR/T1e);
-
-            /* OLD VERSION
-            mt = exp(-(TE-tau)*R2t) * ( 1 - ( 1 + (2*exp((TE-tau)/(2*T1t))) ) 
-                                        * ( 2 - exp(-(TR-TI)/T1t)) * exp(-TI/T1t)  );
-            mb = exp(-(TE-tau)*R2b) * ( 1 - ( 1 + (2*exp((TE-tau)/(2*T1b))) ) 
-                                        * ( 2 - exp(-(TR-TI)/T1b)) * exp(-TI/T1b)  );
-            me = exp(-(TE-tau)*R2e) * ( 1 - ( 1 + (2*exp((TE-tau)/(2*T1e))) ) 
-                                        * ( 2 - exp(-(TR-TI)/T1e)) * exp(-TI/T1e)  );
-            */
-            
-            // calculate tissue compartment weightings
-            lam0 = (ne*me*lam) / ( (nt*mt*(1-lam)) + (ne*me*lam) );
-            CBV = nb*mb*(1-lam0)*DBV;
-
-            // add up compartments
-            result(ii) = S0*(((1-CBV-lam0)*St) + (CBV*Sb) + (lam0*Se));
-
-        } // if (single_comp) ... else
+        // add up the compartments
+        result(ii) = S0*(((1-CBV-lam0)*St) + (CBV*Sb) + (lam0*Se));
 
     } // for (int i = 1; i <= taus.Nrows(); i++)
 
