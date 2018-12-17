@@ -12,25 +12,24 @@ setFigureDefaults;
 
 
 %% Data for Comparisons across SNR levels
-% % Data for 1C model
-% SNR  = [  5    ,  10    ,  25    , 50     , 100    , 200     , 500     ];
-% OC_L = [  0    ,   0.15 ,   0.082,   0.070,   0.096,   0.224 ,   0.936 ];
-% OC_1 = [  0.241,   0.269,   0.287,   0.326,   0.416,   0.449 ,   0.458 ];
-% OE_L = [  0    , 302.5  , 848.9  , 678.5  , 278.6  , 139.2   ,  16.8   ];
-% OE_1 = [104.2  ,  94.6  ,  69.3  ,  63.4  ,  53.3  ,  43.6   ,  38.3   ];
-% DC_L = [  0    ,   0    ,   0.298,   0.621,   0.814,   0.894 ,   0.924 ];
-% DC_1 = [  0    ,   0    ,   0.18 ,   0.294,   0.338,   0.308 ,   0.309 ];
-% DE_L = [  0    ,  11.9  ,   4.3  ,   2.6  ,   1.7  ,   1.3   ,   1.2   ];
-% DE_1 = [ 18.6  ,  10.5  ,  11.9  ,  14.1  ,  15.7  ,  17.9   ,  19.2   ];
-
-% Data for 2C model
+% Data for 1C model
 SNR  = [  5    ,  10    ,  25    , 50     , 100    , 200     , 500     ];
-OE_L = [  302  , 736    ,  2696   , 1065   , 112    , 34  , 385 ];
-OE_1 = [  109  , 95.9   , 70.5   , 62.6   ,  60.8 , 53.3, 41.5 ];
-OE_2 = [  114, 99.1, 75.4, 64.4, 50.8, 48.8, 47.8];
-DE_L = [ 25.4, 10.9, 4.7, 2.6, 1.6, 1.16, 0.99];
-DE_1 = [ 17.5, 9.32, 8.67, 10.7, 17.5, 17.8, 17.3];
-DE_2 = [ 17, 9.18, 10.7, 13.5, 15.1, 16.6, 15.2];
+
+% SNR         5          10         25         50         100        200        500
+Err_OEF = [ 100.0000,  100.0000,  100.0000,  100.0000,  100.0000,  100.0000,  100.0000; ...
+            100.0000,  100.0000,   75.2000,   62.0000,   55.2000,   52.3000,   52.4000; ...
+            100.0000,  100.0000,   70.4000,   53.9000,   44.6000,   42.1000,   43.2000 ];
+       
+% SNR         5          10         25         50         100        200        500
+Err_DBV = [ 100.0000,   11.3000,    4.7500,    2.6800,    1.4700,    0.9700,    0.7600; ...
+             13.3000,    9.8400,   13.3000,   21.1000,   23.0000,   25.6000,   26.9000; ...
+             12.7000,    8.8900,   15.2000,   19.9000,   24.4000,   23.6000,   23.7000 ];
+         
+% SNR         5          10         25         50         100        200        500
+Err_R2p = [  12.9000,    4.0200,    2.5200,    2.2600,    2.1900,    2.1800,    2.1700; ...
+              5.5900,    5.0300,    4.8800,    4.6500,    4.6500,    4.5600,    4.5700; ...
+              5.5400,    5.0100,    5.6700,    5.5200,    5.4500,    5.3500,    5.5700 ];
+
 
 
 %% Data for comparisons of FABBER prior precisions (1C Model)
@@ -62,74 +61,74 @@ DE_2 = [ 17, 9.18, 10.7, 13.5, 15.1, 16.6, 15.2];
         
 %% Data for comparisons of FABBER prior precisions (2C Model)
 
-PrecR2p = [     1e1,       1e0,       1e-1,      1e-2,      1e-3,      1e-4,      1e-5 ];
-PrecDBV = [ 1e2, 1e1, 1e0, 1e-1, 1e-2];
-
-% P(R2')     1e1        1e0        1e-1       1e-2       1e-3       1e-4       1e-5
-Err_OEF = [ 38.5000,   45.7000,  100.0000,  100.0000,  100.0000,  100.0000,  100.0000; ...
-            41.0000,   47.0000,  100.0000,  100.0000,  100.0000,  100.0000,  100.0000; ...
-            41.1000,   48.9000,  100.0000,   43.2000,   96.0000,   30.0000,   87.1000; ...
-            41.9000,   46.5000,   94.1000,   47.2000,   32.7000,   79.4000,   72.6000; ...
-            40.7000,   44.6000,  100.0000,   50.9000,   45.6000,   40.6000,   40.0000 ];
-       
-% P(R2')     1e1        1e0        1e-1       1e-2       1e-3       1e-4       1e-5
-Err_DBV = [  4.0200,    3.4000,    5.8100,    3.7000,    3.7300,    3.9100,  100.0000; ...
-             7.8200,    7.5300,    6.4600,    5.5700,    7.0900,    4.4700,  100.0000; ...
-            10.3000,   10.9000,   14.6000,   23.7000,   21.0000,   16.0000,  100.0000; ...
-             8.3000,   36.6000,   19.2000,   89.4000,  100.0000,   69.1000,   94.5000; ...
-           100.0000,  100.0000,  100.0000,  100.0000,  100.0000,  100.0000,  100.0000 ];
-         
-% P(R2')     1e1        1e0        1e-1       1e-2       1e-3       1e-4       1e-5
-Err_R2p = [ 10.5000,    9.8200,    5.1100,    1.8000,    5.3100,    6.6000,  120.0000; ...
-            10.5000,    9.8600,    5.1000,    5.4100,    9.9100,   32.6000,  100.0000; ...
-            10.5000,    9.9100,    4.7600,    5.5700,    9.9600,   13.9000,  107.0000; ...
-            10.5000,    9.8700,    5.3500,    4.9000,    7.0100,   44.5000,   82.0000; ...
-            10.5000,    9.9100,    5.7900,    6.5500,   12.9000,   18.3000,  140.0000 ];
+% PrecR2p = [     1e1,       1e0,       1e-1,      1e-2,      1e-3,      1e-4,      1e-5 ];
+% PrecDBV = [ 1e2, 1e1, 1e0, 1e-1, 1e-2];
+% 
+% % P(R2')     1e1        1e0        1e-1       1e-2       1e-3       1e-4       1e-5
+% Err_OEF = [ 38.5000,   45.7000,  100.0000,  100.0000,  100.0000,  100.0000,  100.0000; ...
+%             41.0000,   47.0000,  100.0000,  100.0000,  100.0000,  100.0000,  100.0000; ...
+%             41.1000,   48.9000,  100.0000,   43.2000,   96.0000,   30.0000,   87.1000; ...
+%             41.9000,   46.5000,   94.1000,   47.2000,   32.7000,   79.4000,   72.6000; ...
+%             40.7000,   44.6000,  100.0000,   50.9000,   45.6000,   40.6000,   40.0000 ];
+%        
+% % P(R2')     1e1        1e0        1e-1       1e-2       1e-3       1e-4       1e-5
+% Err_DBV = [  4.0200,    3.4000,    5.8100,    3.7000,    3.7300,    3.9100,  100.0000; ...
+%              7.8200,    7.5300,    6.4600,    5.5700,    7.0900,    4.4700,  100.0000; ...
+%             10.3000,   10.9000,   14.6000,   23.7000,   21.0000,   16.0000,  100.0000; ...
+%              8.3000,   36.6000,   19.2000,   89.4000,  100.0000,   69.1000,   94.5000; ...
+%            100.0000,  100.0000,  100.0000,  100.0000,  100.0000,  100.0000,  100.0000 ];
+%          
+% % P(R2')     1e1        1e0        1e-1       1e-2       1e-3       1e-4       1e-5
+% Err_R2p = [ 10.5000,    9.8200,    5.1100,    1.8000,    5.3100,    6.6000,  120.0000; ...
+%             10.5000,    9.8600,    5.1000,    5.4100,    9.9100,   32.6000,  100.0000; ...
+%             10.5000,    9.9100,    4.7600,    5.5700,    9.9600,   13.9000,  107.0000; ...
+%             10.5000,    9.8700,    5.3500,    4.9000,    7.0100,   44.5000,   82.0000; ...
+%             10.5000,    9.9100,    5.7900,    6.5500,   12.9000,   18.3000,  140.0000 ];
         
         
 %% Plotting FABBER prior comparisons
 
-% Plot R2p data as a function of prec(R2p)
-figure; box on;
-semilogx(PrecR2p,Err_R2p(1,:));
-hold on;
-semilogx(PrecR2p,Err_R2p(2,:));
-semilogx(PrecR2p,Err_R2p(3,:));
-semilogx(PrecR2p,Err_R2p(4,:));
-semilogx(PrecR2p,Err_R2p(5,:));
-axis([6e-6,2e1,0,30]);
-ylabel('R2'' Error (%)');
-xlabel('Precision (R2'')');
-legend('Prec(DBV) = 100','Prec(DBV) = 10','Prec(DBV) = 1','Prec(DBV) = 0.1','Prec(DBV) = 0.01',...
-       'Location','NorthEast');
-
-% Plot DBV data as a function of prec(R2p)
-figure; box on;
-semilogx(PrecR2p,Err_DBV(1,:));
-hold on;
-semilogx(PrecR2p,Err_DBV(2,:));
-semilogx(PrecR2p,Err_DBV(3,:));
-semilogx(PrecR2p,Err_DBV(4,:));
-semilogx(PrecR2p,Err_DBV(5,:));
-axis([6e-6,2e1,0,100]);
-ylabel('DBV Error (%)');
-xlabel('Precision (R2'')');
-legend('Prec(DBV) = 100','Prec(DBV) = 10','Prec(DBV) = 1','Prec(DBV) = 0.1','Prec(DBV) = 0.01',...
-       'Location','NorthEast');
-
-% Plot OEF data as a function of prec(R2p)
-figure; box on;
-semilogx(PrecR2p,Err_OEF(1,:));
-hold on;
-semilogx(PrecR2p,Err_OEF(2,:));
-semilogx(PrecR2p,Err_OEF(3,:));
-semilogx(PrecR2p,Err_OEF(4,:));
-semilogx(PrecR2p,Err_OEF(5,:));
-axis([6e-6,2e1,0,100]);
-ylabel('OEF Error (%)');
-xlabel('Precision (R2'')');
-legend('Prec(DBV) = 100','Prec(DBV) = 10','Prec(DBV) = 1','Prec(DBV) = 0.1','Prec(DBV) = 0.01',...
-       'Location','SouthEast');
+% % Plot R2p data as a function of prec(R2p)
+% figure; box on;
+% semilogx(PrecR2p,Err_R2p(1,:));
+% hold on;
+% semilogx(PrecR2p,Err_R2p(2,:));
+% semilogx(PrecR2p,Err_R2p(3,:));
+% semilogx(PrecR2p,Err_R2p(4,:));
+% semilogx(PrecR2p,Err_R2p(5,:));
+% axis([6e-6,2e1,0,30]);
+% ylabel('R2'' Error (%)');
+% xlabel('Precision (R2'')');
+% legend('Prec(DBV) = 100','Prec(DBV) = 10','Prec(DBV) = 1','Prec(DBV) = 0.1','Prec(DBV) = 0.01',...
+%        'Location','NorthEast');
+% 
+% % Plot DBV data as a function of prec(R2p)
+% figure; box on;
+% semilogx(PrecR2p,Err_DBV(1,:));
+% hold on;
+% semilogx(PrecR2p,Err_DBV(2,:));
+% semilogx(PrecR2p,Err_DBV(3,:));
+% semilogx(PrecR2p,Err_DBV(4,:));
+% semilogx(PrecR2p,Err_DBV(5,:));
+% axis([6e-6,2e1,0,100]);
+% ylabel('DBV Error (%)');
+% xlabel('Precision (R2'')');
+% legend('Prec(DBV) = 100','Prec(DBV) = 10','Prec(DBV) = 1','Prec(DBV) = 0.1','Prec(DBV) = 0.01',...
+%        'Location','NorthEast');
+% 
+% % Plot OEF data as a function of prec(R2p)
+% figure; box on;
+% semilogx(PrecR2p,Err_OEF(1,:));
+% hold on;
+% semilogx(PrecR2p,Err_OEF(2,:));
+% semilogx(PrecR2p,Err_OEF(3,:));
+% semilogx(PrecR2p,Err_OEF(4,:));
+% semilogx(PrecR2p,Err_OEF(5,:));
+% axis([6e-6,2e1,0,100]);
+% ylabel('OEF Error (%)');
+% xlabel('Precision (R2'')');
+% legend('Prec(DBV) = 100','Prec(DBV) = 10','Prec(DBV) = 1','Prec(DBV) = 0.1','Prec(DBV) = 0.01',...
+%        'Location','SouthEast');
    
 % % Plot R2p data as a function of prec(DBV)
 % figure; box on;
@@ -175,49 +174,41 @@ legend('Prec(DBV) = 100','Prec(DBV) = 10','Prec(DBV) = 1','Prec(DBV) = 0.1','Pre
    
    
 %% Plotting SNR comparisons
-% % Plot OEF Error
-% figure; box on;
-% semilogx(SNR(1:end),OE_L(1:end));
-% hold on;
-% semilogx(SNR,OE_1);
-% semilogx(SNR,OE_2);
-% ylabel('OEF Error (%)');
-% xlabel('SNR');
-% legend('Linear Model','1C Model','2C Model');
-% xlim([0,500]);
-% ylim([0, 700]);
-% xticks(SNR);
+% Plot R2p Error
+figure; box on;
+semilogx(SNR,Err_R2p(1,:));
+hold on;
+semilogx(SNR,Err_R2p(2,:));
+semilogx(SNR,Err_R2p(3,:));
+ylabel('R2'' Error (%)');
+xlabel('SNR');
+legend('Linear Model','1C Model','2C Model');
+xlim([0,500]);
+ylim([0, 15]);
+xticks(SNR);
 
-% % Plot DBV Error
-% figure; box on;
-% semilogx(SNR(1:end),DE_L(1:end));
-% hold on;
-% semilogx(SNR,DE_1);
-% semilogx(SNR,DE_2);
-% ylabel('DBV Error (%)');
-% xlabel('SNR');
-% legend('Linear Model','1C Model','2C Model');
-% xlim([0,500]);
-% xticks(SNR);
+% Plot DBV Error
+figure; box on;
+semilogx(SNR,Err_DBV(1,:));
+hold on;
+semilogx(SNR,Err_DBV(2,:));
+semilogx(SNR,Err_DBV(3,:));
+ylabel('DBV Error (%)');
+xlabel('SNR');
+legend('Linear Model','1C Model','2C Model');
+xlim([0,500]);
+ylim([0,100]);
+xticks(SNR);
 
-% % Plot OEF Correlation
-% figure; box on;
-% semilogx(SNR,OC_L);
-% hold on;
-% semilogx(SNR,OC_1);
-% ylabel('OEF Correlation');
-% xlabel('SNR');
-% legend('Linear Model','1C Model','Location','NorthWest');
-% xlim([0,500]);
-% xticks(SNR);
-% 
-% % Plot DBV Correlation
-% figure; box on;
-% semilogx(SNR,DC_L);
-% hold on;
-% semilogx(SNR,DC_1);
-% ylabel('DBV Correlation');
-% xlabel('SNR');
-% legend('Linear Model','1C Model','Location','NorthWest');
-% xlim([0,500]);
-% xticks(SNR);
+% Plot OEF Error
+figure; box on;
+semilogx(SNR,Err_OEF(1,:));
+hold on;
+semilogx(SNR,Err_OEF(2,:));
+semilogx(SNR,Err_OEF(3,:));
+ylabel('OEF Error (%)');
+xlabel('SNR');
+legend('Linear Model','1C Model','2C Model');
+xlim([0,500]);
+ylim([0,100]);
+xticks(SNR);

@@ -21,7 +21,7 @@
 
     
 clear; 
-clc;
+% clc;
 
 %% User To Select Fabber Data To Display
 
@@ -29,7 +29,7 @@ clc;
 vars = {'R2p','DBV','OEF'};
 
 % Choose Data set
-setnum = 747;
+setnum = 748;
 
 % Which set of subjects is this from?
 setname = 'genNF';          % 'VS', 'genF', 'genNF', or 'AMICI'

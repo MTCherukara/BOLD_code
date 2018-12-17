@@ -6,8 +6,8 @@
 % 5 December 2018
 
 clear;
-% close all;
-% setFigureDefaults;
+close all;
+setFigureDefaults;
 
 clc;
 
@@ -18,11 +18,11 @@ vars = {'OEF','DBV','R2p'};
 do_std = 0;
 
 % Do we want a figure?
-plot_fig = 0;
+plot_fig = 1;
 
 % Data directory
 resdir = '/Users/mattcher/Documents/DPhil/Data/Fabber_ModelFits/';
-setnum = 262;
+setnum = 292; % 292 then 278, then 285
 
 % Figure out the results directory we want to load from
 fdname = dir([resdir,'fabber_',num2str(setnum),'_*']);
@@ -134,12 +134,12 @@ for vv = 1:length(vars)
     
 end % for vv = 1:length(vars)
     
-% Also do Free Energy
-thFE = 1e6;
-volFE = LoadSlice([fabdir,'freeEnergy.nii.gz'],1);
-vecFE = volFE(:);
-vecFE(abs(vecFE) > thFE) = [];
-
-disp(' ');
-disp(['Free Energy (Mean)  : ',num2str(-mean(vecFE),3)]);
-disp(['Free Energy (Median): ',num2str(-median(vecFE),3)]);
+% % Also do Free Energy
+% thFE = 1e6;
+% volFE = LoadSlice([fabdir,'freeEnergy.nii.gz'],1);
+% vecFE = volFE(:);
+% vecFE(abs(vecFE) > thFE) = [];
+% 
+% disp(' ');
+% disp(['Free Energy (Mean)  : ',num2str(-mean(vecFE),3)]);
+% disp(['Free Energy (Median): ',num2str(-median(vecFE),3)]);

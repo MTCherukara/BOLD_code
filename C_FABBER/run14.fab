@@ -25,11 +25,11 @@ inferS0
 inferR2p
 inferDBV
 
-#single_compartment
 motional_narrowing
+include_intra
 
-precR2p=1e0
-precDBV=1e-1
+precR2p=1e-2
+precDBV=1e0
 
 # Scan Parameters (maybe I'll think of a better way of doing this...)
 TE=0.084
