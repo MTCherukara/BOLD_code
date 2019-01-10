@@ -46,7 +46,7 @@ if ~exist('threshold','var')
         threshold = 0.15;
         cmp = magma;
     elseif strfind(lower(niname),'r2p')
-        threshold = 25;
+        threshold = 30;
         cmp = viridis;
     elseif strfind(lower(niname),'oef')
         threshold = 1.0;

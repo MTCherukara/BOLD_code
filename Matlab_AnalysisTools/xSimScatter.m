@@ -5,14 +5,17 @@
 % MT Cherukara
 % 5 December 2018
 
+% Actively used as of 2019-01-10
+
 clear;
 close all;
-setFigureDefaults;
+% setFigureDefaults;
 
 clc;
 
 % Choose variables
 vars = {'OEF','DBV','R2p'};
+% vars = {'OEF'};
 
 % Do we have STD data?
 do_std = 0;
@@ -22,7 +25,7 @@ plot_fig = 1;
 
 % Data directory
 resdir = '/Users/mattcher/Documents/DPhil/Data/Fabber_ModelFits/';
-setnum = 292; % 292 then 278, then 285
+setnum = 278; % 292 then 278, then 285
 
 % Figure out the results directory we want to load from
 fdname = dir([resdir,'fabber_',num2str(setnum),'_*']);
@@ -104,7 +107,8 @@ for vv = 1:length(vars)
     
     % Calculate root mean square error
     diffs = gndVec - volVec;
-    RMSE(vv) = sqrt(mean(diffs.^2));
+%     RMSE(vv) = sqrt(mean(diffs.^2));
+    RMSE(vv) = mean(abs(gndVec - volVec));
     
     if do_std
         wdiff = diffs.*nm_std;
