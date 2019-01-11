@@ -9,9 +9,20 @@
 
 
 clear;
-% close all;
+close all;
 
 setFigureDefaults;
+
+% Data Row names
+rnames = {'Linear Model'      ; ...
+          'Linear (2C) Model' ; ...
+          '1C Model'          ; ...
+          '2C Model'          ; ...
+          '1C Model'          ; ...
+          '2C Model'           };
+
+% Select the rows we want to plot
+plotrows = [1,5,6];
 
 
 %% Data for Comparisons across SNR levels
@@ -22,19 +33,25 @@ SNR  = [  5    ,  10    ,  25    , 50     , 100    , 200     , 500     ];
 Err_OEF = [  45.5000,  100.0000,  100.0000,   75.6000,  100.0000,   26.9000,   17.0000; ...
              45.5000,  100.0000,  100.0000,   54.6000,   32.8000,   22.3000,   15.6000; ...
              71.3000,   69.3000,   51.3000,   41.7000,   36.6000,   34.0000,   34.0000; ...
-             79.5000,   66.4000,   46.3000,   34.4000,   28.1000,   26.0000,   25.6000 ];
+             79.5000,   66.4000,   46.3000,   34.4000,   28.1000,   26.0000,   25.6000; ...
+            100.0000,   81.2000,   52.4000,   41.7000,   35.5000,   32.4000,   32.3000; ...
+            100.0000,   70.8000,   46.7000,   32.7000,   25.3000,   22.6000,   21.9000 ];
        
 % SNR         5          10         25         50         100        200        500
 Err_DBV = [  24.1000,    8.4300,    3.7300,    2.1100,    1.1600,    0.7500,    0.5800; ...
              24.1000,    8.6200,    3.6900,    2.0100,    1.1000,    0.6400,    0.4100; ...
               9.8500,    7.1000,    6.5200,    9.0000,   10.3000,   11.4000,   12.1000; ...
-              9.5200,    6.8400,    6.4800,    7.8000,    9.4300,    9.0800,    9.3200];
+              9.5200,    6.8400,    6.4800,    7.8000,    9.4300,    9.0800,    9.3200; ...
+              8.0300,    6.2000,    4.6900,    4.6800,    4.3600,    4.2600,    4.8800; ...
+              9.1900,    6.6800,    4.5600,    3.7200,    3.7000,    3.2800,    2.9500 ];
          
 % SNR         5          10         25         50         100        200        500
 Err_R2p = [   8.8900,    3.0000,    1.9700,    1.8300,    1.7900,    1.7900,    1.7800; ...
               8.8700,    3.0800,    2.1600,    1.9800,    1.9500,    1.9400,    1.9500; ...
               4.1000,    3.2200,    2.9300,    2.7800,    2.7900,    2.7000,    2.7200; ...
-              3.9000,    3.1200,    3.2700,    3.1700,    3.1600,    3.0900,    3.1900 ];
+              3.9000,    3.1200,    3.2700,    3.1700,    3.1600,    3.0900,    3.1900; ...
+              3.5000,    2.2800,    1.9300,    1.9100,    1.9000,    1.8600,    1.9300; ...
+              3.7300,    2.3300,    2.1200,    2.1400,    2.1900,    2.1800,    2.1500 ];
 
 
 
@@ -180,44 +197,41 @@ Err_R2p = [   8.8900,    3.0000,    1.9700,    1.8300,    1.7900,    1.7900,    
    
    
 %% Plotting SNR comparisons
+
+% Pull out the rows we want
+npr = length(plotrows);
+rlabels = rnames(plotrows);
+
+
 % Plot R2p Error
-figure; box on;
-semilogx(SNR,Err_R2p(1,:));
+figure; box on; 
+semilogx(SNR,Err_R2p(plotrows,:));
 hold on;
-% semilogx(SNR,Err_R2p(2,:));
-semilogx(SNR,Err_R2p(3,:));
-semilogx(SNR,Err_R2p(4,:));
 ylabel('R2'' Error (%)');
 xlabel('SNR');
-legend('Linear Model','1C Model','2C Model');
+legend(rlabels{:});
 xlim([0,500]);
-ylim([0, 11]);
+ylim([0, 10]);
 xticks(SNR);
 
 % Plot DBV Error
 figure; box on;
-semilogx(SNR,Err_DBV(1,:));
+semilogx(SNR,Err_DBV(plotrows,:));
 hold on;
-% semilogx(SNR,Err_DBV(2,:));
-semilogx(SNR,Err_DBV(3,:));
-semilogx(SNR,Err_DBV(4,:));
 ylabel('DBV Error (%)');
 xlabel('SNR');
-legend('Linear Model','1C Model','2C Model');
+legend(rlabels{:});
 xlim([0,500]);
 ylim([0, 30]);
 xticks(SNR);
 
 % Plot OEF Error
 figure; box on;
-semilogx(SNR,Err_OEF(1,:));
+semilogx(SNR,Err_OEF(plotrows,:));
 hold on;
-% semilogx(SNR,Err_OEF(2,:));
-semilogx(SNR,Err_OEF(3,:));
-semilogx(SNR,Err_OEF(4,:));
 ylabel('OEF Error (%)');
 xlabel('SNR');
-legend('Linear Model','1C Model','2C Model');
+legend(rlabels{:});
 xlim([0,500]);
 ylim([0,100]);
 xticks(SNR);

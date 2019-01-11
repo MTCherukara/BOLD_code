@@ -8,7 +8,7 @@
 % Actively used as of 2019-01-10
 
 clear;
-close all;
+% close all;
 % setFigureDefaults;
 
 clc;
@@ -18,14 +18,18 @@ vars = {'OEF','DBV','R2p'};
 % vars = {'OEF'};
 
 % Do we have STD data?
-do_std = 0;
+do_std = 1;
 
 % Do we want a figure?
-plot_fig = 1;
+plot_fig = 0;
 
 % Data directory
 resdir = '/Users/mattcher/Documents/DPhil/Data/Fabber_ModelFits/';
-setnum = 278; % 292 then 278, then 285
+setnum = 287; % 292 then 278, then 285
+
+% Standard Deviation Thresholds
+thrR = 3.0;
+thrD = 0.2;
 
 % Figure out the results directory we want to load from
 fdname = dir([resdir,'fabber_',num2str(setnum),'_*']);
@@ -50,6 +54,18 @@ corrs = zeros(length(vars),2);
 RMSE  = zeros(length(vars),1);
 WMSE  = zeros(length(vars),1);      % weighted root mean square error
 
+% if we have std data, load it and mask out bad voxels
+if do_std
+    
+    stdR = LoadSlice([fabdir,'std_R2p.nii.gz'],1);
+    stdD = LoadSlice([fabdir,'std_DBV.nii.gz'],1);
+    
+    threshmask = (stdR > thrR) + (stdD > thrD);
+    threshVec = threshmask(:) > 0.5;
+    
+end % if do_std
+
+
 % Load the arrays of true OEF and DBV values
 
 % Loop through variables
@@ -58,17 +74,11 @@ for vv = 1:length(vars)
     % Identify variable
     vname = vars{vv};
     
-    % Load the data
+    % Load the data, Take Absolute Values and Vectorize
     volData = LoadSlice([fabdir,'mean_',vname,'.nii.gz'],1);
-    if do_std
-        stdData = LoadSlice([fabdir,'std_' ,vname,'.nii.gz'],1);
-    end
-    
-   
-    
-    % Take Absolute Values and Vectorize, also, scale up to a percentage
     volVec = abs(volData(:));
     if do_std
+        stdData = LoadSlice([fabdir,'std_' ,vname,'.nii.gz'],1);
         stdVec = abs(stdData(:));
     end
     
@@ -76,25 +86,28 @@ for vv = 1:length(vars)
     gndVec = gndMat(:,vv);
     sclVec = sclMat(:,vv);
     
-     if strcmp(vname,'DBV') || strcmp(vname,'OEF')
+    if strcmp(vname,'DBV') || strcmp(vname,'OEF')
         volVec = volVec.*100;
         gndVec = gndVec.*100;
-        if do_std
-            stdVec = stdVec.*100;
-        end
     end
     
     % Limits, for plotting
     minV = gndVec(1);
     maxV = gndVec(end);
     
+    % Remove data points whose standard deviation is too high
+    if do_std
+        volVec(threshVec) = [];
+        gndVec(threshVec) = [];
+        sclVec(threshVec) = [];
+        stdVec(threshVec) = [];
+    end
+    
     % Colour the results based on the log of their standard deviation
     if do_std
         ln_std = -log(stdVec);
         nm_std = ln_std + abs(min(ln_std));     % normalized log standard deviation
         nm_std = nm_std./max(nm_std);
-    else
-        ln_std = [0,0,0];
     end
     
     shades = sclVec;
@@ -132,11 +145,18 @@ for vv = 1:length(vars)
         disp(['    Not Significant (p = ',num2str(P(1,2),2),')']);
     end
     disp(['  RMS Error: ',num2str(RMSE(vv),3),' %']);
-    if do_std
-        disp(['  Weighted Error: ',num2str(WMSE(vv),3),' %']);
-    end
+%     if do_std
+%         disp(['  Weighted Error: ',num2str(WMSE(vv),3),' %']);
+%     end
     
 end % for vv = 1:length(vars)
+
+
+% Print the number of bad voxels we had to remove
+if do_std
+    disp(' ');
+    disp(['(Excluded ',num2str(sum(threshVec)),' of 2500 data points)']);
+end
     
 % % Also do Free Energy
 % thFE = 1e6;
