@@ -227,8 +227,8 @@ function M = calcMagnetization(tau,TE,TR,T1,T2,TI)
     termt = exp(-expT2);
 
     % put it all together
-%     M = ( 1 - (terme.*termf) ) .* termt;
-    M = 1 - (2*exp(-TI./T1)) + exp(-TR./T1);
+    M = ( 1 - (terme.*termf) ) .* termt;
+%     M = 1 - (2*exp(-TI./T1)) + exp(-TR./T1);
     
 end
 

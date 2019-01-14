@@ -25,7 +25,7 @@ inferS0
 inferR2p
 inferDBV
 
-#motional_narrowing
+motional_narrowing
 include_intra
 
 precR2p=1e-2
