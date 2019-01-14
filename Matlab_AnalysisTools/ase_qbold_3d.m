@@ -7,8 +7,8 @@
 
 clear;
 
-start_tau = -16;
-delta_tau = 8;
+start_tau = -28;
+delta_tau = 4;
 end_tau = 64;
 
 if ~exist('nii_name','var')

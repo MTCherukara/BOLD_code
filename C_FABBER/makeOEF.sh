@@ -7,8 +7,8 @@
 # Matthew Cherukara, 3 October 2017
 
 # directory of results
-#rdir=~/Documents/DPhil/Data/Fabber_Results
-rdir=~/Documents/DPhil/Data/Fabber_ModelFits
+rdir=~/Documents/DPhil/Data/Fabber_Results
+#rdir=~/Documents/DPhil/Data/Fabber_ModelFits
 
 # find the name of the directory that has the specified number, if no input is specified, use the
 # default-created directory "+" 

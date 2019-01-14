@@ -1,8 +1,42 @@
 % Various sets of qBOLD data, for bar-chart plotting:
 %
-% Updated 2018-11-06
+% Updated 2019-01-04
 
-%% Phenomonelogical Model Testing
+%% New Data (subjects 12-14) CSF Correction Testing (Nov 2018)
+
+legtext = {'FP','NF','NFC-T1','NFC-T2'};
+
+%       FLAIR      NF-I       NFC-T1-I   NFC-T2-I
+R2p = [ 6.3040,    4.5900,    5.5220,    4.6150; ...
+        5.7870,    4.8010,    5.7110,    4.1390; ...
+        5.8570,    4.9180,    5.8510,    3.3090 ];
+
+%       FLAIR      NF-I       NFC-T1-I   NFC-T2-I
+DBV = [ 5.9780,    4.0440,    4.4010,    4.5080; ...
+        5.4130,    3.7220,    4.1300,    3.9810; ...
+        5.5210,    3.5450,    3.9940,    3.3380 ];
+
+%       FLAIR      NF-I       NFC-T1-I   NFC-T2-I
+OEF = [ 34.2100,   34.4500,   39.1700,   34.3800; ...
+        33.8800,   36.1100,   40.5400,   32.7800; ...
+        33.1300,   37.8100,   42.4200,   33.1800 ];
+    
+%        FLAIR      NF-I       NFC-T1-I   NFC-T2-I
+eR2p = [ 2.1640,    2.1190,    0.9580,    1.2710; ...
+         2.1270,    2.0540,    0.9740,    1.5570; ...
+         2.1410,    1.9750,    0.8810,    1.7810 ];
+     
+%        FLAIR      NF-I       NFC-T1-I   NFC-T2-I
+eDBV = [ 7.4100,    2.8200,    2.5140,    2.9360; ...
+         7.3880,    2.8930,    2.6030,    3.2710; ...
+         7.4480,    2.6510,    2.3140,    3.0380 ];
+
+%        FLAIR      NF-I       NFC-T1-I   NFC-T2-I
+eOEF = [ 25.1000,   29.7300,   22.4000,   25.3300; ...
+         30.5800,   31.8400,   24.8800,   30.6100; ...
+         27.3100,   31.5800,   23.9700,   35.0000 ];
+
+%% Phenomonelogical Model Testing (Oct 2018)
 
 legtext = {'L Model','2C Model','Ph Fixed','Ph Var.','L Model','2C Model','Ph Fixed','Ph Var.'};
 

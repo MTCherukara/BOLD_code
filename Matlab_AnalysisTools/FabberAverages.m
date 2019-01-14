@@ -21,7 +21,7 @@
 
     
 clear; 
-% clc;
+clc;
 
 %% User To Select Fabber Data To Display
 
@@ -29,13 +29,16 @@ clear;
 vars = {'R2p','DBV','OEF'};
 
 % Choose Data set
-setnum = 748;
+setnum = 775;
 
 % Which set of subjects is this from?
-setname = 'genNF';          % 'VS', 'genF', 'genNF', or 'AMICI'
+setname = 'VS';          % 'VS', 'genF', 'genNF', or 'AMICI'
 
 % do Free energy? - LEAVE THIS AS 0 FOR NOW!!
 do_FE = 0;
+
+% do standard deviations
+do_std = 1;
 
 
 %% Initial Stuff
@@ -53,7 +56,7 @@ switch setname
     case 'VS'
         
         slicenum = 4:9;
-        maskname = 'mask_gm_60.nii.gz';
+        maskname = 'mask_gm.nii.gz';
         CC = strsplit(fabdir,'_vs');
         subnum = CC{2}(1);
         maskdir = ['/Users/mattcher/Documents/DPhil/Data/validation_sqbold/vs',subnum,'/'];
@@ -110,27 +113,35 @@ for vv = 1:length(vars)
         
     % Load the data
     volData = LoadSlice([fabdir,'mean_',vname,'.nii.gz'],slicenum);
-    stdData = LoadSlice([fabdir,'std_' ,vname,'.nii.gz'],slicenum);
-    
-    
     
     % Apply Mask and Threshold
     volData = abs(volData(:).*mskData(:));
-    stdData = abs(stdData(:).*mskData(:));
+
+    % Load Standard Deviation data
+    if do_std
+        stdData = LoadSlice([fabdir,'std_' ,vname,'.nii.gz'],slicenum);
+        stdData = abs(stdData(:).*mskData(:));
+    end
     
     % Create a mask of values to remove
     badData = (volData == 0) + ~isfinite(volData) + (volData > thrsh);
-    badData = badData + ~isfinite(stdData) + (stdData > thrsh) + (stdData < (thrsh.*1e-3));
+    if do_std
+        badData = badData + ~isfinite(stdData) + (stdData > thrsh) + (stdData < (thrsh.*1e-3));
+    end
     
     % Remove bad values
     volData(badData ~= 0) = [];
-    stdData(badData ~= 0) = [];
+    if do_std
+        stdData(badData ~= 0) = [];
+    end
     
    
     % convert certain params to percentages
     if strcmp(vname,'DBV') || strcmp(vname,'OEF') || strcmp(vname,'VC') || strcmp(vname,'lambda')
         volData = volData.*100;
-        stdData = stdData.*100;
+        if do_std
+            stdData = stdData.*100;
+        end
     end
     
     % calculate IQR
@@ -144,8 +155,11 @@ for vv = 1:length(vars)
     
     disp('   ');
     disp(['Mean ',vname,'   : ',num2str(mean(volData),4)]);
-    disp(['    Std ',vname,': ',num2str(mean(stdData),4)]);
-%     disp(['    Std ',vname,': ',num2str(std(volData),4)]);
+    if do_std
+        disp(['    Std ',vname,': ',num2str(mean(stdData),4)]);
+    else
+        disp(['    Std ',vname,': ',num2str(std(volData),4)]);
+    end
 
 end
 
