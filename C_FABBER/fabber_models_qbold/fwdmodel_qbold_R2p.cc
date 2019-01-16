@@ -469,7 +469,7 @@ void R2primeFwdModel::Evaluate(const ColumnVector &params, ColumnVector &result)
     }
     if (infer_lam)
     {
-        lam = abs(paramcpy(lam_index()));
+        lam = (paramcpy(lam_index()));
     }
     else
     {

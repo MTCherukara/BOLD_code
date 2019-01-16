@@ -29,10 +29,10 @@ clc;
 vars = {'R2p','DBV','OEF'};
 
 % Choose Data set
-setnum = 782;
+setnum = 812;
 
 % Which set of subjects is this from?
-setname = 'VS';          % 'VS', 'genF', 'genNF', or 'AMICI'
+setname = 'CSF';          % 'VS', 'genF', 'genNF', 'CSF', or 'AMICI'
 
 % do Free energy? - LEAVE THIS AS 0 FOR NOW!!
 do_FE = 0;
@@ -71,6 +71,14 @@ switch setname
         sesnum = C2{2}(1);
         maskdir = ['/Users/mattcher/Documents/BIDS_Data/qbold_stroke/sourcedata/sub-',...
                    subnum,'/ses-00',sesnum,'/func-ase/'];
+               
+    case 'CSF'
+        
+        slicenum = 3:8;
+        maskname = 'mask_new_gm_50.nii.gz';
+        CC = strsplit(fabdir,'_s');     % need a 2-digit subject number
+        subnum = CC{2}(1:2);
+        maskdir = ['/Users/mattcher/Documents/DPhil/Data/subject_',subnum,'/'];
                
     case 'genF'
         
@@ -115,18 +123,18 @@ for vv = 1:length(vars)
     volData = LoadSlice([fabdir,'mean_',vname,'.nii.gz'],slicenum);
     
     % Apply Mask and Threshold
-    volData = abs(volData(:).*mskData(:));
+    volData = (volData(:).*mskData(:));
 
     % Load Standard Deviation data
     if do_std
         stdData = LoadSlice([fabdir,'std_' ,vname,'.nii.gz'],slicenum);
-        stdData = abs(stdData(:).*mskData(:));
+        stdData = (stdData(:).*mskData(:));
     end
     
     % Create a mask of values to remove
     badData = (volData == 0) + ~isfinite(volData) + (volData > thrsh);
     if do_std
-        badData = badData + ~isfinite(stdData) + (stdData > thrsh) + (stdData < (thrsh.*1e-3));
+        badData = badData + ~isfinite(stdData) + (stdData > (thrsh/2)) + (stdData < (thrsh.*1e-3));
     end
     
     % Remove bad values
