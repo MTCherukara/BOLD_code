@@ -29,7 +29,7 @@ clc;
 vars = {'R2p','DBV','OEF'};
 
 % Choose Data set
-setnum = 812;
+setnum = 840;
 
 % Which set of subjects is this from?
 setname = 'CSF';          % 'VS', 'genF', 'genNF', 'CSF', or 'AMICI'
