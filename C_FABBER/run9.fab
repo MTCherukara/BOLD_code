@@ -1,8 +1,8 @@
 # fabber run 9, AMICI Protocol Testing
 
 # Input Data
-data=../../Data/subject_14/ASE_80_nonFLAIR.nii.gz
-mask=../../Data/subject_14/mask_80_nonFLAIR.nii.gz
+data=../../Data/subject_12/ASE_80_FLAIR.nii.gz
+mask=../../Data/subject_12/mask_80_FLAIR.nii.gz
 
 # Run Options
 output=../../Data/Fabber_Results/
@@ -11,29 +11,29 @@ save-model-fit
 print-free-energy
 
 # Method Information
-method=spatialvb
+method=vb
 noise=white
 max-iterations=10
 allow-bad-voxels
 
 # Spatial VB Information (remove this if method!=spatialvb)
-param-spatial-priors=NNNI
-image-prior4=../../Data/subject_14/CSF_T2w_80.nii.gz
+#param-spatial-priors=NNN
+#image-prior4=../../Data/subject_14/CSF_T2w_80.nii.gz
 
 # Inference Model 
 model=qboldR2p
 inferS0
-inferR2p
+inferOEF
 inferDBV
-inferlam
+#inferlam
 
 #motional_narrowing
 #include_intra
-include_csf
+#include_csf
 
-precR2p=1e-2
+#precR2p=1e-2
 precDBV=1e0
-precCSF=1e2
+#precCSF=1e2
 
 # Model Parameters
 #SR=0.537
@@ -42,8 +42,8 @@ beta=1
 # Scan Parameters
 TE=0.084
 TR=2.000
-TI=0.0
-#TI=0.870
+#TI=0.0
+TI=0.870
 
 tau1=-0.016
 tau2=-0.008

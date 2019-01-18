@@ -1,7 +1,7 @@
 # fabber run 7, validation sqbold data
 # Input Data
-data=../../Data/validation_sqbold/vs7/ASE_FLAIR_av_mc.nii.gz
-mask=../../Data/validation_sqbold/vs7/mask_flair.nii.gz
+data=../../Data/validation_sqbold/vs1/ASE_FLAIR_av_mc.nii.gz
+mask=../../Data/validation_sqbold/vs1/mask_flair.nii.gz
 
 # Run Options
 output=../../Data/Fabber_Results/
@@ -22,13 +22,13 @@ allow-bad-voxels
 # Inference Model 
 model=qboldR2p
 inferS0
-inferR2p
+inferOEF
 inferDBV
 
 motional_narrowing
 include_intra
 
-precR2p=1e-2
+#precR2p=1e-2
 precDBV=1e0
 
 # Scan Parameters (maybe I'll think of a better way of doing this...)

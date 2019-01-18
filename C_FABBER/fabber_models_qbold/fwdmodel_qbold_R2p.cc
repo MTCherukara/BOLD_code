@@ -257,7 +257,7 @@ void R2primeFwdModel::HardcodedInitialDists(MVNDist &prior, MVNDist &posterior) 
 
     if (infer_OEF)
     {
-        prior.means(OEF_index()) = 0.2;
+        prior.means(OEF_index()) = 0.4;
         precisions(OEF_index(), OEF_index()) = 1e-1; // 1e-1
     }
     
@@ -317,8 +317,8 @@ void R2primeFwdModel::HardcodedInitialDists(MVNDist &prior, MVNDist &posterior) 
     // Set distributions for initial posteriors
     if (infer_OEF)
     {
-        posterior.means(OEF_index()) = 0.21;
-        precisions(OEF_index(), OEF_index()) = 1e1; // 1e1
+        posterior.means(OEF_index()) = 0.4;
+        precisions(OEF_index(), OEF_index()) = 1e-1; // 1e1
     }
     
     if (infer_R2p)
@@ -522,14 +522,14 @@ void R2primeFwdModel::Evaluate(const ColumnVector &params, ColumnVector &result)
 
     // calculate tc and threshold it if necessary
     tc = 1.7/dw;
-    if (tc > 0.021)
+    if (tc > 0.025)
     {
-        tc = 0.021;
+        tc = 0.025;
     }
-    else if (tc < 0.010)
+    else if (tc < 0.005)
     {
-        tc = 0.010;
-    }
+        tc = 0.005;
+    } 
 
     // evaluate blood relaxation rates
     R2b  = ( 4.5 + (16.4*Hct)) + ( ((165.2*Hct) + 55.7)*pow(OEF,2.0) );
@@ -547,18 +547,19 @@ void R2primeFwdModel::Evaluate(const ColumnVector &params, ColumnVector &result)
     // we can do the magnetization stuff outside the loop, since they are not affected by tau
 
     // calculate steady state magnetization values, for tissue, blood, and CSF
-    /* NEW VERSION
+    // NEW VERSION
     mt = 1.0 - (2.0*exp(-TI/T1t)) + exp(-TR/T1t);
     mb = 1.0 - (2.0*exp(-TI/T1b)) + exp(-TR/T1b);
     me = 1.0 - (2.0*exp(-TI/T1e)) + exp(-TR/T1e);
-    */
+    
 
     // OLD VERSION (with no TAU dependence)
+    /*
     double TE = TEvals(1);
     mt = exp(-TE*R2t) * ( 1 - ( 1 + (2*exp(TE/(2*T1t))) ) * ( 2 - exp(-(TR-TI)/T1t)) * exp(-TI/T1t) );
     mb = exp(-TE*R2b) * ( 1 - ( 1 + (2*exp(TE/(2*T1b))) ) * ( 2 - exp(-(TR-TI)/T1b)) * exp(-TI/T1b) );
     me = exp(-TE*R2e) * ( 1 - ( 1 + (2*exp(TE/(2*T1e))) ) * ( 2 - exp(-(TR-TI)/T1e)) * exp(-TI/T1e) );
-                                
+      */                          
     /* OLD OLD VERSION
     mt = exp(-(TE-tau)*R2t) * ( 1 - ( 1 + (2*exp((TE-tau)/(2*T1t))) ) 
                                 * ( 2 - exp(-(TR-TI)/T1t)) * exp(-TI/T1t)  );

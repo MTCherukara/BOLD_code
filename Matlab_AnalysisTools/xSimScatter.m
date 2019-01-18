@@ -14,7 +14,7 @@ clear;
 clc;
 
 % Choose variables
-vars = {'OEF','DBV','R2p'};
+vars = {'OEF','DBV'};
 % vars = {'OEF'};
 
 % Do we have STD data?
@@ -25,11 +25,11 @@ plot_fig = 0;
 
 % Data directory
 resdir = '/Users/mattcher/Documents/DPhil/Data/Fabber_ModelFits/';
-setnum = 287; % 292 then 278, then 285
+setnum = 333; % 292 then 278, then 285
 
 % Standard Deviation Thresholds
-thrR = 3.0;
-thrD = 0.2;
+thrR = 10.0;
+thrD = 1.0;
 
 % Figure out the results directory we want to load from
 fdname = dir([resdir,'fabber_',num2str(setnum),'_*']);
@@ -53,11 +53,12 @@ sclMat = [dbvData(:),oefData(:),r2pData(:)];
 corrs = zeros(length(vars),2);
 RMSE  = zeros(length(vars),1);
 WMSE  = zeros(length(vars),1);      % weighted root mean square error
+RELE  = zeros(length(vars),1);
 
 % if we have std data, load it and mask out bad voxels
 if do_std
     
-    stdR = LoadSlice([fabdir,'std_R2p.nii.gz'],1);
+    stdR = LoadSlice([fabdir,'std_OEF.nii.gz'],1);
     stdD = LoadSlice([fabdir,'std_DBV.nii.gz'],1);
     
     threshmask = (stdR > thrR) + (stdD > thrD);
@@ -122,6 +123,7 @@ for vv = 1:length(vars)
     diffs = gndVec - volVec;
 %     RMSE(vv) = sqrt(mean(diffs.^2));
     RMSE(vv) = mean(abs(gndVec - volVec));
+    RELE(vv) = 100*mean(abs(gndVec - volVec)./gndVec);
     
     if do_std
         wdiff = diffs.*nm_std;
@@ -144,7 +146,8 @@ for vv = 1:length(vars)
     if P(1,2) > 0.05
         disp(['    Not Significant (p = ',num2str(P(1,2),2),')']);
     end
-    disp(['  RMS Error: ',num2str(RMSE(vv),3),' %']);
+    disp(['  RMS Error:  ',num2str(RMSE(vv),3),' %']);
+    disp(['  Rel. Error: ',num2str(RELE(vv),3),' %']);
 %     if do_std
 %         disp(['  Weighted Error: ',num2str(WMSE(vv),3),' %']);
 %     end
