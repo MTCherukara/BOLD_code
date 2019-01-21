@@ -87,6 +87,7 @@ void R2primeFwdModel::Initialize(ArgsType &args)
     prec_R2p = convertTo<double>(args.ReadWithDefault("precR2p","1e-2"));
     prec_DBV = convertTo<double>(args.ReadWithDefault("precDBV","1e0"));
     prec_CSF = convertTo<double>(args.ReadWithDefault("precCSF","1e-1"));
+    prec_OEF = convertTo<double>(args.ReadWithDefault("precOEF","1e-1"));
 
     // First read tau values, since these will always be specified
 
@@ -258,7 +259,7 @@ void R2primeFwdModel::HardcodedInitialDists(MVNDist &prior, MVNDist &posterior) 
     if (infer_OEF)
     {
         prior.means(OEF_index()) = 0.4;
-        precisions(OEF_index(), OEF_index()) = 1e-1; // 1e-1
+        precisions(OEF_index(), OEF_index()) = prec_OEF; // 1e-1
     }
     
     if (infer_R2p)

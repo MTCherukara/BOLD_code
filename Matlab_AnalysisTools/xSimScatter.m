@@ -18,14 +18,14 @@ vars = {'OEF','DBV'};
 % vars = {'OEF'};
 
 % Do we have STD data?
-do_std = 1;
+do_std = 0;
 
 % Do we want a figure?
-plot_fig = 0;
+plot_fig = 1;
 
 % Data directory
 resdir = '/Users/mattcher/Documents/DPhil/Data/Fabber_ModelFits/';
-setnum = 333; % 292 then 278, then 285
+setnum = 346; % 292 then 278, then 285
 
 % Standard Deviation Thresholds
 thrR = 10.0;

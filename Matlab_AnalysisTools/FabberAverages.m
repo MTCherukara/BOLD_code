@@ -21,18 +21,18 @@
 
     
 clear; 
-clc;
+% clc;
 
 %% User To Select Fabber Data To Display
 
 % Choose Variables
-vars = {'R2p','DBV','OEF'};
+vars = {'DBV','OEF'};
 
 % Choose Data set
-setnum = 840;
+setnum = 864;
 
 % Which set of subjects is this from?
-setname = 'CSF';          % 'VS', 'genF', 'genNF', 'CSF', or 'AMICI'
+setname = 'VS';          % 'VS', 'genF', 'genNF', 'CSF', or 'AMICI'
 
 % do Free energy? - LEAVE THIS AS 0 FOR NOW!!
 do_FE = 0;
@@ -122,8 +122,8 @@ for vv = 1:length(vars)
     % Load the data
     volData = LoadSlice([fabdir,'mean_',vname,'.nii.gz'],slicenum);
     
-    % Apply Mask and Threshold
-    volData = (volData(:).*mskData(:));
+    % Apply Mask and Threshold (ABSOLUTE VALUE)
+    volData = abs(volData(:).*mskData(:));
 
     % Load Standard Deviation data
     if do_std
@@ -134,7 +134,8 @@ for vv = 1:length(vars)
     % Create a mask of values to remove
     badData = (volData == 0) + ~isfinite(volData) + (volData > thrsh);
     if do_std
-        badData = badData + ~isfinite(stdData) + (stdData > (thrsh/2)) + (stdData < (thrsh.*1e-3));
+%         badData = badData + ~isfinite(stdData) + (stdData > (thrsh/2)) + (stdData < (thrsh.*1e-3));
+        badData = badData + ~isfinite(stdData) ;
     end
     
     % Remove bad values

@@ -32,8 +32,8 @@ legend('Uninformative Prior','Informative Prior',...
 
 
 % DBV
-mean_DBV = 3;
-XD = linspace(-10,15,np);
+mean_DBV = 40;
+XD = linspace(0,100,np);
 Du = normpdf(XD,mean_DBV,prc(1e-3));
 Di = normpdf(XD,mean_DBV,prc(1e-1));
 Da = normpdf(XD,0.0429,0.0322); % results

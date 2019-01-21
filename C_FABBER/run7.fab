@@ -25,11 +25,12 @@ inferS0
 inferOEF
 inferDBV
 
-motional_narrowing
-include_intra
+#motional_narrowing
+#include_intra
 
 #precR2p=1e-2
 precDBV=1e0
+precOEF=1e-1
 
 # Scan Parameters (maybe I'll think of a better way of doing this...)
 TE=0.074
