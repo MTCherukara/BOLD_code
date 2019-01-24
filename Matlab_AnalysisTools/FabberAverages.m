@@ -6,6 +6,9 @@
     %
     % Changelog:
     %
+    % 2019-01-24 (MTC). Brought back the averaging of residuals, free energy,
+    %       and model SNR.
+    %
     % 2018-11-26 (MTC). Removed the use of MTC_LoadVol.m (now this script just
     %       calls LoadSlice.m directly, in order that it can be generalized to
     %       using masks (etc) from a range of datasets.
@@ -21,7 +24,7 @@
 
     
 clear; 
-% clc;
+clc;
 
 %% User To Select Fabber Data To Display
 
@@ -29,13 +32,13 @@ clear;
 vars = {'DBV','OEF'};
 
 % Choose Data set
-setnum = 861;
+setnum = 841;
 
 % Which set of subjects is this from?
 setname = 'VS';          % 'VS', 'genF', 'genNF', 'CSF', or 'AMICI'
 
-% do Free energy? - LEAVE THIS AS 0 FOR NOW!!
-do_FE = 0;
+% do Free energy?
+do_FE = 1;
 
 % do standard deviations
 do_std = 1;
@@ -172,20 +175,61 @@ for vv = 1:length(vars)
 
 end
 
-%% Free Energy
+%% Free Energy and Residuals
 
 if do_FE
-    [FEData,RData,MData] = MTC_LoadFreeEnergy(setnum,subnum,slicenum);
+    
+    % Load these data
+    RData = LoadSlice([fabdir,'residuals.nii.gz'],slicenum);
+    
+    if do_std
+        % For FABBER data that has _std.nii.gz files
+        FData = LoadSlice([fabdir,'freeEnergy.nii.gz'],slicenum);
+        MData = LoadSlice([fabdir,'modelfit.nii.gz'],slicenum);
+    
+        % Calculate model SNR
+        SData = MData ./ abs(RData);
+        
+    else
+        % Otherwise
+        SData = LoadSlice([fabdir,'modelSNR.nii.gz'],slicenum);
+    end
+    
+    % Average residual and SNR over all taus
+    RData = mean(RData,4);
+    SData = mean(SData,4);
+    
+    % Apply mask
+    RData = (RData(:).*mskData(:));
+    SData = (SData(:).*mskData(:));
 
+    % Define bad values (threshold residuals at 100, and FE at 10k
+    badData = (RData == 0) + ~isfinite(RData) + (abs(RData) > 100);
+    badData = badData + (SData == 0) + ~isfinite(SData) + (SData > 10000);
+    
+    if do_std
+        % if we have Free Energy data
+        FData = (FData(:).*mskData(:));
+        badData = badData + (FData == 0) + ~isfinite(FData) + (abs(FData) > 10000);
+        FData(badData ~= 0) = [];
+    end
+    
+    % Remove bad values
+    RData(badData ~= 0) = [];
+    SData(badData ~= 0) = [];
+
+    
     disp('   ');
-    % disp(['     Mean Residual : ',num2str(mean(RData),4)]);
+    disp(['     Mean Residual : ',num2str(mean(RData),4)]);
     disp([' Absolute Residual : ',num2str(mean(abs(RData)),4)]);
-    % disp(['   Median Residual : ',num2str(median(RData),4)]);
+%     disp(['   Median Residual : ',num2str(median(RData),4)]);
     % 
-    % disp('   ');
-    disp(['      Modelfit SNR : ',num2str(mean(MData)./mean(abs(RData)),4)]);
-
     disp('   ');
-    disp(['  Mean Free Energy : ',num2str(-mean(FEData),4)]);
-    disp(['Median Free Energy : ',num2str(-median(FEData),4)]);
+    disp(['      Modelfit SNR : ',num2str(mean(SData),4)]);
+
+    if do_std
+        disp('   ');
+        disp(['  Mean Free Energy : ',num2str(-mean(FData),4)]);
+        disp(['Median Free Energy : ',num2str(-median(FData),4)]);
+    end
 end

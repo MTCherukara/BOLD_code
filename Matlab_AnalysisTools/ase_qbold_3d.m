@@ -17,13 +17,13 @@ if ~exist('nii_name','var')
 end
 
 %% Load dataset
-[V, ~, scales] = read_avw(nii_name);
+[V, ~, scales] = read_avw(nii_name); % V = the raw data;
 [x, y, z, v] = size(V);
 %disp(size(V))
 
 %% Fit R2'
 % Constants
-Hct = 0.34; % hct ratio in small vessels
+Hct = 0.4; % hct ratio in small vessels
 dChi0 = 0.264*10^-6; % ppm, sus difference between fully oxy & deoxy rbc's
 gamma = 2.675*10^4; % rads/(secs.Gauss) gyromagnetic ratio
 B0 = 3*10^4; %Gauss, Field strength
@@ -68,10 +68,6 @@ for xID = 1:x
     end
 end
 
-% range_r2p = [0 7];
-% range_dbv = [0 0.12];
-% range_oef = [0 1.0];
-% range_dhb = [0 10];
 
 % Calculate Physiological Parameters
 s0_id = find(tau == 0);
@@ -81,21 +77,22 @@ dbv = c - ln_Sase(:,:,:,s0_id);
 oef = r2p./(dbv.*gamma.*(4./3).*pi.*dChi0.*Hct.*B0);
 dhb = r2p./(dbv.*gamma.*(4./3).*pi.*dChi0.*B0.*k);
 
-% % Display parameter maps
-% imgH_r2p = brain_montage(r2p, range_r2p, 0, 'R_2''','R2''','JetBlack', '[s^{-1}]',[1 z]);
-% if nii_out, print('r2p.eps','-depsc2','-r300'), end
-% imgH_dbv = brain_montage(dbv, range_dbv, 0, 'DBV','DBV','JetBlack', '[%]',[1 z]);
-% if nii_out, print('dbv.eps','-depsc2','-r300'), end
-% imgH_oef = brain_montage(oef, range_oef, 0, 'OEF','OEF','JetBlack', '[%]',[1 z]);
-% if nii_out, print('oef.eps','-depsc2','-r300'), end
-% imgH_dhb = brain_montage(dhb, range_dhb, 0, 'dHb','dHb','JetBlack', '[g.dl^{-1}]',[1 z]);
-% if nii_out, print('dhb.eps','-depsc2','-r300'), end
+%% Calculate residuals by re-generating some signal data
+taus = shiftdim(repmat(tau',1,64,64,10),1);
+S0 = V(:,:,:,s0_id);
+Snew = S0.*exp(-repmat(r2p,1,1,1,24).*taus + repmat(dbv,1,1,1,24));
+
+res = V(:,:,:,tau_lineID) - Snew(:,:,:,tau_lineID);
+
+snr = Snew(:,:,:,tau_lineID) ./ abs(res);
 
 %% Output parameter niftis
     
     save_avw(r2p, 'qbold_results/mean_R2p', 'f', scales);
     save_avw(dbv, 'qbold_results/mean_DBV', 'f', scales);
     save_avw(oef, 'qbold_results/mean_OEF', 'f', scales);
+    save_avw(res, 'qbold_results/residuals','f', scales);
+    save_avw(snr, 'qbold_results/modelSNR', 'f', scales);
 %     save_avw(dhb, 'dhb', 'f', scales);
 
 %     saveas(imgH_r2p, 'r2p.fig')

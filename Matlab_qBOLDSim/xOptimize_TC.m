@@ -1,4 +1,4 @@
-% xOptimize_TC.m
+function TC_ideal = xOptimize_TC
 
 % To optimize the value of Tc (the point of transition between the linear-
 % exponential and quadratic-exponential regimes in the asymptotic qBOLD model).
@@ -17,72 +17,101 @@ clear;
 
 setFigureDefaults;
 
-% constants 
-params.B0   = 3.0;          % T         - static magnetic field
-params.dChi = 2.64e-7;      % parts     - susceptibility difference
-params.gam  = 2.67513e8;    % rad/s/T   - gyromagnetic ratio
+% Create a parameter structure
+params = genParams;
 
-% scan parameters 
-TE  = 0.074;        % s         - echo time
-% tau = linspace(-0.060,0.072,1000); % for visualising
+% Scan
+params.TE   = 0.084;        % s         - echo time
+params.TI   = 3;
+params.contr = 'OEF';
+params.incT1 = 0;
+params.incT2 = 1;
+params.incIV = 0;
+
+% Physiology
+params.lam0 = 0.0;         % no units  - ISF/CSF signal contribution
+params.zeta = 0.03;         % no units  - deoxygenated blood volume
+params.OEF  = 0.40;         % no units  - oxygen extraction fraction
+
 tau = (-28:1:64)/1000; % for testing
 
 
-% model fitting parameters
-params.S0   = 100;          % a. units  - signal
-params.R2t  = 1/0.087;      % 1/s       - rate constant, tissue
-params.R2e  = 4;            % 1/s       - rate constant, extracellular
-params.dF   = 5;            % Hz        - frequency shift
-params.lam0 = 0.000;        % no units  - ISF/CSF signal contribution
-params.zeta = 0.05;        % no units  - deoxygenated blood volume
-params.OEF  = 0.25;        % no units  - oxygen extraction fraction
-params.Hct  = 0.400;        % no units  - fractional hematocrit
-params.geom = 0.3;          % no units  - quadratic regime geometry factor
-
-params.dw   = (4/3)*pi*params.gam*params.dChi*params.Hct*params.OEF*params.B0;   
-   
-
 %% Calculate the Analytical tissue signal
 
-OEFs = linspace(0.2,0.6,50);
-DBVs = linspace(0.01,0.05,50);
-TC_ideal = zeros(1,21);
-DW_ideal = zeros(1,21);
+np = 50;
 
-for ii = 1:length(OEFs)
-    
-    params.OEF = OEFs(ii);
-%     params.zeta = DBVs(ii);
-    
-    params.dw   = (4/3)*pi*params.gam*params.dChi*params.Hct*params.OEF*params.B0;   
+% 50x50 narrower range
+OEFs = 0.21:0.01:0.70;
+DBVs = 0.003:0.003:0.15;
+TC_ideal = zeros(np,np);
+% DW_ideal = zeros(1,np^2);
 
-    S_analytical = MTC_ASE_bessel(tau,TE,params);
 
-    myfun = @(x) sum((S_analytical-MTC_ASE_tissue(tau,TE,params,x)).^2);
+for i2 = 1:length(DBVs)
+    for ii = 1:length(OEFs)
 
-    DW_ideal(ii) = params.dw;
-    TC_ideal(ii) = fminbnd(myfun,0.5,3.0);
+    %     params.OEF = OEFs(ii);
+        params.zeta = DBVs(ii);
 
-%     disp([' OEF  = ',num2str(params.OEF)]);
-%     disp([' DBV  = ',num2str(params.zeta)]);
-%     disp([' Tc   = ',num2str(TC_ideal(ii))]);
-    
+        % Calculate analytical model
+        params.model = 'Full';
+        S_analytical = qASE_model(tau,params.TE,params);
+
+        % Calculate asymptotic model
+        params.model = 'Asymp';    
+
+        myfun = @(x) sum((S_analytical-calcTissueAsymp(tau,params.TE,params,x)).^2);
+
+    %     DW_ideal(ii) = params.dw;
+        TC_ideal(ii,i2) = fminbnd(myfun,1.0,3.0);
+
+    %     disp([' OEF  = ',num2str(params.OEF)]);
+    %     disp([' DBV  = ',num2str(params.zeta)]);
+    %     disp([' Tc   = ',num2str(TC_ideal(ii))]);
+
+    end
 end
 
-%% Plot Ideal TC as a function of OEF or DBV
+% Average TC_ideal
+best_TC = mean(TC_ideal(:));
+disp(['Optimal TC = ',num2str(best_TC)]);
+
+% The best TC is 1.756!!!!
+
+%% Plot Ideal TC as a function of OEF
 figure; hold on; box on;
 % plot(OEFs,1000*1.5./DW_ideal,':');
 % plot(OEFs,1000*1.7./DW_ideal,'--');
-plot([0.2,0.6],[1.5,1.5],':');
-plot([0.2,0.6],[1.7,1.7],'--');
-ylim([1.45, 1.95]);
-plot(OEFs,TC_ideal,'kx');
-xlabel('OEF');
-% ylabel('t_C (ms)');
-ylabel('a,  where  t_C = a/\delta\omega');
+plot([20,70],[1.5,1.5],':');
+plot([20,70],[best_TC,best_TC],'--');
+ylim([1.49, 1.81]);
+plot(100*OEFs,mean(TC_ideal,1),'kx');
+xlabel('OEF (%)');
+ylabel('Transition Constant (\delta\omega . \tau)');
+% ylabel('a,  where  t_C = a/\delta\omega');
 % title(['OEF = ',num2str(100*params.OEF),'%']);
-legend('a = 1.5','a = 1.7','Optimized a');
+% legend('a = 1.5','a = 1.7','Optimized a');
 
+% DBV
+figure; hold on; box on;
+plot([0.3,15],[1.5,1.5],':');
+plot([0.3,15],[best_TC,best_TC],'--');
+ylim([1.49, 1.81]);
+plot(100*DBVs,mean(TC_ideal,2),'kx');
+xlabel('DBV (%)');
+ylabel('Transition Constant (\delta\omega . \tau)');
+% ylabel('a,  where  t_C = a/\delta\omega');
+% title(['OEF = ',num2str(100*params.OEF),'%']);
+% legend('a = 1.5','a = 1.7','Optimized a');
+
+% Surface
+figure; hold on;
+surf(100*OEFs,100*DBVs,TC_ideal);
+view(2); shading flat; axis tight;
+axis square; box on;
+colorbar;
+xlabel('OEF (%)');
+ylabel('DBV (%)');
 
 %% Plot Analytical and Asymptotic Solutions together
 
@@ -118,3 +147,29 @@ legend('a = 1.5','a = 1.7','Optimized a');
 % xlabel('\tau (s)');
 % ylabel('Relative Signal Difference');
 % title(['OEF = ',num2str(100*params.OEF),'%, DBV = ',num2str(100*params.zeta),'%']);
+
+end
+
+
+function ST = calcTissueAsymp(TAU,TE,PARAMS,TC)
+    
+    DBV = PARAMS.zeta;
+    dw  = (4/3)*pi*PARAMS.gam*PARAMS.B0*PARAMS.dChi*PARAMS.Hct*PARAMS.OEF;
+    R2p = dw .* DBV;
+    
+    ST = zeros(1,length(TAU));
+    
+    for ii = 1:length(TAU)
+        
+        if abs(TAU(ii)) < (TC/dw)
+            % Short tau regime
+            ST(ii) = exp(-(0.3.*(R2p.*TAU(ii)).^2)./DBV);
+            
+        else
+            % Long tau regime
+            ST(ii) = exp(DBV - (R2p.*abs(TAU(ii))));
+        end
+    end
+    
+    ST = PARAMS.S0.*ST.*exp(-PARAMS.R2t.*TE);
+end

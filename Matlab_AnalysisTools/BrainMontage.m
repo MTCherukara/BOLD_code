@@ -55,7 +55,7 @@ if ~exist('threshold','var')
         threshold = 15;
         cmp = inferno;
     else
-        threshold = 150;
+        threshold = 300;
         cmp = gray;
     end
 
