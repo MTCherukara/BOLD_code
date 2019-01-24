@@ -29,7 +29,7 @@ clear;
 vars = {'DBV','OEF'};
 
 % Choose Data set
-setnum = 864;
+setnum = 861;
 
 % Which set of subjects is this from?
 setname = 'VS';          % 'VS', 'genF', 'genNF', 'CSF', or 'AMICI'
@@ -123,7 +123,7 @@ for vv = 1:length(vars)
     volData = LoadSlice([fabdir,'mean_',vname,'.nii.gz'],slicenum);
     
     % Apply Mask and Threshold (ABSOLUTE VALUE)
-    volData = abs(volData(:).*mskData(:));
+    volData = (volData(:).*mskData(:));
 
     % Load Standard Deviation data
     if do_std
@@ -132,7 +132,7 @@ for vv = 1:length(vars)
     end
     
     % Create a mask of values to remove
-    badData = (volData == 0) + ~isfinite(volData) + (volData > thrsh);
+    badData = (volData <= 0) + ~isfinite(volData) + (volData > thrsh);
     if do_std
 %         badData = badData + ~isfinite(stdData) + (stdData > (thrsh/2)) + (stdData < (thrsh.*1e-3));
         badData = badData + ~isfinite(stdData) ;
