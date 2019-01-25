@@ -422,7 +422,7 @@ void R2primeFwdModel::Evaluate(const ColumnVector &params, ColumnVector &result)
     // assign values to parameters
     if (infer_DBV)
     {
-        DBV = (paramcpy(DBV_index()));
+        DBV = abs(paramcpy(DBV_index()));
     }
     else
     {

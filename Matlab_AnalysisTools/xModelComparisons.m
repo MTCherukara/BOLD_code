@@ -25,7 +25,7 @@ rnames = {'Linear Model'      ; ...     % 1
 
 
 % Select the rows we want to plot
-plotrows = [2,7,8];
+plotrows = [2,3,4];
 
 
 % %% Data for Comparisons across SNR levels
@@ -255,16 +255,16 @@ npr = length(plotrows);
 rlabels = rnames(plotrows);
 
 
-% % Plot R2p Error
-% figure; box on; 
-% semilogx(SNR,Err_R2p(plotrows,:));
-% hold on;
-% ylabel('R2'' Error (%)');
-% xlabel('SNR');
-% legend(rlabels{:});
-% xlim([0,500]);
-% ylim([0, 10]);
-% xticks(SNR);
+% Plot R2p Error
+figure; box on; 
+semilogx(SNR,Err_R2p(plotrows,:));
+hold on;
+ylabel('R2'' Error (%)');
+xlabel('SNR');
+legend(rlabels{:});
+xlim([0,500]);
+ylim([0, 10]);
+xticks(SNR);
 
 % Plot DBV Error
 figure; box on;

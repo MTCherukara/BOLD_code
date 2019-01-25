@@ -32,16 +32,16 @@ clc;
 vars = {'DBV','OEF'};
 
 % Choose Data set
-setnum = 841;
+setnum = 869;
 
 % Which set of subjects is this from?
 setname = 'VS';          % 'VS', 'genF', 'genNF', 'CSF', or 'AMICI'
 
 % do Free energy?
-do_FE = 1;
+do_FE = 0;
 
 % do standard deviations
-do_std = 1;
+do_std = 0;
 
 
 %% Initial Stuff

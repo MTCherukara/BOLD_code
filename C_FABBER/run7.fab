@@ -1,7 +1,7 @@
 # fabber run 7, validation sqbold data
 # Input Data
-data=../../Data/validation_sqbold/vs1/ASE_FLAIR_av_mc.nii.gz
-mask=../../Data/validation_sqbold/vs1/mask_flair.nii.gz
+data=../../Data/validation_sqbold/vs7/ASE_FLAIR_av_mc.nii.gz
+mask=../../Data/validation_sqbold/vs7/mask_flair.nii.gz
 
 # Run Options
 output=../../Data/Fabber_Results/
@@ -10,13 +10,13 @@ save-model-fit
 print-free-energy
 
 # Method Information
-method=vb
+method=spatialvb
 noise=white
-max-iterations=10
+max-iterations=6
 allow-bad-voxels
 
 # Spatial VB Information (remove all of this if method!=spatialvb)
-#param-spatial-priors=MMMM
+param-spatial-priors=MMM
 #image-prior4=../../Data/subject_04/CSF_T2w.nii.gz
 
 # Inference Model 
@@ -25,12 +25,12 @@ inferS0
 inferOEF
 inferDBV
 
-#motional_narrowing
-#include_intra
+motional_narrowing
+include_intra
 
 #precR2p=1e-2
-precDBV=1e-1
-precOEF=1e-1
+precDBV=1e0
+precOEF=1e0
 
 # Scan Parameters (maybe I'll think of a better way of doing this...)
 TE=0.074
