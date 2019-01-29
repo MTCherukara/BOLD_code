@@ -2,7 +2,7 @@
     % Loads a particular Fabber dataset and displays the average (mean and
     % median) values of R2' and DBV in the top 8 slices.
     %
-    % Actively used as of 2018-08-27
+    % Actively used as of 2019-01-29
     %
     % Changelog:
     %
@@ -29,10 +29,10 @@ clc;
 %% User To Select Fabber Data To Display
 
 % Choose Variables
-vars = {'DBV','OEF'};
+vars = {'R2p','DBV','OEF'};
 
 % Choose Data set
-setnum = 869;
+setnum = 782;
 
 % Which set of subjects is this from?
 setname = 'VS';          % 'VS', 'genF', 'genNF', 'CSF', or 'AMICI'
@@ -160,18 +160,18 @@ for vv = 1:length(vars)
     qnt = quantile(volData,[0.75,0.25]);
     iqr = qnt(1) - qnt(2) ./ 2;
     
-%     Display results
-%     disp('   ');
-%     disp(['Median ',vname,': ',num2str(median(volData),4)]);
-%     disp(['   IQR ',vname,': ',num2str(iqr,4)]);
-    
+	% Display results
     disp('   ');
-    disp(['Mean ',vname,'   : ',num2str(mean(volData),4)]);
-    if do_std
-        disp(['    Std ',vname,': ',num2str(mean(stdData),4)]);
-    else
-        disp(['    Std ',vname,': ',num2str(std(volData),4)]);
-    end
+    disp(['Median ',vname,': ',num2str(median(volData),4)]);
+    disp(['   IQR ',vname,': ',num2str(iqr,4)]);
+    
+%     disp('   ');
+%     disp(['Mean ',vname,'   : ',num2str(mean(volData),4)]);
+%     if do_std
+%         disp(['    Std ',vname,': ',num2str(mean(stdData),4)]);
+%     else
+%         disp(['    Std ',vname,': ',num2str(std(volData),4)]);
+%     end
 
 end
 

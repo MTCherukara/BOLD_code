@@ -22,15 +22,15 @@ allow-bad-voxels
 # Inference Model 
 model=qboldR2p
 inferS0
-inferOEF
+inferR2p
 inferDBV
 
 #motional_narrowing
 #include_intra
 
-#precR2p=1e-2
-precDBV=1e-2
-precOEF=1e2
+precR2p=1e-3
+precDBV=1e-1
+#precOEF=1e2
 
 # Scan Parameters (maybe I'll think of a better way of doing this...)
 TE=0.084
