@@ -28,8 +28,8 @@ inferDBV
 #motional_narrowing
 #include_intra
 
-precR2p=1e-3
-precDBV=1e-1
+precR2p=1e1
+precDBV=1e2
 #precOEF=1e2
 
 # Scan Parameters (maybe I'll think of a better way of doing this...)

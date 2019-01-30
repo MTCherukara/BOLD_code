@@ -5,7 +5,7 @@
 % others). Based on MTC_qBOLD.m 
 %
 % 
-%       Copyright (C) University of Oxford, 2016-2017
+%       Copyright (C) University of Oxford, 2016-2019
 %
 % 
 % Created by MT Cherukara, 17 May 2016
@@ -44,7 +44,7 @@ clear;
 setFigureDefaults;
 
 plot_fig = 1;       
-save_data = 0;      % set to 1 in order to save out ASE data
+save_data = 1;      % set to 1 in order to save out ASE data
 
 
 %% Model Parameters
@@ -61,28 +61,28 @@ params.TI   = 3;
 % Physiology
 params.lam0 = 0.0;         % no units  - ISF/CSF signal contribution
 params.zeta = 0.03;         % no units  - deoxygenated blood volume
-params.OEF  = 0.7;         % no units  - oxygen extraction fraction
+params.OEF  = 0.4;         % no units  - oxygen extraction fraction
 
 % Simulation
 params.model  = 'Full';     % STRING    - model type: 'Full','Asymp','Phenom','Kiselev'
 params.contr  = 'OEF';      % STRING    - contrast source: 'OEF','R2p','dHb',...
 params.incT1  = 1;          % BOOL      - should T1 differences be considered?
 params.incT2  = 1;          % BOOL      - should T2 differences be considered?
-params.incIV  = 1;          % BOOL      - should blood compartment be included?
+params.incIV  = 0;          % BOOL      - should blood compartment be included?
 
 % Scaling
 % params.SR   = 0.548;        % no units  - scaling factor for R2'
 % params.Voff = -0.003;
 
 % noise
-params.SNR = 500;
+params.SNR = 50;
 
 
 %% Compute Model
 
 % define tau values that we want to simulate
-% tau = (-16:8:64)/1000; % for testing
-tau = linspace(-0.028,0.064,1000); % for visualising
+tau = (-16:8:64)/1000; % for testing
+% tau = linspace(-0.028,0.064,1000); % for visualising
 
 
 np = length(tau);

@@ -65,13 +65,13 @@ DBVs = 1:2:9;
 [gOEF,gDBV] = meshgrid(OEFs,DBVs);
 
 % Parameters
-% pnames = { 'R2p'    ; 'zeta'     };
-% interv = [ 0.01, 26 ; 0.005, 0.115 ];
-% np     = [ 1000     ; 1000       ];
-
-pnames = { 'OEF'    ; 'zeta'     };
-interv = [ 0.1, 0.9 ; 0.005, 0.115 ];
+pnames = { 'R2p'    ; 'zeta'     };
+interv = [ 0.2, 20 ; 0.003, 0.15 ];
 np     = [ 1000     ; 1000       ];
+
+% pnames = { 'OEF'    ; 'zeta'     };
+% interv = [ 0.2, 0.7 ; 0.003, 0.15 ];
+% np     = [ 1000     ; 1000       ];
 
 % pnames = { 'OEF'    ; 'zeta'     };
 % interv = [ 0, 0.1 ; 0.01, 0.05 ];
@@ -87,12 +87,12 @@ np     = [ 1000     ; 1000       ];
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 nj = length(OEFs)*length(DBVs);
 maxes = zeros(2,nj);
-for jj = 1:5%:nj
+for jj = 1%:nj
 
     tic;
     
     % Load the Data: 
-    load('ASE_Data/Data_181204_40_3_1C.mat');
+    load('ASE_Data/Data_190130_40_3_SNR_50.mat');
     
     
 %     vOEF = num2str(gOEF(jj));     % only useful when looping over things
@@ -119,7 +119,7 @@ for jj = 1:5%:nj
     
     % Add Random Gaussian Noise
     sigma = mean(S_total)./SNR;
-    S_total = S_total + sigma.*randn(1,ns);
+%     S_total = S_total + sigma.*randn(1,ns);
     S_sample = S_total ./ max(S_total);
 
 
@@ -238,8 +238,8 @@ for jj = 1:5%:nj
         
         % x axis - DBV
         if strcmp(pn2,'zeta')
-            xticks(0.01:0.02:0.11);
-            xticklabels({'1','3','5','7','9','11'});
+            xticks(0.01:0.02:0.15);
+            xticklabels({'1','3','5','7','9','11','13','15'});
             xlabel('DBV (%)');
         else
             xlabel(pn2);
@@ -247,8 +247,8 @@ for jj = 1:5%:nj
         
         % y axis - OEF
         if strcmp(pn1,'OEF')
-            yticks(0.2:0.2:0.8);
-            yticklabels({'20','40','60','80'});
+            yticks(0.2:0.1:0.7);
+            yticklabels({'20','30','40','50','60','70'});
             ylabel('OEF (%)');
         elseif strcmp(pn1,'R2p')
             ylabel('R_2'' (s^-^1)');

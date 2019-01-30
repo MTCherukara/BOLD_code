@@ -25,7 +25,7 @@ plot_fig = 0;
 
 % Data directory
 resdir = '/Users/mattcher/Documents/DPhil/Data/Fabber_ModelFits/';
-setnum = 367; % 292 then 278, then 285
+setnum = 152; % 292 then 278, then 285
 
 % Standard Deviation Thresholds
 thrR = 10.0;
@@ -142,6 +142,7 @@ for vv = 1:length(vars)
     end
     
     % Display some results
+    disp(' ');
     disp([vname,' Correlation: ',num2str(R(1,2),3)]);
     if P(1,2) > 0.05
         disp(['    Not Significant (p = ',num2str(P(1,2),2),')']);
