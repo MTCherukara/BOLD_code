@@ -32,7 +32,7 @@ clc;
 vars = {'R2p','DBV','OEF'};
 
 % Choose Data set
-setnum = 782;
+setnum = 928;
 
 % Which set of subjects is this from?
 setname = 'VS';          % 'VS', 'genF', 'genNF', 'CSF', or 'AMICI'
@@ -161,17 +161,17 @@ for vv = 1:length(vars)
     iqr = qnt(1) - qnt(2) ./ 2;
     
 	% Display results
-    disp('   ');
-    disp(['Median ',vname,': ',num2str(median(volData),4)]);
-    disp(['   IQR ',vname,': ',num2str(iqr,4)]);
-    
 %     disp('   ');
-%     disp(['Mean ',vname,'   : ',num2str(mean(volData),4)]);
-%     if do_std
-%         disp(['    Std ',vname,': ',num2str(mean(stdData),4)]);
-%     else
-%         disp(['    Std ',vname,': ',num2str(std(volData),4)]);
-%     end
+%     disp(['Median ',vname,': ',num2str(median(volData),4)]);
+%     disp(['   IQR ',vname,': ',num2str(iqr,4)]);
+    
+    disp('   ');
+    disp(['Mean ',vname,'   : ',num2str(mean(volData),4)]);
+    if do_std
+        disp(['    Std ',vname,': ',num2str(mean(stdData),4)]);
+    else
+        disp(['    Std ',vname,': ',num2str(std(volData),4)]);
+    end
 
 end
 

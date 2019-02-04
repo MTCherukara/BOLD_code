@@ -25,7 +25,7 @@ plot_fig = 0;
 
 % Data directory
 resdir = '/Users/mattcher/Documents/DPhil/Data/Fabber_ModelFits/';
-setnum = 152; % 292 then 278, then 285
+setnum = 166; % 292 then 278, then 285
 
 % Standard Deviation Thresholds
 thrR = 10.0;
@@ -122,8 +122,8 @@ for vv = 1:length(vars)
     % Calculate root mean square error
     diffs = gndVec - volVec;
 %     RMSE(vv) = sqrt(mean(diffs.^2));
-    RMSE(vv) = mean(abs(gndVec - volVec));
-    RELE(vv) = 100*mean(abs(gndVec - volVec)./gndVec);
+    RMSE(vv) = mean((gndVec - volVec));
+    RELE(vv) = 100*mean((gndVec - volVec)./gndVec);
     
     if do_std
         wdiff = diffs.*nm_std;

@@ -17,7 +17,7 @@
 clear;
 setFigureDefaults;
 
-slices = 1;
+slices = 3:10;
 
 % SQ-LS    SQ-VB   1C-VBS  1C-VBTC 1C-VBI  1C-VB-TCI  2C-VB   2C-VBI  2C-VB-TC  2C-VB-TCI
 % '101'  , '250' , '330' , '264' , '257' , '316'    , '201' , '236' , '281'   , '309' ;...   % subject vs1
@@ -46,10 +46,10 @@ if ~exist('threshold','var')
         threshold = 0.15;
         cmp = magma;
     elseif strfind(lower(niname),'r2p')
-        threshold = 30;
+        threshold = 10;
         cmp = viridis;
     elseif strfind(lower(niname),'oef')
-        threshold = 1.0;
+        threshold = 0.8;
         cmp = parula;
     elseif strfind(lower(niname),'df')
         threshold = 15;
@@ -84,11 +84,11 @@ voldata(voldata > threshold) = threshold;
 % remove some of the empty voxels from around the sides, so that the brains are
 % closer together in the montage
 
-% sh_sds = 12;        % sides
-% sh_top = 5;         % top and bottom
+sh_sds = 12;        % sides
+sh_top = 5;         % top and bottom
 
-sh_sds = 0;
-sh_top = 0;
+% sh_sds = 0;
+% sh_top = 0;
 
 voldata = voldata(1+sh_sds:end-sh_sds,1+sh_top:end-sh_top,:);
 
@@ -149,7 +149,7 @@ montage_image = fliplr(montage_image);
 
 %% DISPLAY FIGURE
 
-% cmp(1,:) = [0,0,0];
+cmp(1,:) = [0,0,0];
 
 figure; hold on;
 imagesc(montage_image,[0,threshold]);

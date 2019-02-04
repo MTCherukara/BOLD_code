@@ -14,10 +14,10 @@ setFigureDefaults;
 %% User To Select Fabber Data To Display
 
 % Choose Variables - There should be only two of these!!
-vars = {'DBV','OEF'};
+vars = {'DBV','R2p'};
 
 % Choose Data set
-setnum = 776;
+setnum = 855;
 
 % Which set of subjects is this from?
 setname = 'VS';          % 'VS', 'genF', 'genNF', 'CSF', or 'AMICI'
@@ -147,11 +147,13 @@ figure; hold on; box on;
 scatter(vData1,vData2,'k.');
 xlabel(vars{1});
 ylabel(vars{2});
-axis([0,20,0,70]);
-% axis([0,20,0,10]);
+% axis([0,20,0,70]);
+axis([0,20,0,10]);
 
 % Plot mean and median as lines
-plot([0,20],[mn2,mn2],'r-');
-plot([0,20],[md2,md2],'b--');
+l1 = plot([0,20],[mn2,mn2],'r-');
+l2 = plot([0,20],[md2,md2],'b--');
 plot([mn1,mn1],[0,70],'r-');
 plot([md1,md1],[0,70],'b--');
+
+legend([l1,l2],'Mean','Median','Location','NorthEast');
