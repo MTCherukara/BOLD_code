@@ -18,14 +18,14 @@ vars = {'OEF','DBV','R2p'};
 % vars = {'OEF'};
 
 % Do we have STD data?
-do_std = 1;
+do_std = 0;
 
 % Do we want a figure?
-plot_fig = 0;
+plot_fig = 1;
 
 % Data directory
 resdir = '/Users/mattcher/Documents/DPhil/Data/Fabber_ModelFits/';
-setnum = 166; % 292 then 278, then 285
+setnum = 163; % 292 then 278, then 285
 
 % Standard Deviation Thresholds
 thrR = 10.0;
@@ -122,8 +122,8 @@ for vv = 1:length(vars)
     % Calculate root mean square error
     diffs = gndVec - volVec;
 %     RMSE(vv) = sqrt(mean(diffs.^2));
-    RMSE(vv) = mean((gndVec - volVec));
-    RELE(vv) = 100*mean((gndVec - volVec)./gndVec);
+    RMSE(vv) = mean(abs(gndVec - volVec));
+    RELE(vv) = 100*mean(abs(gndVec - volVec)./gndVec);
     
     if do_std
         wdiff = diffs.*nm_std;

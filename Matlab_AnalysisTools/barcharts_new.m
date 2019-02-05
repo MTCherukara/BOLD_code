@@ -123,11 +123,11 @@ end
      
 % averages   
 aR2p = mean(R2p,2);
-sR2p = std(R2p,0,2);
+sR2p = mean(eR2p,2); %std(R2p,0,2); %
 aDBV = mean(DBV,2);
-sDBV = std(DBV,0,2); %mean(eDBV,2); %
+sDBV = mean(eDBV,2); %std(DBV,0,2); %
 aOEF = mean(OEF,2);
-sOEF = std(OEF,0,2); %mean(eOEF,2); %
+sOEF = mean(eOEF,2); %std(OEF,0,2); %
 aFE  = mean(FE,2);
 sFE  = std(FE,0,2);
 aRR  = mean(RR,2);

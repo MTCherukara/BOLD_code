@@ -17,7 +17,7 @@
 clear;
 setFigureDefaults;
 
-slices = 3:10;
+slices = 1;
 
 % SQ-LS    SQ-VB   1C-VBS  1C-VBTC 1C-VBI  1C-VB-TCI  2C-VB   2C-VBI  2C-VB-TC  2C-VB-TCI
 % '101'  , '250' , '330' , '264' , '257' , '316'    , '201' , '236' , '281'   , '309' ;...   % subject vs1
