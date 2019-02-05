@@ -30,10 +30,10 @@ rnames = {'L Model'     ; ...   % 1 - L model, 11 tau values
           '9 taus'      ; ...   % 7 - 2C model, 9 tau values
           '5 taus'      ; ...   % 8 - 2C model, 5 tau values
           '6 taus'      ; ...   % 9 - 2C model, 6 tau values
-          '11 taus'     ; ...   % 10 - 2C model, 11 tau values
-          '9 taus'      ; ...   % 11 - 2C model, 9 tau values
-          '5 taus'      ; ...   % 12 - 2C model, 5 tau values
-          '6 taus'        ...   % 13 - 2C model, 6 tau values
+          '11\tau ( -16:8:64 )'    ; ...   % 10 - 2C model, 11 tau values
+          '9\tau ( 0:8:64 )'      ; ...   % 11 - 2C model, 9 tau values
+          '5\tau ( 0:16:64 )'     ; ...   % 12 - 2C model, 5 tau values
+          '6\tau ( -16:16:64 )'     ...   % 13 - 2C model, 6 tau values
          };
      
 % SNR values
