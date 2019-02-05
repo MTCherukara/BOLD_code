@@ -14,8 +14,8 @@ clear;
 %% Set parameters
 
 TE = 0.084;
-tau = (-16:8:64)/1000;
-SEind = 3; % in this case
+tau = (-24:1:64)/1000;
+SEind = 25; % in this case
 
 % 30x30 data
 % OEFvals = 0.10:0.025:0.825;
@@ -67,8 +67,9 @@ for i1 = 1:no
         S_model = qASE_model(tau,TE,inparam);
         
         % add Gaussian noise
-        sigma = mean(S_model)./SNR;
-        S_data = S_model + sigma.*randn(1,nt);
+%         sigma = mean(S_model)./SNR;
+%         S_data = S_model + sigma.*randn(1,nt);
+        S_data = S_model;
         
         % normalize data to the spin echo
         S_data = S_data./S_data(SEind);
@@ -85,9 +86,10 @@ end % OEF loop
 
 
 %% Save out data
-dname = strcat('ASE_Grid_2C_',num2str(no),'x',num2str(nv),'_SNR_',num2str(SNR));
+% dname = strcat('ASE_Grid_2C_',num2str(no),'x',num2str(nv),'_SNR_',num2str(SNR));
+dname = strcat('ASE_Grid_2C_',num2str(no),'x',num2str(nv),'_allTaus');
 save([dname,'.mat'],'ase_data','ase_model','tau','TE','params','OEFvals','DBVvals');
-save_avw(100.*ase_data,[dname,'.nii.gz'],'d',[1,1,1,3]);
+% save_avw(100.*ase_data,[dname,'.nii.gz'],'d',[1,1,1,3]);
 % save_avw(OEF_grid,[dname,'_OEF.nii.gz'],'d',[1,1,1,3]);
 % save_avw(DBV_grid,[dname,'_DBV.nii.gz'],'d',[1,1,1,3]);
 
