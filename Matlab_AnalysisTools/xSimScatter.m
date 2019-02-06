@@ -21,11 +21,11 @@ vars = {'OEF','DBV','R2p'};
 do_std = 0;
 
 % Do we want a figure?
-plot_fig = 1;
+plot_fig = 0;
 
 % Data directory
 resdir = '/Users/mattcher/Documents/DPhil/Data/Fabber_ModelFits/';
-setnum = 163; % 292 then 278, then 285
+setnum = 177; % 292 then 278, then 285
 
 % Standard Deviation Thresholds
 thrR = 10.0;

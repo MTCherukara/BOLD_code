@@ -523,6 +523,7 @@ void R2primeFwdModel::Evaluate(const ColumnVector &params, ColumnVector &result)
 
     // calculate tc and threshold it if necessary
     tc = 1.7/dw;
+    /*
     if (tc > 0.025)
     {
         tc = 0.025;
@@ -530,7 +531,7 @@ void R2primeFwdModel::Evaluate(const ColumnVector &params, ColumnVector &result)
     else if (tc < 0.005)
     {
         tc = 0.005;
-    } 
+    } */
 
     // evaluate blood relaxation rates
     R2b  = ( 4.5 + (16.4*Hct)) + ( ((165.2*Hct) + 55.7)*pow(OEF,2.0) );

@@ -13,9 +13,9 @@ clear;
 
 %% Set parameters
 
-TE = 0.084;
-tau = (-24:1:64)/1000;
-SEind = 25; % in this case
+TE = 0.050;
+tau = (0:1:40)/1000;
+SEind = 1; % in this case (-24:1:64, SEind=25)
 
 % 30x30 data
 % OEFvals = 0.10:0.025:0.825;

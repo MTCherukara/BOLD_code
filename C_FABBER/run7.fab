@@ -1,6 +1,6 @@
 # fabber run 7, validation sqbold data
 # Input Data
-data=../../Data/validation_sqbold/vs7/ASE_FLAIR_tau5.nii.gz
+data=../../Data/validation_sqbold/vs7/ASE_FLAIR_11.nii.gz
 mask=../../Data/validation_sqbold/vs7/mask_flair.nii.gz
 
 # Run Options
@@ -10,13 +10,13 @@ save-model-fit
 print-free-energy
 
 # Method Information
-method=spatialvb
+method=vb
 noise=white
 max-iterations=10
 allow-bad-voxels
 
 # Spatial VB Information (remove all of this if method!=spatialvb)
-param-spatial-priors=MMM
+#param-spatial-priors=MMM
 #image-prior4=../../Data/subject_04/CSF_T2w.nii.gz
 
 # Inference Model 
@@ -37,17 +37,18 @@ TE=0.074
 TR=3.000
 TI=1.210
 
-#tau1=-0.016
-#tau2=-0.008
-#tau3=0.0
-#tau4=0.008
-#tau5=0.016
-#tau6=0.024
-#tau7=0.032
-#tau8=0.040
-#tau9=0.048
-#tau10=0.056
-#tau11=0.064
+# for data ASE_FLAIR_11.nii.gz
+tau1=-0.016
+tau2=-0.008
+tau3=0.0
+tau4=0.008
+tau5=0.016
+tau6=0.024
+tau7=0.032
+tau8=0.040
+tau9=0.048
+tau10=0.056
+tau11=0.064
 
 # for data ASE_FLAIR_14.nii.gz
 #tau1=-0.028
@@ -108,8 +109,8 @@ TI=1.210
 #tau24=0.064
 
 # for data ASE_FLAIR_tau5.nii.gz
-tau1=0.0
-tau2=0.016
-tau3=0.032
-tau4=0.048
-tau5=0.064
+#tau1=0.0
+#tau2=0.016
+#tau3=0.032
+#tau4=0.048
+#tau5=0.064
