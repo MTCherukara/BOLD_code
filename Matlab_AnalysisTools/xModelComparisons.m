@@ -34,6 +34,8 @@ rnames = {'L Model'     ; ...   % 1 - L model, 11 tau values
 % SNR values
 SNR = [ 5, 10, 25, 50, 100, 200, 500 ];
 
+nmes = [ 11, 11, 11, 11, 7, 7, 7, 11];   % number of measurements at each point
+
 % SNR         5         10         25         50        100        200        500
 Err_OEF = [ 145.0000,  200.0000,  200.0000,   54.6000,   32.8000,   22.3000,   15.6000; ...
              40.7000,   44.3000,   42.8000,   38.0000,   30.2000,   22.8000,   21.1000; ...
@@ -142,40 +144,43 @@ Rel_All = [ 613.2000,  851.9000,  569.5000,  221.3000,  122.7000,   86.2000,   6
 npr = length(plotrows);
 rlabels = rnames(plotrows);
 
+% modified SNR
+modSNR = repmat(SNR,length(nmes),1)./repmat(sqrt(nmes)',1,length(SNR));
+
 
 % Plot R2p Error
-figure; box on; 
-semilogx(SNR,abs(Err_R2p(plotrows,:)));
+figure; box on;    
+semilogx(modSNR(plotrows,:)',abs(Err_R2p(plotrows,:))');
 hold on;
 ylabel('R2'' Error (%)');
-xlabel('SNR');
+xlabel('SNR/sqrt(#\tau)');
 legend(rlabels{:});
-xlim([4,600]);
-ylim([0, 10]);
+xlim([1,250]);
+ylim([0,9.5]);
 xticks(SNR);
 
 % Plot DBV Error
 Max_DBV = 30;
 % Err_DBV(abs(Err_DBV) > Max_DBV) = Max_DBV;
 figure; box on;
-semilogx(SNR,abs(Err_DBV(plotrows,:)));
+semilogx(modSNR(plotrows,:)',abs(Err_DBV(plotrows,:))');
 hold on;
 ylabel('DBV Error (%)');
-xlabel('SNR');
+xlabel('SNR/sqrt(#\tau)');
 legend(rlabels{:});
-xlim([0,500]);
+xlim([1,250]);
 ylim([0, Max_DBV]);
 xticks(SNR);
 
 % Plot OEF Error
 figure; box on;
-semilogx(SNR,abs(Err_OEF(plotrows,:)));
+semilogx(modSNR(plotrows,:)',abs(Err_OEF(plotrows,:))');
 hold on;
 ylabel('OEF Error (%)');
-xlabel('SNR');
+xlabel('SNR/sqrt(#\tau)');
 legend(rlabels{:});
-xlim([0,500]);
-ylim([0,200]);
+xlim([1,250]);
+ylim([0,190]);
 xticks(SNR);
 
 % Plot Total Relative Error

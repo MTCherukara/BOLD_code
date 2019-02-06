@@ -21,11 +21,11 @@ vars = {'OEF','DBV','R2p'};
 do_std = 0;
 
 % Do we want a figure?
-plot_fig = 0;
+plot_fig = 1;
 
 % Data directory
 resdir = '/Users/mattcher/Documents/DPhil/Data/Fabber_ModelFits/';
-setnum = 177; % 292 then 278, then 285
+setnum = 196;
 
 % Standard Deviation Thresholds
 thrR = 10.0;
@@ -47,7 +47,7 @@ dbvData = LoadSlice([gnddir,'ASE_Grid_50x50_DBV.nii.gz'],1);
 r2pData = LoadSlice([gnddir,'ASE_Grid_50x50_R2p.nii.gz'],1);
 
 gndMat = [oefData(:),dbvData(:),r2pData(:)];
-sclMat = [dbvData(:),oefData(:),r2pData(:)];
+sclMat = [dbvData(:),oefData(:),dbvData(:)];
 
 % Pre-allocate some result arrays
 corrs = zeros(length(vars),2);
