@@ -14,14 +14,14 @@ clear;
 simdir = '../../Data/vesselsim_data/';
 
 % Which distribution we want - 'sharan' or 'frechet'
-distname = 'lauwers';
+distname = 'sharan';
 
 % Options
 plot_figure = 1;
 
 % Fixed Parameters
-TEv  = 0.072;
-tau = (-28:4:64)./1000;    % For TE = 72ms or 108ms
+TEv  = 0.084;
+tau = (-28:1:64)./1000;    % For TE = 72ms or 108ms
 % tau = (-12:4:32)./1000;      % For TE = 36ms
 
 % Vessel Distribution
@@ -48,7 +48,7 @@ end
 % Array sizes
 nr = length(RR);    % number of different vessel radii
 nt = length(tau);   % number of tau values
-np = 100;           % number of different parameter values to generate
+np = 50;           % number of different parameter values to generate
 
 % Preallocate arrays
 %       Dimensions: TIME, DBV, OEF, RADIUS

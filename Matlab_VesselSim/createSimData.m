@@ -16,11 +16,11 @@ t0 = tic; % main timer
 simdir = '../../Data/vesselsim_data/';
 
 % Selet distribution 
-distname = 'lauwers';
+distname = 'sharan';
 
 % Fixed Parameters
-TE  = 0.072;
-tau = (-28:4:64)./1000;    % For TE = 72ms or 108ms or 84 ms
+TE  = 0.084;
+tau = (-28:1:64)./1000;    % For TE = 72ms or 108ms or 84 ms
 % tau = (-12:4:32)./1000;      % For TE = 36ms or 56 ms
 
 % Vessel Distribution
@@ -50,18 +50,18 @@ end
 % Array sizes
 nr = length(RR);    % number of different vessel radii
 nt = length(tau);   % number of tau values
-np = 100;           % number of different parameter values to generate
+np = 50;           % number of different parameter values to generate
 
 % Physiological Parameters
-OEFvals = linspace(0.1875,0.6,np);
-DBVvals = linspace(0.01,0.07,np);
+OEFvals = linspace(0.21,0.7,np);
+DBVvals = linspace(0.003,0.15,np);
 
 % OEFvals = 0.4;
 % DBVvals = 0.05;
 
 % Decide on which radii to calculate
-rstart = 88;
-rend   = 88;
+rstart = 1;
+rend   = 6;
 
 
 %% Generate signals for each radius
@@ -124,7 +124,7 @@ for i1 = rstart:rend
     
     % Save out data for each radius
     sname = strcat(simdir,'vs_arrays/vsArray',num2str(np),'_',distname,...
-                   '_TE_',num2str(1000*TE),'_R_',num2str(vrad),'test.mat');
+                   '_TE_',num2str(1000*TE),'_R_',num2str(vrad),'.mat');
     save(sname,'S_ev','S_iv','tau','TE','OEFvals','DBVvals');
     
     % Timer
