@@ -21,14 +21,14 @@ legtext = {'L Model','1C Model','2C Model','1C Spatial','2C Spatial','5 \tau VB'
 %           1         2          3          4            5            6           7            8          . 
 
 % Choose which columns to plot
-dpts = [1,2,4,3,5];
+dpts = [2,4,3,5];
 
 % Pick pairwise comparisons from DPTS values
-grps = {[1,2],[1,3],[1,4],[1,5]};
+grps = {[1,2],[3,4],[1,3],[2,4]};
 
 % Decide on additional plots
-plot_FE = 0;    % Free Energy
-plot_RR = 0;    % Median Residuals
+plot_FE = 1;    % Free Energy (Median)
+plot_RR = 0;    % Median Residuals (Absolute)
 plot_SN = 0;    % Model Signal-to-Noise Ratio
 
 
@@ -100,14 +100,30 @@ eOEF = [ 16.7400,   13.7900,   17.2100,   14.2100,   14.4700,   16.5900,   14.75
 % % %    FREE ENERGY        % % % % % % % % % % % % % % % % % % % % % % % % % %
 % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % %
 
-% NEGATIVE
-%      LinMean   
-FE = [  ];
-     
-%      LinMean   
-RR = [  ];
+% NEGATIVE MEDIAN FREE ENERGY
+%      VS 1       VS 2       VS 3       VS 4       VS 5       VS 6       VS 7
+FE = [   0     ,    0     ,    0     ,    0     ,    0     ,    0     ,    0     ; ...
+       185.0000,  308.5000,  153.1000,  223.2000,  267.8000,  240.3000,  269.9000;
+       170.9000,  291.3000,  144.2000,  207.0000,  281.6000,  242.3000,  273.5000;
+       158.6000,  251.3000,  128.4000,  190.8000,  259.9000,  209.6000,  256.4000;
+       156.6000,  253.3000,  128.9000,  191.6000,  254.6000,  213.5000,  251.5000 ];
    
-%      LinMean    
+% % NEGATIVE MEAN FREE ENERGY
+% %      VS 1       VS 2       VS 3       VS 4       VS 5       VS 6       VS 7
+% FE = [   0     ,    0     ,    0     ,    0     ,    0     ,    0     ,    0     ; ...
+%        263.1000,  571.3000,  229.0000,  338.7000,  604.7000,  453.4000,  429.3000; ...
+%        267.3000,  550.0000,  254.5000,  336.2000,  710.7000,  515.7000,  500.3000; ...
+%        222.3000,  446.5000,  205.6000,  296.1000,  629.2000,  410.7000,  425.3000; ...
+%        229.0000,  506.0000,  207.2000,  314.7000,  706.0000,  444.6000,  456.0000 ];
+     
+%      VS 1       VS 2       VS 3       VS 4       VS 5       VS 6       VS 7
+RR = [ 0     ,    0     ,    0     ,    0     ,    0     ,    0     ,    0     ; ...
+       0.1470,    0.7200,    0.3180,    0.3560,    0.9200,    0.7310,    0.5660; ...
+       0.2110,    0.8770,    0.4310,    0.4190,    1.2270,    1.0120,    0.7810; ...
+       0.0920,    0.5990,    0.2730,    0.2930,    1.0590,    0.6520,    0.5680; ...
+       0.0990,    0.7570,    0.3080,    0.3390,    1.2740,    0.7910,    0.6610 ];
+   
+%      VS 1       VS 2       VS 3       VS 4       VS 5       VS 6       VS 7
 SN = [  ];
 
 
@@ -186,7 +202,7 @@ errorbar(1:npts,aOEF(dpts),sOEF(dpts),'k.','LineWidth',2,'MarkerSize',1);
 if rebase
     axis([0.5,npts+0.5,0,2]);
 else
-    axis([0.5,npts+0.5,0,43]);
+    axis([0.5,npts+0.5,0,37]);
 end
 ylabel('OEF (%)');
 xticks(1:length(dpts));
@@ -196,10 +212,10 @@ xticklabels(lbls);
 
 % Plot Free Energy
 if plot_FE
-    figure(); hold on; box on;
+    figure(11); hold on; box on;
     bar(1:npts,aFE(dpts),0.6,'FaceColor',defColour(1));
     errorbar(1:npts,aFE(dpts),sFE(dpts),'k.','LineWidth',2,'MarkerSize',1);
-    axis([0.5,length(dpts)+0.5,0,200]);
+    axis([0.5,length(dpts)+0.5,0,400]);
     ylabel('-Free Energy');
     xticks(1:length(dpts));
     xticklabels(lbls);
@@ -207,10 +223,10 @@ end
 
 % Plot Median Residual
 if plot_RR
-    figure(); hold on; box on;
+    figure(12); hold on; box on;
     bar(1:npts,aRR(dpts),0.6,'FaceColor',defColour(1));
     errorbar(1:npts,aRR(dpts),sRR(dpts),'k.','LineWidth',2,'MarkerSize',1);
-    axis([0.5,length(dpts)+0.5,-0.35,0.35]);
+    axis([0.5,length(dpts)+0.5,0,1.5]);
     ylabel('Median Residual');
     xticks(1:length(dpts));
     xticklabels(lbls);
@@ -218,7 +234,7 @@ end
 
 % Plot Model SNR
 if plot_SN
-    figure(); hold on; box on;
+    figure(13); hold on; box on;
     bar(1:npts,aSN(dpts),0.6,'FaceColor',defColour(1));
     errorbar(1:npts,aSN(dpts),sSN(dpts),'k.','LineWidth',2,'MarkerSize',1);
     axis([0.5,length(dpts)+0.5,0,85]);
@@ -264,4 +280,37 @@ HO = sigstar(grps,p_O,1);
 set(HO,'Color','k')
 set(HO(:,2),'FontSize',16);
 
+% FE ANOVA
+if plot_FE
+    [~,~,stat_FE] = anova2(FE(dpts,:)',1,'off');
+    c_FE = multcompare(stat_FE,'display','off');
+    p_FE = MC_pvalues(c_FE,grps);
+
+    figure(11);
+    HFE = sigstar(grps,p_FE,1);
+    set(HFE,'Color','k')
+    set(HFE(:,2),'FontSize',16);
+end
+
+if plot_RR
+    [~,~,stat_RR] = anova2(RR(dpts,:)',1,'off');
+    c_RR = multcompare(stat_RR,'display','off');
+    p_RR = MC_pvalues(c_RR,grps);
+
+    figure(12);
+    HRR = sigstar(grps,p_R,1);
+    set(HRR,'Color','k')
+    set(HRR(:,2),'FontSize',16);
+end
+
+if plot_SN
+    [~,~,stat_SN] = anova2(SN(dpts,:)',1,'off');
+    c_SN = multcompare(stat_SN,'display','off');
+    p_SN = MC_pvalues(c_SN,grps);
+
+    figure(12);
+    HSN = sigstar(grps,p_SN,1);
+    set(HSN,'Color','k')
+    set(HSN(:,2),'FontSize',16);
+end
 

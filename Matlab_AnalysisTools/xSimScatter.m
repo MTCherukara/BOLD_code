@@ -25,7 +25,7 @@ plot_fig = 1;
 
 % Data directory
 resdir = '/Users/mattcher/Documents/DPhil/Data/Fabber_ModelFits/';
-setnum = 196;
+setnum = 229;
 
 % Standard Deviation Thresholds
 thrR = 10.0;

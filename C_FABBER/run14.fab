@@ -1,7 +1,7 @@
 # fabber run 14 - SDR simulation testing
 
 # Input Data
-data=../../Data/qboldsim_data/ASE_Grid_2C_50x50_SNR_500.nii.gz
+data=../../Data/qboldsim_data/ASE_Grid_Sharan_50x50_Taus_11_SNR_500.nii.gz
 mask=../../Data/qboldsim_data/ASE_Grid_50x50_mask.nii.gz
 
 # Run Options
@@ -17,7 +17,7 @@ max-iterations=10
 allow-bad-voxels
 
 # Spatial VB Information (remove this if method!=spatialvb)
-#param-spatial-priors=NNN
+#param-spatial-priors=MMM
 
 # Inference Model 
 model=qboldR2p
@@ -25,8 +25,8 @@ inferS0
 inferR2p
 inferDBV
 
-motional_narrowing
-include_intra
+#motional_narrowing
+#include_intra
 
 precR2p=1e-4
 precDBV=1e-1

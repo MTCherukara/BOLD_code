@@ -29,16 +29,16 @@ clc;
 %% User To Select Fabber Data To Display
 
 % Choose Variables
-vars = {'R2p','DBV','OEF'};
+vars = {'R2p'};
 
 % Choose Data set
-setnum = 949;
+setnum = 929;
 
 % Which set of subjects is this from?
 setname = 'VS';          % 'VS', 'genF', 'genNF', 'CSF', or 'AMICI'
 
 % do Free energy?
-do_FE = 0;
+do_FE = 1;
 
 % do standard deviations
 do_std = 1;
