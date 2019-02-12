@@ -29,19 +29,19 @@ clc;
 %% User To Select Fabber Data To Display
 
 % Choose Variables
-vars = {'R2p'};
+vars = {'R2p','DBV','OEF'};
 
 % Choose Data set
-setnum = 929;
+setnum = 956;
 
 % Which set of subjects is this from?
 setname = 'VS';          % 'VS', 'genF', 'genNF', 'CSF', or 'AMICI'
 
 % do Free energy?
-do_FE = 1;
+do_FE = 0;
 
 % do standard deviations
-do_std = 1;
+do_std = 0;
 
 
 %% Initial Stuff
@@ -223,9 +223,9 @@ if do_FE
     disp(['     Mean Residual : ',num2str(mean(RData),4)]);
     disp([' Absolute Residual : ',num2str(mean(abs(RData)),4)]);
 %     disp(['   Median Residual : ',num2str(median(RData),4)]);
-    % 
-    disp('   ');
-    disp(['      Modelfit SNR : ',num2str(mean(SData),4)]);
+    
+%     disp('   ');
+%     disp(['      Modelfit SNR : ',num2str(mean(SData),4)]);
 
     if do_std
         disp('   ');

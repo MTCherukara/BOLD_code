@@ -39,7 +39,7 @@ string sqBOLDFwdModel::GetDescription() const
 
 string sqBOLDFwdModel::ModelVersion() const
 {
-    return "1.0";
+    return "1.1 (2019-02-11)";
 } // ModelVersion
 
 
@@ -106,10 +106,10 @@ void sqBOLDFwdModel::HardcodedInitialDists(MVNDist &prior, MVNDist &posterior) c
     SymmetricMatrix precisions = IdentityMatrix(NumParams()) * 1e-3;
 
     prior.means(R2p_index()) = 4.0;
-    precisions(R2p_index(), R2p_index()) = 1e-3; // 1e-3 or 1e0
+    precisions(R2p_index(), R2p_index()) = 1e-4; // 1e-3 or 1e0
     
     prior.means(DBV_index()) = 0.05;
-    precisions(DBV_index(), DBV_index()) = 1e0; // 1e0 or 1e3
+    precisions(DBV_index(), DBV_index()) = 1e-1; // 1e0 or 1e3
     
     prior.means(S0_index()) = 100.0;
     precisions(S0_index(), S0_index()) = 1e-5; // 1e-5
@@ -142,21 +142,21 @@ void sqBOLDFwdModel::Evaluate(const ColumnVector &params, ColumnVector &result) 
     double S0;
 
     // pull out parameter values
-    R2p = abs(paramcpy(R2p_index()));
-    DBV = abs(paramcpy(DBV_index()));
+    R2p = (paramcpy(R2p_index()));
+    DBV = (paramcpy(DBV_index()));
     S0 = (paramcpy(S0_index()));
 
     // loop through taus (not the first one)
     result.ReSize(taus.Nrows());
 
-    result(1) = S0*exp(-DBV);
+    result(1) = S0;
 
     for (int ii = 2; ii <= taus.Nrows(); ii++)
     {
         double tau = taus(ii);
         
         // evaluate linear exponential
-        result(ii) = S0*exp(-R2p*tau);
+        result(ii) = S0*exp(DBV-(R2p*tau));
 
     }
 

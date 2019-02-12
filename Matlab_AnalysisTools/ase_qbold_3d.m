@@ -11,6 +11,9 @@ start_tau = -28;
 delta_tau = 4;
 end_tau = 64;
 
+% manually specify input name
+nii_name = '/Users/mattcher/Documents/DPhil/Data/qboldsim_data/ASE_Grid_2C_50x50_Taus_24_SNR_500.nii.gz';
+
 if ~exist('nii_name','var')
     [dfile,ddir] = uigetfile('*.nii.gz','Choose Data File');
     nii_name = strcat(ddir,dfile);
@@ -33,14 +36,12 @@ k = 0.03; % conversion factor Hct (% rbc's in blood) to Hb (iron-containing mole
 
 % X
 % Convert tau to seconds
-tau = [start_tau:delta_tau:end_tau];
-tau = tau.*10^-3;
+tau = (start_tau:delta_tau:end_tau).*10^-3;
 
 % Check that tau matches the number of volumes 
 
 if (length(tau) ~= v)
     disp('List of Tau values doesn''t match the number of volumes') 
-    %disp(tau)
     sprintf('Number of volumes = %1.0f', v)
     
 else
@@ -58,8 +59,7 @@ p = zeros(x,y,z,2);
 for xID = 1:x
     for yID = 1:y
         for zID = 1:z
-%             fprintf('xID%d ; yID%d ; zID%d \n',xID,yID,zID) 
-            %% LSCOV: fit linear regime
+            % LSCOV: fit linear regime
             X = [ones(length(tau(1,tau_lineID)'),1) tau(1,tau_lineID)'];
             Y = squeeze(ln_Sase(xID,yID,zID,tau_lineID));
 
@@ -77,29 +77,25 @@ dbv = c - ln_Sase(:,:,:,s0_id);
 oef = r2p./(dbv.*gamma.*(4./3).*pi.*dChi0.*Hct.*B0);
 dhb = r2p./(dbv.*gamma.*(4./3).*pi.*dChi0.*B0.*k);
 
+
 %% Calculate residuals by re-generating some signal data
-taus = shiftdim(repmat(tau',1,64,64,10),1);
-S0 = V(:,:,:,s0_id);
-Snew = S0.*exp(-repmat(r2p,1,1,1,24).*taus + repmat(dbv,1,1,1,24));
+% taus = shiftdim(repmat(tau',1,64,64,10),1);
+% S0 = V(:,:,:,s0_id);
+% Snew = S0.*exp(-repmat(r2p,1,1,1,24).*taus + repmat(dbv,1,1,1,24));
+% 
+% res = V(:,:,:,tau_lineID) - Snew(:,:,:,tau_lineID);
+% 
+% snr = Snew(:,:,:,tau_lineID) ./ abs(res);
 
-res = V(:,:,:,tau_lineID) - Snew(:,:,:,tau_lineID);
-
-snr = Snew(:,:,:,tau_lineID) ./ abs(res);
 
 %% Output parameter niftis
     
-    save_avw(r2p, 'qbold_results/mean_R2p', 'f', scales);
-    save_avw(dbv, 'qbold_results/mean_DBV', 'f', scales);
-    save_avw(oef, 'qbold_results/mean_OEF', 'f', scales);
-    save_avw(res, 'qbold_results/residuals','f', scales);
-    save_avw(snr, 'qbold_results/modelSNR', 'f', scales);
+    save_avw(abs(r2p), 'qbold_results/mean_R2p', 'f', scales);
+    save_avw(abs(dbv), 'qbold_results/mean_DBV', 'f', scales);
+    save_avw(abs(oef), 'qbold_results/mean_OEF', 'f', scales);
+%     save_avw(res, 'qbold_results/residuals','f', scales);
+%     save_avw(snr, 'qbold_results/modelSNR', 'f', scales);
 %     save_avw(dhb, 'dhb', 'f', scales);
 
-%     saveas(imgH_r2p, 'r2p.fig')
-%     saveas(imgH_dbv, 'dbv.fig')
-%     saveas(imgH_oef, 'oef.fig')
-%     saveas(imgH_dhb, 'dhb.fig')
-   
 
 end
-% end

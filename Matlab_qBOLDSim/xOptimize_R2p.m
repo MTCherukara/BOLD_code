@@ -17,23 +17,23 @@ setFigureDefaults;
 tic;
 
 % Choose TE (train on 0.072, test on 0.084, also 0.108 and 0.036)
-TE = 0.072;
+TE = 0.084;
 
 % Vessel Type
 vsd_name = 'sharan';
 
 % Load data
 %   Dimensions of S0:     DBV, OEF, TIME
-load(['../../Data/vesselsim_data/vs_arrays/TE',num2str(1000*TE),'_vsData_',vsd_name,'_100.mat']);
+load(['../../Data/vesselsim_data/vs_arrays/TE',num2str(1000*TE),'_vsData_',vsd_name,'_50.mat']);
 
 % declare global variables
 global S_dist param1 tau1
 tau1 = tau;
 
 % create a parameters structure with the right params
-param1 = genParams('incIV',false,'incT2',false,...
+param1 = genParams('incIV',false,'incT2',true,...
                    'Model','Asymp','TE',TE,...
-                   'beta',1.2);
+                   'beta',1.0);
                
 nDBV = length(DBVvals);
 nOEF = length(OEFvals);
@@ -57,12 +57,12 @@ for i1 = 1:nOEF
         param1.OEF  = OEFvals(i1);
         
         % find the optimum R2' scaling factor
-        X1 = fminbnd(@optimScaling,0,3);
-%         X1 = fminsearch(@optimPowerScale,[1.0,1.0]);
+%         X1 = fminbnd(@optimScaling,0,3);
+        X1 = fminsearch(@optimPowerScale,[0.5,1.0]);
         
         % Fill in ests matrix
         ests(i1,i2) = X1(1);
-%         est2(i1,i2) = X1(2);
+        est2(i1,i2) = X1(2);
         
     end % DBV Loop
     
@@ -77,14 +77,14 @@ disp(['Mean B    :  ',round2str(mean(est2(:)),4)]);
 
 
 % plot the results
-plotGrid(ests,DBVvals,OEFvals,...
+plotGrid(ests,100*DBVvals,100*OEFvals,...
           'cmap',inferno,...
-          'cvals',[0,3],...
+          'cvals',[0,1],...
           'title','Optimized R2'' Scaling Factor');
       
-plotGrid(est2,DBVvals,OEFvals,...
+plotGrid(est2,100*DBVvals,100*OEFvals,...
           'cmap',inferno,...
-          'cvals',[-1,1],...
+          'cvals',[0,2],...
           'title','Optimized R2'' Scaling Factor');
 
 % Key datapoints for comparing

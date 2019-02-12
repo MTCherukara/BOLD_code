@@ -13,9 +13,9 @@ clear;
 
 %% Set parameters
 
-TE = 0.050;
-tau = (0:1:40)/1000;
-SEind = 1; % in this case (-24:1:64, SEind=25)
+TE = 0.074;
+tau = (-28:1:64)/1000;
+SEind = 29; % in this case (-24:1:64, SEind=25)
 
 % 30x30 data
 % OEFvals = 0.10:0.025:0.825;
@@ -87,7 +87,7 @@ end % OEF loop
 
 %% Save out data
 % dname = strcat('ASE_Grid_2C_',num2str(no),'x',num2str(nv),'_SNR_',num2str(SNR));
-dname = strcat('ASE_Grid_2C_',num2str(no),'x',num2str(nv),'_allTaus');
+dname = strcat('ASE_Grid_2C_',num2str(no),'x',num2str(nv),'_TE_74');
 save([dname,'.mat'],'ase_data','ase_model','tau','TE','params','OEFvals','DBVvals');
 % save_avw(100.*ase_data,[dname,'.nii.gz'],'d',[1,1,1,3]);
 % save_avw(OEF_grid,[dname,'_OEF.nii.gz'],'d',[1,1,1,3]);

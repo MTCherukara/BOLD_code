@@ -63,16 +63,16 @@ axis square;
 
 % Do the labels
 xlabel(r.xlabel);
-if strcmp(r.xlabel,'DBV (%)')
-    xticks(0.01:0.01:0.07);
-    xticklabels({'1','2','3','4','5','6','7'});
-end
+% if strcmp(r.xlabel,'DBV (%)')
+%     xticks(0.01:0.01:0.07);
+%     xticklabels({'1','2','3','4','5','6','7'});
+% end
 
 ylabel(r.ylabel);
-if strcmp(r.ylabel,'OEF (%)')
-    yticks(0.2:0.1:0.6);
-    yticklabels({'20','30','40','50','60'})
-end
+% if strcmp(r.ylabel,'OEF (%)')
+%     yticks(0.2:0.1:0.6);
+%     yticklabels({'20','30','40','50','60'})
+% end
 
 title(r.title)
 

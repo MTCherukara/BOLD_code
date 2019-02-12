@@ -1,11 +1,16 @@
 # fabber run 5 - SQBOLD
 
-# Input Data
-data=../../Data/validation_sqbold/vs7/sub07_ASE_FLAIR_longnorm.nii.gz
-mask=../../Data/validation_sqbold/vs7/mask_flair.nii.gz
+# Input Data - in vivo ASE
+#data=../../Data/validation_sqbold/vs7/ASE_FLAIR_long.nii.gz
+#mask=../../Data/validation_sqbold/vs7/mask_flair.nii.gz
+#output=../../Data/Fabber_Results/
+
+# Input Data - simulated ASE
+data=../../Data/qboldsim_data/ASE_Grid_2C_50x50_Taus_14_SNR_500.nii.gz
+mask=../../Data/qboldsim_data/ASE_Grid_50x50_mask.nii.gz
+output=../../Data/Fabber_ModelFits/
 
 # Run Options
-output=../../Data/Fabber_Results/
 save-residuals
 save-model-fit
 print-free-energy
@@ -18,7 +23,6 @@ allow-bad-voxels
 
 # Spatial VB Information (remove all of this if method!=spatialvb)
 #param-spatial-priors=MMM
-#image-prior6=../../Data/subject_06/CSF_T2fit.nii.gz
 
 # Inference Model 
 model=sqBOLD
