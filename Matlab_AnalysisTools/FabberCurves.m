@@ -4,109 +4,118 @@
 %
 % MT Cherukara
 % 
-% Actively used as of 2018-09-19
-
+% Actively used as of 2019-02-12
+%
+% Changelog:
+%
+% 2019-02-12 (MTC). Adapted this specifically to use simulated grid data. Will
+%       eventually have to apply this to brain data (which will require also
+%       loading a mask and stuff like that), but for now, this only works in
+%       simulated data. 
 
 clear;
 % close all;
 
 setFigureDefaults;
 
-% Parameters
-% slices = 4:9;       % VS data
-slices = 1:6;       % s11 FLAIR data
+% User Choices:
+slices = 1;
+setnum = 264;
 
-% Subject number
-subnum = 11;
+% signal threshold
+thrsh = 1000;
 
-%% Load the data
-
-% Have the users specify a file to load, which will be either ASE data, or
-% modelfit, or residual
-[dname, ddir] = uigetfile('*.nii.gz','Select NIFTY Data to load...');
-
-% % Extract the VS number from the chosen directory's name
-% C = strsplit(ddir,'vs');
-% VSnum = C{2}(1);
-% 
-% % Load the appropriate grey-matter mask
-% Maskslice = LoadSlice(['/Users/mattcher/Documents/DPhil/Data/validation_sqbold/vs',...
-%                        VSnum,'/mask_gm_60.nii.gz'],slices);
-
-if subnum < 10
-    s_subnum = strcat('0',num2str(subnum));
-else
-    s_subnum = num2str(subnum);
-end
-
-Maskslice = LoadSlice(['/Users/mattcher/Documents/DPhil/Data/subject_',...
-                       s_subnum,'/mask_GM_80_FLAIR.nii.gz'],slices);
+% specify which OEF and DBV values we want
+pickOEF = 40;
+pickDBV = 6;
 
 
-% Load the data
-Dataset = LoadSlice([ddir,dname],slices);
+%% Load the Data
+
+resdir = '/Users/mattcher/Documents/DPhil/Data/Fabber_ModelFits/';
+fdname = dir([resdir,'fabber_',num2str(setnum),'_*']);
+fabdir = strcat(resdir,fdname.name,'/');
+
+% Load modelfit data
+volFit = LoadSlice([fabdir,'modelfit.nii.gz'],slices);
+
+% also load the ground truth
+gnddir = '/Users/mattcher/Documents/DPhil/Data/qboldsim_data/';
+volGnd = LoadSlice([gnddir,'ASE_Grid_2C_50x50_Taus_24_SNR_500.nii.gz'],1);
+
+% info
+nt = size(volFit,3);
 
 
-%% Do some averaging
+%% Prepare for displaying
 
-% number of time-points
-nt = size(Dataset,4);
+% vectorize the rest, so that we can remove bad values
+vecFit = shiftdim(volFit,2);
+vecFit = reshape(vecFit,nt,[]);
 
-% Pre-allocate results vectors
-Sig_mean = zeros(1,nt);
-Sig_std  = zeros(1,nt);
-Sig_med  = zeros(1,nt);
-Sig_iqr  = zeros(1,nt);
+% vectorize the ground truth data
+vecGnd = shiftdim(volGnd,2);
+vecGnd = reshape(vecGnd,nt,[]);
 
+% find bad values
+badData = any(vecFit == 0,1) + any(~isfinite(vecFit),1) + any(vecFit > thrsh,1);
 
-% Loop through time points:
-for ii = 1:nt
-    
-    Dataslice = Dataset(:,:,:,ii);
-    
-    % Apply mask and vectorize
-    Dataslice = Dataslice(:).*Maskslice(:);
-    
-    % Remove zeros
-    Dataslice(Dataslice == 0) = [];
-    
-    % Calculate signal averages
-    Sig_mean(ii) = nanmean(Dataslice);
-    Sig_std(ii)  = nanstd(Dataslice);
-    Sig_med(ii)  = nanmedian(Dataslice);
-    
-    qnt = quantile(Dataslice,[0.75,0.25]);
-    Sig_iqr(ii)  = (qnt(1) - qnt(2)) ./ 2;
+% remove bad values
+vecFit(:,badData ~= 0) = [];
+vecGnd(:,badData ~= 0) = [];
 
-end
+% take the mean
+meanFit = mean(vecFit,2);
+meanGnd = mean(vecGnd,2);
 
 
-%% Plot
-
-% tau values
-if nt == 24
-    taus = (-28:4:64)./1000; % VS
-elseif nt == 14
-    taus = [-28, -20, -12, -4, 0, 4, 8, 16, 24, 32, 40, 48, 56, 64]./1000;
-elseif nt == 11
-    taus = (-16:8:64)./1000; % AMICI Protocol
-else
-    taus = (1:1:nt)./1000;
-end
-
-% Normalize to values around the spin echo
-SEind = find(abs(taus) < 1e-6,1);
-Sig_medN  = Sig_med./mean(Sig_med(SEind-1:SEind+1));
-Sig_meanN = Sig_mean./mean(Sig_med(SEind-1:SEind+1));
+% tau values (which we assume, at this stage)
+tau = -28:4:64;     % in ms, for ease of plotting
 
 
-figure();
-hold on; box on;
-plot(1000*taus,log(Sig_mean),'-');
+%% Plot average
+% figure; box on;
+% plot(tau,meanGnd); hold on;
+% plot(tau,meanFit); 
+% xlabel('Spin echo displacement \tau (ms)')
+% ylabel('ASE Signal');
+% legend('Ground Truth','Fitted Signal');
+% title('Average across all OEF-DBV values');
 
+
+%% Plot a specific OEF-DBV pair
+
+% for a 50x50 grid (dimensions: OEF, DBV)
+OEFvals = 0.21:0.01:0.7;
+DBVvals = 0.003:0.003:0.15;
+
+% find the indices of those values
+indOEF = find(100.*OEFvals >= pickOEF,1);
+indDBV = find(100.*DBVvals >= pickDBV,1);
+
+% pull out the signals (OEF, DBV)
+sigPick = squeeze(volFit(indOEF,indDBV,:));
+sigGnd  = squeeze(volGnd(indOEF,indDBV,:));
+
+% find what the results were on that voxel
+volOEF = LoadSlice([fabdir,'mean_OEF.nii.gz'],slices);
+volDBV = LoadSlice([fabdir,'mean_DBV.nii.gz'],slices);
+volS0  = LoadSlice([fabdir,'mean_S0.nii.gz'],slices);
+
+resOEF = 100*volOEF(indOEF,indDBV);
+resDBV = 100*volDBV(indOEF,indDBV);
+resS0  = volS0(indOEF,indDBV);
+
+% display those
+disp(['True OEF = ',num2str(pickOEF),', Actual OEF = ',num2str(resOEF)]);
+disp(['True DBV = ',num2str(pickDBV),', Actual DBV = ',num2str(resDBV)]);
+disp(['True S0  = ',num2str(100) ,', Actual S0  = ',num2str(resS0)]);
+
+figure; box on;
+plot(tau,sigGnd); hold on;
+plot(tau,sigPick);
+% axis([-32,68,57,103]);
 xlabel('Spin echo displacement \tau (ms)')
 ylabel('ASE Signal');
-% title(['Subject vs',VSnum,' (GM average)']);
-
-% xlim([-32,68]);
-
+legend('Ground Truth','Fitted Signal');
+title(['OEF = ',num2str(pickOEF),'%, DBV = ',num2str(pickDBV),'%']);

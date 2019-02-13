@@ -32,7 +32,7 @@ clc;
 vars = {'R2p','DBV','OEF'};
 
 % Choose Data set
-setnum = 956;
+setnum = 966;
 
 % Which set of subjects is this from?
 setname = 'VS';          % 'VS', 'genF', 'genNF', 'CSF', or 'AMICI'
@@ -41,7 +41,7 @@ setname = 'VS';          % 'VS', 'genF', 'genNF', 'CSF', or 'AMICI'
 do_FE = 0;
 
 % do standard deviations
-do_std = 0;
+do_std = 1;
 
 
 %% Initial Stuff
@@ -103,7 +103,7 @@ end
 
 % Threshold values
 threshes = containers.Map({'R2p', 'DBV', 'OEF', 'VC', 'DF', 'lambda', 'Ax' },...
-                          [ 30  ,   1  ,   1  ,  1  ,  15 ,   1     ,  30  ]);  
+                          [ 50  ,   1  ,   2  ,  1  ,  15 ,   1     ,  30  ]);  
 
 % Title
 disp(['Data from Fabber Set ',num2str(setnum),'. ',setname, ' Subject ',num2str(subnum)]);
@@ -137,8 +137,8 @@ for vv = 1:length(vars)
     % Create a mask of values to remove
     badData = (volData <= 0) + ~isfinite(volData) + (volData > thrsh);
     if do_std
-%         badData = badData + ~isfinite(stdData) + (stdData > (thrsh/2)) + (stdData < (thrsh.*1e-3));
-        badData = badData + ~isfinite(stdData) ;
+        badData = badData + ~isfinite(stdData) + (stdData > (thrsh/2)) + (stdData < (thrsh.*1e-3));
+%         badData = badData + ~isfinite(stdData) ;
     end
     
     % Remove bad values

@@ -422,7 +422,16 @@ void R2primeFwdModel::Evaluate(const ColumnVector &params, ColumnVector &result)
     // assign values to parameters
     if (infer_DBV)
     {
-        DBV = abs(paramcpy(DBV_index()));
+        DBV = (paramcpy(DBV_index()));
+        if (DBV < 0.0001)
+        {
+            DBV = 0.0001;
+        }
+        else if (DBV > 1.0)
+        {
+            DBV = 1.0;
+        }
+        
     }
     else
     {
@@ -450,7 +459,7 @@ void R2primeFwdModel::Evaluate(const ColumnVector &params, ColumnVector &result)
     }
     else
     {
-        Hct = 0.4;
+        Hct = 0.40;
     }
     if (infer_R2e)
     {
@@ -649,13 +658,14 @@ void R2primeFwdModel::Evaluate(const ColumnVector &params, ColumnVector &result)
 
     
     // alternative, if values are outside reasonable bounds
+    /*
     if ( DBV > 0.5 || Hct > 1.0 || OEF > 1.0 || lam0 > 1.0 )
     {
         for (int ii = 1; ii <= taus.Nrows(); ii++)
         {
             result(ii) = result(ii)*100.0;
         }
-    }
+    }*/
     
 
     return;

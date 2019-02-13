@@ -43,10 +43,10 @@ ns = length(slices); % number of slices
 if ~exist('threshold','var')
 
     if strfind(lower(niname),'dbv')
-        threshold = 0.15;
+        threshold = 0.25;
         cmp = magma;
     elseif strfind(lower(niname),'r2p')
-        threshold = 10;
+        threshold = 15;
         cmp = viridis;
     elseif strfind(lower(niname),'oef')
         threshold = 0.8;
@@ -55,7 +55,7 @@ if ~exist('threshold','var')
         threshold = 15;
         cmp = inferno;
     else
-        threshold = 300;
+        threshold = 500;
         cmp = gray;
     end
 

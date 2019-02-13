@@ -65,13 +65,13 @@ DBVs = 1:2:9;
 [gOEF,gDBV] = meshgrid(OEFs,DBVs);
 
 % Parameters
-pnames = { 'R2p'    ; 'zeta'     };
-interv = [ 0.2, 20 ; 0.003, 0.15 ];
-np     = [ 1000     ; 1000       ];
-
-% pnames = { 'OEF'    ; 'zeta'     };
-% interv = [ 0.2, 0.7 ; 0.003, 0.15 ];
+% pnames = { 'R2p'    ; 'zeta'     };
+% interv = [ 0.2, 15 ; 0.003, 0.15 ];
 % np     = [ 1000     ; 1000       ];
+
+pnames = { 'OEF'    ; 'zeta'     };
+interv = [ 0.2, 0.7 ; 0.003, 0.15 ];
+np     = [ 1000     ; 1000       ];
 
 % pnames = { 'OEF'    ; 'zeta'     };
 % interv = [ 0, 0.1 ; 0.01, 0.05 ];
@@ -92,7 +92,7 @@ for jj = 1%:nj
     tic;
     
     % Load the Data: 
-    load('ASE_Data/Data_190130_40_3_SNR_50.mat');
+    load('ASE_Data/Data_190213_40_3_SNR_50.mat');
     
     
 %     vOEF = num2str(gOEF(jj));     % only useful when looping over things
