@@ -12,7 +12,7 @@ delta_tau = 4;
 end_tau = 64;
 
 % manually specify input name
-nii_name = '/Users/mattcher/Documents/DPhil/Data/qboldsim_data/ASE_Grid_2C_50x50_Taus_24_SNR_500.nii.gz';
+nii_name = '/Users/mattcher/Documents/DPhil/Data/qboldsim_data/ASE_Grid_2C_50x50_Taus_24_SNR_200.nii.gz';
 
 if ~exist('nii_name','var')
     [dfile,ddir] = uigetfile('*.nii.gz','Choose Data File');

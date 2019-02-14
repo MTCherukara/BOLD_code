@@ -8,21 +8,27 @@
 %
 % Changelog:
 %
+% 2019-02-14 (MTC). Added functionality for simulated grids. This now works, but
+%       it doesn't actually do the thing we want it to do, because we want to do
+%       an ANOVA test of the errors, not the raw parameter values.       
+%
+% 2019-02-04 (MTC). Re-written, based on FabberAverages, to be better in a bunch
+%       of ways.
 
 
 clear; 
 % close all;
 setFigureDefaults;
 
-set0 = 7;
+set0 = 1;
 
 %% User Selected Parameters
-vname = 'DBV';              % variable name
-setname = 'VS';
+vname = 'R2p';              % variable name
+setname = 'SIM';
 lbls = {'L Model','1C Model','2C Model'};
 
 % Pick FABBER datasets
-fsets = [854, 900, 907] + set0;
+fsets = [250, 264, 271] + set0 - 1;
 
 % Which pairs of FSETS do we want to compare?
 grps = {[1,2];[1,3]};
@@ -32,7 +38,11 @@ grps = {[1,2];[1,3]};
 nsets = length(fsets);      % number of sets
 
 % Results directory
-resdir = '/Users/mattcher/Documents/DPhil/Data/Fabber_Results/';
+if strcmp(setname,'SIM')
+    resdir = '/Users/mattcher/Documents/DPhil/Data/Fabber_ModelFits/';
+else
+    resdir = '/Users/mattcher/Documents/DPhil/Data/Fabber_Results/';
+end
 
 % Look at the first dataset in order to figure out which mask to load
 set1 = fsets(1);
@@ -77,6 +87,11 @@ switch setname
         subnum = CC{2}(1:2);
         maskdir = ['/Users/mattcher/Documents/DPhil/Data/subject_',subnum,'/'];
         
+    case 'SIM'
+        
+        slicenum = 1;
+        subnum = 0;
+        
     otherwise 
         
         slicenum = 5:10;    % new AMICI protocol nonFLAIR
@@ -92,7 +107,11 @@ threshes = containers.Map({'R2p', 'DBV', 'OEF', 'VC', 'DF', 'lambda', 'Ax' },...
                           [ 30  ,   1  ,   1  ,  1  ,  15 ,   1     ,  30  ]);  
 
 % Load mask data
-mskData = LoadSlice([maskdir,maskname],slicenum);
+if strcmp(setname,'SIM')
+    mskData = ones(50,50);
+else
+    mskData = LoadSlice([maskdir,maskname],slicenum);
+end
 
 
 %% Pre-allocation

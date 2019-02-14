@@ -15,13 +15,13 @@ setFigureDefaults;
 
 
 % Select the rows we want to plot
-plotrows = [2,5,7];
+plotrows = [1,5,7];
 
 
 %% Comparisons of SNR Levels (R2p model, 2C simulation, 24 taus)
 
 % Row Names
-rnames = {'L MATLAB'    ; ...   % 1 - L model, MATLAB
+rnames = {'L Model'    ; ...   % 1 - L model, MATLAB
           'L Model'     ; ...   % 2 - L model, VB
           '1C Old'      ; ...   % 3 - 1C model, old thresholding
           '1C Model'    ; ...   % 4 - 1C model, new thresholding
@@ -35,7 +35,7 @@ SNR = [ 5, 10, 25, 50, 100, 200, 500 ];
 
 
 % SNR        5         10         25         50        100        200        500
-Err_OEF = [ 27.7000,   22.7000,   15.8000,   11.6000,    7.8000,   11.8000,    4.5000; ...
+Err_OEF = [ 27.7000,   22.7000,   15.8000,   11.6000,    7.8000,    5.6700,    4.5000; ...
             26.3000,   21.6000,   14.9000,   10.6000,    7.5500,    5.5600,    4.5100; ...
             30.3000,   26.3000,   21.3000,   19.3000,   19.3000,   18.8000,   18.8000; ...
             25.2000,   20.8000,   14.6000,   11.1000,    8.2700,    6.7300,    5.8100; ...
@@ -94,7 +94,7 @@ ylim([0,6.5]);
 xticks(SNR);
 
 % Plot DBV Error
-Max_DBV = 18;
+Max_DBV = 18.5;
 % Err_DBV(abs(Err_DBV) > Max_DBV) = Max_DBV;
 figure; box on;
 semilogx(SNR,abs(Err_DBV(plotrows,:))');
