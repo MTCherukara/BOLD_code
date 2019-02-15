@@ -31,7 +31,7 @@ include_intra
 # correction parameters
 #SR=0.52
 
-precR2p=1e-4
+precR2p=1e-3
 precDBV=1e-1
 #precOEF=1e2
 

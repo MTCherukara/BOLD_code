@@ -21,14 +21,14 @@ clc;
 % Choose variables
 vars = {'OEF', 'DBV', 'R2p'};
 thrA = [  1.0,   1.0,  50  ];     % threshold of actual values
-thrS = [  2.0,   1.0,  50  ];     % threshold of standard deviations
+thrS = [ 10.0,   1.0,  50  ];     % threshold of standard deviations
 % vars = {'OEF'};
 
 % choose dataset
-setnum = 255;
+setnum = 284;
 
 % Do we have STD data?
-do_std = 0;
+do_std = 1;
 
 % Do we want a figure?
 plot_fig = 0;
