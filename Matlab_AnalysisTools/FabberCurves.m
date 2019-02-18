@@ -20,14 +20,17 @@ setFigureDefaults;
 
 % User Choices:
 slices = 1;
-setnum = 264;
+setnum = 241;
 
 % signal threshold
 thrsh = 1000;
 
 % specify which OEF and DBV values we want
-pickOEF = 40;
-pickDBV = 6;
+pickOEF = 41;
+pickDBV = 3;
+
+% options
+plot_av = 1;        % plot the average across all voxels
 
 
 %% Load the Data
@@ -41,7 +44,8 @@ volFit = LoadSlice([fabdir,'modelfit.nii.gz'],slices);
 
 % also load the ground truth
 gnddir = '/Users/mattcher/Documents/DPhil/Data/qboldsim_data/';
-volGnd = LoadSlice([gnddir,'ASE_Grid_2C_50x50_Taus_24_SNR_500.nii.gz'],1);
+% volGnd = LoadSlice([gnddir,'ASE_Grid_2C_50x50_Taus_24_SNR_500.nii.gz'],1);
+volGnd = LoadSlice([gnddir,'ASE_Grid_Sharan_50x50_Taus_11_SNR_200.nii.gz'],1);
 
 % info
 nt = size(volFit,3);
@@ -70,17 +74,22 @@ meanGnd = mean(vecGnd,2);
 
 
 % tau values (which we assume, at this stage)
-tau = -28:4:64;     % in ms, for ease of plotting
+% tau = -28:4:64;     % in ms, for ease of plotting
+tau = -16:8:64;
 
 
 %% Plot average
-% figure; box on;
-% plot(tau,meanGnd); hold on;
-% plot(tau,meanFit); 
-% xlabel('Spin echo displacement \tau (ms)')
-% ylabel('ASE Signal');
-% legend('Ground Truth','Fitted Signal');
-% title('Average across all OEF-DBV values');
+if plot_av
+    figure; box on;
+    plot(tau,meanGnd); hold on;
+    plot(tau,meanFit); 
+    xlabel('Spin echo displacement \tau (ms)')
+    ylabel('ASE Signal');
+    legend('Ground Truth','Fitted Signal');
+    title('Average across all OEF-DBV values');
+    xlim([-32,68]);
+    % ylim([57,103]);
+end
 
 
 %% Plot a specific OEF-DBV pair
@@ -114,7 +123,8 @@ disp(['True S0  = ',num2str(100) ,', Actual S0  = ',num2str(resS0)]);
 figure; box on;
 plot(tau,sigGnd); hold on;
 plot(tau,sigPick);
-% axis([-32,68,57,103]);
+xlim([-32,68]);
+% ylim([57,103]);
 xlabel('Spin echo displacement \tau (ms)')
 ylabel('ASE Signal');
 legend('Ground Truth','Fitted Signal');

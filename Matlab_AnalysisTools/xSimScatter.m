@@ -25,10 +25,10 @@ thrS = [ 10.0,   1.0,  50  ];     % threshold of standard deviations
 % vars = {'OEF'};
 
 % choose dataset
-setnum = 284;
+setnum = 362;
 
 % Do we have STD data?
-do_std = 1;
+do_std = 0;
 
 % Do we want a figure?
 plot_fig = 0;

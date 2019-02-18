@@ -495,7 +495,7 @@ void R2primeFwdModel::Evaluate(const ColumnVector &params, ColumnVector &result)
     }
     else if (infer_R2p)
     {
-        R2p = (paramcpy(R2p_index()));
+        R2p = SR*(paramcpy(R2p_index()));
         /*if (DBV < 0.0001)
         {
             DBV = 0.0001;
@@ -519,9 +519,9 @@ void R2primeFwdModel::Evaluate(const ColumnVector &params, ColumnVector &result)
             SR2p = 0.01;
         } */ 
 
-        SR2p = SR;
+        // SR2p = SR;
        
-        R2p = dw*DBV*SR2p;
+        // R2p = dw*DBV*SR2p;
 
     }
     else
@@ -533,13 +533,13 @@ void R2primeFwdModel::Evaluate(const ColumnVector &params, ColumnVector &result)
     // calculate tc and threshold it if necessary
     tc = 1.7/dw;
     /*
-    if (tc > 0.025)
+    if (tc > 0.03)
     {
-        tc = 0.025;
+        tc = 0.03;
     }
-    else if (tc < 0.005)
+    else if (tc < 0.01)
     {
-        tc = 0.005;
+        tc = 0.01;
     } */
 
     // evaluate blood relaxation rates

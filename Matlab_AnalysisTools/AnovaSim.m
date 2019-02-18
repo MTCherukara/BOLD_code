@@ -15,11 +15,11 @@ clear;
 close all;
 setFigureDefaults;
 
-set0 = 7;
+set0 = 5;
 
 %% User Selected Parameters
-vname = 'OEF';              % variable name
-lbls = {'L Model','1C Model','2C Model'};
+vname = 'R2p';              % variable name
+lbls = {'Linear LSQ','VB','2C Model'};
 
 % Pick FABBER datasets
 fsets = [250, 243] + set0 - 1;
