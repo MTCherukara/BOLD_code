@@ -15,20 +15,20 @@ clear;
 close all;
 setFigureDefaults;
 
-set0 = 5;
+set0 = 7;
 
 %% User Selected Parameters
-vname = 'R2p';              % variable name
+vname = 'OEF';              % variable name
 lbls = {'Linear LSQ','VB','2C Model'};
 
 % Pick FABBER datasets
-fsets = [250, 243] + set0 - 1;
+fsets = [250, 264, 271] + set0 - 1;
 
 % Which pairs of FSETS do we want to compare?
-grps = {[1,2]};
+grps = {[1,2],[1,3],[2,3]};
 
 % Options
-do_std = 0;
+do_std = 1;
 plot_rel = 0;
 
 
@@ -46,7 +46,7 @@ vecGnd = volGnd(:);
 
 % Threshold values
 threshes = containers.Map({'R2p', 'DBV', 'OEF', 'VC', 'DF', 'lambda', 'Ax' },...
-                          [ 30  ,   1  ,   1  ,  1  ,  15 ,   1     ,  30  ]);  
+                          [ 50  ,   1  ,   1  ,  1  ,  15 ,   1     ,  30  ]);  
 
 nsets = length(fsets);      % number of sets
 ng = length(volGnd(:));     % grid size

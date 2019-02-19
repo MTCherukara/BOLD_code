@@ -32,7 +32,7 @@ clc;
 vars = {'R2p','DBV','OEF'};
 
 % Choose Data set
-setnum = 966;
+setnum = 915;
 
 % Which set of subjects is this from?
 setname = 'VS';          % 'VS', 'genF', 'genNF', 'CSF', or 'AMICI'
@@ -41,7 +41,7 @@ setname = 'VS';          % 'VS', 'genF', 'genNF', 'CSF', or 'AMICI'
 do_FE = 0;
 
 % do standard deviations
-do_std = 1;
+do_std = 0;
 
 
 %% Initial Stuff

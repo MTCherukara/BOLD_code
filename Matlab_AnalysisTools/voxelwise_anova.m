@@ -24,11 +24,11 @@ set0 = 1;
 
 %% User Selected Parameters
 vname = 'R2p';              % variable name
-setname = 'SIM';
+setname = 'VS';
 lbls = {'L Model','1C Model','2C Model'};
 
 % Pick FABBER datasets
-fsets = [250, 264, 271] + set0 - 1;
+fsets = [855, 901, 915] + set0 - 1;
 
 % Which pairs of FSETS do we want to compare?
 grps = {[1,2];[1,3]};
