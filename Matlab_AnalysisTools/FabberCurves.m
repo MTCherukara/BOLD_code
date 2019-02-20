@@ -20,7 +20,7 @@ setFigureDefaults;
 
 % User Choices:
 slices = 1;
-setnum = 241;
+setnum = 354;
 
 % signal threshold
 thrsh = 1000;

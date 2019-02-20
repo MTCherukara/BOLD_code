@@ -495,7 +495,7 @@ void R2primeFwdModel::Evaluate(const ColumnVector &params, ColumnVector &result)
     }
     else if (infer_R2p)
     {
-        R2p = SR*(paramcpy(R2p_index()));
+        R2p = (paramcpy(R2p_index()));
         /*if (DBV < 0.0001)
         {
             DBV = 0.0001;
@@ -595,11 +595,11 @@ void R2primeFwdModel::Evaluate(const ColumnVector &params, ColumnVector &result)
         // calculate tissue signal
         if (tau < -tc)
         {
-            St = exp(DBV + (R2p*tau));
+            St = exp(DBV + (SR*R2p*tau));
         }
         else if (tau > tc)
         {
-            St = exp(DBV - (R2p*tau));
+            St = exp(DBV - (SR*R2p*tau));
         }
         else
         {

@@ -20,12 +20,12 @@ clc;
 
 % Choose variables
 vars = {'OEF', 'DBV', 'R2p'};
-thrA = [  1.0,   1.0,  50  ];     % threshold of actual values
+thrA = [  2.0,   1.0,  50  ];     % threshold of actual values
 thrS = [ 10.0,   1.0,  50  ];     % threshold of standard deviations
 % vars = {'OEF'};
 
 % choose dataset
-setnum = 362;
+setnum = 242;
 
 % Do we have STD data?
 do_std = 0;
@@ -72,6 +72,11 @@ for vv = 1:length(vars)
     
     % Load the data
     volData = LoadSlice([fabdir,'mean_',vname,'.nii.gz'],1);
+    
+    % OPTIONALLY scale OEF
+    if strcmp(vname,'OEF')
+        volData = volData.*0.52;
+    end
       
     % take the absolute value and store it 
     matAll(:,vv) = (volData(:));
