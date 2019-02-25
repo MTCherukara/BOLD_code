@@ -17,7 +17,7 @@
 clear;
 setFigureDefaults;
 
-slices = 1;
+% slices = 1;
 
 % SQ-LS    SQ-VB   1C-VBS  1C-VBTC 1C-VBI  1C-VB-TCI  2C-VB   2C-VBI  2C-VB-TC  2C-VB-TCI
 % '101'  , '250' , '330' , '264' , '257' , '316'    , '201' , '236' , '281'   , '309' ;...   % subject vs1
@@ -41,12 +41,12 @@ ns = length(slices); % number of slices
 
 % Set threshold based on the type of variable we're looking at
 if ~exist('threshold','var')
-
+5
     if strfind(lower(niname),'dbv')
-        threshold = 0.15;
+        threshold = 0.35;
         cmp = magma;
     elseif strfind(lower(niname),'r2p')
-        threshold = 25;
+        threshold = 10;
         cmp = viridis;
     elseif strfind(lower(niname),'oef')
         threshold = 0.8;
@@ -55,7 +55,7 @@ if ~exist('threshold','var')
         threshold = 15;
         cmp = inferno;
     else
-        threshold = 500;
+        threshold = 1000;
         cmp = gray;
     end
 
@@ -63,11 +63,11 @@ end
 
 
 %% LOAD AND THRESHOLD DATA
-[voldata, dims] = read_avw(inputnifti);
+[inputdata, dims] = read_avw(inputnifti);
 
 % Take absolute value of DBV data
 % if strfind(lower(niname),'dbv')
-    voldata = abs(voldata);
+    voldata = abs(inputdata);
 % end
 
 % Threshold
@@ -84,13 +84,14 @@ voldata(voldata > threshold) = threshold;
 % remove some of the empty voxels from around the sides, so that the brains are
 % closer together in the montage
 
-% sh_sds = 12;        % sides
-% sh_top = 5;         % top and bottom
+sh_sds = 12+10;        % sides
+sh_top = 10+10;         % top and bottom
+sh_bot = 0+10;
 
-sh_sds = 0;
-sh_top = 0;
+% sh_sds = 0;
+% sh_top = 0;
 
-voldata = voldata(1+sh_sds:end-sh_sds,1+sh_top:end-sh_top,:);
+voldata = voldata(1+sh_sds:end-sh_sds,1+sh_bot:end-sh_top,:);
 
 % work out the new sizes
 sv = size(voldata);
@@ -133,7 +134,7 @@ pos_c = 1;
 for ii = slices
     
     % Fill the slice in the montage_image
-    montage_image(pos_c:pos_c+sv(2)-1,pos_r:pos_r+sv(1)-1) = squeeze(voldata(:,:,ii,1))';
+    montage_image(pos_c:pos_c+sv(2)-1,pos_r:pos_r+sv(1)-1) = fliplr(squeeze(voldata(:,:,ii,1))');
     
     % Move on to the next starting point
     pos_r = pos_r + sv(1);
@@ -159,3 +160,21 @@ axis equal
 % colorbar;
 set(gca,'Visible','off')
 set(gca,'LooseInset',get(gca,'TightInset'));
+
+
+%% Special display for Grid Search figures
+
+% OEFvals = 100*(0.21:0.01:0.70);
+% DBVvals = 100*(0.003:0.003:0.15);
+% 
+% % orient properly
+% montage_image = flipud(montage_image');
+% 
+% figure; hold on;
+% imagesc(DBVvals,OEFvals,montage_image,[0,threshold]);
+% colormap(cmp);
+% axis([0.3,15,21,70]);
+% set(gca,'FontSize',20);
+% ylabel('OEF (%)');
+% xlabel('DBV (%)');
+% yticks([25,35,45,55,65]);

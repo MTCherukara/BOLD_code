@@ -16,24 +16,21 @@ noise=white
 max-iterations=10
 allow-bad-voxels
 
+# Spatial VB Information (remove all of this if method!=spatialvb)
+param-spatial-priors=MMM
+
 # Inference Model 
 model=qboldR2p
 inferS0
 inferR2p
 inferDBV
 
-#single_compartment
-motional_narrowing
+#include_intra
+#motional_narrowing
 
-#infpriors
-
-# Model Parameters
-#SR=0.542
-beta=1
-
-# Spatial VB Information (remove all of this if method!=spatialvb)
-param-spatial-priors=NNN
-#image-prior4=../../Data/subject_04/CSF_T1w.nii.gz
+precR2p=1e-3
+precDBV=1e-1
+#precOEF=1e0
 
 # Scan Parameters
 TE=0.082
