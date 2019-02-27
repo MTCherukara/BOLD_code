@@ -9,6 +9,8 @@ function TC_ideal = xOptimize_TC
 %
 % CHANGELOG:
 %
+% 2019-01-?? (MTC). Updated, as below.
+%
 % 2018-09-13 (MTC). NB: THIS SCRIPT NEEDS TO BE UPDATED TO REFLECT CHANGES TO
 %       THE MODEL CALCULATION FUNCTIONS!!
 
@@ -33,7 +35,7 @@ params.lam0 = 0.0;         % no units  - ISF/CSF signal contribution
 params.zeta = 0.03;         % no units  - deoxygenated blood volume
 params.OEF  = 0.40;         % no units  - oxygen extraction fraction
 
-tau = (-28:1:64)/1000; % for testing
+tau = (-28:4:64)/1000; % for testing
 
 
 %% Calculate the Analytical tissue signal

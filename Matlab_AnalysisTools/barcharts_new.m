@@ -21,7 +21,7 @@ legtext = {'L Model','1C Model','2C Model','1C Spatial','2C Spatial','5 \tau VB'
 %           1         2          3          4            5            6           7            8            9          . 
 
 % Choose which columns to plot
-dpts = [1,2,4];
+dpts = [1,2,4,3,5];
 
 % Pick pairwise comparisons from DPTS values
 grps = {[1,2],[1,3],[2,3]};
