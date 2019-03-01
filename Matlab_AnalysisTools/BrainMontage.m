@@ -33,32 +33,28 @@ end
 
 % Check whether slices have been specified, if not, default to 3:10
 if ~exist('slices','var')
-%     slices = 3:8;       % VS
+    slices = 2:7;       % VS
 %     slices = 3:14;       % CSF
-    slices = 1:6;       % s11 FLAIR
+%     slices = 1:6;       % s11 FLAIR
 end
 ns = length(slices); % number of slices
 
 % Set threshold based on the type of variable we're looking at
-if ~exist('threshold','var')
-5
-    if strfind(lower(niname),'dbv')
-        threshold = 0.35;
-        cmp = magma;
-    elseif strfind(lower(niname),'r2p')
-        threshold = 10;
-        cmp = viridis;
-    elseif strfind(lower(niname),'oef')
-        threshold = 0.8;
-        cmp = parula;
-    elseif strfind(lower(niname),'df')
-        threshold = 15;
-        cmp = inferno;
-    else
-        threshold = 1000;
-        cmp = gray;
-    end
-
+if strfind(lower(niname),'dbv')
+    threshold = 0.2;
+    cmp = magma;
+elseif strfind(lower(niname),'r2p')
+    threshold = 10;
+    cmp = viridis;
+elseif strfind(lower(niname),'oef')
+    threshold = 0.8;
+    cmp = parula;
+elseif strfind(lower(niname),'df')
+    threshold = 15;
+    cmp = inferno;
+else
+    threshold = 1000;
+    cmp = gray;
 end
 
 
@@ -84,9 +80,9 @@ voldata(voldata > threshold) = threshold;
 % remove some of the empty voxels from around the sides, so that the brains are
 % closer together in the montage
 
-sh_sds = 12+10;        % sides
-sh_top = 10+10;         % top and bottom
-sh_bot = 0+10;
+sh_sds = 15;        % sides
+sh_top = 10;         % top and bottom
+sh_bot = 5;
 
 % sh_sds = 0;
 % sh_top = 0;
