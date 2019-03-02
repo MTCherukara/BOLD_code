@@ -32,7 +32,7 @@ clc;
 vars = {'R2p','DBV','OEF'};
 
 % Choose Data set
-setnum = 915;
+setnum = 928;
 
 % Which set of subjects is this from?
 setname = 'VS';          % 'VS', 'genF', 'genNF', 'CSF', or 'AMICI'
@@ -103,13 +103,16 @@ end
 
 % Threshold values
 threshes = containers.Map({'R2p', 'DBV', 'OEF', 'VC', 'DF', 'lambda', 'Ax' },...
-                          [ 50  ,   1  ,   2  ,  1  ,  15 ,   1     ,  30  ]);  
+                          [ 10  ,  1   ,  1   ,  1  ,  15 ,   1     ,  30  ]);  
 
 % Title
 disp(['Data from Fabber Set ',num2str(setnum),'. ',setname, ' Subject ',num2str(subnum)]);
 
 % Load mask data
 mskData = LoadSlice([maskdir,maskname],slicenum);
+
+% count the number of GM voxels
+ngm = sum(mskData(:) >= 0.5);
 
 
 %% Loop Through Variables, Displaying Averages:
@@ -160,18 +163,29 @@ for vv = 1:length(vars)
     qnt = quantile(volData,[0.75,0.25]);
     iqr = qnt(1) - qnt(2) ./ 2;
     
+    % calculate and display the number of voxels we had to threshold out
+    nkept = length(volData);
+    nlost = ngm - nkept;
+    
+    disp('  ');
+    disp(vname);
+    disp(['  Kept ',num2str(nkept),' of ',num2str(ngm),' voxels (',round2str(100*nkept/ngm,1),'%)']);
+    disp(['  Lost ',num2str(nlost),' of ',num2str(ngm),' voxels (',round2str(100*nlost/ngm,1),'%)']);
+    
 	% Display results
 %     disp('   ');
 %     disp(['Median ',vname,': ',num2str(median(volData),4)]);
 %     disp(['   IQR ',vname,': ',num2str(iqr,4)]);
     
-    disp('   ');
-    disp(['Mean ',vname,'   : ',num2str(mean(volData),4)]);
-    if do_std
-        disp(['    Std ',vname,': ',num2str(mean(stdData),4)]);
-    else
-        disp(['    Std ',vname,': ',num2str(std(volData),4)]);
-    end
+%     disp('   ');
+%     disp(['Mean ',vname,'   : ',num2str(mean(volData),4)]);
+%     if do_std
+%         disp(['    Std ',vname,': ',num2str(mean(stdData),4)]);
+%     else
+%         disp(['    Std ',vname,': ',num2str(std(volData),4)]);
+%     end
+    
+    
 
 end
 
