@@ -59,14 +59,16 @@ params.TE   = 0.074;        % s         - echo time
 params.TI   = 3;
 
 % Physiology
-params.lam0 = 0.0;         % no units  - ISF/CSF signal contribution
+params.lam0 = 0.05;         % no units  - ISF/CSF signal contribution
 params.zeta = 0.03;         % no units  - deoxygenated blood volume
-params.OEF  = 0.4;         % no units  - oxygen extraction fraction
+params.OEF  = 0.40;         % no units  - oxygen extraction fraction
+
+params.dF = 5;
 
 % Simulation
 params.model  = 'Full';     % STRING    - model type: 'Full','Asymp','Phenom','Kiselev'
 params.contr  = 'OEF';      % STRING    - contrast source: 'OEF','R2p','dHb',...
-params.incT1  = 1;          % BOOL      - should T1 differences be considered?
+params.incT1  = 0;          % BOOL      - should T1 differences be considered?
 params.incT2  = 1;          % BOOL      - should T2 differences be considered?
 params.incIV  = 1;          % BOOL      - should blood compartment be included?
 
@@ -75,13 +77,13 @@ params.incIV  = 1;          % BOOL      - should blood compartment be included?
 % params.Voff = -0.003;
 
 % noise
-params.SNR = 50;
+params.SNR = 500;
 
 
 %% Compute Model
 
 % define tau values that we want to simulate
-tau = (-28:4:64)/1000; % for testing
+tau = (-16:8:64)/1000; % for testing
 % tau = linspace(-0.028,0.064,1000); % for visualising
 
 

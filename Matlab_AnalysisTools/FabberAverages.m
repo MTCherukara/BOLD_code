@@ -32,7 +32,7 @@ clc;
 vars = {'R2p','DBV','OEF'};
 
 % Choose Data set
-setnum = 928;
+setnum = 980;
 
 % Which set of subjects is this from?
 setname = 'VS';          % 'VS', 'genF', 'genNF', 'CSF', or 'AMICI'
@@ -103,7 +103,7 @@ end
 
 % Threshold values
 threshes = containers.Map({'R2p', 'DBV', 'OEF', 'VC', 'DF', 'lambda', 'Ax' },...
-                          [ 10  ,  1   ,  1   ,  1  ,  15 ,   1     ,  30  ]);  
+                          [ 100  ,  1   ,  2   ,  1  ,  15 ,   1     ,  30  ]);  
 
 % Title
 disp(['Data from Fabber Set ',num2str(setnum),'. ',setname, ' Subject ',num2str(subnum)]);
@@ -167,23 +167,23 @@ for vv = 1:length(vars)
     nkept = length(volData);
     nlost = ngm - nkept;
     
-    disp('  ');
-    disp(vname);
-    disp(['  Kept ',num2str(nkept),' of ',num2str(ngm),' voxels (',round2str(100*nkept/ngm,1),'%)']);
-    disp(['  Lost ',num2str(nlost),' of ',num2str(ngm),' voxels (',round2str(100*nlost/ngm,1),'%)']);
+%     disp('  ');
+%     disp(vname);
+%     disp(['  Kept ',num2str(nkept),' of ',num2str(ngm),' voxels (',round2str(100*nkept/ngm,1),'%)']);
+%     disp(['  Lost ',num2str(nlost),' of ',num2str(ngm),' voxels (',round2str(100*nlost/ngm,1),'%)']);
     
 	% Display results
 %     disp('   ');
 %     disp(['Median ',vname,': ',num2str(median(volData),4)]);
 %     disp(['   IQR ',vname,': ',num2str(iqr,4)]);
     
-%     disp('   ');
-%     disp(['Mean ',vname,'   : ',num2str(mean(volData),4)]);
-%     if do_std
-%         disp(['    Std ',vname,': ',num2str(mean(stdData),4)]);
-%     else
-%         disp(['    Std ',vname,': ',num2str(std(volData),4)]);
-%     end
+    disp('   ');
+    disp(['Mean ',vname,'   : ',num2str(mean(volData),4)]);
+    if do_std
+        disp(['    Std ',vname,': ',num2str(mean(stdData),4)]);
+    else
+        disp(['    Std ',vname,': ',num2str(std(volData),4)]);
+    end
     
     
 

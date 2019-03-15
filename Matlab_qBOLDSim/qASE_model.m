@@ -318,7 +318,7 @@ function SE = calcExtraCompartment(TAU,TE,PARAMS)
     end
 
     % calculate signal
-    SE = abs(exp(- 2i.*pi.*PARAMS.dF.*abs(TAU)));
+    SE = real(exp(- 2i.*pi.*PARAMS.dF.*abs(TAU)));
     
     % add T2 effect
     if PARAMS.incT2

@@ -57,7 +57,7 @@ plot_fig = 1;
 save_data = 0;
 
 % Add noise?
-SNR = 50;              % For no noise: SNR = inf;
+SNR = 100;              % For no noise: SNR = inf;
 
 % For looping over multiple datasets:
 OEFs = 20:20:80;
@@ -65,21 +65,21 @@ DBVs = 1:2:9;
 [gOEF,gDBV] = meshgrid(OEFs,DBVs);
 
 % Parameters
-% pnames = { 'R2p'    ; 'zeta'     };
-% interv = [ 0.2, 15 ; 0.003, 0.15 ];
-% np     = [ 1000     ; 1000       ];
-
-pnames = { 'OEF'    ; 'zeta'     };
-interv = [ 0.2, 0.7 ; 0.003, 0.15 ];
-np     = [ 1000     ; 1000       ];
+% pnames = { 'R2p'    ; 'zeta'      };
+% interv = [ 0.2, 15  ; 0.003, 0.15 ];
+% np     = [ 1000     ; 1000        ];
 
 % pnames = { 'OEF'    ; 'zeta'     };
-% interv = [ 0, 0.1 ; 0.01, 0.05 ];
-% np     = [  1000     ; 1000        ];
+% interv = [ 0.2, 0.7 ; 0.003, 0.15 ];
+% np     = [ 1000     ; 1000       ];
 
-% pnames = { 'dhb'    ; 'zeta'     };
-% interv = [ 0.8, 2.4   ; 0.01, 0.07 ];
-% np     = [ 100     ; 100       ];
+% pnames = { 'lam0'    ; 'zeta'      };
+% interv = [ 0.01, 0.2 ; 0.003, 0.15 ];
+% np     = [ 1000      ; 1000        ];
+
+pnames = { 'lam0'    ; 'dF'     };
+interv = [ 0.01, 0.2 ; 1, 15 ];
+np     = [ 1000     ; 1000       ];
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -92,7 +92,7 @@ for jj = 1%:nj
     tic;
     
     % Load the Data: 
-    load('ASE_Data/Data_190213_40_3_SNR_50.mat');
+    load('ASE_Data/Data_190315_40_3_CSFreal.mat');
     
     
 %     vOEF = num2str(gOEF(jj));     % only useful when looping over things
@@ -129,7 +129,7 @@ for jj = 1%:nj
     
     % Model selection
     params.model = 'Asymp';  % should the asymptotic tissue model be used?
-    params.incIV = 0;
+    params.incIV = 1;
 
     % extract relevant parameters
     params.R2p = params.dw.*params.zeta;
@@ -259,7 +259,7 @@ for jj = 1%:nj
         ylabel(c,'Posterior Probability Density');
         axis([min(pv2),max(pv2),min(pv1),max(pv1)]);
         set(gca,'YDir','normal');
-        set(c,'FontSize',16);
+        set(c,'FontSize',18);
     end
 
 
