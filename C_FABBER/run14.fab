@@ -1,7 +1,7 @@
 # fabber run 14 - SDR simulation testing
 
 # Input Data
-data=../../Data/qboldsim_data/ASE_Grid_Sharan_50x50_Taus_11_SNR_200.nii.gz
+data=../../Data/qboldsim_data/ASE_Grid_1C_50x50_Taus_11_SNR_500.nii.gz
 mask=../../Data/qboldsim_data/ASE_Grid_50x50_mask.nii.gz
 
 # Run Options
@@ -29,7 +29,7 @@ inferDBV
 #include_intra
 
 # correction parameters
-SR=0.52
+#SR=0.52
 
 precR2p=1e-3
 precDBV=1e-1

@@ -29,19 +29,19 @@ clc;
 %% User To Select Fabber Data To Display
 
 % Choose Variables
-vars = {'R2p','DBV','OEF'};
+vars = {'R2p'};
 
 % Choose Data set
-setnum = 980;
+setnum = 830;
 
 % Which set of subjects is this from?
-setname = 'VS';          % 'VS', 'genF', 'genNF', 'CSF', or 'AMICI'
+setname = 'CSF';          % 'VS', 'genF', 'genNF', 'CSF', or 'AMICI'
 
 % do Free energy?
 do_FE = 0;
 
 % do standard deviations
-do_std = 0;
+do_std = 1;
 
 
 %% Initial Stuff
@@ -78,7 +78,7 @@ switch setname
     case 'CSF'
         
         slicenum = 3:8;
-        maskname = 'mask_new_gm_50.nii.gz';
+        maskname = 'mask_new_gm_PV.nii.gz';
         CC = strsplit(fabdir,'_s');     % need a 2-digit subject number
         subnum = CC{2}(1:2);
         maskdir = ['/Users/mattcher/Documents/DPhil/Data/subject_',subnum,'/'];

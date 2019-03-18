@@ -78,56 +78,65 @@ Corr_R2p = [ 0.7140,    0.9100,    0.6600,    0.7830,    0.3620,    0.0800,    0
         
 %% Plotting FABBER prior comparisons (R2p)
 
+VarR2p = 1./PrecR2p;
+
 % Plot R2p data as a function of prec(R2p)
 figure; box on;
-semilogx(PrecR2p,Err_R2p(1,:));
+semilogx(VarR2p,Err_R2p(1,:));
 hold on;
-semilogx(PrecR2p,Err_R2p(2,:));
-semilogx(PrecR2p,Err_R2p(3,:));
-semilogx(PrecR2p,Err_R2p(4,:));
-semilogx(PrecR2p,Err_R2p(5,:));
-semilogx(PrecR2p,Err_R2p(6,:));
-axis([6e-7,2e1,0,9.5]);
-ylabel('R2'' Error (s^-^1)');
-xlabel('Precision (R2'')');
-legend('\phi_0(DBV) = 10^-^5','\phi_0(DBV) = 10^-^4','\phi_0(DBV) = 10^-^3',...
-       '\phi_0(DBV) = 10^-^2','\phi_0(DBV) = 10^-^1','\phi_0(DBV) = 10^0',...
-       'Location','NorthWest');
-
+semilogx(VarR2p,Err_R2p(2,:));
+semilogx(VarR2p,Err_R2p(3,:));
+semilogx(VarR2p,Err_R2p(4,:));
+semilogx(VarR2p,Err_R2p(5,:));
+semilogx(VarR2p,Err_R2p(6,:));
+axis([6e-2,2e6,0,9.5]);
+ylabel('R''_2 Error (s^-^1)');
+xlabel('Standard Devation  \sigma(R''_2)');
+xticks([1e0,1e2,1e4,1e6]);
+xticklabels({'1', '10', '100', '1000'});
+% legend('\phi_0(DBV) = 10^-^5','\phi_0(DBV) = 10^-^4','\phi_0(DBV) = 10^-^3',...
+%        '\phi_0(DBV) = 10^-^2','\phi_0(DBV) = 10^-^1','\phi_0(DBV) = 10^0',...
+%        'Location','NorthWest');
+   
 % Plot DBV data as a function of prec(R2p)
 Err_DBV(Err_DBV > 20) = 20;
 
 figure; box on;
-semilogx(PrecR2p,Err_DBV(1,:));
+semilogx(VarR2p,Err_DBV(1,:));
 hold on;
-semilogx(PrecR2p,Err_DBV(2,:));
-semilogx(PrecR2p,Err_DBV(3,:));
-semilogx(PrecR2p,Err_DBV(4,:));
-semilogx(PrecR2p,Err_DBV(5,:));
-semilogx(PrecR2p,Err_DBV(6,:));
-axis([6e-7,2e1,0,14.5]);
-ylabel('DBV Error (%)');
-xlabel('Precision (R2'')');
-legend('\phi_0(DBV) = 10^-^5','\phi_0(DBV) = 10^-^4','\phi_0(DBV) = 10^-^3',...
-       '\phi_0(DBV) = 10^-^2','\phi_0(DBV) = 10^-^1','\phi_0(DBV) = 10^0',...
-       'Location','North');
+semilogx(VarR2p,Err_DBV(2,:));
+semilogx(VarR2p,Err_DBV(3,:));
+semilogx(VarR2p,Err_DBV(4,:));
+semilogx(VarR2p,Err_DBV(5,:));
+semilogx(VarR2p,Err_DBV(6,:));
+axis([6e-2,2e6,0,14.5]);
+ylabel('_ DBV Error (%)^ ');
+xlabel('Standard Devation  \sigma(R''_2)');
+xticks([1e0,1e2,1e4,1e6]);
+xticklabels({'1', '10', '100', '1000'});
+% legend('\phi_0(DBV) = 10^-^5','\phi_0(DBV) = 10^-^4','\phi_0(DBV) = 10^-^3',...
+%        '\phi_0(DBV) = 10^-^2','\phi_0(DBV) = 10^-^1','\phi_0(DBV) = 10^0',...
+%        'Location','North');
 
 % Plot OEF data as a function of prec(R2p)
 figure; box on;
-semilogx(PrecR2p,Err_OEF(1,:));
+semilogx(VarR2p,Err_OEF(1,:));
 hold on;
-semilogx(PrecR2p,Err_OEF(2,:));
-semilogx(PrecR2p,Err_OEF(3,:));
-semilogx(PrecR2p,Err_OEF(4,:));
-semilogx(PrecR2p,Err_OEF(5,:));
-semilogx(PrecR2p,Err_OEF(6,:));
-axis([6e-7,2e1,0,37]);
-ylabel('OEF Error (%)');
-xlabel('Precision (R2'')');
-legend('\phi_0(DBV) = 10^-^5','\phi_0(DBV) = 10^-^4','\phi_0(DBV) = 10^-^3',...
-       '\phi_0(DBV) = 10^-^2','\phi_0(DBV) = 10^-^1','\phi_0(DBV) = 10^0',...
-       'Location','NorthWest');
-   
+semilogx(VarR2p,Err_OEF(2,:));
+semilogx(VarR2p,Err_OEF(3,:));
+semilogx(VarR2p,Err_OEF(4,:));
+semilogx(VarR2p,Err_OEF(5,:));
+semilogx(VarR2p,Err_OEF(6,:));
+axis([6e-2,2e6,0,37]);
+ylabel('_ OEF Error (%)^ ');
+xlabel('Standard Devation  \sigma(R''_2)');
+xticks([1e0,1e2,1e4,1e6]);
+xticklabels({'1', '10', '100', '1000'});
+% legend('\sigma_0(DBV) = 10^5^/^2','\sigma_0(DBV) =^ 100',...
+%        '\sigma_0(DBV) = 10^3^/^2','\sigma_0(DBV) =^ 10' ,...
+%        '\sigma_0(DBV) = 10^1^/^2','\sigma_0(DBV) =^ 1'  ,...
+%        'Location','NorthEast');
+%    
 % % Plot Total Relative Error as a function of prec(R2p)
 % figure; box on;
 % semilogx(PrecR2p,Rel_All(1,:));
