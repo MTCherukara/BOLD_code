@@ -45,13 +45,13 @@ close all;
 setFigureDefaults;
 
 % Options
-plot_trace = 0;
+plot_trace = 1;
 plot_results = 1;
 save_figures = 0;
 
 % Load Data
 % load('ASE_Data/Data_MultiTE_180208_SNR_200.mat');
-load('ASE_Data/Data_181024_40_3_noNoise.mat');
+load('ASE_Data/Data_190320_40_3_CSF_FLAIR.mat');
 params_true = params;
 m_params = params;      % this will be the struct that we actually change
 
@@ -59,8 +59,8 @@ m_params = params;      % this will be the struct that we actually change
 p_names = {  'OEF' ; 'R2p'; 'zeta' ; 'R2t' ; 'lam0' };
 p_infer = [    0   ,   1  ,   1    ,   0   ,   0    ];
 p_inits = [  0.500 ,  4.0 ,  0.050 ,  10.0 ,  0.10  ];
-p_range = [  0.001 ,  1.0 ,  0.001 ,   5.0 ,  0.00   ;...
-             1.000 , 15.0 ,  0.200 ,  15.0 ,  1.00  ];
+p_range = [  0.001 ,  0.0 ,  0.001 ,   5.0 ,  0.00   ;...
+             1.000 , 20.0 ,  0.200 ,  15.0 ,  1.00  ];
 
 
 % cut parameters down to size
@@ -75,21 +75,24 @@ else
     m_params.contr = 'OEF';
 end
 
+% Obviously, we want to use the asymptotic model here
+m_params.model = 'Asymp';
+
 % how many parameters?
 np = sum(p_infer);
 
 %% Metropolis Parameters
-j_run  = 1e6;       % number of jumps in the real thing
+j_run  = 1e5;       % number of jumps in the real thing
 j_updt = 10;        % rate of updating the scaling parameter
 j_rng  = 200;       % range of samples to look over when updating scaling param
-j_brn  = (200*j_updt) + j_rng;      % number of jumps in the 'burn-in' phase
+j_brn  = (2000*j_updt) + j_rng;      % number of jumps in the 'burn-in' phase
 
 % counters
 c_rt  = 0;      % rate counter
 
 % ideal acceptance rate
 if np == 2
-    qs = 0.352;     % for 2 parameters
+    qs = 1-0.352;     % for 2 parameters
 elseif np == 3
     qs = 0.316;     % for 3 parameters
 else % if np > 3
@@ -231,8 +234,9 @@ if plot_results
         xlim(p_rng(:,pp));
         
         if save_figures
-            ftitle = strcat('temp_plots/MH_',date,'_Hist_',p_name{pp});
-            export_fig([ftitle,'.pdf']);
+            warning('You need to save figures manually');
+%             ftitle = strcat('temp_plots/MH_',date,'_Hist_',p_name{pp});
+%             export_fig([ftitle,'.pdf']);
 %             print(gcf,ftitle,'-dpdf');
         end
 
@@ -283,13 +287,6 @@ if plot_results
         % labels
         xlabel(p_name{prm2});
         ylabel(p_name{prm1});   
-        
-        if save_figures
-            ftitle = strcat('temp_plots/MH_',date,'_2D_',...
-                            p_name{prm2},'_',p_name{prm1});
-            export_fig [ftitle,'.pdf'] -nocrop;
-%             print(gcf,ftitle,'-dpdf');
-        end
 
     end % for pp = 1:size(p_pairs,1)
     
