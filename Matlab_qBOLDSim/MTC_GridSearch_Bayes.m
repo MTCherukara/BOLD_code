@@ -73,13 +73,17 @@ DBVs = 1:2:9;
 % interv = [ 0.2, 0.7 ; 0.003, 0.15 ];
 % np     = [ 1000     ; 1000       ];
 
-% pnames = { 'lam0'    ; 'zeta'      };
-% interv = [ 0.01, 0.2 ; 0.003, 0.15 ];
+pnames = { 'zeta'    ; 'R2e'      };
+interv = [ 0.003, 0.15  ; 0.1, 8.0 ];
+np     = [ 1000     ; 1000        ];
+
+% pnames = { 'lam0'    ; 'dF'      };
+% interv = [ 0.01, 0.2 ; 1, 15 ];
 % np     = [ 1000      ; 1000        ];
 
-pnames = { 'lam0'    ; 'dF'     };
-interv = [ 0.01, 0.2 ; 1, 15 ];
-np     = [ 1000     ; 1000       ];
+% pnames = { 'zeta'    ; 'lam0'     };
+% interv = [ 0.003, 0.15 ; 0.01, 0.2 ];
+% np     = [ 1000     ; 1000       ];
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -92,8 +96,8 @@ for jj = 1%:nj
     tic;
     
     % Load the Data: 
-    load('ASE_Data/Data_190315_40_3_CSFreal.mat');
-    
+    load('ASE_Data/Data_190320_40_3_CSF_Both.mat');
+%     load('ASE_Data/Data_190320_40_3_CSF_nonFLAIR.mat');
     
 %     vOEF = num2str(gOEF(jj));     % only useful when looping over things
 %     vDBV = num2str(gDBV(jj));
@@ -130,6 +134,7 @@ for jj = 1%:nj
     % Model selection
     params.model = 'Asymp';  % should the asymptotic tissue model be used?
     params.incIV = 1;
+    params.incT1 = 1;
 
     % extract relevant parameters
     params.R2p = params.dw.*params.zeta;
@@ -194,10 +199,11 @@ for jj = 1%:nj
                 inpars = updateParams(pv22(i2),looppars,pn2);
 
                 % run the model to evaluate the signal with current params            
-                S_mod = qASE_model(T_sample,TE_sample,inpars);
+%                 S_mod = qASE_model(T_sample,TE_sample,inpars);
+                S_mod = qASE_model_FLAIR(T_sample,TE_sample,inpars);
 
-                % normalize
-                S_mod = S_mod./max(S_mod);
+                % normalize (not necessary in double-FLAIR version)
+%                 S_mod = S_mod./max(S_mod);
 
                 % calculate posterior based on known noise value
                 posvec(i2) = calcLogLikelihood(S_sample,S_mod,sigma);
@@ -259,7 +265,7 @@ for jj = 1%:nj
         ylabel(c,'Posterior Probability Density');
         axis([min(pv2),max(pv2),min(pv1),max(pv1)]);
         set(gca,'YDir','normal');
-        set(c,'FontSize',18);
+%         set(c,'FontSize',18);
     end
 
 

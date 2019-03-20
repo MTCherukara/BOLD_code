@@ -28,6 +28,10 @@ function [S,PARAMS] = qASE_model(TAU,TE,PARAMS)
     %
     % CHANGELOG:
     %
+    % 2019-03-20 (MTC). Changed teh way steady-state magnetization is calculated
+    %       back to the simpler model, because the more complicated version
+    %       doesn't actually work in terms of the FLAIR inversion.
+    %
     % 2018-10-30 (MTC). Added in a parameter for short-tau DBV offset (referred
     %       to in my notes as beta), and for linear R2' scaling factor SR, and
     %       for [dHb] exponent beta (a.k.a. gamma from Ogawa)
@@ -227,8 +231,8 @@ function M = calcMagnetization(tau,TE,TR,T1,T2,TI)
     termt = exp(-expT2);
 
     % put it all together
-    M = ( 1 - (terme.*termf) ) .* termt;
-%     M = 1 - (2*exp(-TI./T1)) + exp(-TR./T1);
+%     M = ( 1 - (terme.*termf) ) .* termt;
+    M = 1 - (2*exp(-TI./T1)) + exp(-TR./T1);
     
 end
 
