@@ -9,6 +9,9 @@
 %
 % Changelog:
 %
+% 2019-03-21 (MTC). Made the results print out in a way that they can be copied
+%       straight into FabberAverages.xls
+%
 % 2019-02-13 (MTC). Changed the way the loop works so instead we load all the
 %       data in upfront, in order to generate a mask of "bad values" to remove.
 
@@ -21,11 +24,11 @@ clc;
 % Choose variables
 vars = {'OEF', 'DBV', 'R2p'};
 thrA = [  1.0,   1.0,  30  ];     % threshold of actual values
-thrS = [ 10.0,   1.0,  50  ];     % threshold of standard deviations
+thrS = [  2.0,   1.0,  30  ];     % threshold of standard deviations
 % vars = {'OEF'};
 
 % choose dataset
-setnum = 384;
+for setnum = 401:414
 
 % Do we have STD data?
 do_std = 1;
@@ -42,8 +45,8 @@ resdir = '/Users/mattcher/Documents/DPhil/Data/Fabber_ModelFits/';
 fdname = dir([resdir,'fabber_',num2str(setnum),'_*']);
 fabdir = strcat(resdir,fdname.name,'/');
 
-disp(' ');
-disp(['Opening dataset ',fdname.name,':']);
+% disp(' ');
+% disp(['Opening dataset ',fdname.name,':']);
 
 % Ground truth data is stored here
 gnddir = '/Users/mattcher/Documents/DPhil/Data/qboldsim_data/';
@@ -63,6 +66,7 @@ matScl = [volDBV(:),volOEF(:),volDBV(:)];
 matAll = zeros(size(matGnd,1),length(vars));
 matStd = zeros(size(matGnd,1),length(vars));
 vecBad = zeros(size(matGnd,1),1);
+vecRes = zeros(3*length(vars),1);
 
 % Loop through variables
 for vv = 1:length(vars)
@@ -174,24 +178,34 @@ for vv = 1:length(vars)
         axis([minV,maxV,minV,maxV]);    % always go from 0% to 100% in the figure
     end
     
+    % Store the results
+    vecRes((3*vv)-2) = R(1,2);
+    vecRes((3*vv)-1) = RMSE(vv);
+    vecRes((3*vv)  ) = RELE(vv);
+    
     % Display some results
-    disp(' ');
-    disp([vname,' Correlation: ',num2str(R(1,2),3)]);
-    if P(1,2) > 0.05
-        disp(['    Not Significant (p = ',num2str(P(1,2),2),')']);
-    end
-    disp(['  RMS Error:  ',num2str(RMSE(vv),3),' %']);
-    disp(['  Rel. Error: ',num2str(RELE(vv),3),' %']);
-%     if do_std
-%         disp(['  Weighted Error: ',num2str(WMSE(vv),3),' %']);
+%     disp(' ');
+%     disp([vname,' Correlation: ',num2str(R(1,2),3)]);
+%     if P(1,2) > 0.05
+%         disp(['    Not Significant (p = ',num2str(P(1,2),2),')']);
 %     end
+%     disp(['  RMS Error:  ',num2str(RMSE(vv),3),' %']);
+%     disp(['  Rel. Error: ',num2str(RELE(vv),3),' %']);
+% %     if do_std
+% %         disp(['  Weighted Error: ',num2str(WMSE(vv),3),' %']);
+% %     end
     
 end % for vv = 1:length(vars)
 
 
 % Print the number of bad voxels we had to remove
-disp(' ');
-disp(['(Excluded ',num2str(sum(vecThres)),' of 2500 data points)']);
+% disp(' ');
+% disp(['(Excluded ',num2str(sum(vecThres)),' of 2500 data points)']);
+
+% Display the whole results row entry
+disp(num2str(vecRes'));
+
+end % for setnum = ....
     
 % % Also do Free Energy
 % thFE = 1e6;

@@ -39,7 +39,7 @@ string FreqShiftFwdModel::GetDescription() const
 
 string FreqShiftFwdModel::ModelVersion() const
 {
-    return "1.1";
+    return "1.2 (March 2019)";
 } // ModelVersion
 
 
@@ -54,9 +54,13 @@ void FreqShiftFwdModel::Initialize(ArgsType &args)
     infer_R2p = args.ReadBool("inferR2p");
     infer_DBV = args.ReadBool("inferDBV");
     infer_phi = args.ReadBool("inferphi");
-    infer_VWM = args.ReadBool("inferWM");
 
-    fit_difference = args.ReadBool("fitDifference");
+    // allow for manual entry of prior precisions
+    prec_R2p = convertTo<double>(args.ReadWithDefault("precR2p","1e-3"));
+    prec_DBV = convertTo<double>(args.ReadWithDefault("precDBV","1e0"));
+    prec_CSF = convertTo<double>(args.ReadWithDefault("precCSF","1e-1"));
+    prec_DF = convertTo<double>(args.ReadWithDefault("precDF","1e-1"));
+
     
     string tau_temp; 
 
@@ -80,14 +84,6 @@ void FreqShiftFwdModel::Initialize(ArgsType &args)
     // add information to the log
     LOG << "Inference using development model" << endl;     
     LOG << "Inferring on Magnetization M0" << endl;
-    if (fit_difference)
-    {
-        LOG << "Using non-FLAIR minus FLAIR difference data" << endl;
-    }
-    else
-    {
-        LOG << "Using concatenated FLAIR, nonFLAIR data" << endl;
-    }
     if (infer_R2p)
     {
         LOG << "Inferring on Reversible Transverse Dephasing R2'" << endl;
@@ -108,10 +104,7 @@ void FreqShiftFwdModel::Initialize(ArgsType &args)
     {
         LOG << "Inferring on CSF Phase" << endl;
     }
-    if (infer_VWM)
-    {
-        LOG << "Inferring on WM volume fraction" << endl;
-    }
+
     
 } // Initialize
 
@@ -145,10 +138,7 @@ void FreqShiftFwdModel::NameParams(vector<string> &names) const
     {
         names.push_back("phi");  // parameter 6 - Phase shift phi
     }
-    if (infer_VWM)
-    {
-        names.push_back("V_WM");  // parameter 7 - White matter volume fraction
-    }
+
     
 
 } // NameParams
@@ -172,42 +162,37 @@ void FreqShiftFwdModel::HardcodedInitialDists(MVNDist &prior, MVNDist &posterior
     if (infer_VC)
     {
         prior.means(VC_index()) = 0.05;
-        precisions(VC_index(), VC_index()) = 1e1; // 1e-1
+        precisions(VC_index(), VC_index()) = prec_CSF; // 1e-1
     }
 
     // parameter 3 - Delta F
     if (infer_DF)
     {
         prior.means(DF_index()) = 5.0;
-        precisions(DF_index(), DF_index()) = 1e-2; // 1e-2
+        precisions(DF_index(), DF_index()) = prec_DF; // 1e-2
     }
 
     // parameter 4 - R2-prime (Tissue)
     if (infer_R2p)
     {
-        prior.means(R2p_index()) = 3.0;
-        precisions(R2p_index(), R2p_index()) = 1e-2; // 1e-2
+        prior.means(R2p_index()) = 2.6;
+        precisions(R2p_index(), R2p_index()) = prec_R2p; // 1e-3
     }
     
     // parameter 5 - DBV
     if (infer_DBV)
     {
-        prior.means(DBV_index()) = 0.03;
-        precisions(DBV_index(), DBV_index()) = 1e2; // 1e-1
+        prior.means(DBV_index()) = 0.036;
+        precisions(DBV_index(), DBV_index()) = prec_DBV; // 1e0
     }
 
     // parameter 6 - CSF Phase shift phi
     if (infer_phi)
     {
         prior.means(phi_index()) = 0.0;
-        precisions(phi_index(), phi_index()) = 1e-1; // 1e-1
+        precisions(phi_index(), phi_index()) = 1e-3; // 1e-1
     }
 
-    if (infer_VWM)
-    {
-        prior.means(VWM_index()) = 0.01;
-        precisions(VWM_index(), VWM_index()) = 1e0; // 1e0
-    }
 
     prior.SetPrecisions(precisions);
 
@@ -233,7 +218,6 @@ void FreqShiftFwdModel::Evaluate(const ColumnVector &params, ColumnVector &resul
     double R2p; 
     double DBV; 
     double phi;
-    double VW;
 
     // fixed-value parameters
     double T1t = 1.200;     // Grey matter T1 (Lu et al., 2005)
@@ -241,14 +225,25 @@ void FreqShiftFwdModel::Evaluate(const ColumnVector &params, ColumnVector &resul
     double T1b = 1.580;     // Blood T1 (Lu et al., 2004)
     double T1w = 0.730;     // White matter T1 (Lue et al., 2005)
     double R2t = 11.5;      // Grey matter T2=87ms (He & Yablonskiy, 2007)
-    // double R2e = 0.65;      // CSF T2=1573ms (Qin, 2011) 
+    /// double R2e = 0.65;      // CSF T2=1573ms (Qin, 2011) 
     double R2e = 4.00;      // CSF T2=250ms (He & Yablonskiy, 2007)
-    double R2w = 13.89;     // White matter T2=72ms (Lu et al., 2005)
-    double R2b = 27.97;     //    Calculated based on OEF=0.4, Hct=0.4, using formula from 
-    double Rsb = 48.89;     //    Zhao et al., 2007 (cited in Simon et al., 2016)
+    double Hct = 0.40;
+
+    double nt = 0.723;
+    double ne = 1.000;
+    double nb = 0.775;
 
     // calculated parameters
+    double OEF;
     double dw;
+    double mt;
+    double me;
+    double mb;
+    double lam0;        // apparent lambda
+    double CBV;         // apparent DBV
+    double tc;
+    double R2b;
+    double R2bp;
 
     complex<double> i(0,1);
 
@@ -256,7 +251,15 @@ void FreqShiftFwdModel::Evaluate(const ColumnVector &params, ColumnVector &resul
     M0 = (paramcpy(M0_index()));
     if (infer_VC)
     {
-        VC = abs(paramcpy(VC_index()));
+        VC = (paramcpy(VC_index()));
+        if (VC < 0.0001)
+        {
+            VC = 0.0001;
+        }
+        else if (VC > 1.0)
+        {
+            VC = 1.0;
+        }
     }
     else
     {
@@ -268,7 +271,7 @@ void FreqShiftFwdModel::Evaluate(const ColumnVector &params, ColumnVector &resul
     }
     else
     {
-        DF = 7.0;
+        DF = 5.0;
     }
     if (infer_R2p)
     {
@@ -276,177 +279,141 @@ void FreqShiftFwdModel::Evaluate(const ColumnVector &params, ColumnVector &resul
     } 
     else
     {
-        R2p = 2.0;
+        R2p = 2.6;
     }
     if (infer_DBV)
     {
-        DBV = abs(paramcpy(DBV_index()));
+        DBV = (paramcpy(DBV_index()));
+        if (DBV < 0.0001)
+        {
+            DBV = 0.0001;
+        }
+        else if (DBV > 1.0)
+        {
+            DBV = 1.0;
+        }
     }
     else
     {
-        DBV = 0.03; 
+        DBV = 0.03;
     }
     if (infer_phi)
     {
-        phi = abs(paramcpy(phi_index()));
+        phi = (paramcpy(phi_index()));
     }
     else
     {
         phi = 0.0; 
     }
-    if (infer_VWM)
-    {
-        VW = abs(paramcpy(VWM_index()));
-    }
-    else
-    {
-        VW = 0.01; 
-    }
 
     // calculate parameters
     dw = R2p/DBV;
+    OEF = R2p/(887.4082*DBV*Hct);
 
+    // calculate tc
+    tc = 1.7/dw;
 
-    if (fit_difference)
+    // evaluate blood relaxation rates
+    R2b  = ( 4.5 + (16.4*Hct)) + ( ((165.2*Hct) + 55.7)*pow(OEF,2.0) );
+    R2bp = (10.2 - ( 1.5*Hct)) + ( ((136.9*Hct) - 13.9)*pow(OEF,2.0) );
+
+    result.ReSize(2*taus.Nrows());
+
+    // loop through FLAIR data
+    for (int ii = 1; ii <= taus.Nrows(); ii++)
     {
-        // now evaluate information
-        result.ReSize(taus.Nrows());
+        // component parameters
+        double St;      // tissue (grey matter)
+        double Sb;      // blood
+        double Se;      // CSF
+        complex<double> Sec; // complex version of CSF signal
 
-        // loop through tau values
-        for (int ii = 1; ii <= taus.Nrows(); ii++)
+        // magnetization
+        mt = exp(-TE*R2t) * ( 1 - ( 1 + (2*exp(TE/(2*T1t))) ) * ( 2 - exp(-(TR-TI)/T1t)) * exp(-TI/T1t) );
+        mb = exp(-TE*R2b) * ( 1 - ( 1 + (2*exp(TE/(2*T1b))) ) * ( 2 - exp(-(TR-TI)/T1b)) * exp(-TI/T1b) );
+        me = exp(-TE*R2e) * ( 1 - ( 1 + (2*exp(TE/(2*T1e))) ) * ( 2 - exp(-(TR-TI)/T1e)) * exp(-TI/T1e) );
+
+        // calculate tissue compartment weightings
+        lam0 = (ne*me*VC) / ( (nt*mt*(1-VC)) + (ne*me*VC) );
+        CBV = nb*mb*(1-lam0)*DBV;
+
+        double tau = taus(ii);
+
+        // Tissue Component
+        if (tau < -tc)
         {
-            // component parameters
-            double St;      // tissue (grey matter)
-            double Sb;      // blood
-            double Se;      // CSF
-            double Sw;      // tissue (white matter)
-            complex<double> Sec; // complex version of CSF signal
-
-            double tau = taus(ii);
-
-            // Tissue Component
-            if (abs(tau) < (0.021))
-            {
-                St = exp(-0.3*pow(R2p*tau,2.0)/DBV);
-            }
-            else 
-            {
-                St = exp(DBV - (R2p*tau));
-            }
-
-            Sw = St * (exp(-R2w*TE)) * 2.0 * (exp(-TI/T1w) - exp(-TR/T1w));
-
-            St *=  (exp(-R2t*TE)) * 2.0 * (exp(-TI/T1t) - exp(-TR/T1t));
-
-            // Blood Component
-            Sb = (exp(-R2b*(TE-tau))) * (exp(-Rsb*tau)) * 2.0 * (exp(-TI/T1b) - exp(-TR/T1b));
-
-            // CSF Component
-            Sec = (exp(-R2e*TE)) * (exp(-2.0*i*M_PI*DF*tau - (i*phi))) *  2.0 * (exp(-TI/T1e) - exp(-TR/T1e));
-            Se = real(Sec);
-
-            // Total
-            result(ii) = M0 * (( (1-(DBV+VC+VW))*St ) + (DBV*Sb) + (VC*Se) + (VW*Sw));
-
+            St = exp(DBV + (R2p*tau));
         }
-    } // if (fit_difference)
-    else
-    {
-        result.ReSize(2*taus.Nrows());
-
-        // loop through FLAIR data
-        for (int ii = 1; ii <= taus.Nrows(); ii++)
+        else if (tau > tc)
+        {    
+            St = exp(DBV - (R2p*tau));
+        }
+        else
         {
-            // component parameters
-            double St;      // tissue (grey matter)
-            double Sb;      // blood
-            double Se;      // CSF
-            double Sw;      // tissue (white matter)
-            complex<double> Sec; // complex version of CSF signal
-
-            double tau = taus(ii);
-
-            // Tissue Component
-            if (abs(tau) < (0.021))
-            {
-                St = exp(-0.3*pow(R2p*tau,2.0)/DBV);
-            }
-            else 
-            {
-                St = exp(DBV - (R2p*tau));
-            }
-
-            Sw = St * ( 1 - ( (2 - exp(-(TR-TI)/T1w) ) * exp(-TI/T1w))) * (exp(-R2w*TE));
-
-            St *= ( 1 - ( (2 - exp(-(TR-TI)/T1t) ) * exp(-TI/T1t))) * (exp(-R2t*TE));
-
-            // Blood Component
-            Sb = ( 1 - ( (2 - exp(-(TR-TI)/T1b) ) * exp(-TI/T1b))) * (exp(-R2b*(TE-tau))) * (exp(-Rsb*tau));
-
-            // CSF Component
-            Sec = ( 1 - ( (2 - exp(-(TR-TI)/T1e) ) * exp(-TI/T1e))) * (exp(-R2e*TE)) * (exp(-2.0*i*M_PI*DF*tau - (i*phi)));
-            Se = real(Sec);
-
-            // Total
-            result(ii) = M0 * (( (1-(DBV+VC+VW))*St ) + (DBV*Sb) + (VC*Se) + (VW*Sw));
-
+            St = exp(-0.3*pow(R2p*tau,2.0)/DBV);
         }
 
-        // loop through non-FLAIR data
-        for (int jj = (taus.Nrows()+1); jj <= 2*taus.Nrows(); jj++)
-        {
-            // component parameters
-            double St;      // tissue
-            double Sb;      // blood
-            double Se;      // CSF
-            double Sw;      // tissue (white matter)
-            complex<double> Sec; // complex version of CSF signal
+        St *= (exp(-R2t*TE));
 
-            double tau = taus(jj-taus.Nrows());
+        // linear model
+        Sb = exp(-R2b*TE)*exp(-R2bp*abs(tau));
 
-            // Tissue Component
-            if (abs(tau) < (0.021))
-            {
-                St = exp(-0.3*pow(R2p*tau,2.0)/DBV);
-            }
-            else 
-            {
-                St = exp(DBV - (R2p*tau));
-            }
+        // CSF Component
+        Sec = exp(-R2e*TE)*exp(-2.0*i*M_PI*DF*abs(tau));
+        Se = real(Sec);
 
-            Sw = St * ( 1 - (exp(-TR/T1w)) ) * (exp(-R2w*TE));
-
-            St *= ( 1 - (exp(-TR/T1t)) ) * (exp(-R2t*TE));
-
-            // Blood Component
-            Sb = ( 1 - (exp(-TR/T1b)) ) * (exp(-R2b*(TE-tau))) * (exp(-Rsb*tau));
-
-            // CSF Component
-            Sec = ( 1 - (exp(-TR/T1e)) ) * (exp(-R2e*TE)) * (exp(-2.0*i*M_PI*DF*tau - (i*phi)));
-            Se = real(Sec);
-
-            // Total
-            result(jj) = M0 * (( (1-(DBV+VC+VW))*St ) + (DBV*Sb) + (VC*Se) + (VW*Sw));
-            
-        }
-    } // if (fit_difference) ... else ... 
-
-    // alternative, if values are outside reasonable bounds
-    if ( DBV > 0.5 || VC > 1.1 || VW > 1.1 )
-    {
-        for (int ii = 1; ii <= taus.Nrows(); ii++)
-        {
-            result(ii) = result(ii)*100.0;
-        }
-        if (fit_difference == false)
-        {
-            for (int ii = 1; ii <= taus.Nrows(); ii++)
-            {
-                result(ii+taus.Nrows()) = result(ii+taus.Nrows())*100.0;
-            }
-        }
+        // Total
+        result(ii) = M0*(((1-CBV-lam0)*St) + (CBV*Sb) + (lam0*Se));
     }
 
-    return;
+    // loop through non-FLAIR data
+    for (int jj = (taus.Nrows()+1); jj <= 2*taus.Nrows(); jj++)
+    {
+        // component parameters
+        double St;      // tissue
+        double Sb;      // blood
+        double Se;      // CSF
+        complex<double> Sec; // complex version of CSF signal
+
+        // magnetization
+        mt = exp(-TE*R2t) * ( 1 - ( 1 + (2*exp(TE/(2*T1t))) ) * ( 2 - exp(-TR/T1t)) );
+        mb = exp(-TE*R2b) * ( 1 - ( 1 + (2*exp(TE/(2*T1b))) ) * ( 2 - exp(-TR/T1b)) );
+        me = exp(-TE*R2e) * ( 1 - ( 1 + (2*exp(TE/(2*T1e))) ) * ( 2 - exp(-TR/T1e)) );
+
+        // calculate tissue compartment weightings
+        lam0 = (ne*me*VC) / ( (nt*mt*(1-VC)) + (ne*me*VC) );
+        CBV = nb*mb*(1-lam0)*DBV;
+
+        double tau = taus(jj-taus.Nrows());
+
+        // Tissue Component
+        if (tau < -tc)
+        {
+            St = exp(DBV + (R2p*tau));
+        }
+        else if (tau > tc)
+        {    
+            St = exp(DBV - (R2p*tau));
+        }
+        else
+        {
+            St = exp(-0.3*pow(R2p*tau,2.0)/DBV);
+        }
+
+        St *= (exp(-R2t*TE));
+
+        // linear model
+        Sb = exp(-R2b*TE)*exp(-R2bp*abs(tau));
+
+        // CSF Component
+        Sec = exp(-R2e*TE)*exp(-2.0*i*M_PI*DF*abs(tau));
+        Se = real(Sec);
+
+        // Total
+        result(jj) = M0*(((1-CBV-lam0)*St) + (CBV*Sb) + (lam0*Se));
+            
+    }
+
+return;
 
 } // Evaluate

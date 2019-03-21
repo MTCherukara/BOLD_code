@@ -6,16 +6,16 @@
 % Created: 19 March 2019
     
 clear; 
-% clc;
+clc;
 
 %% Selected Data
 
 % Choose Variable (just one)
-vname = 'R2p';
+vname = 'OEF';
 
 % Choose Data set
-setnum = 525;
-
+for setnum = 516:530
+    
 % Mask names
 maskbase = 'mask_new_gm_';
 masknums = {'99','90','80','70','60','50','PV'};
@@ -43,7 +43,7 @@ threshes = containers.Map({'R2p', 'DBV', 'OEF', 'VC', 'DF', 'lambda', 'Ax' },...
                           [ 50  ,  1   ,  1   ,  1  ,  15 ,   1     ,  30  ]);  
 
 % Title
-disp(['Data from Fabber Set ',num2str(setnum),'. Subject ',num2str(subnum)]);
+% disp(['Data from Fabber Set ',num2str(setnum),'. Subject ',num2str(subnum)]);
 
 
 %% Load the Data
@@ -107,3 +107,5 @@ matAll = [vecMeans; vecStdvs];
 
 % Display
 disp(num2str(matAll(:)'));
+
+end

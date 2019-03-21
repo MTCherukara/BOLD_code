@@ -13,11 +13,11 @@ print-free-energy
 # Method Information
 method=spatialvb
 noise=white
-max-iterations=8
+max-iterations=10
 allow-bad-voxels
 
 # Spatial VB Information (remove all of this if method!=spatialvb)
-param-spatial-priors=NNNI
+param-spatial-priors=NMMI
 image-prior4=../../Data/subject_09/CSF_T2fit.nii.gz
 
 # Inference Model 
@@ -30,9 +30,9 @@ inferlam
 motional_narrowing
 include_intra
 
-precR2p=1e-4
-precDBV=1e1
-precCSF=1e-1
+precR2p=1e-3
+precDBV=1e0
+precCSF=1e0
 
 # Model Parameters
 #SR=0.808

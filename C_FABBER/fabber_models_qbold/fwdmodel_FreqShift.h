@@ -28,7 +28,7 @@ public:
     virtual void NameParams(vector<string> &names) const;
     virtual int NumParams() const 
     {
-        return 1 + (infer_VC ? 1 : 0) + (infer_DF ? 1 : 0) + (infer_R2p ? 1 : 0) + (infer_DBV ? 1 : 0) + (infer_phi ? 1 : 0) + (infer_VWM ? 1 : 0);
+        return 1 + (infer_VC ? 1 : 0) + (infer_DF ? 1 : 0) + (infer_R2p ? 1 : 0) + (infer_DBV ? 1 : 0) + (infer_phi ? 1 : 0);
     }    
     virtual void HardcodedInitialDists(MVNDist &prior, MVNDist &posterior) const;
     virtual void Evaluate(const NEWMAT::ColumnVector &params, NEWMAT::ColumnVector &result) const;
@@ -40,6 +40,12 @@ protected:
     double TE;
     double TI;
     double TR;
+
+    // Bayesian inference parameters
+    double prec_R2p;
+    double prec_DBV;
+    double prec_CSF;
+    double prec_DF;
 
     // Parameters are: Magnetization M0, VCSF, DF
     // Lookup starting indices of parameters - 
@@ -73,11 +79,6 @@ protected:
         // DBV
         return DBV_index() + (infer_phi ? 1 : 0);
     }
-    int VWM_index() const
-    {
-        // White matter volume
-        return phi_index() + (infer_VWM ? 1 : 0);
-    }
 
     // For choosing which parameters to infer on
     bool infer_VC;
@@ -85,8 +86,6 @@ protected:
     bool infer_DBV;
     bool infer_phi;
     bool infer_R2p;
-    bool infer_VWM;
-    bool fit_difference;
 
 private:
     static FactoryRegistration<FwdModelFactory, FreqShiftFwdModel> registration;

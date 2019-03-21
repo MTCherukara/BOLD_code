@@ -387,6 +387,7 @@ void R2primeFwdModel::Evaluate(const ColumnVector &params, ColumnVector &result)
     ColumnVector paramcpy = params;
 
     // calculated parameters
+    double Ss;  // static dephasing signal (will be used to make St and Se)
     double St;  // tissue signal
     double Sb;  // blood signal
     double Se;  // extracellular signal
@@ -467,7 +468,7 @@ void R2primeFwdModel::Evaluate(const ColumnVector &params, ColumnVector &result)
     }
     else
     {
-        R2e = 1.0;
+        R2e = 4.0;
     }
     if (infer_dF)
     {
@@ -475,7 +476,7 @@ void R2primeFwdModel::Evaluate(const ColumnVector &params, ColumnVector &result)
     }
     else
     {
-        dF = 6.00;
+        dF = 5.00;
     }
     if (infer_lam)
     {
@@ -598,19 +599,19 @@ void R2primeFwdModel::Evaluate(const ColumnVector &params, ColumnVector &result)
         // calculate tissue signal
         if (tau < -tc)
         {
-            St = exp(DBV + (SR*R2p*tau));
+            Ss = exp(DBV + (SR*R2p*tau));
         }
         else if (tau > tc)
         {
-            St = exp(DBV - (SR*R2p*tau));
+            Ss = exp(DBV - (SR*R2p*tau));
         }
         else
         {
-            St = exp(-0.3*pow(R2p*tau,2.0)/DBV);
+            Ss = exp(-0.3*pow(R2p*tau,2.0)/DBV);
         }
 
         // add T2 effect to tissue compartment
-        St *= exp(-R2t*TE);
+        St = Ss*exp(-R2t*TE);
 
         // calculate intravascular signal
         if (motion_narr)

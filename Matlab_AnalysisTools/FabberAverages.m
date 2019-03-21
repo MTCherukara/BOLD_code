@@ -24,15 +24,15 @@
 
     
 clear; 
-clc;
+% clc;
 
 %% User To Select Fabber Data To Display
 
 % Choose Variables
-vars = {'R2p'};
+vars = {'R2p','DBV','OEF'};
 
 % Choose Data set
-setnum = 512;
+setnum = 526;
 
 % Which set of subjects is this from?
 setname = 'CSF';          % 'VS', 'genF', 'genNF', 'CSF', or 'AMICI'
