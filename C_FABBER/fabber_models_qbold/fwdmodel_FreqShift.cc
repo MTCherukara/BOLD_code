@@ -256,10 +256,6 @@ void FreqShiftFwdModel::Evaluate(const ColumnVector &params, ColumnVector &resul
         {
             VC = 0.0001;
         }
-        else if (VC > 1.0)
-        {
-            VC = 1.0;
-        }
     }
     else
     {

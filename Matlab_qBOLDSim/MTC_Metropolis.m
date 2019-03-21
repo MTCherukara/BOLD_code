@@ -9,7 +9,7 @@
 % a DTC lecture example given by Saad Jbabdi, Michaelmas Term 2015.
 %
 % 
-%       Copyright (C) University of Oxford, 2015-2018
+%       Copyright (C) University of Oxford, 2015-2019
 %
 % 
 % Created by MT Cherukara, 16 January 2018
@@ -45,19 +45,20 @@ close all;
 setFigureDefaults;
 
 % Options
-plot_trace = 1;
+plot_trace = 0;
 plot_results = 1;
 save_figures = 0;
 
 % Load Data
 % load('ASE_Data/Data_MultiTE_180208_SNR_200.mat');
-load('ASE_Data/Data_190320_40_3_CSF_FLAIR.mat');
+load('ASE_Data/Data_190320_40_3_CSF_nonFLAIR.mat');
 params_true = params;
 m_params = params;      % this will be the struct that we actually change
+SEind = 3; % hardcoded for now
 
 % Parameter Values
 p_names = {  'OEF' ; 'R2p'; 'zeta' ; 'R2t' ; 'lam0' };
-p_infer = [    0   ,   1  ,   1    ,   0   ,   0    ];
+p_infer = [    0   ,   1  ,   1    ,   0   ,   1    ];
 p_inits = [  0.500 ,  4.0 ,  0.050 ,  10.0 ,  0.10  ];
 p_range = [  0.001 ,  0.0 ,  0.001 ,   5.0 ,  0.00   ;...
              1.000 , 20.0 ,  0.200 ,  15.0 ,  1.00  ];
@@ -82,23 +83,24 @@ m_params.model = 'Asymp';
 np = sum(p_infer);
 
 %% Metropolis Parameters
-j_run  = 1e5;       % number of jumps in the real thing
+j_run  = 1e6;       % number of jumps in the real thing
 j_updt = 10;        % rate of updating the scaling parameter
 j_rng  = 200;       % range of samples to look over when updating scaling param
-j_brn  = (2000*j_updt) + j_rng;      % number of jumps in the 'burn-in' phase
+j_brn  = (200*j_updt) + j_rng;      % number of jumps in the 'burn-in' phase
 
 % counters
 c_rt  = 0;      % rate counter
 
 % ideal acceptance rate
 if np == 2
-    qs = 1-0.352;     % for 2 parameters
+    qs = 0.352;     % for 2 parameters
 elseif np == 3
     qs = 0.316;     % for 3 parameters
 else % if np > 3
     qs = 0.234;
 end
 
+% qs = 0.5;
 
 %% Algorithm Initialization
 
@@ -112,6 +114,9 @@ end
 
 % evaluate model at its initial parameter values
 S_mod = qASE_model(T_sample,TE_sample,m_params);
+
+% normalize to the spin echo
+S_mod = S_mod./S_mod(SEind);
 
 % calculate difference between data and generated sample
 L0 = norm(S_sample-S_mod);
@@ -154,6 +159,9 @@ for ii = 1:(j_brn+j_run)
         
         % calculate the model
         S_mod = qASE_model(T_sample,TE_sample,m_params);
+        
+        % normalize to the spin echo
+        S_mod = S_mod./S_mod(SEind);
         
         % Evaluate the norm
         L1 = norm(S_sample-S_mod);
@@ -230,8 +238,14 @@ if plot_results
 
         figure; hold on; box on;
         histogram(sample_results(pp,:),hres);
+        hold on;
+      
         xlabel(p_name{pp});
         xlim(p_rng(:,pp));
+        
+        % show the true value
+        true1 = eval(['params_true.',p_name{pp}]);
+        plot([true1,true1],get(gca,'ylim'),'r-');
         
         if save_figures
             warning('You need to save figures manually');
