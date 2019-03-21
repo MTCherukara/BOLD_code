@@ -560,19 +560,21 @@ void R2primeFwdModel::Evaluate(const ColumnVector &params, ColumnVector &result)
 
     // calculate steady state magnetization values, for tissue, blood, and CSF
     // NEW VERSION
+    /*
     mt = 1.0 - (2.0*exp(-TI/T1t)) + exp(-TR/T1t);
     mb = 1.0 - (2.0*exp(-TI/T1b)) + exp(-TR/T1b);
     me = 1.0 - (2.0*exp(-TI/T1e)) + exp(-TR/T1e);
-    
+    */
 
     // OLD VERSION (with no TAU dependence)
-    /*
+    
     double TE = TEvals(1);
     mt = exp(-TE*R2t) * ( 1 - ( 1 + (2*exp(TE/(2*T1t))) ) * ( 2 - exp(-(TR-TI)/T1t)) * exp(-TI/T1t) );
     mb = exp(-TE*R2b) * ( 1 - ( 1 + (2*exp(TE/(2*T1b))) ) * ( 2 - exp(-(TR-TI)/T1b)) * exp(-TI/T1b) );
     me = exp(-TE*R2e) * ( 1 - ( 1 + (2*exp(TE/(2*T1e))) ) * ( 2 - exp(-(TR-TI)/T1e)) * exp(-TI/T1e) );
-      */                          
+                                
     /* OLD OLD VERSION
+    double TE = TEvals(1);
     mt = exp(-(TE-tau)*R2t) * ( 1 - ( 1 + (2*exp((TE-tau)/(2*T1t))) ) 
                                 * ( 2 - exp(-(TR-TI)/T1t)) * exp(-TI/T1t)  );
     mb = exp(-(TE-tau)*R2b) * ( 1 - ( 1 + (2*exp((TE-tau)/(2*T1b))) ) 
@@ -645,7 +647,7 @@ void R2primeFwdModel::Evaluate(const ColumnVector &params, ColumnVector &result)
         if (inc_csf)
         {
             Sec = exp(-R2e*TE)*exp(-2.0*i*M_PI*dF*abs(tau));
-            Se = abs(Sec);
+            Se = real(Sec);
         }
         else
         {

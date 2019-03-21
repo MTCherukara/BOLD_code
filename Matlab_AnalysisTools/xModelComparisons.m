@@ -15,20 +15,23 @@ setFigureDefaults;
 
 
 % Select the rows we want to plot
-plotrows = [1,4,7,8];
+plotrows = [9, 10, 11];
 
 
 %% Data for SNR comparisons using SDR model, February 2019
 
 % Row Names
-rnames = {'L Model (LLS)'    ; ...   % 1 - L model, MATLAB
-          'L Model (VB)'     ; ...   % 2 - L model, VB
-          '1C Model (VB)'    ; ...   % 3 - 1C model, new thresholding
-          '1C Model (VB)'    ; ...   % 4 - 1C model, new, with std thresholding
-          '2C Model (VB)'    ; ...   % 5 - 2C model, new thresholding
-          '2C Model (VB)'    ; ...   % 6 - 2C model, new, with std thresholding
-          '11 \tau (LLS)'    ; ...   % 7 - 1C model, 11 taus, MATLAB
-          '11 \tau (VB)'     ; ...   % 8 - 1C model, 11 taus, VB
+rnames = {'L Model (LLS)'    ; ...   %  1 - L model, MATLAB
+          'L Model (VB)'     ; ...   %  2 - L model, VB
+          '1C Model (VB)'    ; ...   %  3 - 1C model, new thresholding
+          '1C Model (VB)'    ; ...   %  4 - 1C model, new, with std thresholding
+          '2C Model (VB)'    ; ...   %  5 - 2C model, new thresholding
+          '2C Model (VB)'    ; ...   %  6 - 2C model, new, with std thresholding
+          '11 \tau (LLS)'    ; ...   %  7 - 1C model, 11 taus, MATLAB
+          '11 \tau (VB)'     ; ...   %  8 - 1C model, 11 taus, VB
+          'L Model (7\tau)'  ; ...   %  9 - 2C model, 7 taus, MATLAB
+          '1C Model (7\tau)' ; ...   % 10 - 2C model, 7 taus, VB with 1C model
+          '2C Model (7\tau)' ; ...   % 11 - 2C model, 7 taus, VB with 2C model
           };
      
 % SNR values
@@ -43,7 +46,10 @@ Err_OEF = [ 27.7000,   22.7000,   15.8000,   11.6000,    7.8000,    5.6700,    4
             24.6000,   20.2000,   14.4000,   10.8000,    8.0300,    6.3500,    5.5300; ...
             21.5000,   17.3000,   12.2000,    9.0000,    6.7400,    5.4900,    4.8600; ...
             35.0000,   31.7000,   26.9000,   22.4000,   21.3000,   21.0000,   20.5000; ...
-            25.6000,   24.9000,   23.7000,   22.0000,   21.1000,   20.8000,   20.7000 ];
+            25.6000,   24.9000,   23.7000,   22.0000,   21.1000,   20.8000,   20.7000; ...
+            35.8000,   32.0000,   27.2000,   23.5000,   21.9000,   21.1000,   20.7000; ...
+            28.3000,   27.8000,   24.5000,   22.3000,   21.2000,   20.4000,   20.1000; ...
+            26.7000,   25.5000,   23.0000,   21.6000,   20.9000,   20.4000,   19.8000 ];
 
 % SNR        5         10         25         50        100        200        500
 Err_DBV = [ 17.7000,    7.9800,    3.2700,    1.9400,    1.2600,    0.9800,    0.8600; ...
@@ -53,7 +59,10 @@ Err_DBV = [ 17.7000,    7.9800,    3.2700,    1.9400,    1.2600,    0.9800,    0
             11.7000,    7.1500,    3.5800,    1.8000,    1.3700,    1.0100,    0.9100; ...
             13.2000,    7.1200,    2.7500,    1.4800,    1.0000,    0.7900,    0.7700; ...
             19.0000,    8.3100,    3.7800,    2.0100,    1.1800,    0.7600,    0.5800; ...
-            11.2000,    7.5300,    4.2800,    2.3500,    1.3400,    0.8700,    0.6700 ];
+            11.2000,    7.5300,    4.2800,    2.3500,    1.3400,    0.8700,    0.6700; ...
+            22.1000,   10.6000,    4.4700,    2.5100,    1.4900,    1.0300,    0.8000; ...
+            10.6000,    7.9600,    4.5700,    2.6600,    1.7600,    1.3100,    1.1200; ...
+            11.8000,    8.3800,    4.6000,    2.7200,    1.7800,    1.4000,    1.1700 ];
 
 % SNR        5         10         25         50        100        200        500
 Err_R2p = [  5.2500,    3.3300,    2.6800,    2.5300,    2.4800,    2.4500,    2.3900; ...
@@ -63,7 +72,10 @@ Err_R2p = [  5.2500,    3.3300,    2.6800,    2.5300,    2.4800,    2.4500,    2
              3.4700,    2.7300,    2.3400,    2.3000,    2.2700,    2.2300,    2.2000; ...
              4.2300,    3.2900,    2.6300,    2.4500,    2.3500,    2.2800,    2.2300; ...
              5.3600,    2.9400,    2.0200,    1.8700,    1.8100,    1.8000,    1.7800; ...
-             3.7600,    2.6500,    2.0200,    1.8400,    1.7600,    1.7300,    1.7200 ];
+             3.7600,    2.6500,    2.0200,    1.8400,    1.7600,    1.7300,    1.7200; ...
+             6.1200,    3.7900,    2.6400,    2.3900,    2.3200,    2.3000,    2.2900; ...
+             4.3600,    3.1300,    2.4200,    2.2100,    2.1500,    2.1200,    2.1200; ...
+             3.8700,    2.6800,    2.1800,    2.0300,    2.0100,    1.9900,    1.9800 ];
 
 % SNR          5         10        25        50       100       200       500
 Rel_All = [  763.0,     390.3,    176.7,    106.4,     66.1,     64.8,     43.5; ...
@@ -73,9 +85,11 @@ Rel_All = [  763.0,     390.3,    176.7,    106.4,     66.1,     64.8,     43.5;
              617.4,     506.6,    329.1,    167.1,    145.6,    110.1,     98.1; ...
              356.1,     341.3,    134.0,     80.7,     71.3,     49.1,     44.2; ...
              832.2,     419.8,    199.6,    125.0,     94.2,     80.6,     71.6; ...
-             496.7,     356.6,    236.2,    177.0,    130.6,    115.1,    105.4 ];
-
-
+             496.7,     356.6,    236.2,    177.0,    130.6,    115.1,    105.4; ...
+             969.4,     522.2,    231.7,    148.9,    110.8,     89.3,     80.1; ...
+             436.3,     366.2,    285.5,    186.7,    157.9,    129.4,    113.7; ...
+             559.6,     458.0,    328.1,    248.0,    208.9,    198.0,    183.0 ];
+  
    
 %% Plotting SNR comparisons
 
@@ -89,8 +103,10 @@ rlabels = rnames(plotrows);
 
 % Plot R2p Error
 figure; box on;    
-semilogx(SNR,abs(Err_R2p(plotrows,:))');
+semilogx(SNR,abs(Err_R2p(plotrows(1),:))','Color',defColour(1));
 hold on;
+semilogx(SNR,abs(Err_R2p(plotrows(2),:))','Color',defColour(3));
+semilogx(SNR,abs(Err_R2p(plotrows(3),:))','Color',defColour(4));
 ylabel('R_2'' Error (s^-^1)');
 xlabel('SNR');
 % legend(rlabels{:});
@@ -102,24 +118,28 @@ xticks(SNR);
 Max_DBV = 18.5;
 % Err_DBV(abs(Err_DBV) > Max_DBV) = Max_DBV;
 figure; box on;
-semilogx(SNR,abs(Err_DBV(plotrows,:))');
+semilogx(SNR,abs(Err_DBV(plotrows(1),:))','Color',defColour(1));
 hold on;
+semilogx(SNR,abs(Err_DBV(plotrows(2),:))','Color',defColour(3));
+semilogx(SNR,abs(Err_DBV(plotrows(3),:))','Color',defColour(4));
 ylabel('DBV Error (%)');
 xlabel('SNR');
-% legend(rlabels{:});
+legend(rlabels{:});
 xlim([4,600]);
 ylim([0, Max_DBV]);
 xticks(SNR);
 
 % Plot OEF Error
 figure; box on;
-semilogx(SNR,abs(Err_OEF(plotrows,:))');
+semilogx(SNR,abs(Err_OEF(plotrows(1),:))','Color',defColour(1));
 hold on;
+semilogx(SNR,abs(Err_OEF(plotrows(2),:))','Color',defColour(3));
+semilogx(SNR,abs(Err_OEF(plotrows(3),:))','Color',defColour(4));
 ylabel('OEF Error (%)');
 xlabel('SNR');
-% legend(rlabels{:});
+legend(rlabels{:});
 xlim([4,600]);
-ylim([0,32]);
+ylim([15,37]);
 xticks(SNR);
 
 % % Plot Total Relative Error

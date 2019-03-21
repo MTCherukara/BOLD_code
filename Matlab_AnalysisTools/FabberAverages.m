@@ -2,7 +2,7 @@
     % Loads a particular Fabber dataset and displays the average (mean and
     % median) values of R2' and DBV in the top 8 slices.
     %
-    % Actively used as of 2019-01-29
+    % Actively used as of 2019-03-19
     %
     % Changelog:
     %
@@ -32,7 +32,7 @@ clc;
 vars = {'R2p'};
 
 % Choose Data set
-setnum = 830;
+setnum = 512;
 
 % Which set of subjects is this from?
 setname = 'CSF';          % 'VS', 'genF', 'genNF', 'CSF', or 'AMICI'
@@ -41,7 +41,7 @@ setname = 'CSF';          % 'VS', 'genF', 'genNF', 'CSF', or 'AMICI'
 do_FE = 0;
 
 % do standard deviations
-do_std = 1;
+do_std = 0;
 
 
 %% Initial Stuff
@@ -78,7 +78,7 @@ switch setname
     case 'CSF'
         
         slicenum = 3:8;
-        maskname = 'mask_new_gm_PV.nii.gz';
+        maskname = 'mask_new_gm_99.nii.gz';
         CC = strsplit(fabdir,'_s');     % need a 2-digit subject number
         subnum = CC{2}(1:2);
         maskdir = ['/Users/mattcher/Documents/DPhil/Data/subject_',subnum,'/'];
@@ -103,7 +103,7 @@ end
 
 % Threshold values
 threshes = containers.Map({'R2p', 'DBV', 'OEF', 'VC', 'DF', 'lambda', 'Ax' },...
-                          [ 100  ,  1   ,  2   ,  1  ,  15 ,   1     ,  30  ]);  
+                          [ 50  ,  1   ,  1   ,  1  ,  15 ,   1     ,  30  ]);  
 
 % Title
 disp(['Data from Fabber Set ',num2str(setnum),'. ',setname, ' Subject ',num2str(subnum)]);
