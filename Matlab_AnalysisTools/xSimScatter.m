@@ -23,13 +23,13 @@ clc;
 
 % Choose variables
 vars = {'OEF', 'DBV', 'R2p'};
-thrA = [  1.0,   1.0,  30  ];     % threshold of actual values
-thrS = [  2.0,   1.0,  30  ];     % threshold of standard deviations
+thrA = [  5.0,   2.0,  50  ];     % threshold of actual values
+thrS = [  5.0,   2.0,  50  ];     % threshold of standard deviations
 % vars = {'OEF'};
 
 % choose dataset
-for setnum = 401:414
-
+for setnum = [348,336:342]
+    
 % Do we have STD data?
 do_std = 1;
 
@@ -203,7 +203,7 @@ end % for vv = 1:length(vars)
 % disp(['(Excluded ',num2str(sum(vecThres)),' of 2500 data points)']);
 
 % Display the whole results row entry
-disp(num2str(vecRes'));
+disp(num2str(vecRes(5)));
 
 end % for setnum = ....
     

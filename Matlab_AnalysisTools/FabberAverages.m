@@ -32,10 +32,13 @@ clear;
 vars = {'R2p','DBV','OEF'};
 
 % Choose Data set
-setnum = 526;
+for setnum = 915:921
+    
+vecRes = zeros(4*length(vars),1);
+
 
 % Which set of subjects is this from?
-setname = 'CSF';          % 'VS', 'genF', 'genNF', 'CSF', or 'AMICI'
+setname = 'VS';          % 'VS', 'genF', 'genNF', 'CSF', or 'AMICI'
 
 % do Free energy?
 do_FE = 0;
@@ -103,10 +106,10 @@ end
 
 % Threshold values
 threshes = containers.Map({'R2p', 'DBV', 'OEF', 'VC', 'DF', 'lambda', 'Ax' },...
-                          [ 50  ,  1   ,  1   ,  1  ,  15 ,   1     ,  30  ]);  
+                          [ 30  ,  0.2   ,  1   ,  1  ,  15 ,   1     ,  30  ]);  
 
 % Title
-disp(['Data from Fabber Set ',num2str(setnum),'. ',setname, ' Subject ',num2str(subnum)]);
+% disp(['Data from Fabber Set ',num2str(setnum),'. ',setname, ' Subject ',num2str(subnum)]);
 
 % Load mask data
 mskData = LoadSlice([maskdir,maskname],slicenum);
@@ -129,7 +132,7 @@ for vv = 1:length(vars)
     volData = LoadSlice([fabdir,'mean_',vname,'.nii.gz'],slicenum);
     
     % Apply Mask and Threshold (ABSOLUTE VALUE)
-    volData = (volData(:).*mskData(:));
+    volData = abs(volData(:).*mskData(:));
 
     % Load Standard Deviation data
     if do_std
@@ -177,17 +180,29 @@ for vv = 1:length(vars)
 %     disp(['Median ',vname,': ',num2str(median(volData),4)]);
 %     disp(['   IQR ',vname,': ',num2str(iqr,4)]);
     
-    disp('   ');
-    disp(['Mean ',vname,'   : ',num2str(mean(volData),4)]);
+%     disp('   ');
+%     disp(['Mean ',vname,'   : ',num2str(mean(volData),4)]);
+%     if do_std
+%         disp(['    Std ',vname,': ',num2str(mean(stdData),4)]);
+%     else
+%         disp(['    Std ',vname,': ',num2str(std(volData),4)]);
+%     end
+
+    vecRes((4*vv)-1) = mean(volData);
     if do_std
-        disp(['    Std ',vname,': ',num2str(mean(stdData),4)]);
+        vecRes((4*vv)) = mean(stdData);
     else
-        disp(['    Std ',vname,': ',num2str(std(volData),4)]);
+        vecRes((4*vv)) = std(volData);
     end
     
     
 
-end
+end % for vv = length(vars)
+
+% display the results
+disp(num2str(vecRes'));
+
+end % for setnum = ...
 
 %% Free Energy and Residuals
 

@@ -16,6 +16,11 @@
 %
 % CHANGELOG:
 %
+% 2019-03-21 (MTC). Fixed the model evaluation (it needed to be normalized to
+%       the spin echo in this script). Now the whole algorithm appears to be
+%       working well (for 2 parameters). Still might want to play with the
+%       acceptance rate and jump size, etc., and the presentation of results.
+%
 % 2018-10-24 (MTC). Updated to reflect changes in the way the model is
 %       calculated. It's still not really working correctly. Need to sort out
 %       the jump sizes and acceptance rate, possibly, and present the results in
@@ -51,17 +56,17 @@ save_figures = 0;
 
 % Load Data
 % load('ASE_Data/Data_MultiTE_180208_SNR_200.mat');
-load('ASE_Data/Data_190320_40_3_CSF_nonFLAIR.mat');
+load('ASE_Data/Data_190320_40_3_CSF_FLAIR.mat');
 params_true = params;
 m_params = params;      % this will be the struct that we actually change
 SEind = 3; % hardcoded for now
 
 % Parameter Values
 p_names = {  'OEF' ; 'R2p'; 'zeta' ; 'R2t' ; 'lam0' };
-p_infer = [    0   ,   1  ,   1    ,   0   ,   1    ];
-p_inits = [  0.500 ,  4.0 ,  0.050 ,  10.0 ,  0.10  ];
+p_infer = [    1   ,   0  ,   1    ,   0   ,   0    ];
+p_inits = [  0.500 ,  4.0 ,  0.100 ,  10.0 ,  0.10  ];
 p_range = [  0.001 ,  0.0 ,  0.001 ,   5.0 ,  0.00   ;...
-             1.000 , 20.0 ,  0.200 ,  15.0 ,  1.00  ];
+             1.000 , 20.0 ,  0.500 ,  15.0 ,  1.00  ];
 
 
 % cut parameters down to size
@@ -195,7 +200,7 @@ for ii = 1:(j_brn+j_run)
         accept_rate(c_rt) = ra;
         
         % change proposal distribution sigma
-        q_sig = q_sig.*(1+(0.1*(ra-qs)));        
+        q_sig = q_sig.*(1+(1*(ra-qs)));        
         
     end % if ( mod(ii,j_updt) == 0 && ii < j_brn && ii > j_rng )
     
@@ -230,8 +235,8 @@ end
 if plot_results
 
     % resolutions
-    hres = 25;
-    cres = 25;
+    hres = 50;
+    cres = 100;
 
     % individual parameter histograms
     for pp = 1:np
@@ -286,16 +291,27 @@ if plot_results
         % Otherwise, make a contour plot
         else
 
-            % collect contour points
-            [n,c] = hist3(sample_results([prm1,prm2],:)',[cres,cres]);
+%             % collect contour points
+%             [n,c] = hist3(sample_results([prm1,prm2],:)',[cres,cres]);
+%             
+%             % this time, put the true values underneath the countour lines, in black
+%             plot([p_rng(1,prm2),p_rng(2,prm2)],[true1,true1],'k-');
+%             plot([true2,true2],[p_rng(1,prm1),p_rng(2,prm1)],'k-');
+% 
+%             % plot
+%             contour(c{2},c{1},n);
 
-            % this time, put the true values underneath the countour lines, in black
-            plot([p_rng(1,prm2),p_rng(2,prm2)],[true1,true1],'k-');
-            plot([true2,true2],[p_rng(1,prm1),p_rng(2,prm1)],'k-');
-
+            % for surface plot
+            [nh,ch] = hist3(sample_results([prm1,prm2],:)',[cres,cres]);
+            
             % plot
-            contour(c{2},c{1},n);
-
+            surf(ch{2},ch{1},nh);
+            view(2); shading flat;
+            
+            % add true values over the top
+            plot3([p_rng(1,prm2),p_rng(2,prm2)],[true1,true1],[1e3,1e3],'k-');
+            plot3([true2,true2],[p_rng(1,prm1),p_rng(2,prm1)],[1e3,1e3],'k-');
+        
         end % if size(sample_results,2) < 20000
 
         % labels

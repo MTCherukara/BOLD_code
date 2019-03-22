@@ -428,9 +428,9 @@ void R2primeFwdModel::Evaluate(const ColumnVector &params, ColumnVector &result)
         {
             DBV = 0.0001;
         }
-        else if (DBV > 1.0)
+        else if (DBV > 0.5)
         {
-            DBV = 1.0;
+            DBV = 0.5;
         }
         
     }
@@ -497,10 +497,10 @@ void R2primeFwdModel::Evaluate(const ColumnVector &params, ColumnVector &result)
     else if (infer_R2p)
     {
         R2p = (paramcpy(R2p_index()));
-        /*if (R2p < 0.01)
+        if (R2p < 0.01)
         {
             R2p = 0.01;
-        }*/
+        }
 
         OEF = pow(R2p/(887.4082*DBV),1/beta)/Hct;
         /*if (OEF < 0.01)
@@ -545,8 +545,9 @@ void R2primeFwdModel::Evaluate(const ColumnVector &params, ColumnVector &result)
     } */
 
     // evaluate blood relaxation rates
-    R2b  = ( 4.5 + (16.4*Hct)) + ( ((165.2*Hct) + 55.7)*pow(OEF,2.0) );
+    // R2b  = ( 4.5 + (16.4*Hct)) + ( ((165.2*Hct) + 55.7)*pow(OEF,2.0) );
     R2bp = (10.2 - ( 1.5*Hct)) + ( ((136.9*Hct) - 13.9)*pow(OEF,2.0) );
+    R2b = 5.291;    // fixed value (Berman, 2017)
 
     // here are some more constants we will need
     double T1t = 1.20;
@@ -561,19 +562,21 @@ void R2primeFwdModel::Evaluate(const ColumnVector &params, ColumnVector &result)
 
     // calculate steady state magnetization values, for tissue, blood, and CSF
     // NEW VERSION
-    /*
+    
     mt = 1.0 - (2.0*exp(-TI/T1t)) + exp(-TR/T1t);
     mb = 1.0 - (2.0*exp(-TI/T1b)) + exp(-TR/T1b);
     me = 1.0 - (2.0*exp(-TI/T1e)) + exp(-TR/T1e);
-    */
+    
 
     // OLD VERSION (with no TAU dependence)
     
+    /*
     double TE = TEvals(1);
     mt = exp(-TE*R2t) * ( 1 - ( 1 + (2*exp(TE/(2*T1t))) ) * ( 2 - exp(-(TR-TI)/T1t)) * exp(-TI/T1t) );
     mb = exp(-TE*R2b) * ( 1 - ( 1 + (2*exp(TE/(2*T1b))) ) * ( 2 - exp(-(TR-TI)/T1b)) * exp(-TI/T1b) );
     me = exp(-TE*R2e) * ( 1 - ( 1 + (2*exp(TE/(2*T1e))) ) * ( 2 - exp(-(TR-TI)/T1e)) * exp(-TI/T1e) );
-                                
+      */
+
     /* OLD OLD VERSION
     double TE = TEvals(1);
     mt = exp(-(TE-tau)*R2t) * ( 1 - ( 1 + (2*exp((TE-tau)/(2*T1t))) ) 
@@ -587,7 +590,7 @@ void R2primeFwdModel::Evaluate(const ColumnVector &params, ColumnVector &result)
     // calculate tissue compartment weightings
     lam0 = (ne*me*lam) / ( (nt*mt*(1-lam)) + (ne*me*lam) );
     CBV = nb*mb*(1-lam0)*DBV;
-
+    
     // loop through taus
     result.ReSize(taus.Nrows());
 
@@ -657,7 +660,7 @@ void R2primeFwdModel::Evaluate(const ColumnVector &params, ColumnVector &result)
 
         // add up the compartments
         result(ii) = S0*(((1-CBV-lam0)*St) + (CBV*Sb) + (lam0*Se));
-
+        
     } // for (int i = 1; i <= taus.Nrows(); i++)
 
     

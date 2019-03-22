@@ -17,7 +17,7 @@
 clear;
 setFigureDefaults;
 
-% slices = 1;
+slices = 1;
 
 % SQ-LS    SQ-VB   1C-VBS  1C-VBTC 1C-VBI  1C-VB-TCI  2C-VB   2C-VBI  2C-VB-TC  2C-VB-TCI
 % '101'  , '250' , '330' , '264' , '257' , '316'    , '201' , '236' , '281'   , '309' ;...   % subject vs1
@@ -80,12 +80,13 @@ voldata(voldata > threshold) = threshold;
 % remove some of the empty voxels from around the sides, so that the brains are
 % closer together in the montage
 
-sh_sds = 15;        % sides
-sh_top = 10;         % top and bottom
-sh_bot = 5;
+% sh_sds = 15;        % sides
+% sh_top = 10;         % top and bottom
+% sh_bot = 5;
 
-% sh_sds = 0;
-% sh_top = 0;
+sh_sds = 0;
+sh_top = 0;
+sh_bot = 0;
 
 voldata = voldata(1+sh_sds:end-sh_sds,1+sh_bot:end-sh_top,:);
 
