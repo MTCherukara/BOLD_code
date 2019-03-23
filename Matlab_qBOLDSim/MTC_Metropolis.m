@@ -56,14 +56,14 @@ save_figures = 0;
 
 % Load Data
 % load('ASE_Data/Data_MultiTE_180208_SNR_200.mat');
-load('ASE_Data/Data_190320_40_3_CSF_FLAIR.mat');
+load('ASE_Data/Data_190320_40_3_CSF_nonFLAIR.mat');
 params_true = params;
 m_params = params;      % this will be the struct that we actually change
 SEind = 3; % hardcoded for now
 
 % Parameter Values
 p_names = {  'OEF' ; 'R2p'; 'zeta' ; 'R2t' ; 'lam0' };
-p_infer = [    1   ,   0  ,   1    ,   0   ,   0    ];
+p_infer = [    0   ,   1  ,   1    ,   0   ,   1    ];
 p_inits = [  0.500 ,  4.0 ,  0.100 ,  10.0 ,  0.10  ];
 p_range = [  0.001 ,  0.0 ,  0.001 ,   5.0 ,  0.00   ;...
              1.000 , 20.0 ,  0.500 ,  15.0 ,  1.00  ];
@@ -88,7 +88,7 @@ m_params.model = 'Asymp';
 np = sum(p_infer);
 
 %% Metropolis Parameters
-j_run  = 1e6;       % number of jumps in the real thing
+j_run  = 1e7;       % number of jumps in the real thing
 j_updt = 10;        % rate of updating the scaling parameter
 j_rng  = 200;       % range of samples to look over when updating scaling param
 j_brn  = (200*j_updt) + j_rng;      % number of jumps in the 'burn-in' phase
@@ -248,6 +248,9 @@ if plot_results
         xlabel(p_name{pp});
         xlim(p_rng(:,pp));
         
+        yticks([]);
+        ylabel('Count');
+        
         % show the true value
         true1 = eval(['params_true.',p_name{pp}]);
         plot([true1,true1],get(gca,'ylim'),'r-');
@@ -274,14 +277,17 @@ if plot_results
         true1 = eval(['params_true.',p_name{prm1}]);
         true2 = eval(['params_true.',p_name{prm2}]);
 
-        % make figure    
-        figure; hold on; box on;
+        
 
         % For a small number of samples, do a scatter plot
         if size(sample_results,2) < 20000
 
+            figure;
+            
             % plot scatter
             scatter(sample_results(prm2,:),sample_results(prm1,:),'k.');
+            
+            hold on; box on;
 
             % in this case, plot the true values on top, in red
             plot([p_rng(1,prm2),p_rng(2,prm2)],[true1,true1],'r-');
@@ -290,6 +296,8 @@ if plot_results
 
         % Otherwise, make a contour plot
         else
+            
+            figure;
 
 %             % collect contour points
 %             [n,c] = hist3(sample_results([prm1,prm2],:)',[cres,cres]);
@@ -305,12 +313,14 @@ if plot_results
             [nh,ch] = hist3(sample_results([prm1,prm2],:)',[cres,cres]);
             
             % plot
-            surf(ch{2},ch{1},nh);
-            view(2); shading flat;
+            surf(ch{2},ch{1},(nh));
+            colormap(flipud(magma));
+            view(2); shading flat; axis square;
+            hold on; box on;
             
             % add true values over the top
-            plot3([p_rng(1,prm2),p_rng(2,prm2)],[true1,true1],[1e3,1e3],'k-');
-            plot3([true2,true2],[p_rng(1,prm1),p_rng(2,prm1)],[1e3,1e3],'k-');
+            plot3([p_rng(1,prm2),p_rng(2,prm2)],[true1,true1],[1e4,1e4],'k-');
+            plot3([true2,true2],[p_rng(1,prm1),p_rng(2,prm1)],[1e4,1e4],'k-');
         
         end % if size(sample_results,2) < 20000
 
