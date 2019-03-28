@@ -15,7 +15,7 @@ setFigureDefaults;
 
 
 % Select the rows we want to plot
-plotrows = [7,8,9];
+plotrows = [1,3,10,11];
 
 
 %% Data for SNR comparisons using SDR model, February 2019
@@ -112,11 +112,13 @@ semilogx(SNR,abs(Err_R2p(plotrows(1),:))','Color',defColour(1));
 hold on;
 semilogx(SNR,abs(Err_R2p(plotrows(2),:))','Color',defColour(3));
 semilogx(SNR,abs(Err_R2p(plotrows(3),:))','Color',defColour(4));
+semilogx(SNR,abs(Err_R2p(plotrows(4),:))','Color',defColour(5));
+
 ylabel('R_2'' Error (s^-^1)');
 xlabel('SNR');
 legend(rlabels{:});
 xlim([4,600]);
-ylim([0,6.5]);
+ylim([2,5.5]);
 xticks(SNR);
 
 % Plot DBV Error
@@ -127,6 +129,7 @@ semilogx(SNR,abs(Err_DBV(plotrows(1),:))','Color',defColour(1));
 hold on;
 semilogx(SNR,abs(Err_DBV(plotrows(2),:))','Color',defColour(3));
 semilogx(SNR,abs(Err_DBV(plotrows(3),:))','Color',defColour(4));
+semilogx(SNR,abs(Err_DBV(plotrows(4),:))','Color',defColour(5));
 ylabel('DBV Error (%)');
 xlabel('SNR');
 legend(rlabels{:});
@@ -140,11 +143,13 @@ semilogx(SNR,abs(Err_OEF(plotrows(1),:))','Color',defColour(1));
 hold on;
 semilogx(SNR,abs(Err_OEF(plotrows(2),:))','Color',defColour(3));
 semilogx(SNR,abs(Err_OEF(plotrows(3),:))','Color',defColour(4));
+semilogx(SNR,abs(Err_OEF(plotrows(4),:))','Color',defColour(5));
+
 ylabel('OEF Error (%)');
 xlabel('SNR');
 legend(rlabels{:});
 xlim([4,600]);
-ylim([15,37]);
+ylim([0,37]);
 xticks(SNR);
 
 % % Plot Total Relative Error
