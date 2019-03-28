@@ -651,7 +651,7 @@ void R2primeFwdModel::Evaluate(const ColumnVector &params, ColumnVector &result)
         if (inc_csf)
         {
             Sec = Ss*exp(-R2e*TE)*exp(-2.0*i*M_PI*dF*abs(tau));
-            Se = real(Sec);
+            Se = abs(Sec);
         }
         else
         {

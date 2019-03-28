@@ -32,13 +32,13 @@ clear;
 vars = {'R2p','DBV','OEF'};
 
 % Choose Data set
-for setnum = 915:921
+for setnum = 826:830
     
 vecRes = zeros(4*length(vars),1);
 
 
 % Which set of subjects is this from?
-setname = 'VS';          % 'VS', 'genF', 'genNF', 'CSF', or 'AMICI'
+setname = 'CSF';          % 'VS', 'genF', 'genNF', 'CSF', or 'AMICI'
 
 % do Free energy?
 do_FE = 0;
@@ -106,7 +106,7 @@ end
 
 % Threshold values
 threshes = containers.Map({'R2p', 'DBV', 'OEF', 'VC', 'DF', 'lambda', 'Ax' },...
-                          [ 30  ,  0.2   ,  1   ,  1  ,  15 ,   1     ,  30  ]);  
+                          [ 30  ,  0.5   ,  1   ,  1  ,  15 ,   1     ,  30  ]);  
 
 % Title
 % disp(['Data from Fabber Set ',num2str(setnum),'. ',setname, ' Subject ',num2str(subnum)]);

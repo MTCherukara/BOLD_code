@@ -133,7 +133,7 @@ void SpinEchoFwdModel::HardcodedInitialDists(MVNDist &prior, MVNDist &posterior)
     {
         // parameter 2 - mixing ratio - only for bi-exponential 
         prior.means(th_index()) = 0.5;
-        precisions(th_index(), th_index()) = 1e0; // 1e-1
+        precisions(th_index(), th_index()) = 1e-2; // 1e-1
 
         if (infer_r2)
         {
@@ -179,7 +179,15 @@ void SpinEchoFwdModel::Evaluate(const ColumnVector &params, ColumnVector &result
 
     if (infer_theta)
     {
-        tht = abs(paramcpy(th_index()));
+        tht = paramcpy(th_index());
+        /*if (tht < 0.0001)
+        {
+            tht = 0.0001;
+        }
+        else if (tht > 1.0)
+        {
+            tht = 1.0;
+        }*/
         
         if (infer_r2)
         {
@@ -221,7 +229,7 @@ void SpinEchoFwdModel::Evaluate(const ColumnVector &params, ColumnVector &result
     } 
 
     // make sure that the weighting parameter theta is between 0 and 1
-    
+    /*
     if (infer_theta)
     {
         if ( tht > 1.0 || tht < 0.0 )
@@ -231,7 +239,7 @@ void SpinEchoFwdModel::Evaluate(const ColumnVector &params, ColumnVector &result
                 result(ii) = 0.0;
             }
         }
-    }
+    }*/
 
     return;
 

@@ -1,7 +1,7 @@
 # fabber run 2, CSF stuff
 
 # Input Data (subjects 3, 4, 6, 8, 9)
-data=../../Data/subject_09/ASE_FLAIR_82_unrung.nii.gz
+data=../../Data/subject_09/ASE_NF_82_unrung.nii.gz
 mask=../../Data/subject_09/mask_FLAIR.nii.gz
 
 # Run Options
@@ -17,8 +17,8 @@ max-iterations=10
 allow-bad-voxels
 
 # Spatial VB Information (remove all of this if method!=spatialvb)
-param-spatial-priors=NMMI
-image-prior4=../../Data/subject_09/CSF_T2fit.nii.gz
+param-spatial-priors=NNNI
+image-prior4=../../Data/subject_09/CSF_T2fit_new.nii.gz
 
 # Inference Model 
 model=qboldR2p

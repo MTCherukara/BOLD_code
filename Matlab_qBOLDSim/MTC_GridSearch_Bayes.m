@@ -66,24 +66,24 @@ DBVs = 1:2:9;
 
 % Parameters
 % pnames = { 'R2p'    ; 'zeta'      };
-% interv = [ 0.2, 15  ; 0.003, 0.15 ];
+% interv = [ 0.2, 11  ; 0.003, 0.10 ];
 % np     = [ 1000     ; 1000        ];
 
 % pnames = { 'OEF'    ; 'zeta'     };
 % interv = [ 0.2, 0.7 ; 0.003, 0.15 ];
 % np     = [ 1000     ; 1000       ];
 
-pnames = { 'zeta'    ; 'R2e'      };
-interv = [ 0.003, 0.15  ; 0.1, 8.0 ];
-np     = [ 1000     ; 1000        ];
+pnames = { 'lam0'    ; 'dF'      };
+interv = [ 0.01, 0.2 ; 1, 15 ];
+np     = [ 1000      ; 1000        ];
 
-% pnames = { 'lam0'    ; 'dF'      };
-% interv = [ 0.01, 0.2 ; 1, 15 ];
-% np     = [ 1000      ; 1000        ];
+% pnames = { 'R2p'    ; 'lam0'      };
+% interv = [ 0.2, 11  ; 0.01, 0.20 ];
+% np     = [ 1000     ; 1000        ];
 
-% pnames = { 'zeta'    ; 'lam0'     };
-% interv = [ 0.003, 0.15 ; 0.01, 0.2 ];
-% np     = [ 1000     ; 1000       ];
+% pnames = { 'zeta'      ; 'lam0'     };
+% interv = [ 0.003, 0.10 ; 0.01, 0.2 ];
+% np     = [ 1000        ; 1000       ];
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -96,8 +96,8 @@ for jj = 1%:nj
     tic;
     
     % Load the Data: 
-    load('ASE_Data/Data_190320_40_3_CSF_Both.mat');
-%     load('ASE_Data/Data_190320_40_3_CSF_nonFLAIR.mat');
+%     load('ASE_Data/Data_190320_40_3_CSF_Both.mat');
+    load('ASE_Data/Data_190320_40_3_CSF_nonFLAIR.mat');
     
 %     vOEF = num2str(gOEF(jj));     % only useful when looping over things
 %     vDBV = num2str(gDBV(jj));
@@ -199,11 +199,11 @@ for jj = 1%:nj
                 inpars = updateParams(pv22(i2),looppars,pn2);
 
                 % run the model to evaluate the signal with current params            
-%                 S_mod = qASE_model(T_sample,TE_sample,inpars);
-                S_mod = qASE_model_FLAIR(T_sample,TE_sample,inpars);
+                S_mod = qASE_model(T_sample,TE_sample,inpars);
+%                 S_mod = qASE_model_FLAIR(T_sample,TE_sample,inpars);
 
                 % normalize (not necessary in double-FLAIR version)
-%                 S_mod = S_mod./max(S_mod);
+                S_mod = S_mod./max(S_mod);
 
                 % calculate posterior based on known noise value
                 posvec(i2) = calcLogLikelihood(S_sample,S_mod,sigma);
@@ -245,8 +245,8 @@ for jj = 1%:nj
         % x axis - DBV
         if strcmp(pn2,'zeta')
             xticks(0.01:0.02:0.15);
-            xticklabels({'1','3','5','7','9','11','13','15'});
-            xlabel('DBV (%)');
+            xticklabels({'1','3','5','7','9'});
+            xlabel('\zeta (%)');
         else
             xlabel(pn2);
         end

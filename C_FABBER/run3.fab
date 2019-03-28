@@ -1,12 +1,13 @@
 # fabber run 3 - Bi-exponential spin-echo data
 # Input Data
-data=../../Data/subject_09/MR_794_SE.nii.gz
+data=../../Data/subject_09/SE_2D_all_unrung.nii.gz
 mask=../../Data/subject_09/mask_FLAIR.nii.gz
 
 # Run Options
 output=../../Data/Fabber_Results/
 save-residuals
 save-model-fit
+allow-bad-voxels
 
 # Method Information
 method=vb
@@ -15,7 +16,6 @@ max-iterations=10
 
 # Spatial VB Information (remove all of this if method!=spatialvb)
 #param-spatial-priors=MM
-#allow-bad-voxels
 #image-prior2=../../Data/subject_06/MR_710_theta_scaled.nii.gz
 
 
