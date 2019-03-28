@@ -4,3 +4,4 @@
 runfabber*
 fabber
 *.dylib
+*.mexmaci64

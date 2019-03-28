@@ -650,7 +650,7 @@ void R2primeFwdModel::Evaluate(const ColumnVector &params, ColumnVector &result)
         // calculate CSF signal
         if (inc_csf)
         {
-            Sec = exp(-R2e*TE)*exp(-2.0*i*M_PI*dF*abs(tau));
+            Sec = Ss*exp(-R2e*TE)*exp(-2.0*i*M_PI*dF*abs(tau));
             Se = real(Sec);
         }
         else

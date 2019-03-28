@@ -315,18 +315,43 @@ function SE = calcExtraCompartment(TAU,TE,PARAMS)
     % Calculate the extracellular (CSF) contribution to ASE qBOLD signal using
     % the model given in Simon et al., 2016
     
+    % pull out parameters
+    R2p = PARAMS.R2p;
+    zeta = PARAMS.zeta;
+    dw = PARAMS.dw;
+    dF = PARAMS.dF;
+    R2e = PARAMS.R2e;
+    
 
     % check whether one TE, or a vector, is supplied
     if length(TE) ~= length(TAU)
         TE(2:length(TAU)) = TE(1);
     end
+    
+    % calculate static dephasing signal
+    tc = 1.7/dw;
 
-    % calculate signal
-    SE = real(exp(- 2i.*pi.*PARAMS.dF.*abs(TAU)));
+    % pre-allocate
+    SE = zeros(1,length(TAU)); 
+
+    % loop through tau values
+    for ii = 1:length(TAU)
+
+        if abs(TAU(ii)) < tc
+            % short tau regime
+            SE(ii) = exp(-(0.3*(R2p.*TAU(ii)).^2)./zeta);
+        else
+            % long tau regime
+            SE(ii) = exp(zeta-(R2p*abs(TAU(ii))));
+        end
+    end
+
+    % add weird frequency shift component
+    SE = SE .* real(exp(- 2i.*pi.*dF.*abs(TAU)));
     
     % add T2 effect
     if PARAMS.incT2
-        SE = SE .* exp( -PARAMS.R2e.*TE);
+        SE = SE .* exp(-R2e.*TE);
     end
     
 end % function SE = calcExtraCompartment(TAU,TE,PARAMS)

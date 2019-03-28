@@ -44,7 +44,7 @@ clear;
 setFigureDefaults;
 
 plot_fig = 1;       
-save_data = 1;      % set to 1 in order to save out ASE data
+save_data = 0;      % set to 1 in order to save out ASE data
 
 
 %% Model Parameters
@@ -84,8 +84,8 @@ params.SNR = 100;
 %% Compute Model
 
 % define tau values that we want to simulate
-tau = (-16:8:64)/1000; % for testing
-% tau = linspace(-0.028,0.064,1000); % for visualising
+% tau = (-16:8:64)/1000; % for testing
+tau = linspace(-0.028,0.064,1000); % for visualising
 
 
 np = length(tau);
