@@ -11,14 +11,14 @@ clc;
 %% Selected Data
 
 % Choose Variable (just one)
-vname = 'OEF';
+vname = 'DBV';
 
 % Choose Data set
-for setnum = 516:530
+for setnum = 816:830
     
 % Mask names
 maskbase = 'mask_new_gm_';
-masknums = {'99','90','80','70','60','50','PV'};
+masknums = {'99','80','8099','60','5080','50'};
 
 
 %% Initial Stuff

@@ -77,12 +77,12 @@ pnames = { 'lam0'    ; 'dF'      };
 interv = [ 0.01, 0.2 ; 1, 15 ];
 np     = [ 1000      ; 1000        ];
 
-% pnames = { 'R2p'    ; 'lam0'      };
-% interv = [ 0.2, 11  ; 0.01, 0.20 ];
+% pnames = { 'R2p'    ; 'dF'      };
+% interv = [ 0.2, 11  ; 1, 15 ];
 % np     = [ 1000     ; 1000        ];
 
-% pnames = { 'zeta'      ; 'lam0'     };
-% interv = [ 0.003, 0.10 ; 0.01, 0.2 ];
+% pnames = { 'zeta'      ; 'dF'     };
+% interv = [ 0.003, 0.10 ; 1, 15 ];
 % np     = [ 1000        ; 1000       ];
 
 
@@ -97,7 +97,7 @@ for jj = 1%:nj
     
     % Load the Data: 
 %     load('ASE_Data/Data_190320_40_3_CSF_Both.mat');
-    load('ASE_Data/Data_190320_40_3_CSF_nonFLAIR.mat');
+    load('ASE_Data/Data_190328_40_3_CSF_nonFLAIR.mat');
     
 %     vOEF = num2str(gOEF(jj));     % only useful when looping over things
 %     vDBV = num2str(gDBV(jj));

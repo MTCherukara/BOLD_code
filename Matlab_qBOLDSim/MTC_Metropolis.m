@@ -56,14 +56,15 @@ save_figures = 0;
 
 % Load Data
 % load('ASE_Data/Data_MultiTE_180208_SNR_200.mat');
-load('ASE_Data/Data_190320_40_3_CSF_Both.mat');
+load('ASE_Data/Data_190328_40_3_CSF_nonFLAIR.mat');
+
 params_true = params;
 m_params = params;      % this will be the struct that we actually change
 SEind = 3; % hardcoded for now
 
 % Parameter Values
 p_names = {  'OEF' ; 'R2p'; 'zeta' ; 'R2t' ; 'lam0' ; 'dF'  };
-p_infer = [    0   ,   1  ,   1    ,   0   ,   0    ,   1   ];
+p_infer = [    0   ,   1  ,   1    ,   0   ,   0    ,   0   ];
 p_inits = [  0.500 ,  4.0 ,  0.100 ,  10.0 ,  0.10  ,   4   ];
 p_range = [  0.001 ,  0.0 ,  0.001 ,   5.0 ,  0.00  ,   0    ;...
              1.000 , 20.0 ,  0.500 ,  15.0 ,  1.00  ,  20   ];
@@ -118,13 +119,13 @@ for pp = 1:np
 end
 
 % % evaluate model at its initial parameter values
-% S_mod = qASE_model(T_sample,TE_sample,m_params);
+S_mod = qASE_model(T_sample,TE_sample,m_params);
 
 % for FLAIR-non-FLAIR data
-S_mod = qASE_model_FLAIR(T_sample,TE_sample,m_params);
+% S_mod = qASE_model_FLAIR(T_sample,TE_sample,m_params);
 
 % % normalize to the spin echo
-% S_mod = S_mod./S_mod(SEind);
+S_mod = S_mod./S_mod(SEind);
 
 % calculate difference between data and generated sample
 L0 = norm(S_sample-S_mod);
@@ -165,14 +166,14 @@ for ii = 1:(j_brn+j_run)
             m_params = updateParams(X1(pp),m_params,p_name{pp});
         end
         
-% %         calculate the model
-%         S_mod = qASE_model(T_sample,TE_sample,m_params);
-%         
-% %         normalize to the spin echo
-%         S_mod = S_mod./S_mod(SEind);
+%         calculate the model
+        S_mod = qASE_model(T_sample,TE_sample,m_params);
         
-        % for FLAIR-non-FLAIR data
-        S_mod = qASE_model_FLAIR(T_sample,TE_sample,m_params);
+%         normalize to the spin echo
+        S_mod = S_mod./S_mod(SEind);
+        
+%         % for FLAIR-non-FLAIR data
+%         S_mod = qASE_model_FLAIR(T_sample,TE_sample,m_params);
         
         % Evaluate the norm
         L1 = norm(S_sample-S_mod);
@@ -218,7 +219,7 @@ for ii = 1:(j_brn+j_run)
 end % for ii = 1:(j_brn+j_run)
 
 toc;
-disp(num2str(mean(sample_results,2)));
+disp(num2str(median(sample_results,2)));
 
 
 %% Display Acceptance Rate Trend
