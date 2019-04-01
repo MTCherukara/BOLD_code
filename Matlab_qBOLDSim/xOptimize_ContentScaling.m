@@ -1,7 +1,8 @@
 % xOptimize_ContentScaling.m
 %
-% To find an optimal scaling factor SR for R2' that optimises estimates of dHb
-% contentration, using only long-tau ASE data, based on xR2p_optimization.m
+% To find an optimal scaling factor kappa (here called SR) for R2' that
+% optimises estimates of dHb contentration, using only long-tau ASE data, based
+% on xR2p_optimization.m 
 %
 % MT Cherukara
 % 2018-11-05

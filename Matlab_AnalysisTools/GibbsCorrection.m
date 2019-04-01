@@ -6,10 +6,10 @@
 clear;
 
 % choose subject
-subnum = '09';
+subnum = '14';
 
 % basics
-filename = 'ASE_NF_82.nii.gz';
+filename = 'ASE_96_FLAIR.nii.gz';
 datadir = ['/Users/mattcher/Documents/DPhil/Data/subject_',subnum,'/'];
 
 % unring parameters - 3x1 array with [minW maxW nsh]

@@ -30,8 +30,8 @@ inferlam
 motional_narrowing
 include_intra
 
-precR2p=1e-3
-precDBV=1e0
+precR2p=1e-4
+precDBV=1e-1
 precCSF=1e0
 
 # Model Parameters

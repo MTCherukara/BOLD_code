@@ -610,7 +610,7 @@ void R2primeFwdModel::Evaluate(const ColumnVector &params, ColumnVector &result)
         }
         else
         {
-            Ss = exp(-0.3*pow(R2p*tau,2.0)/DBV);
+            Ss = exp(-0.3*pow(SR*R2p*tau,2.0)/DBV);
         }
 
         // add T2 effect to tissue compartment

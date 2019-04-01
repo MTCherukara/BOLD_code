@@ -28,10 +28,10 @@ thrS = [  5.0,   2.0,  50  ];     % threshold of standard deviations
 % vars = {'OEF'};
 
 % choose dataset
-for setnum = [348,336:342]
+for setnum = [229:235]
     
 % Do we have STD data?
-do_std = 1;
+do_std = 0;
 
 % Do we want a figure?
 plot_fig = 0;
@@ -203,7 +203,7 @@ end % for vv = 1:length(vars)
 % disp(['(Excluded ',num2str(sum(vecThres)),' of 2500 data points)']);
 
 % Display the whole results row entry
-disp(num2str(vecRes(5)));
+disp(num2str(vecRes(:)'));
 
 end % for setnum = ....
     

@@ -1,6 +1,10 @@
 % xOptimize_R2p.m
-% To optimize the value of a scaling factor applied to R2' in the asmyptotic SDR
-% qBOLD model
+%
+% To optimize the value of a scaling factor kappa (here called SR) applied to
+% R2' in the asmyptotic SDR qBOLD model. In this case, it applies kappa the
+% whole range of tau values, not just the long-tau regime.
+%
+% Actively used as of 2019-04-01
 %
 % MT Cherukara
 % 2018-10-24
@@ -16,7 +20,7 @@ setFigureDefaults;
 
 tic;
 
-% Choose TE (train on 0.072, test on 0.084, also 0.108 and 0.036)
+% Choose TE
 TE = 0.084;
 
 % Vessel Type
@@ -73,7 +77,7 @@ toc;
 % Display Errors
 disp('  Scaling Factor:');
 disp(['Mean A    :  ',round2str(mean(ests(:)),4)]);
-disp(['Mean B    :  ',round2str(mean(est2(:)),4)]);
+% disp(['Mean B    :  ',round2str(mean(est2(:)),4)]);
 
 
 % plot the results
