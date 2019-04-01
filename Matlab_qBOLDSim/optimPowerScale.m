@@ -7,7 +7,7 @@ function LL = optimPowerScale(xx)
     loc_param = param1;
     
     loc_param.SR   = xx(1);
-    loc_param.beta = xx(2);
+    loc_param.sgeo = xx(2);
     
     S_model = qASE_model(tau1,param1.TE,loc_param);
     S_model = S_model./max(S_model);

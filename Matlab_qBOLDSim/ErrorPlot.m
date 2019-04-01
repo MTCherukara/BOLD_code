@@ -20,25 +20,26 @@ tic;
 
 %% User-Selected Inputs
 
-var_name = 'DBV';               % Variable to test - 'OEF', 'DBV', or 'DHB'
+var_name = 'DHB';               % Variable to test - 'OEF', 'DBV', or 'DHB'
 vsd_name = 'sharan';            % Distribution to use - 'sharan', 'frechet', 'lauwers'
 mod_name = 'Asymp';             % Model to test - DON'T CHANGE
 
-TE = 0.036;                     % TE value to use - 36, 72, 84, 108
-% cTaus = (-28:4:64)./1000;       % Tau values to use - DON'T CHANGE
-cTaus = (-12:4:32)./1000;      % For TE = 36ms
+TE = 0.084;                     % TE value to use - 36, 72, 84, 108
+cTaus = (-16:8:64)./1000;       % Tau values to use - DON'T CHANGE
+% cTaus = (-12:4:32)./1000;      % For TE = 36ms
 
-kappa = 1;                    % Scalar correction to R2'
+kappa = 0.52;                    % Scalar correction to R2'
 % kappa = 28.5*(TE.^2) + 0.54; 
 % kappa = 0.77 - (2.78*TE);
 beta = 1;                     % Scalar power of [dHb]
+alpha = 1;                   % Geometric factor (short tau)
 
 plot_est = 0;                   % Plot options
 plot_tru = 0;
 plot_err = 0;
 plot_rel = 1;
 
-SNR = Inf;                      % Noise SNR. For no noise: SNR = inf;
+SNR = 500;                      % Noise SNR. For no noise: SNR = inf;
 nreps = 1;                      % Repetitions, only used for noise testing
 
 
@@ -57,11 +58,11 @@ global S_true param1 tau1;
 % generate a params structure
 param1 = genParams('incIV',false,'incT2',false,...
                    'Model',mod_name,'TE',TE,...
-                   'SR',kappa,'beta',beta);
+                   'SR',kappa,'beta',beta,'sgeo',alpha);
                               
 
 % Load the actual dataset we want to examine
-load([simdir,'vs_arrays/TE',num2str(1000*TE),'_vsData_',vsd_name,'_100.mat']);
+load([simdir,'vs_arrays/TE',num2str(1000*TE),'_vsData_',vsd_name,'_50.mat']);
 % load([simdir,'simulated_data/ASE_TauData_FullModel.mat']);
 
 % Depending on the data type we might be using
@@ -188,7 +189,7 @@ rel_err = errs ./ trus;
 
 % Display Errors
 disp(['Mean Rel. Error:  ',round2str(100*mean(abs(rel_err(:))),2)]);
-disp([' OEF 40, DBV 5  : ',round2str(100*rel_err(52,67),2)]);
+% disp([' OEF 40, DBV 5  : ',round2str(100*rel_err(52,67),2)]);
 % disp([' OEF 55, DBV 2  : ',round2str(100*rel_err(88,18),2)]);
 % disp([' OEF 25, DBV 6.5: ',round2str(100*rel_err(16,92),2)]);
 

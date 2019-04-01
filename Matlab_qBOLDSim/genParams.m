@@ -25,6 +25,7 @@ addParameter(q, 'SNR'   , inf   , @isnumeric);      % Signal to noise ratio
 addParameter(q, 'SR'    , 1.00  , @isnumeric);      % R2' scaling factor
 addParameter(q, 'Voff'  , 0.00  , @isnumeric);      % Short-tau DBV offset
 addParameter(q, 'beta'  , 1.00  , @isnumeric);      % dHb exponent
+addParameter(q, 'sgeo'  , 0.3   , @isnumeric);      % Short-tau geometric factor
 addParameter(q, 'Model' , 'Full' );                 % Simulated qBOLD model
 addParameter(q, 'incIV' , true  , @islogical);      % Include Blood compartment
 addParameter(q, 'incT2' , true  , @islogical);      % Include T2 weightings
@@ -60,7 +61,7 @@ params.kap  = 0.003;        % ?         - conversion between Hct and [Hb]
 params.S0   = 100;          % a. units  - signal
 params.SR   = r.SR;         % no units  - scaling factor for R2'
 params.beta = r.beta;       % no units  - [dHb] exponent
-params.sgeo = 0.3;          % no units  - short-tau geometric factor (3/10) 
+params.sgeo = r.sgeo;       % no units  - short-tau geometric factor (3/10) 
 
 % CSF Compartment-specific parameters
 params.lam0 = r.vCSF;       % no units  - ISF/CSF signal contribution

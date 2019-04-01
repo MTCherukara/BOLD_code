@@ -61,8 +61,8 @@ for i1 = 1:nOEF
         param1.OEF  = OEFvals(i1);
         
         % find the optimum R2' scaling factor
-        X1 = fminbnd(@optimScaling,0,3);
-%         X1 = fminsearch(@optimPowerScale,[0.5,1.0]);
+        X1 = fminbnd(@optimScaling,0,2);
+%         X1 = fminsearch(@optimPowerScale,[0.5,0.5]);
         
         % Fill in ests matrix
         ests(i1,i2) = X1(1);
@@ -88,7 +88,7 @@ plotGrid(ests,100*DBVvals,100*OEFvals,...
       
 % plotGrid(est2,100*DBVvals,100*OEFvals,...
 %           'cmap',inferno,...
-%           'cvals',[0,2],...
+%           'cvals',[-0.5,0.5],...
 %           'title','Optimized R2'' Scaling Factor');
 
 % Key datapoints for comparing

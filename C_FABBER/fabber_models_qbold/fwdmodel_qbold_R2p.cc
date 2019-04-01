@@ -135,6 +135,8 @@ void R2primeFwdModel::Initialize(ArgsType &args)
     // read SR and beta
     SR   = convertTo<double>(args.ReadWithDefault("SR","1.0"));
     beta = convertTo<double>(args.ReadWithDefault("beta","1.0"));
+    eta  = convertTo<double>(args.ReadWithDefault("eta","0.0"));
+    alpha= convertTo<double>(args.ReadWithDefault("alpha","0.3"));
 
     // add information to the log
     LOG << "Inference using development model" << endl;
@@ -610,7 +612,7 @@ void R2primeFwdModel::Evaluate(const ColumnVector &params, ColumnVector &result)
         }
         else
         {
-            Ss = exp(-0.3*pow(SR*R2p*tau,2.0)/DBV);
+            Ss = exp((eta*DBV)-alpha*pow(SR*R2p*tau,2.0)/DBV);
         }
 
         // add T2 effect to tissue compartment

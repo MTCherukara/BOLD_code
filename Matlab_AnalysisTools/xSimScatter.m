@@ -16,10 +16,10 @@
 %       data in upfront, in order to generate a mask of "bad values" to remove.
 
 clear;
-close all;
+% close all;
 % setFigureDefaults;
 
-clc;
+% clc;
 
 % Choose variables
 vars = {'OEF', 'DBV', 'R2p'};
@@ -28,13 +28,13 @@ thrS = [  5.0,   2.0,  50  ];     % threshold of standard deviations
 % vars = {'OEF'};
 
 % choose dataset
-for setnum = [229:235]
+for setnum = 421
     
 % Do we have STD data?
 do_std = 0;
 
 % Do we want a figure?
-plot_fig = 0;
+plot_fig = 1;
 
 
 %% Find directories, and load ground truth data and stuff
@@ -176,6 +176,9 @@ for vv = 1:length(vars)
         xlabel(['Simulated ',vname,' (%)']);
         ylabel(['Estimated ',vname,' (%)']);
         axis([minV,maxV,minV,maxV]);    % always go from 0% to 100% in the figure
+        if strcmp(vname,'OEF')
+            axis([minV,maxV,0,100]);
+        end
     end
     
     % Store the results
