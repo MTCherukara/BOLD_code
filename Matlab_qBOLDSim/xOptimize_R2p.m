@@ -47,6 +47,10 @@ nOEF = length(OEFvals);
 ests = zeros(nOEF,nDBV);
 est2 = zeros(nOEF,nDBV);
 
+options = optimset('MaxFunEvals',400);
+
+param1.SR = 0.44;
+
 % Loop over OEF
 for i1 = 1:nOEF
     
@@ -61,8 +65,8 @@ for i1 = 1:nOEF
         param1.OEF  = OEFvals(i1);
         
         % find the optimum R2' scaling factor
-        X1 = fminbnd(@optimScaling,0,2);
-%         X1 = fminsearch(@optimPowerScale,[0.5,0.5]);
+        X1 = fminbnd(@optimScaling,0,1);
+%         X1 = fminsearch(@optimPowerScale,[0.5,1.0],options);
         
         % Fill in ests matrix
         ests(i1,i2) = X1(1);

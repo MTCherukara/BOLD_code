@@ -29,8 +29,8 @@ motional_narrowing
 include_intra
 
 # correction parameters
-SR=0.52
-alpha=0.03
+SR=0.44
+eta=0.52
 
 precR2p=1e-4
 precDBV=1e-1

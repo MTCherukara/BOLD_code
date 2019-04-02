@@ -12,7 +12,7 @@ delta_tau = 8;
 end_tau = 64;
 
 % manually specify input name
-nii_name = '/Users/mattcher/Documents/DPhil/Data/qboldsim_data/ASE_Grid_2C_50x50_Taus_11_SNR_500.nii.gz';
+nii_name = '/Users/mattcher/Documents/DPhil/Data/qboldsim_data/ASE_Grid_Sharan_50x50_Taus_11_SNR_200.nii.gz';
 
 if ~exist('nii_name','var')
     [dfile,ddir] = uigetfile('*.nii.gz','Choose Data File');
@@ -60,7 +60,7 @@ for xID = 1:x
     for yID = 1:y
         for zID = 1:z
             % LSCOV: fit linear regime
-            X = [ones(length(tau(1,tau_lineID)'),1) tau(1,tau_lineID)'];
+            X = [ones(length(tau(1,tau_lineID)'),1), 0.52*tau(1,tau_lineID)'];
             Y = squeeze(ln_Sase(xID,yID,zID,tau_lineID));
 
             p(xID,yID,zID,:) = flipud(lscov(X,Y,w));        

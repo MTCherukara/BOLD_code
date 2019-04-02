@@ -19,8 +19,8 @@ simdir = '../../Data/vesselsim_data/';
 distname = 'sharan';
 
 % Fixed Parameters
-TE  = 0.084;
-tau = (-28:1:64)./1000;    % For TE = 72ms or 108ms or 84 ms
+TE  = 0.048;
+tau = (-20:1:40)./1000;    % For TE = 72ms or 108ms or 84 ms
 % tau = (-12:4:32)./1000;      % For TE = 36ms or 56 ms
 
 % Vessel Distribution
@@ -93,8 +93,8 @@ for i1 = rstart:rend
         Vvals = DBVvals;    % to avoid using DBVvals as a broadcast variable
         
         % Compute T2 of blood
-        R2b = 4.5 + 16.4*p.Hct + (165.2*p.Hct + 55.7)*OEF^2;
-
+        R2b = 5.29;
+        
         % Pre-allocate some arrays to fill within the inner loop,
         %       Dimensions: TIME, DBV
         Sin_EV  = zeros(nt,np);
@@ -110,8 +110,8 @@ for i1 = rstart:rend
             vFrac = 0.793.*DBV.*volf;
             
             % Calculate signal
-            [~, ~, Sin_EV(:,i3), Sin_IV(:,i3)] = generate_signal(p,spp,...
-                'display',false,'Vf',vFrac,'Y',Y,'seq','ASE','includeIV',false,...
+            [Sin_EV(:,i3), Sin_IV(:,i3)] = generate_signal(p,spp,...
+                'display',false,'Vf',vFrac,'Y',Y,'seq','ASE','includeIV',true,...
                 'T2EV',0.087,'T2b0',1/R2b,'TE',TE,'tau',tau);
             
         end % DBV loop

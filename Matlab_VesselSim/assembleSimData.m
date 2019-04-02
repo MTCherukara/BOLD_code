@@ -20,8 +20,8 @@ distname = 'sharan';
 plot_figure = 1;
 
 % Fixed Parameters
-TEv  = 0.084;
-tau = (-28:1:64)./1000;    % For TE = 72ms or 108ms
+TEv = 0.048;
+tau = (-20:1:40)./1000;    % For TE = 72ms or 108ms or 84 ms
 % tau = (-12:4:32)./1000;      % For TE = 36ms
 
 % Vessel Distribution
@@ -131,10 +131,10 @@ if plot_figure
     xlabel('DBV (%)');
     ylabel('OEF (%)');
     
-    xticks(0.01:0.01:0.07);
-    xticklabels({'1','2','3','4','5','6','7'});
-    yticks(0.2:0.1:0.6);
-    yticklabels({'20','30','40','50','60'});
+%     xticks(0.01:0.01:0.07);
+%     xticklabels({'1','2','3','4','5','6','7'});
+%     yticks(0.2:0.1:0.6);
+%     yticklabels({'20','30','40','50','60'});
     
 end
 

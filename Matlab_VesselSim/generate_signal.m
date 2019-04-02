@@ -1,4 +1,4 @@
-function [sigTOT, tau, sigEV, sigIV]=generate_signal(p,storedPhase,varargin)
+function [sigEV, sigIV]=generate_signal(p,storedPhase,varargin)
 
 	q=inputParser;
 	addParameter(q,'TE',p.TE,@isnumeric); %target echo time
@@ -23,14 +23,14 @@ function [sigTOT, tau, sigEV, sigIV]=generate_signal(p,storedPhase,varargin)
 		return;
 	end
 	
-	%scale for different Y values
-	if length(p.R)>1
-		Yscale=1;
-	else
-		Yscale=(1-r.Y)./(1-p.Y(end));
-	end
+% 	%scale for different Y values
+% 	if length(p.R)>1
+% 		Yscale=1;
+% 	else
+% 		Yscale=(1-r.Y)./(1-p.Y(end));
+% 	end
 
-	if strcmp(r.seq,'ASE')
+    if strcmp(r.seq,'ASE')
 		%generate an ASE weighted signal
 		if isempty(r.tau) %error checking required here
 			tau=(r.TE:-p.deltaTE*2:-r.TE)';
@@ -71,7 +71,7 @@ function [sigTOT, tau, sigEV, sigIV]=generate_signal(p,storedPhase,varargin)
 		
 		TE=r.TE+tau;
 		TEind=round((r.TE+tau)./p.deltaTE,0);
-		SEind=r.TE./(2*p.deltaTE);
+		SEind=r.TE/(2*p.deltaTE);
 	
 		for k=1:length(tau)
 			Phase(k,:)=sum(storedPhase(1:SEind,:),1)-sum(storedPhase(SEind+1:TEind(k),:),1);
@@ -81,7 +81,7 @@ function [sigTOT, tau, sigEV, sigIV]=generate_signal(p,storedPhase,varargin)
 		return;
     end
       
-	numStepsInVessel=p.numStepsInVessel;
+% 	numStepsInVessel=p.numStepsInVessel;
 	
 	switch(r.permeable)
 		case true

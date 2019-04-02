@@ -9,13 +9,15 @@ function TC_ideal = xOptimize_TC
 %
 % CHANGELOG:
 %
+% 2019-04-02 (MTC). 
+%
 % 2019-01-?? (MTC). Updated, as below.
 %
 % 2018-09-13 (MTC). NB: THIS SCRIPT NEEDS TO BE UPDATED TO REFLECT CHANGES TO
 %       THE MODEL CALCULATION FUNCTIONS!!
 
 clear;
-% close all;
+close all;
 
 setFigureDefaults;
 
@@ -24,18 +26,19 @@ params = genParams;
 
 % Scan
 params.TE   = 0.084;        % s         - echo time
-params.TI   = 3;
+params.TR   = 3;
+params.TI   = 0;
 params.contr = 'OEF';
 params.incT1 = 0;
 params.incT2 = 1;
-params.incIV = 0;
+params.incIV = 1;
 
 % Physiology
 params.lam0 = 0.0;         % no units  - ISF/CSF signal contribution
 params.zeta = 0.03;         % no units  - deoxygenated blood volume
 params.OEF  = 0.40;         % no units  - oxygen extraction fraction
 
-tau = (-28:4:64)/1000; % for testing
+tau = (-16:1:64)/1000; % for testing
 
 
 %% Calculate the Analytical tissue signal
@@ -48,24 +51,40 @@ DBVs = 0.003:0.003:0.15;
 TC_ideal = zeros(np,np);
 % DW_ideal = zeros(1,np^2);
 
+% Load data from an already-generated dataset
+simdir = '../../Data/vesselsim_data/';
+datname = 'TE84_vsData_sharan_50.mat';
+
+datIn = load([simdir,'vs_arrays/',datname]);
+% datIn = load('ASE_Data/ASE_Grid_1C_50x50_Taus_11_SNR_500.mat');
+
+% find tau indices
+[~,Tind,~] = intersect(datIn.tau,tau);
+SEind = 3;
+
 
 for i2 = 1:length(DBVs)
-    for ii = 1:length(OEFs)
+    for i1 = 1:length(OEFs)
 
-    %     params.OEF = OEFs(ii);
-        params.zeta = DBVs(ii);
+        params.OEF = OEFs(i1);
+        params.zeta = DBVs(i2);
 
         % Calculate analytical model
-        params.model = 'Full';
-        S_analytical = qASE_model(tau,params.TE,params);
+%         params.model = 'Full';
+%         S_analytical = qASE_model(tau,params.TE,params);
+        S_analytical = squeeze(datIn.S0(i2,i1,Tind))';
+%         S_analytical = squeeze(datIn.ase_data(i1,i2,:,Tind))';
+        
+        % normalize to spin echo
+        S_analytical = S_analytical./S_analytical(SEind);
 
         % Calculate asymptotic model
-        params.model = 'Asymp';    
+%         params.model = 'Asymp';    
 
         myfun = @(x) sum((S_analytical-calcTissueAsymp(tau,params.TE,params,x)).^2);
 
     %     DW_ideal(ii) = params.dw;
-        TC_ideal(ii,i2) = fminbnd(myfun,1.0,3.0);
+        TC_ideal(i1,i2) = fminbnd(myfun,0.0,4.0);
 
     %     disp([' OEF  = ',num2str(params.OEF)]);
     %     disp([' DBV  = ',num2str(params.zeta)]);
@@ -75,8 +94,8 @@ for i2 = 1:length(DBVs)
 end
 
 % Average TC_ideal
-best_TC = mean(TC_ideal(:));
-disp(['Optimal TC = ',num2str(best_TC)]);
+TC_best = mean(TC_ideal(:));
+disp(['Optimal TC = ',num2str(TC_best)]);
 
 % The best TC is 1.756!!!!
 
@@ -85,8 +104,8 @@ figure; hold on; box on;
 % plot(OEFs,1000*1.5./DW_ideal,':');
 % plot(OEFs,1000*1.7./DW_ideal,'--');
 plot([20,70],[1.5,1.5],':');
-plot([20,70],[best_TC,best_TC],'--');
-ylim([1.49, 1.81]);
+plot([20,70],[TC_best,TC_best],'--');
+% ylim([1.49, 1.81]);
 plot(100*OEFs,mean(TC_ideal,1),'kx');
 xlabel('OEF (%)');
 ylabel('Transition Constant (\delta\omega . \tau)');
@@ -97,8 +116,8 @@ ylabel('Transition Constant (\delta\omega . \tau)');
 % DBV
 figure; hold on; box on;
 plot([0.3,15],[1.5,1.5],':');
-plot([0.3,15],[best_TC,best_TC],'--');
-ylim([1.49, 1.81]);
+plot([0.3,15],[TC_best,TC_best],'--');
+% ylim([1.49, 1.81]);
 plot(100*DBVs,mean(TC_ideal,2),'kx');
 xlabel('DBV (%)');
 ylabel('Transition Constant (\delta\omega . \tau)');
@@ -169,9 +188,11 @@ function ST = calcTissueAsymp(TAU,TE,PARAMS,TC)
             
         else
             % Long tau regime
-            ST(ii) = exp(DBV - (R2p.*abs(TAU(ii))));
+            ST(ii) = exp(DBV - (0.52.*R2p.*abs(TAU(ii))));
         end
     end
     
-    ST = PARAMS.S0.*ST.*exp(-PARAMS.R2t.*TE);
+%     ST = PARAMS.S0.*ST.*exp(-PARAMS.R2t.*TE);
+    
+    ST = ST./ST(3);
 end
