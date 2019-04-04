@@ -26,6 +26,9 @@ TE = 0.084;
 % Vessel Type
 vsd_name = 'sharan';
 
+% Are we optimizing two parameters at once?
+optim2 = 0;
+
 % Load data
 %   Dimensions of S0:     DBV, OEF, TIME
 load(['../../Data/vesselsim_data/vs_arrays/TE',num2str(1000*TE),'_vsData_',vsd_name,'_50.mat']);
@@ -35,7 +38,7 @@ global S_dist param1 tau1
 tau1 = tau;
 
 % create a parameters structure with the right params
-param1 = genParams('incIV',false,'incT2',true,...
+param1 = genParams('incIV',true,'incT2',true,...
                    'Model','Asymp','TE',TE,...
                    'beta',1.0);
                
@@ -49,7 +52,8 @@ est2 = zeros(nOEF,nDBV);
 
 options = optimset('MaxFunEvals',400);
 
-param1.SR = 0.44;
+% param1.SR = 0.8-(3*TE);
+param1.SR = 0.45;
 
 % Loop over OEF
 for i1 = 1:nOEF
@@ -65,12 +69,17 @@ for i1 = 1:nOEF
         param1.OEF  = OEFvals(i1);
         
         % find the optimum R2' scaling factor
-        X1 = fminbnd(@optimScaling,0,1);
-%         X1 = fminsearch(@optimPowerScale,[0.5,1.0],options);
+        if optim2
+            X1 = fminsearch(@optimPowerScale,[1.0,1.0],options);        
+        else
+            X1 = fminbnd(@optimScaling,-1,1);
+        end
         
         % Fill in ests matrix
         ests(i1,i2) = X1(1);
-%         est2(i1,i2) = X1(2);
+        if optim2
+            est2(i1,i2) = X1(2);
+        end
         
     end % DBV Loop
     
@@ -81,19 +90,22 @@ toc;
 % Display Errors
 disp('  Scaling Factor:');
 disp(['Mean A    :  ',round2str(mean(ests(:)),4)]);
-% disp(['Mean B    :  ',round2str(mean(est2(:)),4)]);
-
+if optim2
+    disp(['Mean B    :  ',round2str(mean(est2(:)),4)]);
+end
 
 % plot the results
 plotGrid(ests,100*DBVvals,100*OEFvals,...
           'cmap',inferno,...
-          'cvals',[0,1],...
+          'cvals',[-1,1],...
           'title','Optimized R2'' Scaling Factor');
       
-% plotGrid(est2,100*DBVvals,100*OEFvals,...
-%           'cmap',inferno,...
-%           'cvals',[-0.5,0.5],...
-%           'title','Optimized R2'' Scaling Factor');
+if optim2
+    plotGrid(est2,100*DBVvals,100*OEFvals,...
+          'cmap',inferno,...
+          'cvals',[-0.5,0.5],...
+          'title','Optimized R2'' Scaling Factor');
+end
 
 % Key datapoints for comparing
 % OEF(52): 40 %    	OEF(88): 55 %       OEF(16): 25   %

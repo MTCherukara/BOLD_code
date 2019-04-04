@@ -30,7 +30,9 @@ include_intra
 
 # correction parameters
 SR=0.44
-eta=0.52
+#beta=1.03
+eta=0.6
+#alpha=0.1
 
 precR2p=1e-4
 precDBV=1e-1

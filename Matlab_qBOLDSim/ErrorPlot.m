@@ -28,7 +28,7 @@ TE = 0.084;                     % TE value to use - 36, 72, 84, 108
 cTaus = (-16:8:64)./1000;       % Tau values to use - DON'T CHANGE
 % cTaus = (-12:4:32)./1000;      % For TE = 36ms
 
-kappa = 0.52;                    % Scalar correction to R2'
+kappa = 1.0;                    % Scalar correction to R2'
 % kappa = 28.5*(TE.^2) + 0.54; 
 % kappa = 0.77 - (2.78*TE);
 beta = 1;                     % Scalar power of [dHb]

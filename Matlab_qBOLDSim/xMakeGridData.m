@@ -12,8 +12,8 @@ clear;
 
 
 %% Specify what we want
-SNR = 5;
-tau = (-4:4:32)./1000;
+SNR = 500;
+tau = (-24:8:80)./1000;
 
 % figure out SEind
 SEind = find(tau == 0);
@@ -21,7 +21,7 @@ SEind = find(tau == 0);
 
 %% Load in the big grid
 % fulldata = load(['ASE_Data/ASE_Grid_2C_50x50_TE_84.mat']);
-fulldata = load('../../Data/vesselsim_data/vs_arrays/TE48_vsData_sharan_50.mat');
+fulldata = load('../../Data/vesselsim_data/vs_arrays/TE100_vsData_sharan_50.mat');
 
 % Pull values
 DBVvals = fulldata.DBVvals;
@@ -57,7 +57,7 @@ ase_data = ase_data ./ repmat(ase_data(:,:,:,SEind),1,1,1,nt);
 
 
 %% Save out
-dname = strcat('ASE_Grid_2C_50x50_TE_',num2str(1000*TE),'_Taus_',num2str(nt),'_SNR_',num2str(SNR));
+dname = strcat('ASE_Grid_Sharan_50x50_TE_',num2str(1000*TE),'_Taus_',num2str(nt),'_SNR_',num2str(SNR));
 
 % save([dname,'.mat'],'ase_data','ase_model','tau','TE','OEFvals','DBVvals','params');
 save([dname,'.mat'],'ase_data','ase_model','tau','TE','OEFvals','DBVvals');

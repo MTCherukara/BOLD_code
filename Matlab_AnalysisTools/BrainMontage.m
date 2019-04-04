@@ -47,7 +47,7 @@ elseif strfind(lower(niname),'r2p')
     threshold = 10;
     cmp = viridis;
 elseif strfind(lower(niname),'oef')
-    threshold = 0.8;
+    threshold = 1.0;
     cmp = parula;
 elseif strfind(lower(niname),'df')
     threshold = 15;
@@ -80,13 +80,16 @@ voldata(voldata > threshold) = threshold;
 % remove some of the empty voxels from around the sides, so that the brains are
 % closer together in the montage
 
-% sh_sds = 15;        % sides
-% sh_top = 10;         % top and bottom
-% sh_bot = 5;
+if length(slices) == 1
+    sh_sds = 0;
+    sh_top = 0;
+    sh_bot = 0;
+else
+    sh_sds = 15;        % sides
+    sh_top = 10;         % top and bottom
+    sh_bot = 5;
+end
 
-sh_sds = 0;
-sh_top = 0;
-sh_bot = 0;
 
 voldata = voldata(1+sh_sds:end-sh_sds,1+sh_bot:end-sh_top,:);
 

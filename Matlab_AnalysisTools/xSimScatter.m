@@ -16,7 +16,7 @@
 %       data in upfront, in order to generate a mask of "bad values" to remove.
 
 clear;
-close all;
+% close all;
 % setFigureDefaults;
 
 % clc;
@@ -28,7 +28,7 @@ thrS = [  5.0,   2.0,  50  ];     % threshold of standard deviations
 % vars = {'OEF'};
 
 % choose dataset
-for setnum = 464:477
+for setnum = 429:435
     
 % Do we have STD data?
 do_std = 0;
@@ -52,9 +52,9 @@ fabdir = strcat(resdir,fdname.name,'/');
 gnddir = '/Users/mattcher/Documents/DPhil/Data/qboldsim_data/';
 
 % Load ground truth data for both OEF and DBV
-volOEF = LoadSlice([gnddir,'ASE_Grid_50x50_OEF.nii.gz'],1);
-volDBV = LoadSlice([gnddir,'ASE_Grid_50x50_DBV.nii.gz'],1);
-volR2p = LoadSlice([gnddir,'ASE_Grid_50x50_R2p.nii.gz'],1);
+volOEF = LoadSlice([gnddir,'True_Grid_50x50_OEF.nii.gz'],1);
+volDBV = LoadSlice([gnddir,'True_Grid_50x50_DBV.nii.gz'],1);
+volR2p = LoadSlice([gnddir,'True_Grid_50x50_R2p.nii.gz'],1);
 
 matGnd = [volOEF(:),volDBV(:),volR2p(:)];
 matScl = [volDBV(:),volOEF(:),volDBV(:)];
@@ -79,7 +79,7 @@ for vv = 1:length(vars)
     
     % OPTIONALLY scale OEF
     if strcmp(vname,'OEF')
-        volData = volData.*0.52;
+        volData = volData*0.54;
     end
       
     % take the absolute value and store it 

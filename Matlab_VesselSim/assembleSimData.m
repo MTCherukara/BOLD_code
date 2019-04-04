@@ -20,8 +20,8 @@ distname = 'sharan';
 plot_figure = 1;
 
 % Fixed Parameters
-TEv = 0.048;
-tau = (-20:1:40)./1000;    % For TE = 72ms or 108ms or 84 ms
+TE  = 0.100;
+tau = (-40:2:80)./1000;    % For TE = 72ms or 108ms or 84 ms
 % tau = (-12:4:32)./1000;      % For TE = 36ms
 
 % Vessel Distribution
@@ -65,7 +65,7 @@ for i1 = 1:nr
     
     % Load data
     load([simdir,'vs_arrays/vsArray',num2str(np),'_',distname,...
-                 '_TE_',num2str(1000*TEv),'_R_',num2str(vrad),'.mat']);
+                 '_TE_',num2str(1000*TE),'_R_',num2str(vrad),'.mat']);
 %     load([simdir,'vs_arrays/vsArray',num2str(np),'_',distname,...
 %                  '_R_',num2str(vrad),'.mat']);
     % Fill matrix
@@ -110,8 +110,7 @@ end % OEF loop
 
 
 %% Save Data
-sname = strcat(simdir,'vs_arrays/TE',num2str(1000*TEv),'_vsData_',distname,'_',num2str(np),'.mat');
-TE = TEv;
+sname = strcat(simdir,'vs_arrays/TE',num2str(1000*TE),'_vsData_',distname,'_',num2str(np),'.mat');
 save(sname,'S0','S_ev','S_iv','tau','TE','OEFvals','DBVvals');
     
 

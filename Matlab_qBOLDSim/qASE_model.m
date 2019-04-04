@@ -367,6 +367,7 @@ function ST = calcTissueAsymp(TAU,TE,PARAMS)
     zeta = PARAMS.zeta;
     Voff = PARAMS.Voff;         % the short-tau DBV offset
     sgeo = PARAMS.sgeo;         % the short-tau geometric scaling constant
+    kapp = PARAMS.SR;
 %     BB = 6.263*(1-exp(-3.477*PARAMS.OEF));
 %     R2p = 2.76.*PARAMS.OEF.*exp(-BB.*TE).*PARAMS.R2p;
     R2p = PARAMS.R2p;
@@ -376,7 +377,7 @@ function ST = calcTissueAsymp(TAU,TE,PARAMS)
     if PARAMS.tc_man
         tc = PARAMS.tc_val;
     else
-        tc = 1.7/dw;
+        tc = kapp*1.7/dw;
     end
 
     % pre-allocate
@@ -390,7 +391,7 @@ function ST = calcTissueAsymp(TAU,TE,PARAMS)
             ST(ii) = exp((Voff*zeta)-(sgeo*(R2p.*TAU(ii)).^2)./zeta);
         else
             % long tau regime
-            ST(ii) = exp(zeta-(PARAMS.SR*R2p*abs(TAU(ii))));
+            ST(ii) = exp(zeta-(kapp*R2p*abs(TAU(ii))));
         end
     end
     
