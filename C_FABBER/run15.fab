@@ -11,13 +11,13 @@ save-model-fit
 print-free-energy
 
 # Method Information
-method=vb
+method=spatialvb
 noise=white
 max-iterations=10
 allow-bad-voxels
 
 # Spatial VB Information (remove this if method!=spatialvb)
-#param-spatial-priors=MMM
+param-spatial-priors=NNN
 
 # Inference Model 
 model=qboldR2p
@@ -25,14 +25,14 @@ inferS0
 inferR2p
 inferDBV
 
-motional_narrowing
+#motional_narrowing
 include_intra
 
 # correction parameters
 SR=0.44
 #beta=1.03
-eta=0.6
-#alpha=0.1
+#eta=0.6
+#alpha=0.03
 
 precR2p=1e-4
 precDBV=1e-1
@@ -45,8 +45,8 @@ TI=0.0
 #TI=1.210
 
 # set with 11 taus
-tau1=0.016
-tau2=0.008
+tau1=-0.016
+tau2=-0.008
 tau3=0.0
 tau4=0.008
 tau5=0.016

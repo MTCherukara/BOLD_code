@@ -130,7 +130,7 @@ void R2primeFwdModel::Initialize(ArgsType &args)
 
     // read TR and TI
     TR = convertTo<double>(args.ReadWithDefault("TR","3.000"));
-    TI = convertTo<double>(args.ReadWithDefault("TI","3.000"));
+    TI = convertTo<double>(args.ReadWithDefault("TI","0.000"));
 
     // read SR and beta
     SR   = convertTo<double>(args.ReadWithDefault("SR","1.0"));
@@ -332,8 +332,8 @@ void R2primeFwdModel::HardcodedInitialDists(MVNDist &prior, MVNDist &posterior) 
 
     if (infer_DBV)
     {
-        posterior.means(DBV_index()) = 0.036;
-        precisions(DBV_index(), DBV_index()) = 1e-1; 
+        posterior.means(DBV_index()) = 0.05;
+        precisions(DBV_index(), DBV_index()) = 1e0; 
     }
 
     if (infer_R2t)
@@ -454,7 +454,7 @@ void R2primeFwdModel::Evaluate(const ColumnVector &params, ColumnVector &result)
     }
     else
     {
-        S0 = 100.0;
+        S0 = 265.0;
     }
     if (infer_Hct)
     {
@@ -547,9 +547,9 @@ void R2primeFwdModel::Evaluate(const ColumnVector &params, ColumnVector &result)
     } */
 
     // evaluate blood relaxation rates
-    // R2b  = ( 4.5 + (16.4*Hct)) + ( ((165.2*Hct) + 55.7)*pow(OEF,2.0) );
+    R2b  = ( 4.5 + (16.4*Hct)) + ( ((165.2*Hct) + 55.7)*pow(OEF,2.0) );
     R2bp = (10.2 - ( 1.5*Hct)) + ( ((136.9*Hct) - 13.9)*pow(OEF,2.0) );
-    R2b = 5.291;    // fixed value (Berman, 2017)
+    // R2b = 5.291;    // fixed value (Berman, 2017)
 
     // here are some more constants we will need
     double T1t = 1.20;
@@ -612,7 +612,7 @@ void R2primeFwdModel::Evaluate(const ColumnVector &params, ColumnVector &result)
         }
         else
         {
-            Ss = exp((eta*DBV)-alpha*pow(SR*R2p*tau,2.0)/DBV);
+            Ss = exp((eta*DBV)-alpha*pow(R2p*tau,2.0)/DBV);
         }
 
         // add T2 effect to tissue compartment

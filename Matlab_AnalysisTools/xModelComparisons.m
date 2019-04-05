@@ -15,7 +15,7 @@ setFigureDefaults;
 
 
 % Select the rows we want to plot
-plotrows = [1,2,5,4];
+plotrows = [1,2,4];
 
 
 %% Data for SNR comparisons using SDR model, February 2019

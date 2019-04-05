@@ -44,7 +44,7 @@ if strfind(lower(niname),'dbv')
     threshold = 0.2;
     cmp = magma;
 elseif strfind(lower(niname),'r2p')
-    threshold = 10;
+    threshold = 50;
     cmp = viridis;
 elseif strfind(lower(niname),'oef')
     threshold = 1.0;

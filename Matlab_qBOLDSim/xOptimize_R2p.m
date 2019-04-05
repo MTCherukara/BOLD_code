@@ -27,7 +27,7 @@ TE = 0.084;
 vsd_name = 'sharan';
 
 % Are we optimizing two parameters at once?
-optim2 = 0;
+optim2 = 1;
 
 % Load data
 %   Dimensions of S0:     DBV, OEF, TIME
@@ -70,7 +70,7 @@ for i1 = 1:nOEF
         
         % find the optimum R2' scaling factor
         if optim2
-            X1 = fminsearch(@optimPowerScale,[1.0,1.0],options);        
+            X1 = fminsearch(@optimPowerScale,[0.5,0.0],options);        
         else
             X1 = fminbnd(@optimScaling,-1,1);
         end

@@ -16,7 +16,7 @@
 %       data in upfront, in order to generate a mask of "bad values" to remove.
 
 clear;
-% close all;
+close all;
 % setFigureDefaults;
 
 % clc;
@@ -28,13 +28,13 @@ thrS = [  5.0,   2.0,  50  ];     % threshold of standard deviations
 % vars = {'OEF'};
 
 % choose dataset
-for setnum = 429:435
+for setnum = 235
     
 % Do we have STD data?
 do_std = 0;
 
 % Do we want a figure?
-plot_fig = 0;
+plot_fig = 1;
 
 
 %% Find directories, and load ground truth data and stuff
@@ -79,7 +79,7 @@ for vv = 1:length(vars)
     
     % OPTIONALLY scale OEF
     if strcmp(vname,'OEF')
-        volData = volData*0.54;
+%         volData = volData*0.44;
     end
       
     % take the absolute value and store it 
