@@ -138,6 +138,9 @@ void R2primeFwdModel::Initialize(ArgsType &args)
     eta  = convertTo<double>(args.ReadWithDefault("eta","0.0"));
     alpha= convertTo<double>(args.ReadWithDefault("alpha","0.3"));
 
+    // check for fixed DBV
+    fDBV = convertTo<double>(args.ReadWithDefault("fixDBV","0.03"));
+
     // add information to the log
     LOG << "Inference using development model" << endl;
     LOG << "Using TR = " << TR << "s, and TI = " << TI << "s" << endl;
@@ -438,7 +441,7 @@ void R2primeFwdModel::Evaluate(const ColumnVector &params, ColumnVector &result)
     }
     else
     {
-        DBV = 0.03;
+        DBV = fDBV;
     }
     if (infer_R2t)
     {

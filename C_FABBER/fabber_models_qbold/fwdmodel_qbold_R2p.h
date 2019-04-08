@@ -55,6 +55,7 @@ protected:
     double beta;    // this is a power that is applied to OEF*Hct in calculating DW
     double eta;     // this defines an offset for the short-tau regime
     double alpha;   // this is the geometric constant for the short-tau regime
+    double fDBV;    // fixed value of DBV
 
     // Lookup starting indices of parameters
     int OEF_index() const

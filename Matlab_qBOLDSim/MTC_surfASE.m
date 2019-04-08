@@ -1,5 +1,7 @@
 % MTC_surfASE.m
 %
+% OBSOLETE
+%
 % Generates a 2D surface of ASE datasets along 2 chosen variables, based on
 % MTC_qASE.m, requires qASE_model.m and updateParams.m
 %
@@ -10,6 +12,8 @@
 % Created by MT Cherukara, 2016
 %
 % CHANGELOG:
+%
+% 2018-12-05 (MTC). Superceded by xSimulateGrid.m
 %
 % 2018-10-01 (MTC). Re-written to utilize parallel computing, and to use the new
 %       standard of the model

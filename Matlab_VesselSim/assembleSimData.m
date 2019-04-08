@@ -20,8 +20,8 @@ distname = 'sharan';
 plot_figure = 1;
 
 % Fixed Parameters
-TE  = 0.100;
-tau = (-40:2:80)./1000;    % For TE = 72ms or 108ms or 84 ms
+TE  = 0.084;
+tau = (-16:8:64)./1000;    % For TE = 72ms or 108ms or 84 ms
 % tau = (-12:4:32)./1000;      % For TE = 36ms
 
 % Vessel Distribution
@@ -48,12 +48,13 @@ end
 % Array sizes
 nr = length(RR);    % number of different vessel radii
 nt = length(tau);   % number of tau values
-np = 50;           % number of different parameter values to generate
+nd = 10;            % number of DBV values  
+no = 100;            % number of OEF values
 
 % Preallocate arrays
 %       Dimensions: TIME, DBV, OEF, RADIUS
-S0_ev  = zeros(nt,np,np,nr);     % extravascular (tissue) signal
-S0_iv  = zeros(nt,np,np,nr);     % intravascular (blood) signal
+S0_ev  = zeros(nt,nd,no,nr);     % extravascular (tissue) signal
+S0_iv  = zeros(nt,nd,no,nr);     % intravascular (blood) signal
 
 
 %% Collect signals from all radii
@@ -64,7 +65,7 @@ for i1 = 1:nr
     vrad = RR(i1);
     
     % Load data
-    load([simdir,'vs_arrays/vsArray',num2str(np),'_',distname,...
+    load([simdir,'vs_arrays/vsArray',num2str(nd),'_',distname,...
                  '_TE_',num2str(1000*TE),'_R_',num2str(vrad),'.mat']);
 %     load([simdir,'vs_arrays/vsArray',num2str(np),'_',distname,...
 %                  '_R_',num2str(vrad),'.mat']);
@@ -80,13 +81,13 @@ end % Radius loop
 
 % Preallocate S0 array
 %       Dimensions: DBV, OEF, TIME
-S0 = zeros(np,np,nt);
+S0 = zeros(nd,no,nt);
 
 % Crappy loop version - it would be better if this step was done using matrix
 % operations, but it doesn't matter that much, and at least it works this way...
-for i1 = 1:np
+for i1 = 1:no
     
-    for i2 = 1:np
+    for i2 = 1:nd
         
         % S0_* dimensions:      TIME, DBV, OEF, RADIUS
         % sigASE* dimensions:   TIME, RADIUS
@@ -110,7 +111,7 @@ end % OEF loop
 
 
 %% Save Data
-sname = strcat(simdir,'vs_arrays/TE',num2str(1000*TE),'_vsData_',distname,'_',num2str(np),'.mat');
+sname = strcat(simdir,'vs_arrays/TE',num2str(1000*TE),'_vsData_',distname,'_',num2str(nd),'.mat');
 save(sname,'S0','S_ev','S_iv','tau','TE','OEFvals','DBVvals');
     
 
@@ -122,7 +123,7 @@ if plot_figure
     figure; hold on; box on;
     
     % Plot 2D grid
-    surf(DBVvals,OEFvals,log(S0(:,:,3)));
+    surf(DBVvals,OEFvals,log(S0(:,:,1)'));
     view(2); shading flat;
     c=colorbar;
     

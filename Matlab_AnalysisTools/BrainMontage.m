@@ -53,7 +53,7 @@ elseif strfind(lower(niname),'df')
     threshold = 15;
     cmp = inferno;
 else
-    threshold = 1000;
+    threshold = 100;
     cmp = gray;
 end
 

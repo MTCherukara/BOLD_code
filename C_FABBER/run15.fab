@@ -2,7 +2,7 @@
 
 # Input Data
 data=../../Data/qboldsim_data/ASE_Grid_Sharan_50x50_Taus_11_SNR_500.nii.gz
-mask=../../Data/qboldsim_data/ASE_Grid_50x50_mask.nii.gz
+mask=../../Data/qboldsim_data/Grid_50x50_mask.nii.gz
 
 # Run Options
 output=../../Data/Fabber_ModelFits/

@@ -1,19 +1,24 @@
 % xSimulateGrid.m
-
+%
 % Generate a grid of normalized simulated ASE data with a range of OEF and DBV
 % values, which will then be used for FABBER inference (or for grid search
-% inference, one entry at a time).
-
-% Based on MTC_qASE.m
-
+% inference, one entry at a time). Based on MTC_qASE.m and MTC_surfASE.m
+%
 % MT Cherukara
 % 5 December 2018
+%
+% Actively used as of 2019-04-08
+%
+% CHANGELOG:
+%
+% 2019-04-08 (MTC). Removed the possibility for adding noise here, this should
+%       all be done in xMakeGridData.m
 
 clear;
 
 %% Set parameters
 
-TE = 0.074;
+TE = 0.084;
 tau = (-28:1:64)/1000;
 SEind = 29; % in this case (-24:1:64, SEind=25)
 
@@ -23,7 +28,8 @@ SEind = 29; % in this case (-24:1:64, SEind=25)
 
 % 50x50 narrower range
 OEFvals = 0.21:0.01:0.70;
-DBVvals = 0.003:0.003:0.15;
+% DBVvals = 0.003:0.003:0.15;
+DBVvals = 0.03;
 
 % % 4x4 data
 % OEFvals = 0.2:0.2:0.8;
@@ -40,8 +46,6 @@ params.incT2  = 1;          % BOOL      - should T2 differences be considered?
 params.incIV  = 1;          % BOOL      - should blood compartment be included?
 params.TE     = TE;         % s         - Echo time
 
-% noise 
-SNR = 5;
 
 %% Loop over values, computing the model
 
@@ -66,13 +70,8 @@ for i1 = 1:no
         % compute model
         S_model = qASE_model(tau,TE,inparam);
         
-        % add Gaussian noise
-%         sigma = mean(S_model)./SNR;
-%         S_data = S_model + sigma.*randn(1,nt);
-        S_data = S_model;
-        
         % normalize data to the spin echo
-        S_data = S_data./S_data(SEind);
+        S_data = S_model./S_model(SEind);
         
         % fill array - dimensions: OEF, DBV, BLANK, TIME
         ase_data(i1,i2,1,:)  = S_data;
@@ -87,7 +86,7 @@ end % OEF loop
 
 %% Save out data
 % dname = strcat('ASE_Grid_2C_',num2str(no),'x',num2str(nv),'_SNR_',num2str(SNR));
-dname = strcat('ASE_Grid_2C_',num2str(no),'x',num2str(nv),'_TE_74');
+dname = strcat('ASE_Grid_2C_',num2str(no),'x',num2str(nv),'_TE_',num2str(1000*TE));
 save([dname,'.mat'],'ase_data','ase_model','tau','TE','params','OEFvals','DBVvals');
 % save_avw(100.*ase_data,[dname,'.nii.gz'],'d',[1,1,1,3]);
 % save_avw(OEF_grid,[dname,'_OEF.nii.gz'],'d',[1,1,1,3]);

@@ -19,8 +19,8 @@ simdir = '../../Data/vesselsim_data/';
 distname = 'sharan';
 
 % Fixed Parameters
-TE  = 0.100;
-tau = (-40:2:80)./1000;    % For TE = 72ms or 108ms or 84 ms
+TE  = 0.084;
+tau = (-16:8:64)./1000;    % For TE = 72ms or 108ms or 84 ms
 % tau = (-12:4:32)./1000;      % For TE = 36ms or 56 ms
 
 % Vessel Distribution
@@ -53,15 +53,20 @@ nt = length(tau);   % number of tau values
 np = 50;           % number of different parameter values to generate
 
 % Physiological Parameters
-OEFvals = linspace(0.21,0.7,np);
-DBVvals = linspace(0.003,0.15,np);
+% OEFvals = linspace(0.21,0.7,np);
+% DBVvals = linspace(0.003,0.15,np);
 
+OEFvals = linspace(0.01,1,100);
 % OEFvals = 0.4;
-% DBVvals = 0.05;
+DBVvals = 0:0.01:0.09;
 
 % Decide on which radii to calculate
 rstart = 1;
 rend   = 6;
+
+% lengths
+nd = length(DBVvals);
+no = length(OEFvals);
 
 
 %% Generate signals for each radius
@@ -80,12 +85,12 @@ for i1 = rstart:rend
     
     % pre-allocate radius-level array.
     %       Dimensions: TIME, DBV, OEF
-    S_ev = zeros(nt,np,np);
-    S_iv = zeros(nt,np,np);
+    S_ev = zeros(nt,nd,no);
+    S_iv = zeros(nt,nd,no);
 
     
-    % Loop over OEF
-    parfor i2 = 1:np
+    % Parallel Loop over OEF
+    parfor i2 = 1:no
         
         OEF = OEFvals(i2);
         Y = 1-OEF;
@@ -97,11 +102,11 @@ for i1 = rstart:rend
         
         % Pre-allocate some arrays to fill within the inner loop,
         %       Dimensions: TIME, DBV
-        Sin_EV  = zeros(nt,np);
-        Sin_IV  = zeros(nt,np);
+        Sin_EV  = zeros(nt,nd);
+        Sin_IV  = zeros(nt,nd);
         
         % Loop over DBV
-        for i3 = 1:np
+        for i3 = 1:nd
             
             DBV = Vvals(i3);
             
@@ -123,7 +128,7 @@ for i1 = rstart:rend
     end % OEF loop
     
     % Save out data for each radius
-    sname = strcat(simdir,'vs_arrays/vsArray',num2str(np),'_',distname,...
+    sname = strcat(simdir,'vs_arrays/vsArray',num2str(nd),'_',distname,...
                    '_TE_',num2str(1000*TE),'_R_',num2str(vrad),'.mat');
     save(sname,'S_ev','S_iv','tau','TE','OEFvals','DBVvals');
     
