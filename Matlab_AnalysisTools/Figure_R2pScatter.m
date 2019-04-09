@@ -14,13 +14,13 @@
 
 clear;
 close all;
-% setFigureDefaults;
+setFigureDefaults;
 
 % choose datasets
-sets = 506:510;
+sets = 495;
 
 % variable
-vname = 'OEF';
+vname = 'R2p';
 
 
 %% Find directories, and load ground truth data and stuff
@@ -57,6 +57,7 @@ for ss = 1:length(sets)
        
     % Average
     vecData = mean(volData,1);
+%     vecData = volData(:,2*ss);
         
     % Calculate OEF
     vecOEF = vecData./(354.99.*DBVvals(ss));
@@ -83,9 +84,9 @@ xlabel('Simulated OEF (%)');
 if strcmp(vname,'DBV')
     ylabel('Estimated DBV (%)');
     xlim(OEFlims);
-    ylim([0,0.11]);
-    yticks(0:0.02:0.10);
-    yticklabels({'0','2','4','6','8','10'});
+    ylim([0,0.10]);
+    yticks(0.01:0.02:0.09);
+    yticklabels({'1','3','5','7','9'});
     
     plot([0,100],[0.01,0.01],'-','Color',defColour(1),'LineWidth',1);
     plot([0,100],[0.03,0.03],'-','Color',defColour(2),'LineWidth',1);
@@ -96,24 +97,24 @@ elseif strcmp(vname,'OEF')
     ylabel('Estimated OEF (%)');
     axis([OEFlims,0.01*OEFlims]);
     yticklabels({'0','20','40','60','80','100'})
+    plot([0,100],[0,1],'k-','LineWidth',1);
        
 else
     ylabel('Estimated R2'' ');
     axis([OEFlims,R2plims]);
 end
 
-% legend('SDR Model','Diff. Model (unc.)','Diff. Model (\kappa)','Location','NorthWest');
-
 % Plot OEF estimates
-figure; box on; hold on; axis square;
-for ff = 1:length(sets)
-    scatter(100*OEFvals,100*estOEF(ff,:),[],'filled');
+if strcmp(vname,'R2p')
+    figure; box on; hold on; axis square;
+    for ff = 1:length(sets)
+        scatter(100*OEFvals,100*estOEF(ff,:),[],'filled');
+    end
+    plot([0,100],[0,100],'k-','LineWidth',1);
+
+    xlabel('Simulated OEF (%)');
+    ylabel('Estimated OEF (%)');
+    legend('DBV = 1%','DBV = 3%','DBV = 5%','DBV = 7%','DBV = 9%','Location','NorthWest')
+
+    axis([OEFlims,OEFlims]);
 end
-plot([0,100],[0,100],'k-','LineWidth',1);
-
-xlabel('Simulated OEF (%)');
-ylabel('Estimated OEF (%)');
-legend('DBV = 1%','DBV = 3%','DBV = 5%','DBV = 7%','DBV = 9%','Location','NorthWest')
-
-axis([OEFlims,OEFlims]);
-% legend('SDR Model','Diff. Model (unc.)','Diff. Model (\kappa)','Location','NorthWest');

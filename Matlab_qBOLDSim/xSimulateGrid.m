@@ -27,9 +27,12 @@ SEind = 29; % in this case (-24:1:64, SEind=25)
 % DBVvals = 0.009:0.003:0.096;
 
 % 50x50 narrower range
-OEFvals = 0.21:0.01:0.70;
+% OEFvals = 0.21:0.01:0.70;
 % DBVvals = 0.003:0.003:0.15;
-DBVvals = 0.03;
+
+% 100x10 many OEFs range
+OEFvals = 0.01:0.01:1;
+DBVvals = 0.0:0.01:0.09;
 
 % % 4x4 data
 % OEFvals = 0.2:0.2:0.8;
