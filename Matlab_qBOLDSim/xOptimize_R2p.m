@@ -27,7 +27,7 @@ TE = 0.084;
 vsd_name = 'sharan';
 
 % Are we optimizing two parameters at once?
-optim2 = 1;
+optim2 = 0;
 
 % Load data
 %   Dimensions of S0:     DBV, OEF, TIME
@@ -53,7 +53,8 @@ est2 = zeros(nOEF,nDBV);
 options = optimset('MaxFunEvals',400);
 
 % param1.SR = 0.8-(3*TE);
-param1.SR = 0.45;
+param1.SR = 0.44;
+param1.eta = 1880;
 
 % Loop over OEF
 for i1 = 1:nOEF
@@ -70,9 +71,9 @@ for i1 = 1:nOEF
         
         % find the optimum R2' scaling factor
         if optim2
-            X1 = fminsearch(@optimPowerScale,[0.5,0.0],options);        
+            X1 = fminsearch(@optimPowerScale,[1000.0,22.0],options);        
         else
-            X1 = fminbnd(@optimScaling,-1,1);
+            X1 = fminbnd(@optimScaling,0,10);
         end
         
         % Fill in ests matrix
@@ -97,13 +98,13 @@ end
 % plot the results
 plotGrid(ests,100*DBVvals,100*OEFvals,...
           'cmap',inferno,...
-          'cvals',[-1,1],...
+          'cvals',[-10,10],...
           'title','Optimized R2'' Scaling Factor');
       
 if optim2
     plotGrid(est2,100*DBVvals,100*OEFvals,...
           'cmap',inferno,...
-          'cvals',[-0.5,0.5],...
+          'cvals',[-1,1],...
           'title','Optimized R2'' Scaling Factor');
 end
 

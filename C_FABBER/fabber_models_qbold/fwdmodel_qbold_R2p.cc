@@ -607,15 +607,18 @@ void R2primeFwdModel::Evaluate(const ColumnVector &params, ColumnVector &result)
         // calculate tissue signal
         if (tau < -tc)
         {
-            Ss = exp(DBV + (SR*R2p*tau));
+            // Ss = exp(DBV + (SR*R2p*tau));       // SDR model
+            Ss = exp(SR*(DBV + R2p*tau));       // new model
         }
         else if (tau > tc)
         {
-            Ss = exp(DBV - (SR*R2p*tau));
+            // Ss = exp(DBV - (SR*R2p*tau));       // SDR model
+            Ss = exp(SR*(DBV - R2p*tau));       // new model
         }
         else
         {
-            Ss = exp((eta*DBV)-alpha*pow(R2p*tau,2.0)/DBV);
+            // Ss = exp((eta*DBV)-alpha*pow(R2p*tau,2.0)/DBV);         // SDR model
+            Ss = exp(((eta*DBV)-(alpha*pow(R2p,2.0)))*pow(tau,2.0)); // new model
         }
 
         // add T2 effect to tissue compartment

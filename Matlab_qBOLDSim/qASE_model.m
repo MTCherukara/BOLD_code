@@ -99,8 +99,16 @@ if ~isfield(PARAMS,'SR')
     PARAMS.SR = 1;
 end
 
+if ~isfield(PARAMS,'alpha')
+    PARAMS.beta = 22.51;
+end
+
 if ~isfield(PARAMS,'beta')
     PARAMS.beta = 1;
+end
+
+if ~isfield(PARAMS,'eta')
+    PARAMS.eta = 1188;
 end
 
 if ~isfield(PARAMS,'sgeo')
@@ -367,7 +375,9 @@ function ST = calcTissueAsymp(TAU,TE,PARAMS)
     zeta = PARAMS.zeta;
     Voff = PARAMS.Voff;         % the short-tau DBV offset
     sgeo = PARAMS.sgeo;         % the short-tau geometric scaling constant
-    kapp = PARAMS.SR;
+    kappa = PARAMS.SR;
+    eta = PARAMS.eta;
+    alpha = PARAMS.alpha;
 %     BB = 6.263*(1-exp(-3.477*PARAMS.OEF));
 %     R2p = 2.76.*PARAMS.OEF.*exp(-BB.*TE).*PARAMS.R2p;
     R2p = PARAMS.R2p;
@@ -377,7 +387,7 @@ function ST = calcTissueAsymp(TAU,TE,PARAMS)
     if PARAMS.tc_man
         tc = PARAMS.tc_val;
     else
-        tc = kapp*1.7/dw;
+        tc = kappa*1.7/dw;
     end
 
     % pre-allocate
@@ -388,10 +398,13 @@ function ST = calcTissueAsymp(TAU,TE,PARAMS)
 
         if abs(TAU(ii)) < tc
             % short tau regime
-            ST(ii) = exp((Voff*zeta)-(sgeo*(R2p.*TAU(ii)).^2)./zeta);
+%             ST(ii) = exp((Voff*zeta)-(sgeo*(R2p.*TAU(ii)).^2)./zeta);
+
+            % alternative short tau regime
+            ST(ii) = exp(((eta*zeta) - alpha*(R2p.^2)).*(TAU(ii).^2));
         else
             % long tau regime
-            ST(ii) = exp(zeta-(kapp*R2p*abs(TAU(ii))));
+            ST(ii) = exp(kappa*(zeta-(R2p*abs(TAU(ii)))));
         end
     end
     

@@ -17,10 +17,10 @@ close all;
 setFigureDefaults;
 
 % choose datasets
-sets = 495;
+sets = 521:525;
 
 % variable
-vname = 'R2p';
+vname = 'OEF';
 
 
 %% Find directories, and load ground truth data and stuff
