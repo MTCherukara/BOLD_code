@@ -136,7 +136,7 @@ void R2primeFwdModel::Initialize(ArgsType &args)
     SR   = convertTo<double>(args.ReadWithDefault("SR","1.0"));
     beta = convertTo<double>(args.ReadWithDefault("beta","1.0"));
     eta  = convertTo<double>(args.ReadWithDefault("eta","0.0"));
-    alpha= convertTo<double>(args.ReadWithDefault("alpha","0.3"));
+    alpha= convertTo<double>(args.ReadWithDefault("alpha","0.0"));
 
     // check for fixed DBV
     fDBV = convertTo<double>(args.ReadWithDefault("fixDBV","0.03"));
@@ -552,7 +552,7 @@ void R2primeFwdModel::Evaluate(const ColumnVector &params, ColumnVector &result)
     // evaluate blood relaxation rates
     R2b  = ( 4.5 + (16.4*Hct)) + ( ((165.2*Hct) + 55.7)*pow(OEF,2.0) );
     R2bp = (10.2 - ( 1.5*Hct)) + ( ((136.9*Hct) - 13.9)*pow(OEF,2.0) );
-    // R2b = 5.291;    // fixed value (Berman, 2017)
+    
 
     // here are some more constants we will need
     double T1t = 1.20;
@@ -595,9 +595,15 @@ void R2primeFwdModel::Evaluate(const ColumnVector &params, ColumnVector &result)
     // calculate tissue compartment weightings
     lam0 = (ne*me*lam) / ( (nt*mt*(1-lam)) + (ne*me*lam) );
     CBV = nb*mb*(1-lam0)*DBV;
+
+    // for new (12 APR) model
+    double kk =  887.4082*Hct;
+    double Dpr;
     
     // loop through taus
     result.ReSize(taus.Nrows());
+
+    Dpr = ( (eta-(alpha*DBV))*R2p/(887*Hct) ) + DBV;
 
     for (int ii = 1; ii <= taus.Nrows(); ii++)
     {
@@ -607,18 +613,24 @@ void R2primeFwdModel::Evaluate(const ColumnVector &params, ColumnVector &result)
         // calculate tissue signal
         if (tau < -tc)
         {
-            // Ss = exp(DBV + (SR*R2p*tau));       // SDR model
-            Ss = exp(SR*(DBV + R2p*tau));       // new model
+            Ss = exp(SR*(Dpr + (R2p*tau)));        // SDR model
+            // Ss = exp(SR*(DBV + R2p*tau));       // new model
+            // Ss = exp(SR*R2p*((1/kk) + tau));    // even newer model (12 APR)
+            // Ss = exp(SR*R2p*(((1.45-3.8*DBV)/eta) + tau));    // even newer model (12 APR)
         }
         else if (tau > tc)
         {
-            // Ss = exp(DBV - (SR*R2p*tau));       // SDR model
-            Ss = exp(SR*(DBV - R2p*tau));       // new model
+            Ss = exp(SR*(Dpr - (R2p*tau)));        // SDR model
+            // Ss = exp(SR*(DBV - R2p*tau));       // new model
+            // Ss = exp(SR*R2p*((1/kk) - tau));    // even newer model (12 APR)
+            // Ss = exp(SR*R2p*(((1.45-3.8*DBV)/eta) - tau));    // even newer model (12 APR)
         }
         else
         {
-            // Ss = exp((eta*DBV)-alpha*pow(R2p*tau,2.0)/DBV);         // SDR model
-            Ss = exp(((eta*DBV)-(alpha*pow(R2p,2.0)))*pow(tau,2.0)); // new model
+            Ss = exp((0.1*Dpr)-0.3*pow(R2p*tau,2.0)/Dpr);          // SDR model
+            // Ss = exp(((eta*DBV)-(alpha*pow(R2p,2.0)))*pow(tau,2.0)); // new model
+            // Ss = exp( -alpha*kk*SR*R2p*pow(tau,2.0) );                  // even newer model (12 APR)
+            // Ss = exp( -alpha*(eta/(1.45-3.8*DBV))*SR*R2p*pow(tau,2.0) );                  // even newer model (12 APR)
         }
 
         // add T2 effect to tissue compartment
@@ -633,6 +645,7 @@ void R2primeFwdModel::Evaluate(const ColumnVector &params, ColumnVector &result)
             double dChi = (((-0.736 + (0.264*OEF))*Hct) + (0.722*(1-Hct)))*1e-6;
             double G0   = (4/45)*Hct*(1-Hct)*pow((dChi*3.0),2.0);
             double kk   = 0.5*pow(gm,2.0)*G0*pow(td,2.0);
+            R2b = 5.291;    // fixed value (Berman, 2017) 
 
             // motion narrowing model
             Sb = exp(-kk* ( (TE/td) + pow((0.25 + (TE/td)),0.5) + 1.5 - 

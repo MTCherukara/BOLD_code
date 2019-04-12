@@ -100,7 +100,7 @@ if ~isfield(PARAMS,'SR')
 end
 
 if ~isfield(PARAMS,'alpha')
-    PARAMS.beta = 22.51;
+    PARAMS.alpha = 0;
 end
 
 if ~isfield(PARAMS,'beta')
@@ -108,7 +108,7 @@ if ~isfield(PARAMS,'beta')
 end
 
 if ~isfield(PARAMS,'eta')
-    PARAMS.eta = 1188;
+    PARAMS.eta = 0;
 end
 
 if ~isfield(PARAMS,'sgeo')
@@ -392,19 +392,25 @@ function ST = calcTissueAsymp(TAU,TE,PARAMS)
 
     % pre-allocate
     ST = zeros(1,length(TAU)); 
+    
+    Dprime = zeta + ((eta - (alpha*zeta)).*kappa*R2p./355);
 
     % loop through tau values
     for ii = 1:length(TAU)
 
         if abs(TAU(ii)) < tc
             % short tau regime
-%             ST(ii) = exp((Voff*zeta)-(sgeo*(R2p.*TAU(ii)).^2)./zeta);
+            ST(ii) = exp((Voff*Dprime)-(sgeo*(R2p.*TAU(ii)).^2)./(Dprime));
 
-            % alternative short tau regime
-            ST(ii) = exp(((eta*zeta) - alpha*(R2p.^2)).*(TAU(ii).^2));
+%             % alternative short tau regime
+%             ST(ii) = exp(((eta*zeta) - alpha*(R2p.^2)).*(TAU(ii).^2));
+%             ST(ii) = exp(  );
         else
             % long tau regime
-            ST(ii) = exp(kappa*(zeta-(R2p*abs(TAU(ii)))));
+            ST(ii) = exp((kappa*Dprime)-(kappa*R2p*abs(TAU(ii))));
+            
+%             % alternative long tau regime
+%             ST(ii) = exp(kappa*(zeta-(R2p*abs(TAU(ii)))));
         end
     end
     

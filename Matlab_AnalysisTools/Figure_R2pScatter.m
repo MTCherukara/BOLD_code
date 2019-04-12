@@ -13,11 +13,11 @@
 
 
 clear;
-close all;
+% close all;
 setFigureDefaults;
 
 % choose datasets
-sets = 521:525;
+sets = 531:535;
 
 % variable
 vname = 'OEF';
@@ -75,7 +75,9 @@ end % for setnum = ....
 % Plot R2p estimates
 figure; box on; hold on;
 for ff = 1:length(sets)
-    scatter(100*OEFvals,estR2p(ff,:),[],'filled');
+    scaleDBV = (estR2p(ff,:));% ./ (1.0*OEFvals);
+    scatter(100*OEFvals,scaleDBV,[],'filled');
+%     scatter(100*OEFvals,estR2p(ff,:),[],'filled');
 end
 
 legend('DBV = 1%','DBV = 3%','DBV = 5%','DBV = 7%','DBV = 9%','Location','NorthWest')

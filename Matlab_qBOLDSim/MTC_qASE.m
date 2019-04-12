@@ -57,12 +57,12 @@ params = genParams;
 % Scan
 params.TE   = 0.084;        % s         - echo time
 params.TR   = 3;
-params.TI   = 0;
+params.TI   = 1.21;
 
 % Physiology
 params.lam0 = 0.00;         % no units  - ISF/CSF signal contribution
 params.zeta = 0.03;         % no units  - deoxygenated blood volume
-params.OEF  = 0.45;         % no units  - oxygen extraction fraction
+params.OEF  = 0.40;         % no units  - oxygen extraction fraction
 
 params.dF = 5;
 
@@ -74,12 +74,13 @@ params.incT2  = 1;          % BOOL      - should T2 differences be considered?
 params.incIV  = 1;          % BOOL      - should blood compartment be included?
 
 % Scaling
-params.SR   = 0.44;        % no units  - scaling factor for R2'
-params.Voff = 0;
+params.SR   = 1;        % no units  - scaling factor for R2'
+params.Voff = 0.1;
 params.sgeo = 0.3;
 params.beta = 1;
-params.eta  = 1880;
-params.alpha = 0.78;
+params.alpha = 3.8;
+params.eta  = 1.45;
+
 
 % noise
 params.SNR = 100;
@@ -88,8 +89,8 @@ params.SNR = 100;
 %% Compute Model
 
 % define tau values that we want to simulate
-tau = (-16:8:64)/1000; % for testing
-% tau = linspace(-0.028,0.064,1000); % for visualising
+% tau = (-16:8:64)/1000; % for testing
+tau = linspace(-0.028,0.064,1000); % for visualising
 
 
 np = length(tau);
