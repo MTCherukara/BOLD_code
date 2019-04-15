@@ -52,9 +52,8 @@ protected:
 
     // Model parameters
     double SR;      // this is a scaling factor for R2', applied in the asymptotic model
-    double beta;    // this is a power that is applied to OEF*Hct in calculating DW
-    double eta;     // this defines an offset for the short-tau regime
-    double alpha;   // this is the geometric constant for the short-tau regime
+    double Voff;    // this defines an offset for the short-tau regime
+    double eta;     // this scales DBV' by R2'
     double fDBV;    // fixed value of DBV
 
     // Lookup starting indices of parameters

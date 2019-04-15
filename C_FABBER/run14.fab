@@ -30,12 +30,12 @@ include_intra
 
 # correction parameters
 fixDBV=0.09
-SR=0.44
-alpha=3.8
-eta=1.45
+SR=0.47
+#Voff=0.47
+#eta=0.5
 
 precR2p=1e-3
-precDBV=1e0
+precDBV=1e-1
 #precOEF=1e2
 
 # Scan Parameters (maybe I'll think of a better way of doing this...)

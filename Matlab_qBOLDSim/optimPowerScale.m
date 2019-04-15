@@ -6,7 +6,7 @@ function LL = optimPowerScale(xx)
     
     loc_param = param1;
     
-    loc_param.alpha   = xx(1);
+    loc_param.SR  = xx(1);
     loc_param.eta = xx(2);
     
     S_model = qASE_model(tau1,param1.TE,loc_param);

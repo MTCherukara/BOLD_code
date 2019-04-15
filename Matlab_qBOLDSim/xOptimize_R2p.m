@@ -27,11 +27,11 @@ TE = 0.084;
 vsd_name = 'sharan';
 
 % Are we optimizing two parameters at once?
-optim2 = 1;
+optim2 = 0;
 
 % Load data
 %   Dimensions of S0:     DBV, OEF, TIME
-load(['../../Data/vesselsim_data/vs_arrays/TE',num2str(1000*TE),'_vsData_',vsd_name,'_50.mat']);
+load(['../../Data/vesselsim_data/vs_arrays/TE',num2str(1000*TE),'_vsData_',vsd_name,'_100.mat']);
 
 % declare global variables
 global S_dist param1 tau1
@@ -55,8 +55,8 @@ options = optimset('MaxFunEvals',400);
 % param1.SR = 0.8-(3*TE);
 % param1.alpha = 3.8;
 % param1.eta = 1.45;
-param1.SR = 0.44;
-param1.Voff = 0.1;
+param1.SR = 0.47;
+param1.Voff = param1.SR;
 
 %% Do the thing
 
@@ -75,9 +75,9 @@ for i1 = 1:nOEF
         
         % find the optimum R2' scaling factor
         if optim2
-            X1 = fminsearch(@optimPowerScale,[3.8,1.45],options);        
+            X1 = fminsearch(@optimPowerScale,[1,0],options);        
         else
-            X1 = fminbnd(@optimScaling,0,10);
+            X1 = fminbnd(@optimScaling,0.0001,3);
         end
         
         % Fill in ests matrix
@@ -102,13 +102,13 @@ end
 % plot the results
 plotGrid(ests,100*DBVvals,100*OEFvals,...
           'cmap',inferno,...
-          'cvals',[-0,10],...
+          'cvals',[-2,2],...
           'title','Optimized R2'' Scaling Factor');
       
 if optim2
     plotGrid(est2,100*DBVvals,100*OEFvals,...
           'cmap',jet,...
-          'cvals',[-5,5],...
+          'cvals',[-1,1],...
           'title','Optimized R2'' Scaling Factor');
 end
 

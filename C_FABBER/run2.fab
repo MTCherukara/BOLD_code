@@ -11,13 +11,13 @@ save-model-fit
 print-free-energy
 
 # Method Information
-method=spatialvb
+method=vb
 noise=white
 max-iterations=10
 allow-bad-voxels
 
 # Spatial VB Information (remove all of this if method!=spatialvb)
-param-spatial-priors=MMM
+#param-spatial-priors=MMM
 #image-prior4=../../Data/subject_09/CSF_T2fit_new.nii.gz
 
 # Inference Model 
@@ -31,16 +31,14 @@ inferS0
 #motional_narrowing
 include_intra
 
-precR2p=1e-4
+precR2p=1e-3
 precDBV=1e0
 #precCSF=1e-1
 
-# Model Parameters
-#SR=0.808
-#beta=1.2
-eta=1.45
-alpha=3.8
-
+# Correction Parameters
+SR=0.47
+Voff=0.47
+eta=0.2
 
 # Scan Parameters (maybe I'll think of a better way of doing this...)
 TE=0.082

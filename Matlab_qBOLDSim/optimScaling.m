@@ -6,7 +6,7 @@ function LL = optimScaling(xx)
     
     loc_param = param1;
     
-    loc_param.alpha = xx(1);
+    loc_param.eta = xx(1);
     
     S_model = qASE_model(tau1,param1.TE,loc_param);
     S_model = S_model./max(S_model);

@@ -74,12 +74,12 @@ params.incT2  = 1;          % BOOL      - should T2 differences be considered?
 params.incIV  = 1;          % BOOL      - should blood compartment be included?
 
 % Scaling
-params.SR   = 1;        % no units  - scaling factor for R2'
-params.Voff = 0.1;
-params.sgeo = 0.3;
-params.beta = 1;
-params.alpha = 3.8;
-params.eta  = 1.45;
+params.SR   = 0.47;        % no units  - scaling factor for R2'
+params.Voff = 0.47;
+% params.sgeo = 0.3;
+% params.beta = 1;
+% params.alpha = 0;
+params.eta  = 0.05;
 
 
 % noise
@@ -115,7 +115,7 @@ params.sig = min(S_sample)/params.SNR;
 if plot_fig
     
     % create a figure
-    figure(1); hold on; box on;
+    figure(1); hold on; box on; 
     
     % plot the signal
     S_log = log(S_total);

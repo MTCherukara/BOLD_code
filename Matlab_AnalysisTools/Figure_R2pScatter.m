@@ -17,10 +17,10 @@ clear;
 setFigureDefaults;
 
 % choose datasets
-sets = 531:535;
+sets = [526:530];
 
 % variable
-vname = 'OEF';
+vname = 'DBV';
 
 
 %% Find directories, and load ground truth data and stuff
@@ -75,6 +75,9 @@ end % for setnum = ....
 % Plot R2p estimates
 figure; box on; hold on;
 for ff = 1:length(sets)
+    
+    R2p = 355.*OEFvals.*DBVvals(ff);
+    
     scaleDBV = (estR2p(ff,:));% ./ (1.0*OEFvals);
     scatter(100*OEFvals,scaleDBV,[],'filled');
 %     scatter(100*OEFvals,estR2p(ff,:),[],'filled');
@@ -105,6 +108,8 @@ else
     ylabel('Estimated R2'' ');
     axis([OEFlims,R2plims]);
 end
+
+axis square;
 
 % Plot OEF estimates
 if strcmp(vname,'R2p')
