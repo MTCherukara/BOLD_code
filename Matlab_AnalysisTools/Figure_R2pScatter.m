@@ -17,10 +17,10 @@ clear;
 setFigureDefaults;
 
 % choose datasets
-sets = [526:530];
+sets = [536:540]+5;
 
 % variable
-vname = 'DBV';
+vname = 'OEF';
 
 
 %% Find directories, and load ground truth data and stuff
@@ -36,7 +36,7 @@ OEFvals = linspace(0.01,1,no);
 DBVvals = 0.01:0.02:0.09;
 
 % Axis limits
-R2plims = [0,8.5];
+R2plims = [0,17.5];
 OEFlims = [0,100*max(OEFvals)];
 
 % Pre-allocate
@@ -76,7 +76,7 @@ end % for setnum = ....
 figure; box on; hold on;
 for ff = 1:length(sets)
     
-    R2p = 355.*OEFvals.*DBVvals(ff);
+%     R2p = 355.*OEFvals.*DBVvals(ff);
     
     scaleDBV = (estR2p(ff,:));% ./ (1.0*OEFvals);
     scatter(100*OEFvals,scaleDBV,[],'filled');

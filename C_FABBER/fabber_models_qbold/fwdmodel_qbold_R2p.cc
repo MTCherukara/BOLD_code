@@ -537,7 +537,8 @@ void R2primeFwdModel::Evaluate(const ColumnVector &params, ColumnVector &result)
     }
 
     // calculate tc and threshold it if necessary
-    tc = 1.7/dw;
+    //tc = 1.7/dw;
+    tc = 0.010;
     /*
     if (tc > 0.03)
     {
