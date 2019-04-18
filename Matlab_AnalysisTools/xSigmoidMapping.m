@@ -17,7 +17,7 @@ close all;
 setFigureDefaults;
 
 % choose first dataset (assuming there are 5 after it)
-set1 = 521;
+set1 = 526;
 
 % define the five datasets we want
 sets = set1:set1+4;
@@ -27,14 +27,12 @@ sets = set1:set1+4;
 % Data directory
 resdir = '/Users/mattcher/Documents/DPhil/Data/Fabber_ModelFits/';
 
-% number of OEF points
-no = 100;
-
 % Ground truth
 % OEFvals = linspace(0.21,0.70,no);
-OEFvals = linspace(0.01,1,no);
+OEFvals = 0.01:0.01:1;
 DBVvals = 0.01:0.02:0.09;
 
+no = length(OEFvals);
 
 % Pre-allocate
 estR2p = zeros(length(sets),no);
@@ -61,12 +59,14 @@ for ss = 1:length(sets)
     vecOEF = vecR./vecV;
     
     % Store Results
-    estR2p(ss,:) = vecR;
-    estDBV(ss,:) = vecV;
-    estOEF(ss,:) = vecOEF;
+    estR2p(ss,:) = vecR(1:no);
+    estDBV(ss,:) = vecV(1:no);
+    estOEF(ss,:) = vecOEF(1:no);
    
 end % for setnum = ....
    
+sname = strcat('Fabber_Results_',num2str(set1),'.mat');
+save(sname,'estR2p','estDBV');
 
 
 %% Plotting
@@ -82,13 +82,16 @@ end % for setnum = ....
 % xlabel('Simulated OEF (%)');
 % xlim([0,100]);
 
+yy = 11*tan(0.0066.*estOEF);
+
 % Plot the other way around
 figure; box on; hold on; axis square;
 for ff = 1:length(sets)   
     scatter(estOEF(ff,:),100*OEFvals,[],'filled');
+%     plot(estOEF(ff,:),yy(ff,:),'--','Color',defColour(ff));
 end
 
 legend('DBV = 1%','DBV = 3%','DBV = 5%','DBV = 7%','DBV = 9%','Location','NorthWest')
 xlabel('Ratio R2'' / DBV');
 ylabel('Simulated OEF (%)');
-ylim([0,100]);
+ylim([0,100*max(OEFvals)]);
