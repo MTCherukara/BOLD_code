@@ -7,12 +7,12 @@
 
 clear;
 
-start_tau = -16;
+start_tau = -24;
 delta_tau = 8;
-end_tau = 64;
+end_tau = 80;
 
 % manually specify input name
-nii_name = '/Users/mattcher/Documents/DPhil/Data/qboldsim_data/ASE_Grid_Sharan_100x100_DBV_1_Taus_8_SNR_500.nii.gz';
+nii_name = '/Users/mattcher/Documents/DPhil/Data/qboldsim_data/ASE_Grid_Sharan_50x50_TE_100_Taus_14_SNR_500.nii.gz';
 
 if ~exist('nii_name','var')
     [dfile,ddir] = uigetfile('*.nii.gz','Choose Data File');
@@ -36,8 +36,8 @@ k = 0.03; % conversion factor Hct (% rbc's in blood) to Hb (iron-containing mole
 
 % X
 % Convert tau to seconds
-% tau = (start_tau:delta_tau:end_tau).*10^-3;
-tau = [0,16:8:64]./1000;
+tau = (start_tau:delta_tau:end_tau).*10^-3;
+% tau = [0,16:8:64]./1000;
 
 % Check that tau matches the number of volumes 
 
