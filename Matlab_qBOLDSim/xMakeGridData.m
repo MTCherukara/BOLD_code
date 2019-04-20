@@ -13,11 +13,14 @@ clear;
 
 %% Specify what we want
 SNR = 500;
-% tau = (-16:8:64)./1000;
-tau = [0,16:8:64]./1000;
+tau = (-16:8:64)./1000;
+% tau = [0,16:8:64]./1000;
 
 % figure out SEind
 SEind = find(tau == 0);
+
+Dind = 10; % which DBV index we want
+
 
 
 %% Load in the big grid
@@ -50,7 +53,6 @@ ase_model = zeros(nDBV,nOEF,1,nt);
 ase_model(:,:,1,:) = gridAll(:,:,Tind);
 
 % % For pulling out random specific DBV values
-Dind = 10; % which DBV index we want
 ase_model = repmat(ase_model(Dind,:,:,:),100,1,1,1);
 
 

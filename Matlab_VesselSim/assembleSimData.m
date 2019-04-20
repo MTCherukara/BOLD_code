@@ -20,8 +20,8 @@ distname = 'sharan';
 plot_figure = 1;
 
 % Fixed Parameters
-TE  = 0.084;
-tau = (-16:8:64)./1000;    % For TE = 72ms or 108ms or 84 ms
+TE  = 0.048;
+tau = (0:4:40)./1000;    % For TE = 72ms or 108ms or 84 ms
 % tau = (-12:4:32)./1000;      % For TE = 36ms
 
 % Vessel Distribution
