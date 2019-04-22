@@ -42,7 +42,7 @@ save_data = 1;  % set this to 1 to save storedPhase data out, or 0 not to
 % 0.0100    0.0167    0.0233    0.0300    0.0367    0.0433    0.0500    0.0567    0.0633    0.0700
 
 % Fixed Parameters
-p.D     = 1e-9;     % m^2/s - Rate of diffusion
+p.D     = 0e-9;     % m^2/s - Rate of diffusion
 p.B0    = 3;        % T     - Static magnetic field
 p.TE    = 60e-3;    % s     - Echo time
 p.dt    = 200e-6;   % s     - Time between steps (0.2ms) - leads to having 10 points per T
@@ -54,10 +54,13 @@ p.deltaChi0 = 0.264e-6;     % Susceptibility difference
 p.universeScale = 50;      % Defines size of universe
 p.solidWalls = 0;
 
+% Sharan Radii
+%       2.8    7.5   15.0   22.5   45.0   90.0
+
 % Varied Parameters
-p.R = [7.5,15.0].*1e-6;               % m     - Vessel radius
-p.Y = [0.6,0.6];                  % -     - (1-OEF)
-p.V = [0.15,0.15];                 % -     - Volume
+p.R = 90.*1e-6;               % m     - Vessel radius
+p.Y = 0.6;                  % -     - (1-OEF)
+p.V = 0.03;                 % -     - Volume
 
 
 % Derived parameters

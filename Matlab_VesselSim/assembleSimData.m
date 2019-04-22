@@ -20,8 +20,8 @@ distname = 'sharan';
 plot_figure = 1;
 
 % Fixed Parameters
-TE  = 0.048;
-tau = (0:4:40)./1000;    % For TE = 72ms or 108ms or 84 ms
+TE  = 0.084;
+tau = (-24:4:68)./1000;    % For TE = 72ms or 108ms or 84 ms
 % tau = (-12:4:32)./1000;      % For TE = 36ms
 
 % Vessel Distribution
@@ -48,8 +48,8 @@ end
 % Array sizes
 nr = length(RR);    % number of different vessel radii
 nt = length(tau);   % number of tau values
-nd = 10;            % number of DBV values  
-no = 100;            % number of OEF values
+nd = 50;            % number of DBV values  
+no = 50;            % number of OEF values
 
 % Preallocate arrays
 %       Dimensions: TIME, DBV, OEF, RADIUS
@@ -65,7 +65,7 @@ for i1 = 1:nr
     vrad = RR(i1);
     
     % Load data
-    load([simdir,'vs_arrays/vsArray',num2str(nd),'_',distname,...
+    load([simdir,'vs_arrays/vsArrayND',num2str(nd),'_',distname,...
                  '_TE_',num2str(1000*TE),'_R_',num2str(vrad),'.mat']);
 %     load([simdir,'vs_arrays/vsArray',num2str(np),'_',distname,...
 %                  '_R_',num2str(vrad),'.mat']);
@@ -111,7 +111,7 @@ end % OEF loop
 
 
 %% Save Data
-sname = strcat(simdir,'vs_arrays/TE',num2str(1000*TE),'_vsData_',distname,'_',num2str(nd),'.mat');
+sname = strcat(simdir,'vs_arrays/TE',num2str(1000*TE),'_NDvsData_',distname,'_',num2str(nd),'.mat');
 save(sname,'S0','S_ev','S_iv','tau','TE','OEFvals','DBVvals');
     
 
