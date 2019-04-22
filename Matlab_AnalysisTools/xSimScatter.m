@@ -28,13 +28,13 @@ thrS = [  5.0,   2.0,  50  ];     % threshold of standard deviations
 % vars = {'OEF'};
 
 % choose dataset
-for setnum = 493:497
+for setnum = 463
     
 % Do we have STD data?
 do_std = 0;
 
 % Do we want a figure?
-plot_fig = 0;
+plot_fig = 1;
 
 
 %% Find directories, and load ground truth data and stuff
