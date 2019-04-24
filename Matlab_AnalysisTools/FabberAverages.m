@@ -32,7 +32,7 @@ clear;
 vars = {'R2p','DBV','OEF'};
 
 % Choose Data set
-for setnum = 521:525
+for setnum = 546:555
     
 vecRes = zeros(4*length(vars),1);
 
@@ -81,7 +81,7 @@ switch setname
     case 'CSF'
         
         slicenum = 3:8;
-        maskname = 'mask_new_gm_50.nii.gz';
+        maskname = 'mask_new_gm_80.nii.gz';
         CC = strsplit(fabdir,'_s');     % need a 2-digit subject number
         subnum = CC{2}(1:2);
         maskdir = ['/Users/mattcher/Documents/DPhil/Data/subject_',subnum,'/'];

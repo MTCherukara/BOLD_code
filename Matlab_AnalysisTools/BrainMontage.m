@@ -17,7 +17,7 @@
 clear;
 setFigureDefaults;
 
-slices = 4;
+% slices = 4;
 
 % SQ-LS    SQ-VB   1C-VBS  1C-VBTC 1C-VBI  1C-VB-TCI  2C-VB   2C-VBI  2C-VB-TC  2C-VB-TCI
 % '101'  , '250' , '330' , '264' , '257' , '316'    , '201' , '236' , '281'   , '309' ;...   % subject vs1
@@ -47,7 +47,7 @@ elseif strfind(lower(niname),'r2p')
     threshold = 50;
     cmp = viridis;
 elseif strfind(lower(niname),'oef')
-    threshold = 1.0;
+    threshold = 0.75;
     cmp = parula;
 elseif strfind(lower(niname),'df')
     threshold = 15;
@@ -121,6 +121,9 @@ else
     ncols = ns;
 end
 
+nrows = 1;
+ncols = ns;
+
 % pre-allocate matrix
 montage_image = zeros(nrows*sv(2),ncols*sv(1));
 
@@ -155,12 +158,12 @@ cmp(1,:) = [0,0,0];
 figure; hold on;
 imagesc(montage_image,[0,threshold]);
 colormap(cmp);
-axis equal
+
 
 % colorbar;
 set(gca,'Visible','off')
 set(gca,'LooseInset',get(gca,'TightInset'));
-
+axis equal
 
 %% Special display for Grid Search figures
 
@@ -178,3 +181,5 @@ set(gca,'LooseInset',get(gca,'TightInset'));
 % ylabel('OEF (%)');
 % xlabel('DBV (%)');
 % yticks([25,35,45,55,65]);
+
+% For a 2x3 grid, plot 30 lines high, and up to this point: %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

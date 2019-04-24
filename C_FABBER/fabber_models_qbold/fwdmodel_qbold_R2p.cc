@@ -39,7 +39,7 @@ string R2primeFwdModel::GetDescription() const
 
 string R2primeFwdModel::ModelVersion() const
 {
-    return "1.7";
+    return "1.8 (2019-04-23)";
 } // ModelVersion
 
 
@@ -84,8 +84,8 @@ void R2primeFwdModel::Initialize(ArgsType &args)
     string TE_temp; 
 
     // allow for manual entry of prior precisions
-    prec_R2p = convertTo<double>(args.ReadWithDefault("precR2p","1e-2"));
-    prec_DBV = convertTo<double>(args.ReadWithDefault("precDBV","1e0"));
+    prec_R2p = convertTo<double>(args.ReadWithDefault("precR2p","1e-3"));
+    prec_DBV = convertTo<double>(args.ReadWithDefault("precDBV","1e-1"));
     prec_CSF = convertTo<double>(args.ReadWithDefault("precCSF","1e-1"));
     prec_OEF = convertTo<double>(args.ReadWithDefault("precOEF","1e-1"));
 
@@ -268,13 +268,13 @@ void R2primeFwdModel::HardcodedInitialDists(MVNDist &prior, MVNDist &posterior) 
     
     if (infer_R2p)
     {
-        prior.means(R2p_index()) = 2.6;
+        prior.means(R2p_index()) = 4.0;
         precisions(R2p_index(), R2p_index()) = prec_R2p;
     }
 
     if (infer_DBV)
     {
-        prior.means(DBV_index()) = 0.036; // 0.036
+        prior.means(DBV_index()) = 0.05; // 0.036
         precisions(DBV_index(), DBV_index()) = prec_DBV;
     }
 

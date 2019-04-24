@@ -1,8 +1,8 @@
 # fabber run 14 - SDR simulation testing
 
 # Input Data
-data=../../Data/qboldsim_data/ASE_Grid_Sharan_100x100_DBV_9_Taus_8_SNR_500.nii.gz
-mask=../../Data/qboldsim_data/Grid_100x100_mask.nii.gz
+data=../../Data/qboldsim_data/ASE_Grid_Sharan_50x50_Taus_11_SNR_500.nii.gz
+mask=../../Data/qboldsim_data/Grid_50x50_mask.nii.gz
 
 # Run Options
 output=../../Data/Fabber_ModelFits/
@@ -45,27 +45,27 @@ TI=0.0
 #TI=1.210
 
 # set with 11 taus
-#tau1=0.016
-#tau2=0.008
-#tau3=0.0
-#tau4=0.008
-#tau5=0.016
-#tau6=0.024
-#tau7=0.032
-#tau8=0.040
-#tau9=0.048
-#tau10=0.056
-#tau11=0.064
+tau1=0.016
+tau2=0.008
+tau3=0.0
+tau4=0.008
+tau5=0.016
+tau6=0.024
+tau7=0.032
+tau8=0.040
+tau9=0.048
+tau10=0.056
+tau11=0.064
 
 # set with 8 taus (L model)
-tau1=0.0
-tau2=0.016
-tau3=0.024
-tau4=0.032
-tau5=0.040
-tau6=0.048
-tau7=0.056
-tau8=0.064
+#tau1=0.0
+#tau2=0.016
+#tau3=0.024
+#tau4=0.032
+#tau5=0.040
+#tau6=0.048
+#tau7=0.056
+#tau8=0.064
 
 # set with 7 taus (longer 0:10:60)
 #tau1=0.0

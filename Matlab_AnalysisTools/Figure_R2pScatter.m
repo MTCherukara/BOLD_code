@@ -17,10 +17,10 @@ clear;
 setFigureDefaults;
 
 % choose datasets
-sets = [536:540]+5;
+sets = [536:540]+25;
 
 % variable
-vname = 'OEF';
+vname = 'DBV';
 
 
 %% Find directories, and load ground truth data and stuff

@@ -39,7 +39,7 @@ string sqBOLDFwdModel::GetDescription() const
 
 string sqBOLDFwdModel::ModelVersion() const
 {
-    return "1.1 (2019-02-11)";
+    return "1.2 (2019-04-23)";
 } // ModelVersion
 
 
@@ -48,6 +48,11 @@ string sqBOLDFwdModel::ModelVersion() const
 // ------------------------------------------------------------------------------------------
 void sqBOLDFwdModel::Initialize(ArgsType &args)
 {
+    // read some additional arguments
+    prec_R2p = convertTo<double>(args.ReadWithDefault("precR2p","1e-3"));
+    prec_DBV = convertTo<double>(args.ReadWithDefault("precDBV","1e-1"));
+
+    SR = convertTo<double>(args.ReadWithDefault("SR","1.0"));
 
     // temporary holders for input values
     string tau_temp;
@@ -106,13 +111,13 @@ void sqBOLDFwdModel::HardcodedInitialDists(MVNDist &prior, MVNDist &posterior) c
     SymmetricMatrix precisions = IdentityMatrix(NumParams()) * 1e-3;
 
     prior.means(R2p_index()) = 4.0;
-    precisions(R2p_index(), R2p_index()) = 1e-4; // 1e-3 or 1e0
+    precisions(R2p_index(), R2p_index()) = prec_R2p; // 1e-3 or 1e0
     
     prior.means(DBV_index()) = 0.05;
-    precisions(DBV_index(), DBV_index()) = 1e-1; // 1e0 or 1e3
+    precisions(DBV_index(), DBV_index()) = prec_DBV; // 1e0 or 1e3
     
     prior.means(S0_index()) = 100.0;
-    precisions(S0_index(), S0_index()) = 1e-5; // 1e-5
+    precisions(S0_index(), S0_index()) = 1e-6; // 1e-5
 
     prior.SetPrecisions(precisions);
 
@@ -146,6 +151,16 @@ void sqBOLDFwdModel::Evaluate(const ColumnVector &params, ColumnVector &result) 
     DBV = (paramcpy(DBV_index()));
     S0 = (paramcpy(S0_index()));
 
+    // threshold DBV
+    if (DBV < 0.0001)
+    {
+        DBV = 0.0001;
+    }
+    else if (DBV > 0.5)
+    {
+        DBV = 0.5;
+    }
+
     // loop through taus (not the first one)
     result.ReSize(taus.Nrows());
 
@@ -156,7 +171,7 @@ void sqBOLDFwdModel::Evaluate(const ColumnVector &params, ColumnVector &result) 
         double tau = taus(ii);
         
         // evaluate linear exponential
-        result(ii) = S0*exp(DBV-(R2p*tau));
+        result(ii) = S0*exp(DBV-(SR*R2p*tau));
 
     }
 

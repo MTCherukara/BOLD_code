@@ -16,7 +16,7 @@
 %       data in upfront, in order to generate a mask of "bad values" to remove.
 
 clear;
-close all;
+% close all;
 % setFigureDefaults;
 
 % clc;
@@ -28,13 +28,13 @@ thrS = [  5.0,   2.0,  50  ];     % threshold of standard deviations
 % vars = {'OEF'};
 
 % choose dataset
-for setnum = 463
+for setnum = 498
     
 % Do we have STD data?
 do_std = 0;
 
 % Do we want a figure?
-plot_fig = 1;
+plot_fig = 0;
 
 
 %% Find directories, and load ground truth data and stuff
@@ -79,7 +79,7 @@ for vv = 1:length(vars)
     
     % OPTIONALLY scale OEF
     if strcmp(vname,'OEF')
-%         volData = volData*0.44;
+%         volData = volData*0.47;
     end
       
     % take the absolute value and store it 
@@ -106,11 +106,11 @@ end % for vv = 1:length(vars)
 % Define bad voxels
 vecThres = vecBad > 0.5;
 
-% Remove bad voxels
-matAll(vecThres,:) = [];
-matStd(vecThres,:) = [];
-matGnd(vecThres,:) = [];
-matScl(vecThres,:) = [];
+% % Remove bad voxels
+% matAll(vecThres,:) = [];
+% matStd(vecThres,:) = [];
+% matGnd(vecThres,:) = [];
+% matScl(vecThres,:) = [];
 
 
 %% Now loop through the variables again and display the results
@@ -208,6 +208,36 @@ end % for vv = 1:length(vars)
 % Display the whole results row entry
 disp(num2str(vecRes(:)'));
 
+
+% pull out estimates from the matrix
+matR2p = reshape(matAll(:,3),50,50);
+matOEF = reshape(matAll(:,1),50,50);
+
+OEFvals = 0.21:0.01:0.70;
+DBVvals = 0.003:0.003:0.15;
+
+% calculate errors
+errR2p = matR2p - volR2p;
+errOEF = matOEF - volOEF;
+
+% % Plot R2' error
+% R_err = plotGrid(errR2p,100*DBVvals,100*OEFvals,...
+%                  'cvals',[-15,15],...
+%                  'title','Error in R2''');
+            
+             
+% Plot OEF error
+O_err = plotGrid((100*errOEF),100*DBVvals,100*OEFvals,...
+                 'cvals',[-50,50],...
+                 'title','Error in OEF');
+             
+% axes
+xlim([1,10]);
+ylim([21,60]);
+xlabel('True DBV (%)');
+ylabel('True OEF (%)');
+
+
 end % for setnum = ....
     
 % % Also do Free Energy
@@ -219,3 +249,7 @@ end % for setnum = ....
 % disp(' ');
 % disp(['Free Energy (Mean)  : ',num2str(-mean(vecFE),3)]);
 % disp(['Free Energy (Median): ',num2str(-median(vecFE),3)]);
+
+
+%% Plot R2' and OEF error on surfaces
+

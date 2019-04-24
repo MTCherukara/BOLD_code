@@ -38,6 +38,13 @@ protected:
     // Scan Parameters
     NEWMAT::ColumnVector taus;
 
+    // Bayesian inference parameters
+    double prec_R2p;
+    double prec_DBV;
+
+    // Model parameters
+    double SR;      // this is a scaling factor for R2', applied in the asymptotic model
+
     // Lookup starting indices of parameters
     int R2p_index() const
     {

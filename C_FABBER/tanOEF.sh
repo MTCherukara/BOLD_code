@@ -9,8 +9,8 @@
 # Matthew Cherukara, 22 April 2019
 
 # directory of results
-rdir=~/Documents/DPhil/Data/Fabber_Results
-#rdir=~/Documents/DPhil/Data/Fabber_ModelFits
+#rdir=~/Documents/DPhil/Data/Fabber_Results
+rdir=~/Documents/DPhil/Data/Fabber_ModelFits
 
 # find the name of the directory that has the specified number, if no input is specified, use the
 # default-created directory "+" 
@@ -28,8 +28,8 @@ if [[ -d "${rdir}/${dname}" ]] ; then
     fslmaths ${rdir}/${dname}/mean_DBV.nii.gz -sub 1 -uthr 0 -add 0.999 -thr 0 -add 0.001 temp_DBV.nii.gz
 
     # compute OEF
-    fslmaths ${rdir}/${dname}/mean_R2p.nii.gz -mul 0.0138 -div temp_DBV.nii.gz \
-            -tan -mul 0.106 ${rdir}/${dname}/mean_OEF.nii.gz
+    fslmaths ${rdir}/${dname}/mean_R2p.nii.gz -mul 0.012 -div temp_DBV.nii.gz \
+            -tan -mul 0.25 ${rdir}/${dname}/mean_OEF.nii.gz
     
     # now generate a standard deviation map for OEF too, first by splitting up the MVN file
     #fslsplit ${rdir}/${dname}/finalMVN temp_MVN_ -t 
