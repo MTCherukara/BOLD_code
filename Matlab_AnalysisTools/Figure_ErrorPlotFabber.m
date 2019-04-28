@@ -14,7 +14,7 @@ clear;
 setFigureDefaults;
 
 % Choose FABBER dataset
-setnum = 479;
+setnum = 428;
 
 % Choose what we want to plot
 plot_gnd = 0;

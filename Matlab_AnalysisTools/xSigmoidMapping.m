@@ -20,9 +20,9 @@ plot_orig = 0;      % for plotting the tan shape
 plot_rand = 1;      % for random plots
 
 % choose first dataset (assuming there are 5 after it)
-set1 = 516;
+set1 = 521;
 
-kappa = 1;
+kappa = .47;
 
 % define the five datasets we want
 sets = set1:set1+4;
@@ -82,7 +82,7 @@ end % for setnum = ....
 % Plot the other way around
 if plot_orig
 
-    figure; box on; hold on; axis square;
+    figure; box on; hold on; axis square; grid on;
     for ff = 1:length(sets)   
         scatter(estOEF(ff,:),100*OEFvals,[],'filled');
     %     plot(estOEF(ff,:),yy(ff,:),'--','Color',defColour(ff));
@@ -106,7 +106,7 @@ if plot_rand
     trueR2p = 355.*trueOEF.*trueDBV;
     mR = 0.6*max(trueR2p(:));
 
-    figure; box on; hold on; axis square;
+    figure; box on; hold on; axis square; grid on;
     for ff = 1:nd
         scatter(trueR2p(ff,evns),estR2p(ff,evns),[],'filled');
     end
@@ -122,7 +122,7 @@ if plot_rand
 
     %% Plotting original OEF estimates
 
-    figure; box on; hold on; axis square;
+    figure; box on; hold on; axis square; grid on;
     for ff = 1:nd
         scatter(trueOEF(ff,:),kappa*estOEF(ff,:)./355,[],'filled');
     end
@@ -145,13 +145,13 @@ if plot_rand
     % modOEF = 0.106.*tan(0.0138*estR2p./estDBV);
 
     % 2C model
-    modOEF = 0.212.*tan(0.0125*estR2p./estDBV);
+%     modOEF = 0.212.*tan(0.0125*estR2p./estDBV);
     
     % Kappa 2C
-%     modOEF = 0.145.*tan(0.00477*estR2p./estDBV);
+    modOEF = 0.145.*tan(0.00477*estR2p./estDBV);
 
 
-    figure; box on; hold on; axis square;
+    figure; box on; hold on; axis square; grid on;
     for ff = 1:nd
         scatter(trueOEF(ff,:),modOEF(ff,:),[],'filled');
     end

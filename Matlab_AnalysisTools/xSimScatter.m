@@ -17,7 +17,7 @@
 
 clear;
 % close all;
-% setFigureDefaults;
+setFigureDefaults;
 
 % clc;
 
@@ -27,14 +27,19 @@ thrA = [  5.0,   2.0,  50  ];     % threshold of actual values
 thrS = [  5.0,   2.0,  50  ];     % threshold of standard deviations
 % vars = {'OEF'};
 
+kappa = 1;
+
+% dHb = 0.0361 * R2p;
+
 % choose dataset
-for setnum = 498
+for setnum = 428
     
 % Do we have STD data?
 do_std = 0;
 
 % Do we want a figure?
 plot_fig = 0;
+plot_grid = 1;
 
 
 %% Find directories, and load ground truth data and stuff
@@ -56,8 +61,14 @@ volOEF = LoadSlice([gnddir,'True_Grid_50x50_OEF.nii.gz'],1);
 volDBV = LoadSlice([gnddir,'True_Grid_50x50_DBV.nii.gz'],1);
 volR2p = LoadSlice([gnddir,'True_Grid_50x50_R2p.nii.gz'],1);
 
+% % we actually only want to go up to 10% DBV, not 15%, and we want to halve the
+% % number of OEF points we have
+% volOEF = volOEF(2:1:50,1:34);
+% volDBV = volDBV(2:1:50,1:34);
+% volR2p = volR2p(2:1:50,1:34);
+
 matGnd = [volOEF(:),volDBV(:),volR2p(:)];
-matScl = [volDBV(:),volOEF(:),volDBV(:)];
+matScl = [volDBV(:),volOEF(:),volR2p(:)];
 
 
 %% Loop through and load the actual data
@@ -76,10 +87,11 @@ for vv = 1:length(vars)
     
     % Load the data
     volData = LoadSlice([fabdir,'mean_',vname,'.nii.gz'],1);
+%     volData = volData(2:1:50,1:34);
     
     % OPTIONALLY scale OEF
     if strcmp(vname,'OEF')
-%         volData = volData*0.47;
+        volData = volData*kappa;
     end
       
     % take the absolute value and store it 
@@ -91,6 +103,7 @@ for vv = 1:length(vars)
     % load and store standard deviation data
     if do_std
         volStd = LoadSlice([fabdir,'std_',vname,'.nii.gz'],1);
+%         volStd = volStd(2:1:50,1:34);
         matStd(:,vv) = volStd(:);
         
         % add to threshold mask
@@ -135,6 +148,11 @@ for vv = 1:length(vars)
     if strcmp(vname,'DBV') || strcmp(vname,'OEF')
         vecData = vecData.*100;
         vecGnd = vecGnd.*100;
+    elseif strcmp(vname,'R2p')
+        % Converting R2' to dHb
+        vecData = vecData.*0.0361*0.8;
+        vecGnd = vecGnd.*0.0361;
+        vecScl = vecScl.*0.0361;
     end
     
     % Limits, for plotting
@@ -160,21 +178,27 @@ for vv = 1:length(vars)
     diffs = vecGnd - vecData;
 %     RMSE(vv) = sqrt(mean(diffs.^2));
     RMSE(vv) = mean(abs(vecGnd - vecData));
-    RELE(vv) = 100*mean(abs(vecGnd - vecData)./vecGnd);
+    RELE(vv) = 100*mean(abs(vecGnd - vecData)./abs(vecGnd));
     
     if do_std
         wdiff = diffs.*nm_std;
         WMSE(vv) = sqrt(mean(wdiff.^2));
     end
     
+    if strcmp(vname,'R2p')
+        vlabel = 'dHb content (ml/100g)';
+    else
+        vlabel = strcat(vname,' (%)');
+    end
+    
     % Plot a figure;
     if plot_fig
-        figure; hold on; box on;
-        plot([minV,maxV],[minV,maxV],'Color',defColour(2));
+        figure; hold on; box on; grid on; axis square;
+        plot([0,maxV],[0,maxV],'-k');
         colormap(parula);
         scatter(vecGnd,vecData,[],shades,'filled');
-        xlabel(['Simulated ',vname,' (%)']);
-        ylabel(['Estimated ',vname,' (%)']);
+        xlabel(['True ',vlabel]);
+        ylabel(['Estimated ',vlabel]);
         axis([minV,maxV,minV,maxV]);    % always go from 0% to 100% in the figure
         if strcmp(vname,'OEF')
             axis([minV,maxV,0,100]);
@@ -205,38 +229,43 @@ end % for vv = 1:length(vars)
 % disp(' ');
 % disp(['(Excluded ',num2str(sum(vecThres)),' of 2500 data points)']);
 
-% Display the whole results row entry
-disp(num2str(vecRes(:)'));
+
+if plot_grid
+    % Display the whole results row entry
+    disp(num2str(vecRes(:)'));
 
 
-% pull out estimates from the matrix
-matR2p = reshape(matAll(:,3),50,50);
-matOEF = reshape(matAll(:,1),50,50);
+    % pull out estimates from the matrix
+    matR2p = reshape(matAll(:,3),50,50);
+    matOEF = reshape(matAll(:,1),50,50);
 
-OEFvals = 0.21:0.01:0.70;
-DBVvals = 0.003:0.003:0.15;
+    OEFvals = 0.21:0.01:0.70;
+    DBVvals = 0.003:0.003:0.15;
 
-% calculate errors
-errR2p = matR2p - volR2p;
-errOEF = matOEF - volOEF;
+    % calculate errors
+    errR2p = matR2p - volR2p;
+    errOEF = matOEF - volOEF;
+    
+    % convert R2' to dHb
+    errR2p = 0.0361*errR2p;
 
-% % Plot R2' error
-% R_err = plotGrid(errR2p,100*DBVvals,100*OEFvals,...
-%                  'cvals',[-15,15],...
-%                  'title','Error in R2''');
-            
-             
-% Plot OEF error
-O_err = plotGrid((100*errOEF),100*DBVvals,100*OEFvals,...
-                 'cvals',[-50,50],...
-                 'title','Error in OEF');
-             
-% axes
-xlim([1,10]);
-ylim([21,60]);
-xlabel('True DBV (%)');
-ylabel('True OEF (%)');
+%     % Plot R2' error
+    R_err = plotGrid(errR2p,100*DBVvals,100*OEFvals,...
+                     'cvals',[-0.5,0.5],...
+                     'title','Error in R2''');
 
+
+    % Plot OEF error
+%     O_err = plotGrid((100*errOEF),100*DBVvals,100*OEFvals,...
+%                      'cvals',[-50,50],...
+%                      'title','Error in OEF');
+
+    % axes
+    xlim([1,10]);
+    ylim([21,60]);
+    xlabel('True DBV (%)');
+    ylabel('True OEF (%)');
+end
 
 end % for setnum = ....
     

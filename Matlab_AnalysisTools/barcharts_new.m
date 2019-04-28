@@ -17,11 +17,11 @@ setFigureDefaults;
 %% Plotting Information
 
 % key to data array columns
-legtext = {'SDR Model','\kappa Corrected','New Model','New Model','tan Corrected','SDR SVB','tan SVB'};
-%           1           2                  3           4           5               6         7 
+legtext = {'SDR','L corr.','New Model','New Model','NL corr.','SDR SVB','tan SVB'};
+%           1     2         3           4           5          6         7 
 
 % Choose which columns to plot
-dpts = [1,5,2];
+dpts = [1,2,5];
 
 % Pick pairwise comparisons from DPTS values
 grps = {[1,2],[1,3]};
@@ -127,6 +127,9 @@ SN = [  ];
 
 %% Calculations  
 
+% Convert R2' to dHb
+R2p = R2p.*0.0361;
+
 % R2p(2:end,:) = R2p(2:end,:).*0.44;
 
 ndat = size(R2p,1);
@@ -170,7 +173,7 @@ lbls = legtext(dpts);
 npts = length(dpts);
 
 % Plot R2p
-figure(1); hold on; box on;
+figure(1); hold on; box on; grid on;
 bar(1:npts,aR2p(dpts),0.6,'FaceColor',defColour(1));
 errorbar(1:npts,aR2p(dpts),sR2p(dpts),'k.','LineWidth',2,'MarkerSize',1);
 if rebase
@@ -178,14 +181,14 @@ if rebase
 else
     axis([0.5,npts+0.5,0,10.6]);
 end
-ylabel('R_2'' (s^-^1)');
+ylabel('dHb content (ml/100g)');
 xticks(1:length(dpts));
 xticklabels(lbls); 
-xtickangle(45);
+% xtickangle(45);
 
 
 % Plot DBV
-figure(2); hold on; box on;
+figure(2); hold on; box on; grid on;
 bar(1:npts,aDBV(dpts),0.6,'FaceColor',defColour(1));
 errorbar(1:npts,aDBV(dpts),sDBV(dpts),'k.','LineWidth',2,'MarkerSize',1);
 if rebase
@@ -196,11 +199,11 @@ end
 ylabel('DBV (%)');
 xticks(1:length(dpts));
 xticklabels(lbls);
-xtickangle(45);
+% xtickangle(45);
 
 
 % Plot OEF
-figure(3); hold on; box on;
+figure(3); hold on; box on; grid on;
 bar(1:npts,aOEF(dpts),0.6,'FaceColor',defColour(1));
 errorbar(1:npts,aOEF(dpts),sOEF(dpts),'k.','LineWidth',2,'MarkerSize',1);
 if rebase
@@ -211,7 +214,7 @@ end
 ylabel('OEF (%)');
 xticks(1:length(dpts));
 xticklabels(lbls);
-xtickangle(45);
+% xtickangle(45);
 
 %% Extra Plots
 
@@ -267,23 +270,23 @@ p_R = MC_pvalues(c_R,grps);
 p_D = MC_pvalues(c_D,grps);
 p_O = MC_pvalues(c_O,grps);
 
-% Plot R2p significance stars
-figure(1);
-HR = sigstar(grps,p_R,1);
-set(HR,'Color','k')
-set(HR(:,2),'FontSize',18);
-
-% Plot DBV significance stars1
-figure(2);
-HD = sigstar(grps,p_D,1);
-set(HD,'Color','k')
-set(HD(:,2),'FontSize',18);
-
-% Plot OEF significance stars
-figure(3);
-HO = sigstar(grps,p_O,1);
-set(HO,'Color','k')
-set(HO(:,2),'FontSize',18);
+% % Plot R2p significance stars
+% figure(1);
+% HR = sigstar(grps,p_R,1);
+% set(HR,'Color','k')
+% set(HR(:,2),'FontSize',18);
+% 
+% % Plot DBV significance stars1
+% figure(2);
+% HD = sigstar(grps,p_D,1);
+% set(HD,'Color','k')
+% set(HD(:,2),'FontSize',18);
+% 
+% % Plot OEF significance stars
+% figure(3);
+% HO = sigstar(grps,p_O,1);
+% set(HO,'Color','k')
+% set(HO(:,2),'FontSize',18);
 
 % FE ANOVA
 if plot_FE

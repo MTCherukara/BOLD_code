@@ -47,7 +47,7 @@ elseif strfind(lower(niname),'r2p')
     threshold = 50;
     cmp = viridis;
 elseif strfind(lower(niname),'oef')
-    threshold = 0.75;
+    threshold = 1;
     cmp = parula;
 elseif strfind(lower(niname),'df')
     threshold = 15;
