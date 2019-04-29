@@ -32,13 +32,13 @@ clear;
 vars = {'R2p','DBV','OEF'};
 
 % Choose Data set
-for setnum = 536:540
+for setnum = 565:573
     
 vecRes = zeros(4*length(vars),1);
 
 
 % Which set of subjects is this from?
-setname = 'CSF';          % 'VS', 'genF', 'genNF', 'CSF', or 'AMICI'
+setname = 'genF';          % 'VS', 'genF', 'genNF', 'CSF', or 'AMICI'
 
 % do Free energy?
 do_FE = 0;
@@ -89,7 +89,7 @@ switch setname
     case 'genF'
         
         slicenum = 1:6;     % new AMICI protocol FLAIR
-        maskname = 'mask_gm_80_FLAIR.nii.gz';
+        maskname = 'mask_gm_80_FLAIR_80.nii.gz';
         CC = strsplit(fabdir,'_s');     % need a 2-digit subject number
         subnum = CC{2}(1:2);
         maskdir = ['/Users/mattcher/Documents/DPhil/Data/subject_',subnum,'/'];
