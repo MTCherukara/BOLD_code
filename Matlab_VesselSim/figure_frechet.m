@@ -45,7 +45,7 @@ sigASEtot=(1-sum(Vf)).*prod(sigASEev,2)+sum(bsxfun(@times,Vf,sigASEiv),2);
 se=find(tau==0);
 S0 = sigASEtot./mean(sigASEtot(se-1:se+1));
 
-toc;
+toc; 
 
 
 figure(1);
@@ -62,27 +62,28 @@ xlabel('Spin echo displacement time, \tau (ms)');
 ylabel('Signal fraction (arb.)');
 
 
-%	figure;
-%	bar(Rs,relVf);
-%	axis square;
-%	xlim([0 100])
-%	title('Multiple vessel relative volume fractions: Frechet');
-%	xlabel('Vessel radius (/mum)');
-%	ylabel('Relative volume fraction');
-
-% Ds=[0:2:200];
-% Rs=Ds./2;
-% relVf=gevpdf(Rs,0.41,5.8,10.1);
-% relVf(Rs<3)=0;
-% relVf=relVf./sum(relVf);
-% 
 % % Plot vessel radii distribution
 % figure;
-% stairs(Rs,relVf);
+% bar(Rs,relVf);
 % axis square;
 % xlim([0 100])
 % title('Multiple vessel relative volume fractions: Frechet');
-% xlabel('Vessel radius (\mum)');
+% xlabel('Vessel radius (/mum)');
 % ylabel('Relative volume fraction');
-% grid on;
-% 	
+
+Ds=[0:2:200];
+Rs=Ds./2;
+relVf=gevpdf(Rs,0.41,5.8,10.1);
+relVf(Rs<3)=0;
+relVf=relVf./sum(relVf);
+
+% Plot vessel radii distribution
+figure;
+stairs(Rs,relVf);
+axis square;
+xlim([0 100])
+title('Multiple vessel relative volume fractions: Frechet');
+xlabel('Vessel radius (\mum)');
+ylabel('Relative volume fraction');
+grid on;
+	

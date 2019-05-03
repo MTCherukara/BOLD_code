@@ -14,7 +14,7 @@ Ds=[5.6 15 30 45 90 180];
 Rs=Ds./2;
 
 Ya=1;
-OEF=0.325;
+OEF=0.4;
 DBV=0.03;
 Yv=Ya.*(1-OEF);
 k=0.4;
@@ -53,18 +53,20 @@ title('Multiple vessel scale simulations: Sharan');
 xlabel('Spin echo displacement time, \tau (ms)');
 ylabel('Signal fraction (arb.)');
 
+% Calculate vessel radius distribution
 Rs2=(1:100);
 relVf2=zeros(size(Rs2));
 for k=1:length(Rs)
     relVf2(Rs2==round(Rs(k)))=relVf(k);
 end
 
-% figure;
-% stairs(Rs2,relVf2);
-% axis square;
-% xlim([0 100])
-% title('Multiple vessel relative volume fractions: Sharan');
-% xlabel('Vessel radius (\mum)');
-% ylabel('Relative volume fraction');
-% grid on;
+% Plot vessel radius distribution
+figure;
+stairs(Rs2,relVf2);
+axis square;
+xlim([0 100])
+title('Multiple vessel relative volume fractions: Sharan');
+xlabel('Vessel radius (\mum)');
+ylabel('Relative volume fraction');
+grid on;
 

@@ -81,7 +81,7 @@ for i1 = rstart:rend
     
     disp(['Assembling dataset ',num2str(i1),' of ',num2str(nr),' (R = ',num2str(vrad),'um)']);
     
-    load([simdir,'single_vessel_radius_',dirname,'/simvessimND_res',num2str(vrad),'.mat']);
+    load([simdir,'single_vessel_radius_',dirname,'/simvessim_res',num2str(vrad),'.mat']);
     
     p.vesselFraction = 0.03;
     
