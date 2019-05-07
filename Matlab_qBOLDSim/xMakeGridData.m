@@ -12,7 +12,7 @@ clear;
 
 
 %% Specify what we want
-SNR = 500;
+SNR = inf;
 tau = (-16:8:64)./1000;    % For TE = 72ms or 108ms or 84 ms
 % tau = [0,16:8:64]./1000;
 
@@ -20,12 +20,12 @@ tau = (-16:8:64)./1000;    % For TE = 72ms or 108ms or 84 ms
 SEind = find(tau == 0);
 
 Dind = 10; % which DBV index we want
-
+RR = 100;
 
 
 %% Load in the big grid
 % fulldata = load(['ASE_Data/ASE_Grid_2C_100x10_TE_84.mat']);
-fulldata = load('../../Data/vesselsim_data/vs_arrays/TE84_NDvsData_sharan_10.mat');
+fulldata = load(['../../Data/vesselsim_data/vs_arrays/TE84_vsData_single_ND_R_',num2str(RR),'.mat']);
 
 % Pull values
 DBVvals = fulldata.DBVvals;
@@ -53,7 +53,7 @@ ase_model = zeros(nDBV,nOEF,1,nt);
 ase_model(:,:,1,:) = gridAll(:,:,Tind);
 
 % % For pulling out random specific DBV values
-ase_model = repmat(ase_model(Dind,:,:,:),100,1,1,1);
+% ase_model = repmat(ase_model(Dind,:,:,:),100,1,1,1);
 
 
 %% Add Noise
@@ -70,8 +70,8 @@ ase_data = ase_data ./ repmat(ase_data(:,:,:,SEind),1,1,1,nt);
 
 
 %% Save out
-% dname = strcat('ASE_Grid_SharanND_50x50_TE_',num2str(1000*TE),'_Taus_',num2str(nt),'_SNR_',num2str(SNR));
-dname = strcat('ASE_Grid_Sharan_100x100_DBV_',num2str(Dind-1),'_TE_',num2str(84),'_SNR_',num2str(SNR));
+dname = strcat('ASE_Grid_SingleND_50x50_TE_',num2str(1000*TE),'_R_',num2str(RR));
+% dname = strcat('ASE_Grid_Sharan_100x100_DBV_',num2str(Dind-1),'_TE_',num2str(84),'_SNR_',num2str(SNR));
 
 % save([dname,'.mat'],'ase_data','ase_model','tau','TE','OEFvals','DBVvals','params');
 save([dname,'.mat'],'ase_data','ase_model','tau','TE','OEFvals','DBVvals');

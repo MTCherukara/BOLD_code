@@ -10,7 +10,9 @@ TE=108e-3;
 tauASE = (-28:4:64)./1000;    % For TE = 72ms or 108ms
 % tauASE = (-12:4:32)./1000;      % For TE = 36ms
 
-Ds=[5.6 15 30 45 90 180];
+% Ds=[5.6 15 30 45 90 180];
+Ds=[120 60 30 20 10 5.6 15 30 45 90 180];
+
 Rs=Ds./2;
 
 Ya=1;
@@ -22,8 +24,8 @@ Yc=Yv; % Ya*k+Yv*(1-k);
 Y=[Yc Yv Yv Yv Yv Yv];
 
 aVessels=pi.*Rs.^2;
-lVessels=[600 450 900 1350 2690 5390];
-nVessels=[5.92e7 3.01e6 3.92e5 1.15e5 1.5e4 1880];
+lVessels=[5390 2690 1350 900 450 600 450 900 1350 2690 5390];
+nVessels=[1880 1.5e4 1.15e5 3.92e5 3.01e6 5.92e7 3.01e6 3.92e5 1.15e5 1.5e4 1880];
 volVessels=nVessels.*lVessels.*aVessels;
 relVf=volVessels./sum(volVessels);
 Vtot=DBV*0.793;

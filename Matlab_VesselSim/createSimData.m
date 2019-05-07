@@ -16,11 +16,11 @@ t0 = tic; % main timer
 simdir = '../../Data/vesselsim_data/';
 
 % Selet distribution 
-distname = 'sharan';
+distname = 'single';
 
 % Fixed Parameters
 TE  = 0.084;
-tau = (-24:4:68)./1000;    % For TE = 72ms or 108ms or 84 ms
+tau = (-16:8:64)./1000;    % For TE = 72ms or 108ms or 84 ms
 % tau = (-12:4:32)./1000;      % For TE = 36ms or 56 ms
 
 % Vessel Distribution
@@ -43,6 +43,11 @@ switch lower(distname)
         VF = normpdf(DT,0.38,0.07);
         VF = VF./sum(VF);
         
+    case 'single'
+        dirname = 'D1-0Vf3pc_dist';
+        RR = [3, 10, 30, 100];
+        VF = ones(length(RR),1);
+        
     otherwise
         disp('Invalid distribution');
 end
@@ -62,7 +67,7 @@ DBVvals = linspace(0.003,0.15,np);
 
 % Decide on which radii to calculate
 rstart = 1;
-rend   = 6;
+rend   = nr;
 
 % lengths
 nd = length(DBVvals);
@@ -81,7 +86,7 @@ for i1 = rstart:rend
     
     disp(['Assembling dataset ',num2str(i1),' of ',num2str(nr),' (R = ',num2str(vrad),'um)']);
     
-    load([simdir,'single_vessel_radius_',dirname,'/simvessim_res',num2str(vrad),'.mat']);
+    load([simdir,'single_vessel_radius_',dirname,'/static_simvessim_res',num2str(vrad),'.mat']);
     
     p.vesselFraction = 0.03;
     
@@ -117,7 +122,7 @@ for i1 = rstart:rend
             vFrac = 0.793.*DBV.*volf;
             
             % Calculate signal
-            [Sin_EV(:,i3), Sin_IV(:,i3)] = generate_signal(p,Phase,...
+            [Sin_EV(:,i3), Sin_IV(:,i3)] = generate_signal(p,spp,...
                 'display',false,'Vf',vFrac,'Y',Y,'seq','ASE','includeIV',true,...
                 'T2EV',0.087,'T2b0',1/R2b,'TE',TE,'tau',tau);
             
@@ -130,8 +135,8 @@ for i1 = rstart:rend
     end % OEF loop
     
     % Save out data for each radius
-    sname = strcat(simdir,'vs_arrays/vsArrayND',num2str(nd),'_',distname,...
-                   '_TE_',num2str(1000*TE),'_R_',num2str(vrad),'.mat');
+    sname = strcat(simdir,'vs_arrays/vsArray',num2str(nd),'_',distname,...
+                   '_ND_TE_',num2str(1000*TE),'_R_',num2str(vrad),'.mat');
     save(sname,'S_ev','S_iv','tau','TE','OEFvals','DBVvals');
     
     % Timer

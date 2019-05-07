@@ -32,14 +32,14 @@ kappa = 1;
 % dHb = 0.0361 * R2p;
 
 % choose dataset
-for setnum = 428
+for setnum = [570:573,566:569]
     
 % Do we have STD data?
 do_std = 0;
 
 % Do we want a figure?
 plot_fig = 0;
-plot_grid = 1;
+plot_grid = 0;
 
 
 %% Find directories, and load ground truth data and stuff
@@ -93,12 +93,18 @@ for vv = 1:length(vars)
     if strcmp(vname,'OEF')
         volData = volData*kappa;
     end
+    
+    vecGnd = matGnd(:,vv);
       
     % take the absolute value and store it 
     matAll(:,vv) = (volData(:));
     
     % apply threshold mask
     vecBad = vecBad + ~isfinite(matAll(:,vv)) + ( matAll(:,vv) > thrA(vv) );
+    
+    if strcmp(vname,'DBV')
+        vecBad = vecBad + (vecGnd > 0.1) + (vecGnd < 0.01);
+    end
     
     % load and store standard deviation data
     if do_std
@@ -120,10 +126,10 @@ end % for vv = 1:length(vars)
 vecThres = vecBad > 0.5;
 
 % % Remove bad voxels
-% matAll(vecThres,:) = [];
-% matStd(vecThres,:) = [];
-% matGnd(vecThres,:) = [];
-% matScl(vecThres,:) = [];
+matAll(vecThres,:) = [];
+matStd(vecThres,:) = [];
+matGnd(vecThres,:) = [];
+matScl(vecThres,:) = [];
 
 
 %% Now loop through the variables again and display the results
@@ -150,9 +156,9 @@ for vv = 1:length(vars)
         vecGnd = vecGnd.*100;
     elseif strcmp(vname,'R2p')
         % Converting R2' to dHb
-        vecData = vecData.*0.0361*0.8;
-        vecGnd = vecGnd.*0.0361;
-        vecScl = vecScl.*0.0361;
+%         vecData = vecData.*0.0361*0.8;
+%         vecGnd = vecGnd.*0.0361;
+%         vecScl = vecScl.*0.0361;
     end
     
     % Limits, for plotting
@@ -178,7 +184,8 @@ for vv = 1:length(vars)
     diffs = vecGnd - vecData;
 %     RMSE(vv) = sqrt(mean(diffs.^2));
     RMSE(vv) = mean(abs(vecGnd - vecData));
-    RELE(vv) = 100*mean(abs(vecGnd - vecData)./abs(vecGnd));
+    RELE(vv) = std(abs(vecGnd - vecData));
+%     RELE(vv) = 100*mean(abs(vecGnd - vecData)./abs(vecGnd));
     
     if do_std
         wdiff = diffs.*nm_std;
@@ -229,11 +236,10 @@ end % for vv = 1:length(vars)
 % disp(' ');
 % disp(['(Excluded ',num2str(sum(vecThres)),' of 2500 data points)']);
 
+% Display the whole results row entry
+disp(num2str(vecRes(:)'));
 
 if plot_grid
-    % Display the whole results row entry
-    disp(num2str(vecRes(:)'));
-
 
     % pull out estimates from the matrix
     matR2p = reshape(matAll(:,3),50,50);
