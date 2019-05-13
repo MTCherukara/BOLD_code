@@ -14,7 +14,7 @@ clear;
 simdir = '../../Data/vesselsim_data/';
 
 % Which distribution we want - 'sharan' or 'frechet'
-distname = 'single';
+distname = 'lauwers';
 
 % Options
 plot_figure = 0;
@@ -36,15 +36,15 @@ switch lower(distname)
         VF = VF./sum(VF);
         
     case 'lauwers'
-        RR = 3:100;
+        RR = 3:50;
         DT = 1./sqrt(2*RR);
         VF = normpdf(DT,0.38,0.07);
         VF = VF./sum(VF);
         
     case 'single'
         dirname = 'D1-0Vf3pc_dist';
-        RR = 3;
-        VF = 1;
+        RR = [5, 6];
+        VF = 0.5*ones(length(RR),1);
         
     otherwise
         disp('Invalid distribution');
@@ -71,7 +71,7 @@ for i1 = 1:nr
     
     % Load data
     load([simdir,'vs_arrays/vsArray',num2str(nd),'_',distname,...
-                 '_ND_TE_',num2str(1000*TE),'_R_',num2str(vrad),'.mat']);
+                 '_TE_',num2str(1000*TE),'_R_',num2str(vrad),'.mat']);
 %     load([simdir,'vs_arrays/vsArray',num2str(np),'_',distname,...
 %                  '_R_',num2str(vrad),'.mat']);
     % Fill matrix
@@ -116,7 +116,7 @@ end % OEF loop
 
 
 %% Save Data
-sname = strcat(simdir,'vs_arrays/TE',num2str(1000*TE),'_vsData_',distname,'_ND_R_',num2str(RR(1)),'.mat');
+sname = strcat(simdir,'vs_arrays/TE',num2str(1000*TE),'_vsData_',distname,'_R_',num2str(RR(1)),'.mat');
 save(sname,'S0','S_ev','S_iv','tau','TE','OEFvals','DBVvals');
     
 

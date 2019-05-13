@@ -54,6 +54,8 @@ params = genParams;
 
 % Assign specific parameters
 
+params.B0 = 1.5;
+
 % Scan
 params.TE   = 0.084;        % s         - echo time
 params.TR   = 3;
@@ -74,12 +76,12 @@ params.incT2  = 1;          % BOOL      - should T2 differences be considered?
 params.incIV  = 1;          % BOOL      - should blood compartment be included?
 
 % Scaling
-params.SR   = 0.47;        % no units  - scaling factor for R2'
-params.Voff = 0.47;
+% params.SR   = 0.47;        % no units  - scaling factor for R2'
+% params.Voff = 0.47;
 % params.sgeo = 0.3;
 % params.beta = 1;
 % params.alpha = 0;
-params.eta  = 0.05;
+% params.eta  = 0.05;
 
 
 % noise

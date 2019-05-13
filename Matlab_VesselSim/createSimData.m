@@ -16,7 +16,7 @@ t0 = tic; % main timer
 simdir = '../../Data/vesselsim_data/';
 
 % Selet distribution 
-distname = 'single';
+distname = 'lauwers';
 
 % Fixed Parameters
 TE  = 0.084;
@@ -45,8 +45,8 @@ switch lower(distname)
         
     case 'single'
         dirname = 'D1-0Vf3pc_dist';
-        RR = [3, 10, 30, 100];
-        VF = ones(length(RR),1);
+        RR = [5, 6];
+        VF = 0.5*ones(length(RR),1);
         
     otherwise
         disp('Invalid distribution');
@@ -66,7 +66,7 @@ DBVvals = linspace(0.003,0.15,np);
 % DBVvals = 0:0.01:0.09;
 
 % Decide on which radii to calculate
-rstart = 1;
+rstart = 53;
 rend   = nr;
 
 % lengths
@@ -86,7 +86,7 @@ for i1 = rstart:rend
     
     disp(['Assembling dataset ',num2str(i1),' of ',num2str(nr),' (R = ',num2str(vrad),'um)']);
     
-    load([simdir,'single_vessel_radius_',dirname,'/static_simvessim_res',num2str(vrad),'.mat']);
+    load([simdir,'single_vessel_radius_',dirname,'/simvessim_res',num2str(vrad),'.mat']);
     
     p.vesselFraction = 0.03;
     
@@ -136,7 +136,7 @@ for i1 = rstart:rend
     
     % Save out data for each radius
     sname = strcat(simdir,'vs_arrays/vsArray',num2str(nd),'_',distname,...
-                   '_ND_TE_',num2str(1000*TE),'_R_',num2str(vrad),'.mat');
+                   '_TE_',num2str(1000*TE),'_R_',num2str(vrad),'.mat');
     save(sname,'S_ev','S_iv','tau','TE','OEFvals','DBVvals');
     
     % Timer
