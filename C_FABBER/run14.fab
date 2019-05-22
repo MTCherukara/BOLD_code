@@ -1,7 +1,7 @@
 # fabber run 14 - SDR simulation testing
 
 # Input Data
-data=../../Data/qboldsim_data/ASE_Grid_SingleND_50x50_TE_84_R_100.nii.gz
+data=../../Data/qboldsim_data/ASE_Grid_Single_50x50_TE_84_R_16.nii.gz
 mask=../../Data/qboldsim_data/Grid_50x50_mask.nii.gz
 
 # Run Options
