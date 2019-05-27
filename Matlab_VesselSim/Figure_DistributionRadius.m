@@ -35,27 +35,46 @@ i_DBV = find(DBVvals == DBV,1);
 % Load distribution data
 load([datadir,'TE84_vsData_lauwers_50.mat']);
 Si = squeeze(S0(i_DBV,i_OEF,:));
-Sl_raw = Si./max(Si);
-Sl_dist = log(Sl_raw) + 1;
+SL_raw = Si./max(Si);
+SL_dist = log(SL_raw) + 1;
 
 % Load the single-vessel average data
 load([datadir,'TE84_vsData_single_R_5.mat']);
 Si = squeeze(S0(i_DBV,i_OEF,:));
-Sl_one = Si./max(Si);
-Sl_sing = log(Sl_one) + 1;
+SL_one = Si./max(Si);
+SL_sing = log(SL_one) + 1;
+
+% Load the static distribution data
+load([datadir,'TE84_vsData_lauwers_ND_50.mat']);
+Si = squeeze(S0(i_DBV,i_OEF,:));
+SL_two = Si./max(Si);
+SL_stat = log(SL_two) + 1;
 
 
 %% Plot Lauwers
 
+% figure;
+% plot(taus,Sl_dist,'-');
+% grid on; axis square; hold on;
+% plot(taus,Sl_sing,'--');
+% % set(gca,'FontSize',15);
+% xlabel('Spin Echo Displacement \tau (ms)');
+% ylabel('Log (Signal)');
+% axis([-20,66,0.905,1.005]);
+% legend('Lauwers distribution','Mean radius 5 \mum','Location','SouthWest');
+% title('Lauwers distribution');
+
+% compare static and diffusive
 figure;
-plot(taus,Sl_dist,'-');
+plot(taus,SL_stat,'-','color',defColour(3));
 grid on; axis square; hold on;
-plot(taus,Sl_sing,'--');
-% set(gca,'FontSize',15);
+plot(taus,SL_sing,'-','color',defColour(2));
+plot(taus,SL_dist,'-','color',defColour(1));
+% set(gca,'FontSize',16);
 xlabel('Spin Echo Displacement \tau (ms)');
 ylabel('Log (Signal)');
 axis([-20,66,0.905,1.005]);
-legend('Lauwers distribution','Mean radius 5 \mum','Location','SouthWest');
+legend('Distribution (static)','Single R (diffusive)','Distribution (diffusive)','Location','SouthWest');
 title('Lauwers distribution');
 
 
@@ -99,12 +118,13 @@ SS_stat = log(SS_two) + 1;
 figure;
 plot(taus,SS_stat,'-','color',defColour(3));
 grid on; axis square; hold on;
+plot(taus,SS_sing,'-','color',defColour(2));
 plot(taus,SS_dist,'-','color',defColour(1));
 % set(gca,'FontSize',16);
 xlabel('Spin Echo Displacement \tau (ms)');
 ylabel('Log (Signal)');
 axis([-20,66,0.905,1.005]);
-legend('Static','Diffusive','Location','SouthWest');
+legend('Distribution (static)','Single R (diffusive)','Distribution (diffusive)','Location','SouthWest');
 title('Sharan distribution');
 
 
@@ -147,12 +167,13 @@ SJ_stat = log(SJ_two) + 1;
 figure;
 plot(taus,SJ_stat,'-','color',defColour(3));
 grid on; axis square; hold on;
+plot(taus,SJ_sing,'-','color',defColour(2));
 plot(taus,SJ_dist,'-','color',defColour(1));
 % set(gca,'FontSize',16);
 xlabel('Spin Echo Displacement \tau (ms)');
 ylabel('Log (Signal)');
 axis([-20,66,0.905,1.005]);
-legend('Static','Diffusive','Location','SouthWest');
+legend('Distribution (static)','Single R (diffusive)','Distribution (diffusive)','Location','SouthWest');
 title('Jochimsen distribution');
 
 

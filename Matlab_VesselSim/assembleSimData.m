@@ -14,7 +14,7 @@ clear;
 simdir = '../../Data/vesselsim_data/';
 
 % Which distribution we want - 'sharan' or 'frechet'
-distname = 'sharan';
+distname = 'lauwers';
 
 % Options
 plot_figure = 0;

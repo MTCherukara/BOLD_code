@@ -32,7 +32,7 @@ kappa = 1;
 % dHb = 0.0361 * R2p;
 
 % choose dataset
-for setnum = 574:577
+for setnum = 579
     
 % Do we have STD data?
 do_std = 0;

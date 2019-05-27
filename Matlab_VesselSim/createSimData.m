@@ -16,7 +16,7 @@ t0 = tic; % main timer
 simdir = '../../Data/vesselsim_data/';
 
 % Selet distribution 
-distname = 'sharan';
+distname = 'lauwers';
 
 % Fixed Parameters
 TE  = 0.084;
