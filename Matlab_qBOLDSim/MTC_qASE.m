@@ -63,7 +63,7 @@ params.TI   = 1.21;
 
 % Physiology
 params.lam0 = 0.00;         % no units  - ISF/CSF signal contribution
-params.zeta = 0.03;         % no units  - deoxygenated blood volume
+params.zeta = 0.10;         % no units  - deoxygenated blood volume
 params.OEF  = 0.40;         % no units  - oxygen extraction fraction
 
 params.dF = 5;
@@ -82,7 +82,6 @@ params.incIV  = 1;          % BOOL      - should blood compartment be included?
 % params.beta = 1;
 % params.alpha = 0;
 % params.eta  = 0.05;
-
 
 % noise
 params.SNR = 100;

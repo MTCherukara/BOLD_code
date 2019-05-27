@@ -211,7 +211,9 @@ if PARAMS.incIV
     
     % Include and weight the other compartments
     S_csf = w_csf.*calcExtraCompartment(TAU,TE,PARAMS);
-    S_bld = w_bld.*calcBloodCompartment(TAU,TE,PARAMS);
+%     S_bld = w_bld.*calcBloodCompartment(TAU,TE,PARAMS);
+    S_bld = w_bld.*calcBloodPowder(TAU,TE,PARAMS);
+
     
     % add it all together:
     S = PARAMS.S0.*( (w_tis.*S_tis) + S_csf + S_bld);
@@ -316,6 +318,28 @@ function SB = calcBloodCompartment(TAU,TE,PARAMS)
     end
     
 end % function SB = calcBloodCompartment(TAU,TE,PARAMS)
+
+
+%% calcBloodPowder function
+function SB = calcBloodPowder(TAU,TE,PARAMS)
+    % Calculate intravascular contribution to ASE qBOLD signal using the powder
+    % model (summarized in Yablonskiy, 2013).
+    
+    % pull out parameters
+    dw0 = 1.5*PARAMS.dw;
+    eta = sqrt((2.*dw0.*abs(TAU))./pi);
+    
+    SI = exp(1i.*dw0.*(TAU)./3) .* ( (fresnelc(eta) - 1i.*fresnels(eta)) ./eta);
+    
+    SB = abs(SI);
+    
+    % add T2 effect
+    if PARAMS.incT2
+        SB = SB.*exp(-PARAMS.R2b.*TE);
+    end
+    
+end % function SB = calcBloodPowder(TAU,TE,PARAMS)
+
 
 
 %% calcExtraCompartment function
