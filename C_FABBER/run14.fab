@@ -1,7 +1,7 @@
 # fabber run 14 - SDR simulation testing
 
 # Input Data
-data=../../Data/qboldsim_data/ASE_Grid_ND_Lauwers_50x50_TE_84.nii.gz
+data=../../Data/qboldsim_data/ASE_Grid_1C_50x50_SNR_500.nii.gz
 mask=../../Data/qboldsim_data/Grid_50x50_mask.nii.gz
 
 # Run Options
@@ -25,17 +25,18 @@ inferS0
 inferR2p
 inferDBV
 
-motional_narrowing
-include_intra
+#motional_narrowing
+#include_intra
 
 # correction parameters
-fixDBV=0.09
+fixDBV=0.1
+fixR2p=15.0
 #SR=0.47
 #Voff=0.47
 #eta=0.5
 
-precR2p=1e-3
-precDBV=1e-1
+precR2p=1e-4
+precDBV=1e-2
 #precOEF=1e2
 
 # Scan Parameters (maybe I'll think of a better way of doing this...)

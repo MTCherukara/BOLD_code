@@ -292,12 +292,14 @@ function SB = calcBloodCompartment(TAU,TE,PARAMS)
     Hct = PARAMS.Hct;
     OEF = PARAMS.OEF;
     B0  = PARAMS.B0;
+    Dx0 = PARAMS.dChi;
 
     % assign constants
     td = 0.0045067;     % diffusion time
 
     % calculate parameters
-    dChi = (((-0.736 + (0.264*OEF) )*Hct) + (0.722 * (1-Hct)))*1e-6;
+    dChi = Dx0.*OEF + 0.14e-6;
+%     dChi = (((-0.736 + (0.264*OEF) )*Hct) + (0.722 * (1-Hct)))*1e-6;
     G0   = (4/45)*Hct*(1-Hct)*((dChi*B0)^2);
     kk   = 0.5*(gam^2)*G0*(td^2);
 

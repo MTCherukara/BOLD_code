@@ -7,18 +7,20 @@
 
 clear;
 
-start_tau = -16;
-delta_tau = 8;
+
+start_tau = -28;
+delta_tau = 4;
 end_tau = 64;
 
 % manually specify input name
-nii_name = '/Users/mattcher/Documents/DPhil/Data/qboldsim_data/ASE_Grid_SharanND_100x100_DBV_9_SNR_500.nii.gz';
+nii_name = '/Users/mattcher/Documents/DPhil/Data/validation_sqbold/vs1/ASE_FLAIR_av_mc.nii.gz';
 
 if ~exist('nii_name','var')
     [dfile,ddir] = uigetfile('*.nii.gz','Choose Data File');
     nii_name = strcat(ddir,dfile);
 end
 
+tic; 
 %% Load dataset
 [V, ~, scales] = read_avw(nii_name); % V = the raw data;
 [x, y, z, v] = size(V);
@@ -98,5 +100,5 @@ dhb = r2p./(dbv.*gamma.*(4./3).*pi.*dChi0.*B0.*k);
 %     save_avw(snr, 'qbold_results/modelSNR', 'f', scales);
 %     save_avw(dhb, 'dhb', 'f', scales);
 
-
+toc;
 end

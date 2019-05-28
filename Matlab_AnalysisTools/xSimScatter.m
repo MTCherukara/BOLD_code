@@ -32,7 +32,7 @@ kappa = 1;
 % dHb = 0.0361 * R2p;
 
 % choose dataset
-for setnum = 579
+for setnum = 603:611
     
 % Do we have STD data?
 do_std = 0;
@@ -79,6 +79,8 @@ matStd = zeros(size(matGnd,1),length(vars));
 vecBad = zeros(size(matGnd,1),1);
 vecRes = zeros(3*length(vars),1);
 
+resp = zeros(length(vars),2);
+
 % Loop through variables
 for vv = 1:length(vars)
     
@@ -88,6 +90,15 @@ for vv = 1:length(vars)
     % Load the data
     volData = LoadSlice([fabdir,'mean_',vname,'.nii.gz'],1);
 %     volData = volData(2:1:50,1:34);
+
+    if strcmp(vname,'DBV') || strcmp(vname,'OEF')
+        resp(vv,1) = 100.*volData(20,10);
+        resp(vv,2) = 100.*volData(40,40);
+    else
+        resp(vv,1) = volData(20,10);
+        resp(vv,2) = volData(40,40);
+    end
+    
     
     % OPTIONALLY scale OEF
     if strcmp(vname,'OEF')
@@ -118,6 +129,10 @@ for vv = 1:length(vars)
     
 end % for vv = 1:length(vars)
 
+% % calculate RESP errors
+% tru4 = [ 40, 60; 3, 12; volR2p(20,10), volR2p(40,40)];
+% err4 = tru4' - resp';
+% disp(num2str(err4(:)'));
 
 
 %% Now remove the bad voxels from the whole array

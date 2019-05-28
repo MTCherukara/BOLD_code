@@ -138,7 +138,9 @@ void R2primeFwdModel::Initialize(ArgsType &args)
     eta  = convertTo<double>(args.ReadWithDefault("eta","0.0"));
 
     // check for fixed DBV
-    fDBV = convertTo<double>(args.ReadWithDefault("fixDBV","0.03"));
+    fDBV = convertTo<double>(args.ReadWithDefault("fixDBV","0.036"));
+    fR2p = convertTo<double>(args.ReadWithDefault("fixR2p","2.6"));
+
 
     // add information to the log
     LOG << "Inference using development model" << endl;
@@ -268,13 +270,13 @@ void R2primeFwdModel::HardcodedInitialDists(MVNDist &prior, MVNDist &posterior) 
     
     if (infer_R2p)
     {
-        prior.means(R2p_index()) = 4.0;
+        prior.means(R2p_index()) = fR2p;
         precisions(R2p_index(), R2p_index()) = prec_R2p;
     }
 
     if (infer_DBV)
     {
-        prior.means(DBV_index()) = 0.05; // 0.036
+        prior.means(DBV_index()) = fDBV; // 0.036
         precisions(DBV_index(), DBV_index()) = prec_DBV;
     }
 
@@ -328,13 +330,13 @@ void R2primeFwdModel::HardcodedInitialDists(MVNDist &prior, MVNDist &posterior) 
     
     if (infer_R2p)
     {
-        posterior.means(R2p_index()) = 2.6;
+        posterior.means(R2p_index()) = fR2p;
         precisions(R2p_index(), R2p_index()) = 1e-3;
     }
 
     if (infer_DBV)
     {
-        posterior.means(DBV_index()) = 0.05;
+        posterior.means(DBV_index()) = fDBV;
         precisions(DBV_index(), DBV_index()) = 1e0; 
     }
 
@@ -641,7 +643,8 @@ void R2primeFwdModel::Evaluate(const ColumnVector &params, ColumnVector &result)
             // parameters
             double td   = 0.0045067;       // (based on rc=2.6 um and D=1.5 um^2 / ms)
             double gm   = 2.67513e8;
-            double dChi = (((-0.736 + (0.264*OEF))*Hct) + (0.722*(1-Hct)))*1e-6;
+            // double dChi = (((-0.736 + (0.264*OEF))*Hct) + (0.722*(1-Hct)))*1e-6;
+            double dChi = ((0.27*OEF) + 0.14)*1e-6;
             double G0   = (4/45)*Hct*(1-Hct)*pow((dChi*3.0),2.0);
             double kk   = 0.5*pow(gm,2.0)*G0*pow(td,2.0);
             R2b = 5.291;    // fixed value (Berman, 2017) 
