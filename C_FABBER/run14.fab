@@ -29,8 +29,8 @@ inferDBV
 #include_intra
 
 # correction parameters
-fixDBV=0.1
-fixR2p=15.0
+fixDBV=0.036
+fixR2p=2.6
 #SR=0.47
 #Voff=0.47
 #eta=0.5

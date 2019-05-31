@@ -398,6 +398,7 @@ void R2primeFwdModel::Evaluate(const ColumnVector &params, ColumnVector &result)
     double Sb;  // blood signal
     double Se;  // extracellular signal
     complex<double> Sec; // complex version of the extracellular signal (may be unnecessary)
+    complex<double> Sbc; // complex version of the blood signal (for powder model)
 
     complex<double> i(0,1);
 
@@ -539,8 +540,8 @@ void R2primeFwdModel::Evaluate(const ColumnVector &params, ColumnVector &result)
     }
 
     // calculate tc and threshold it if necessary
-    //tc = 1.7/dw;
-    tc = 0.010;
+    tc = 1.7/dw;
+    //tc = 0.010;
     /*
     if (tc > 0.03)
     {
@@ -661,7 +662,33 @@ void R2primeFwdModel::Evaluate(const ColumnVector &params, ColumnVector &result)
         else if (inc_intra)
         {
             // linear model
-            Sb = exp(-R2b*TE)*exp(-R2bp*abs(tau));
+            //Sb = exp(-R2b*TE)*exp(-R2bp*abs(tau));
+
+            // powder model
+
+            // threshold constant (similar to tc but different?)
+            double pp = 1.5*dw*tau;
+
+            // signum of tau
+            double st = (tau > 0) - (tau < 0);
+
+            if (abs(pp) > 1)
+            {
+                // large pp
+                Sbc = 0.5*sqrt(M_PI/abs(pp))*exp(i*((pp/3.0)-(st*M_PI/4.0)));
+            }
+            else
+            {
+                // small pp
+                Sbc = 1.0 - ((2.0/45.0)*pow(pp,2.0)) + ((8.0*i*pow(pp,3.0))/2835.0);
+            }
+
+            Sb = real(Sbc);
+
+            // T2 effect
+            Sb *= exp(-R2b*TE);
+            
+
 
         } // if (motion_narr) ... else if (inc_intra)
         else

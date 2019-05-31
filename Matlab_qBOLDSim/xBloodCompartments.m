@@ -60,7 +60,29 @@ SI = exp(1i.*dw0.*abs(tau)./3) .* ( (fresnelc(eta) - 1i.*fresnels(eta)) ./eta);
     
 SP = real(SI);
 
+%% Asymptotic powder model
 
+pp = dw0.*tau;
+
+SAc = zeros(1,length(tau));
+
+for ii = 1:length(tau)
+    
+    % small pp
+    if abs(pp(ii)) < 1
+        
+        SAc(ii) = 1 - ((2/45).*(pp(ii).^2)) + ((8i/2835).*(pp(ii).^3));
+        
+    % large pp
+    else
+        
+        SAc(ii) = 0.5.*sqrt(pi./abs(pp(ii))).*exp(1i.*((pp(ii)./3) - (pi.*sign(pp(ii))./4)));
+    end
+end
+
+SA = real(SAc);
+    
+    
 %% Plot them
 
 figure;
@@ -68,7 +90,8 @@ plot(1000*tau,(SO));
 hold on; box on; axis square; grid on;
 plot(1000*tau,(SB));
 plot(1000*tau,(SP));
+plot(1000*tau,(SA));
 xlim([-32,68]);
 xlabel('Spin echo displacement \tau (ms)');
 ylabel('Signal');
-legend('Linear Model','Motional Narrowing','Powder Model','Location','SouthWest');
+legend('Linear Model','Motional Narrowing','Powder Model','Asym. Powder','Location','SouthWest');
