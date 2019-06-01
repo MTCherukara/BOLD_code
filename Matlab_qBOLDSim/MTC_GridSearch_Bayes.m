@@ -64,18 +64,18 @@ OEFs = 20:20:80;
 DBVs = 1:2:9;
 [gOEF,gDBV] = meshgrid(OEFs,DBVs);
 
-% Parameters
-% pnames = { 'R2p'    ; 'zeta'      };
-% interv = [ 0.2, 11  ; 0.003, 0.10 ];
-% np     = [ 1000     ; 1000        ];
+% % Parameters
+pnames = { 'R2p'    ; 'zeta'      };
+interv = [ 0.2, 15  ; 0.003, 0.15 ];
+np     = [ 1000     ; 1000        ];
 
 % pnames = { 'OEF'    ; 'zeta'     };
 % interv = [ 0.2, 0.7 ; 0.003, 0.15 ];
 % np     = [ 1000     ; 1000       ];
 
-pnames = { 'lam0'    ; 'dF'      };
-interv = [ 0.01, 0.2 ; 1, 15 ];
-np     = [ 1000      ; 1000        ];
+% pnames = { 'lam0'    ; 'dF'      };
+% interv = [ 0.01, 0.2 ; 1, 15 ];
+% np     = [ 1000      ; 1000        ];
 
 % pnames = { 'R2p'    ; 'dF'      };
 % interv = [ 0.2, 11  ; 1, 15 ];

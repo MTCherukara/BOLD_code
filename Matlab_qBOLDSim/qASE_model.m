@@ -211,8 +211,8 @@ if PARAMS.incIV
     
     % Include and weight the other compartments
     S_csf = w_csf.*calcExtraCompartment(TAU,TE,PARAMS);
-%     S_bld = w_bld.*calcBloodCompartment(TAU,TE,PARAMS);
-    S_bld = w_bld.*calcBloodPowder(TAU,TE,PARAMS);
+    S_bld = w_bld.*calcBloodCompartment(TAU,TE,PARAMS);
+%     S_bld = w_bld.*calcBloodPowder(TAU,TE,PARAMS);
 
     
     % add it all together:
