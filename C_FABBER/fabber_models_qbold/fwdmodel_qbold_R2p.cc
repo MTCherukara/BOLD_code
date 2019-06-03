@@ -598,14 +598,9 @@ void R2primeFwdModel::Evaluate(const ColumnVector &params, ColumnVector &result)
     // calculate tissue compartment weightings
     lam0 = (ne*me*lam) / ( (nt*mt*(1-lam)) + (ne*me*lam) );
     CBV = nb*mb*(1-lam0)*DBV;
-
-    // for new (12 APR) model
-    double Dpr;
     
     // loop through taus
     result.ReSize(taus.Nrows());
-
-    Dpr = DBV + ( eta*pow(R2p,2.0)/(887*Hct) );
 
     for (int ii = 1; ii <= taus.Nrows(); ii++)
     {
@@ -615,21 +610,21 @@ void R2primeFwdModel::Evaluate(const ColumnVector &params, ColumnVector &result)
         // calculate tissue signal
         if (tau < -tc)
         {
-            Ss = exp(Dpr + (SR*R2p*tau));          // SDR model
+            Ss = exp(DBV + (SR*R2p*tau));          // SDR model
             // Ss = exp(SR*(DBV + R2p*tau));       // new model
             // Ss = exp(SR*R2p*((1/kk) + tau));    // even newer model (12 APR)
             // Ss = exp(SR*R2p*(((1.45-3.8*DBV)/eta) + tau));    // even newer model (12 APR)
         }
         else if (tau > tc)
         {
-            Ss = exp(Dpr - (SR*R2p*tau));          // SDR model
+            Ss = exp(DBV - (SR*R2p*tau));          // SDR model
             // Ss = exp(SR*(DBV - R2p*tau));       // new model
             // Ss = exp(SR*R2p*((1/kk) - tau));    // even newer model (12 APR)
             // Ss = exp(SR*R2p*(((1.45-3.8*DBV)/eta) - tau));    // even newer model (12 APR)
         }
         else
         {
-            Ss = exp((Voff*Dpr)-0.3*pow(SR*R2p*tau,2.0)/Dpr);          // SDR model
+            Ss = exp((Voff*DBV)-0.3*pow(SR*R2p*tau,2.0)/DBV);          // SDR model
             // Ss = exp(((eta*DBV)-(alpha*pow(R2p,2.0)))*pow(tau,2.0)); // new model
             // Ss = exp( -alpha*kk*SR*R2p*pow(tau,2.0) );                  // even newer model (12 APR)
             // Ss = exp( -alpha*(eta/(1.45-3.8*DBV))*SR*R2p*pow(tau,2.0) );                  // even newer model (12 APR)

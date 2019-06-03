@@ -7,7 +7,7 @@ clear;
 close all;
 
 % Manual selection of subject
-subnum = 7;
+subnum = 1;
 ddir = strcat('/Users/mattcher/Documents/DPhil/Data/validation_sqbold/vs',num2str(subnum),'/');
 dfile = 'ASE_FLAIR_av_mc.nii.gz';
 
@@ -85,4 +85,5 @@ disp(['  SNR (end)  : ',round2str(snr(end),1)]);
 
 % Calculate CNR
 cnr = (signal(8) - signal(end))./mean(sigma);
+% cnr = (max(signal) - min(signal))./mean(sigma);
 disp(['  CNR        : ',round2str(cnr,1)]);

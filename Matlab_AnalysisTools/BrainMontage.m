@@ -33,7 +33,7 @@ end
 
 % Check whether slices have been specified, if not, default to 3:10
 if ~exist('slices','var')
-    slices = 2:7;       % VS
+    slices = 3:10;       % VS
 %     slices = 3:14;       % CSF
 %     slices = 1:6;       % s11 FLAIR
 end
@@ -41,13 +41,13 @@ ns = length(slices); % number of slices
 
 % Set threshold based on the type of variable we're looking at
 if strfind(lower(niname),'dbv')
-    threshold = 0.2;
+    threshold = 0.25;
     cmp = magma;
 elseif strfind(lower(niname),'r2p')
-    threshold = 50;
+    threshold = 10;
     cmp = viridis;
 elseif strfind(lower(niname),'oef')
-    threshold = 1;
+    threshold = 0.8;
     cmp = parula;
 elseif strfind(lower(niname),'df')
     threshold = 15;
@@ -85,7 +85,7 @@ if length(slices) == 1
     sh_top = 0;
     sh_bot = 0;
 else
-    sh_sds = 15;        % sides
+    sh_sds = 12;        % sides
     sh_top = 10;         % top and bottom
     sh_bot = 5;
 end
@@ -121,8 +121,8 @@ else
     ncols = ns;
 end
 
-nrows = 1;
-ncols = ns;
+% nrows = 1;
+% ncols = ns;
 
 % pre-allocate matrix
 montage_image = zeros(nrows*sv(2),ncols*sv(1));
@@ -137,7 +137,7 @@ pos_c = 1;
 for ii = slices
     
     % Fill the slice in the montage_image
-    montage_image(pos_c:pos_c+sv(2)-1,pos_r:pos_r+sv(1)-1) = fliplr(squeeze(voldata(:,:,ii,1))');
+    montage_image(pos_c:pos_c+sv(2)-1,pos_r:pos_r+sv(1)-1) = (squeeze(voldata(:,:,ii,1))');
     
     % Move on to the next starting point
     pos_r = pos_r + sv(1);
