@@ -23,7 +23,7 @@ setFigureDefaults;
 
 % Choose variables
 vars = {'OEF', 'DBV', 'R2p'};
-thrA = [  5.0,   2.0,  50  ];     % threshold of actual values
+thrA = [  5.0,   1.0,  50  ];     % threshold of actual values
 thrS = [  5.0,   2.0,  50  ];     % threshold of standard deviations
 % vars = {'OEF'};
 
@@ -32,7 +32,7 @@ kappa = 1;
 % dHb = 0.0361 * R2p;
 
 % choose dataset
-for setnum = 603:611
+for setnum = 612:618
     
 % Do we have STD data?
 do_std = 0;
@@ -199,8 +199,8 @@ for vv = 1:length(vars)
     diffs = vecGnd - vecData;
 %     RMSE(vv) = sqrt(mean(diffs.^2));
     RMSE(vv) = mean(abs(vecGnd - vecData));
-    RELE(vv) = std(abs(vecGnd - vecData));
-%     RELE(vv) = 100*mean(abs(vecGnd - vecData)./abs(vecGnd));
+%     RELE(vv) = std(abs(vecGnd - vecData));
+    RELE(vv) = 100*mean(abs(vecGnd - vecData)./abs(vecGnd));
     
     if do_std
         wdiff = diffs.*nm_std;
