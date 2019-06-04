@@ -23,7 +23,7 @@ setFigureDefaults;
 
 % Choose variables
 vars = {'OEF', 'DBV', 'R2p'};
-thrA = [  5.0,   1.0,  50  ];     % threshold of actual values
+thrA = [  5.0,   2.0,  50  ];     % threshold of actual values
 thrS = [  5.0,   2.0,  50  ];     % threshold of standard deviations
 % vars = {'OEF'};
 
@@ -32,7 +32,7 @@ kappa = 1;
 % dHb = 0.0361 * R2p;
 
 % choose dataset
-for setnum = 612:618
+for setnum = 264:277
     
 % Do we have STD data?
 do_std = 0;
@@ -67,6 +67,10 @@ volR2p = LoadSlice([gnddir,'True_Grid_50x50_R2p.nii.gz'],1);
 % volDBV = volDBV(2:1:50,1:34);
 % volR2p = volR2p(2:1:50,1:34);
 
+volOEF = volOEF(:,35:50);
+volDBV = volDBV(:,35:50);
+volR2p = volR2p(:,35:50);
+
 matGnd = [volOEF(:),volDBV(:),volR2p(:)];
 matScl = [volDBV(:),volOEF(:),volR2p(:)];
 
@@ -90,14 +94,15 @@ for vv = 1:length(vars)
     % Load the data
     volData = LoadSlice([fabdir,'mean_',vname,'.nii.gz'],1);
 %     volData = volData(2:1:50,1:34);
+    volData = volData(:,35:50);
 
-    if strcmp(vname,'DBV') || strcmp(vname,'OEF')
-        resp(vv,1) = 100.*volData(20,10);
-        resp(vv,2) = 100.*volData(40,40);
-    else
-        resp(vv,1) = volData(20,10);
-        resp(vv,2) = volData(40,40);
-    end
+%     if strcmp(vname,'DBV') || strcmp(vname,'OEF')
+%         resp(vv,1) = 100.*volData(20,10);
+%         resp(vv,2) = 100.*volData(40,40);
+%     else
+%         resp(vv,1) = volData(20,10);
+%         resp(vv,2) = volData(40,40);
+%     end
     
     
     % OPTIONALLY scale OEF
@@ -113,9 +118,9 @@ for vv = 1:length(vars)
     % apply threshold mask
     vecBad = vecBad + ~isfinite(matAll(:,vv)) + ( matAll(:,vv) > thrA(vv) );
     
-    if strcmp(vname,'DBV')
-        vecBad = vecBad + (vecGnd > 0.1) + (vecGnd < 0.01);
-    end
+%     if strcmp(vname,'DBV')
+%         vecBad = vecBad + (vecGnd > 0.1) + (vecGnd < 0.01);
+%     end
     
     % load and store standard deviation data
     if do_std
