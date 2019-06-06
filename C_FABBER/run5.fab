@@ -1,8 +1,8 @@
 # fabber run 5 - SQBOLD
 
 # Input Data - in vivo ASE
-data=../../Data/validation_sqbold/vs1/ASE_FLAIR_8.nii.gz
-mask=../../Data/validation_sqbold/vs1/mask_flair.nii.gz
+data=../../Data/validation_sqbold/vs7/ASE_FLAIR_8.nii.gz
+mask=../../Data/validation_sqbold/vs7/mask_flair.nii.gz
 
 
 # Run Options

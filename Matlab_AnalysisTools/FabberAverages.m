@@ -32,7 +32,7 @@ clear;
 vars = {'R2p','DBV','OEF'};
 
 % Choose Data set
-for setnum = [995,987,973]
+for setnum = 436:442
     
 vecRes = zeros(4*length(vars),1);
 
@@ -106,7 +106,7 @@ end
 
 % Threshold values
 threshes = containers.Map({'R2p', 'DBV', 'OEF', 'VC', 'DF', 'lambda', 'Ax' },...
-                          [ 30  ,  0.5   ,  1   ,  1  ,  15 ,   1     ,  30  ]);  
+                          [ 30  ,  1   ,  1   ,  1  ,  15 ,   1     ,  30  ]);  
 
 % Title
 % disp(['Data from Fabber Set ',num2str(setnum),'. ',setname, ' Subject ',num2str(subnum)]);
