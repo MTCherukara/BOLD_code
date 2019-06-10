@@ -62,8 +62,8 @@ params.TR   = 3;
 params.TI   = 1.21;
 
 % Physiology
-params.lam0 = 0.00;         % no units  - ISF/CSF signal contribution
-params.zeta = 0.10;         % no units  - deoxygenated blood volume
+params.lam0 = 0.05;         % no units  - ISF/CSF signal contribution
+params.zeta = 0.03;         % no units  - deoxygenated blood volume
 params.OEF  = 0.40;         % no units  - oxygen extraction fraction
 
 params.dF = 5;

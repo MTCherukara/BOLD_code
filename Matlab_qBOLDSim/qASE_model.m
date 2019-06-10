@@ -236,14 +236,15 @@ function M = calcMagnetization(tau,TE,TR,T1,T2,TI)
     expT2 = (TE - tau)./T2;
 
     % compute terms
-    terme = 1 + (2.*exp(expT2));
+    terme = 1 + (2.*exp((TE - tau)./(2.*T1)));
     termf = (2 - exp(-(TR - TI)./T1)).*exp(-TI./T1);
     termt = exp(-expT2);
 
     % put it all together
 %     M = ( 1 - (terme.*termf) ) .* termt;
-    M = 1 - (2*exp(-TI./T1)) + exp(-TR./T1);
-    
+%     M = 1 - (2*exp(-TI./T1)) + exp(-TR./T1);
+    M = 1 - ( 2 - exp(-(TR-TI)./T1)) .* exp(-TI/T1);
+
 end
 
 
