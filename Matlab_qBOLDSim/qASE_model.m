@@ -21,16 +21,16 @@ function [S,PARAMS] = qASE_model(TAU,TE,PARAMS)
     % components as described by Berman & Pike (2017) and Simon et al. (2016)
     %
     % 
-    %       Copyright (C) University of Oxford, 2016-2018
+    %       Copyright (C) University of Oxford, 2016-2019
     %
     % 
     % Created by MT Cherukara, 16 May 2016
     %
     % CHANGELOG:
     %
-    % 2019-03-20 (MTC). Changed the way steady-state magnetization is calculated
-    %       back to the simpler model, because the more complicated version
-    %       doesn't actually work in terms of the FLAIR inversion.
+    % 2019-05-27 (MTC). Added alternative models for calculating intravascular
+    %       signal, especially the 'powder model' (Sukstanskii, 2001), and the
+    %       'linear' model (Simon et al., 2016).
     %
     % 2018-10-30 (MTC). Added in a parameter for short-tau DBV offset (referred
     %       to in my notes as beta), and for linear R2' scaling factor SR, and

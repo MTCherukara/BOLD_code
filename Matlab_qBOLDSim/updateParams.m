@@ -1,7 +1,9 @@
 function PARAMS = updateParams(VALUE,PARAMS,INFER)
-    % This function is used in Bayesian inference of simulated qBOLD (ASE)
-    % data to update the values in the PARAMS structure at each iteration
-    % of either a grid search or Metropolis Hastings algorithm.
+    % updateParams.m, changes the value of one entry in the PARAMS structure.
+    %
+    % This function is used in Bayesian inference of simulated qBOLD (ASE) data 
+    % to update the values in the PARAMS structure at each iteration of a grid
+    % search algorithm. It is called within gridSearchBayesian.m
     %
     % Usage:
     %
@@ -14,15 +16,17 @@ function PARAMS = updateParams(VALUE,PARAMS,INFER)
     %        INFER  - String corresponding to the name of the specific paramter
     %                 which is to be updated.
     %
-    % For use in MTC_Asymmetric_Bayes and similar
+    % For use in gridSearchBayesian.m and similar
     %
     % 
-    %       Copyright (C) University of Oxford, 2016-2017
+    %       Copyright (C) University of Oxford, 2016-2019
     %
     % 
     % Created by MT Cherukara, 29 April 2016
     %
     % CHANGELOG:
+    %
+    % 2019-06-11 (MTC). Updated for resubmision of model-fitting paper.
     %
     % 2018-09-13 (MTC). Removed the MH multiple-update functionality, now you
     %       have to call this function once per parameter you want to update.

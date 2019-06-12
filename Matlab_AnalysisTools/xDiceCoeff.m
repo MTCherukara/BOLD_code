@@ -16,7 +16,7 @@ clear;
 subnum = '09';
 
 % Define partial volume map names
-mapnames = {'CSF_T1w','CSF_T2seg','CSF_T2fit_new'};
+mapnames = {'CSF_T1w','CSF_T2seg','CSF_T2fit_new','CSF_contrast'};
 
 % Define binary thresholds
 threshes = [0.05, 0.20, 0.40, 0.60, 0.80, 0.95];
@@ -93,7 +93,8 @@ end
 
 % determine number of pairs
 inds = 1:nmap;
-pairs = combnk(inds,2);
+% pairs = flipud(combnk(inT1ds,2));
+pairs = [1,4; 2,4; 3,4];
 npairs = size(pairs,1);
 
 % Pre-allocate DSC results
