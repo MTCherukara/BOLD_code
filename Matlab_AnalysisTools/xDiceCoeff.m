@@ -16,14 +16,14 @@ clear;
 subnum = '09';
 
 % Define partial volume map names
-mapnames = {'CSF_T1w','CSF_T2seg','CSF_T2fit_new','CSF_contrast'};
+mapnames = {'CSF_T1w','CSF_T2seg','CSF_T2fit_new','CSF_contrast','CSF_T2w'};
 
 % Define binary thresholds
 threshes = [0.05, 0.20, 0.40, 0.60, 0.80, 0.95];
 
 % Options
 logit = 0;      % Caluclate logit(DSC)
-display = 0;    % Print out the results
+display = 1;    % Print out the results
 
 
 %% FIXED PARAMETERS
@@ -89,12 +89,12 @@ for tt = 1:nthr
 end
 
 
-%% COMPARE
+%% PAIRWISE COMPARISON
 
 % determine number of pairs
 inds = 1:nmap;
 % pairs = flipud(combnk(inT1ds,2));
-pairs = [1,4; 2,4; 3,4];
+pairs = [1,5];
 npairs = size(pairs,1);
 
 % Pre-allocate DSC results
@@ -140,6 +140,52 @@ for pp = 1:npairs
     
 end % for pp = 1:npairs
 
-if display == 0
-    disp(DSC')
-end
+% if display == 0
+%     disp(DSC')
+% end
+
+
+%% ODD-ONE-OUT COMPARISON
+
+% pre-allocate results
+oddones = zeros(nmap,nthr);
+
+% loop through threshes
+for tt = 1:nthr
+    
+    % pull out that threshold
+    mat_thrs = squeeze(mat_binary(:,:,tt));
+    
+    % sum
+    vec_sum = sum(mat_thrs,2);
+    
+    % identify consensus voxels
+    vec_cons = (vec_sum == 0) + (vec_sum == nmap);
+    
+    % count consensus voxels
+    ncons = sum(vec_cons);
+    
+    % number of non-consensus voxels
+    nnonc = nvox - ncons;
+    
+    % remove consensus voxels from MAT_THRS
+    mat_thrs(vec_cons == 1,:) = [];
+    
+    % Loop through maps
+    for mm = 1:nmap
+        
+        % focus on all other sets
+        mat_rest = mat_thrs;
+        mat_rest(:,mm) = [];
+        
+        % count the new number of consensus voxels
+        vec_rsum = sum(mat_rest,2);
+        vec_rcon = (vec_rsum == 0) + (vec_rsum == (nmap-1));
+        rcons = sum(vec_rcon);
+        
+        % store the fraction of new consensus voxels
+        oddones(mm,tt) = rcons/nvox;
+        
+    end % for mm = 1:nmap
+    
+end % for tt = 1:nthr

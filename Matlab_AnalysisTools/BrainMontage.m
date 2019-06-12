@@ -33,9 +33,9 @@ end
 
 % Check whether slices have been specified, if not, default to 3:10
 if ~exist('slices','var')
-    slices = 3:10;       % VS
+%     slices = 3:10;       % VS
 %     slices = 3:14;       % CSF
-%     slices = 1:6;       % s11 FLAIR
+    slices = 2:6;       % s11 FLAIR
 end
 ns = length(slices); % number of slices
 
@@ -53,7 +53,7 @@ elseif strfind(lower(niname),'df')
     threshold = 15;
     cmp = inferno;
 else
-    threshold = 100;
+    threshold = 1;
     cmp = gray;
 end
 
@@ -85,8 +85,8 @@ if length(slices) == 1
     sh_top = 0;
     sh_bot = 0;
 else
-    sh_sds = 12;        % sides
-    sh_top = 10;         % top and bottom
+    sh_sds = 15;        % sides
+    sh_top = 5;         % top and bottom
     sh_bot = 5;
 end
 
@@ -183,3 +183,5 @@ axis equal
 % yticks([25,35,45,55,65]);
 
 % For a 2x3 grid, plot 30 lines high, and up to this point: %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% Five-row CSF maps up to here: %%%%%%%%%%%%%%%%%%%%%%%%%%%%
