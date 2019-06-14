@@ -569,12 +569,11 @@ void R2primeFwdModel::Evaluate(const ColumnVector &params, ColumnVector &result)
     // we can do the magnetization stuff outside the loop, since they are not affected by tau
 
     // calculate steady state magnetization values, for tissue, blood, and CSF
-    // NEW VERSION
-    
-    mt = 1.0 - (2.0*exp(-TI/T1t)) + exp(-TR/T1t);
-    mb = 1.0 - (2.0*exp(-TI/T1b)) + exp(-TR/T1b);
-    me = 1.0 - (2.0*exp(-TI/T1e)) + exp(-TR/T1e);
-    
+    // CORRECT VERSION
+
+    mt = 1.0 - ( ( 2 - exp(-(TR-TI)/T1t) ) * exp(-TI/T1t) );
+    mb = 1.0 - ( ( 2 - exp(-(TR-TI)/T1b) ) * exp(-TI/T1b) );
+    me = 1.0 - ( ( 2 - exp(-(TR-TI)/T1e) ) * exp(-TI/T1e) );
 
     // OLD VERSION (with no TAU dependence)
     

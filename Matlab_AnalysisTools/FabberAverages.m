@@ -32,13 +32,13 @@ clear;
 vars = {'R2p','DBV','OEF'};
 
 % Choose Data set
-for setnum = 436:442
+for setnum = 826:840
     
 vecRes = zeros(4*length(vars),1);
 
 
 % Which set of subjects is this from?
-setname = 'VS';          % 'VS', 'genF', 'genNF', 'CSF', or 'AMICI'
+setname = 'CSF';          % 'VS', 'genF', 'genNF', 'CSF', or 'AMICI'
 
 % do Free energy?
 do_FE = 0;

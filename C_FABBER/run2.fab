@@ -1,8 +1,8 @@
 # fabber run 2, CSF stuff
 
 # Input Data (subjects 3, 4, 6, 8, 9)
-data=../../Data/subject_12/ASE_80_FLAIR_unrung.nii.gz
-mask=../../Data/subject_12/mask_80_FLAIR.nii.gz
+data=../../Data/subject_09/ASE_NF_82_unrung.nii.gz
+mask=../../Data/subject_09/mask_FLAIR.nii.gz
 
 # Run Options
 output=../../Data/Fabber_Results/
@@ -11,29 +11,29 @@ save-model-fit
 print-free-energy
 
 # Method Information
-method=vb
+method=spatialvb
 noise=white
 max-iterations=10
 allow-bad-voxels
 
 # Spatial VB Information (remove all of this if method!=spatialvb)
-#param-spatial-priors=MMM
-#image-prior4=../../Data/subject_09/CSF_T2fit_new.nii.gz
+param-spatial-priors=NNNI
+image-prior4=../../Data/subject_09/CSF_T2w.nii.gz
 
 # Inference Model 
 model=qboldR2p
 inferR2p
 inferDBV
 inferS0
-#inferlam
+inferlam
 #inferdF
 
-#motional_narrowing
+motional_narrowing
 include_intra
 
-precR2p=1e-3
-precDBV=1e0
-#precCSF=1e-1
+precR2p=1e-4
+precDBV=1e-2
+precCSF=1e0
 
 # Correction Parameters
 #SR=0.47
@@ -41,9 +41,9 @@ precDBV=1e0
 #eta=0.2
 
 # Scan Parameters (maybe I'll think of a better way of doing this...)
-TE=0.084
-TR=2.000
-TI=0.870
+TE=0.082
+TR=3.000
+TI=0.0
 
 tau1=-0.016
 tau2=-0.008
