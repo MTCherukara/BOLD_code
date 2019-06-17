@@ -17,15 +17,15 @@ max-iterations=10
 allow-bad-voxels
 
 # Spatial VB Information (remove all of this if method!=spatialvb)
-param-spatial-priors=NNNI
-image-prior4=../../Data/subject_09/CSF_T2w.nii.gz
+param-spatial-priors=MMM
+#image-prior4=../../Data/subject_09/CSF_T1w.nii.gz
 
 # Inference Model 
 model=qboldR2p
 inferR2p
 inferDBV
 inferS0
-inferlam
+#inferlam
 #inferdF
 
 motional_narrowing
@@ -33,7 +33,7 @@ include_intra
 
 precR2p=1e-4
 precDBV=1e-2
-precCSF=1e0
+#precCSF=1e-1
 
 # Correction Parameters
 #SR=0.47

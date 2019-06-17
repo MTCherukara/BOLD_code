@@ -1,4 +1,4 @@
-% CalculateSNR.m
+% function CalculateSNR(subnum)
 % Matthew Cherukara
 
 % Actively used as of 2019-02-11
@@ -7,9 +7,9 @@ clear;
 close all;
 
 % Manual selection of subject
-subnum = 1;
-ddir = strcat('/Users/mattcher/Documents/DPhil/Data/validation_sqbold/vs',num2str(subnum),'/');
-dfile = 'ASE_FLAIR_av_mc.nii.gz';
+subnum = 3;
+ddir = strcat('/Users/mattcher/Documents/DPhil/Data/subject_0',num2str(subnum),'/');
+dfile = 'ASE_NF_82_unrung.nii.gz';
 
 % % have the user the data file, then load it
 % disp('Choose data file:');
@@ -18,11 +18,11 @@ dfile = 'ASE_FLAIR_av_mc.nii.gz';
 % Load the data
 [ddata,dims] = read_avw([ddir,dfile]);
 
-slices = 4:9;
+slices = 3:8;
 
 % see if there is a 'ROI_brain' file present
 try
-    bmask = read_avw([ddir,'mask_gm.nii.gz']);
+    bmask = read_avw([ddir,'mask_new_gm_80.nii.gz']);
 catch
     disp('Choose brain ROI mask');
     [bfile,bdir] = uigetfile('*.nii.gz','Choose brain ROI mask');
@@ -31,7 +31,7 @@ end
 
 % see if there is a 'ROI_air' file present
 try 
-    amask = read_avw([ddir,'mask_air.nii.gz']);
+    amask = read_avw([ddir,'ROI_air.nii.gz']);
 catch
     disp('Choose air ROI mask');
     [afile,adir] = uigetfile('*.nii.gz','Choose air ROI mask');
@@ -79,11 +79,13 @@ for ii = 1:dims(4)
 %     disp(['  SNR of Volume ',num2str(ii),' of ',num2str(dims(4)),': ',round2str(snr(ii),2)]);
 end
 
-disp(['Average SNR  : ',round2str(mean(snr),1)]);
-disp(['  SNR (tau=0): ',round2str(snr(8),1)]);    % if tau = -28:4:64, tau(8) = 0
-disp(['  SNR (end)  : ',round2str(snr(end),1)]);
+disp(['Average SNR  : ',round2str(mean(snr),2),' +/- ',num2str(std(snr),3)]);
+% disp(['  SNR (tau=0): ',round2str(snr(3),1)]);    % if tau = -28:4:64, tau(8) = 0
+% disp(['  SNR (end)  : ',round2str(snr(end),1)]);
 
 % Calculate CNR
-cnr = (signal(8) - signal(end))./mean(sigma);
+cnr = (signal(3) - signal(end))./mean(sigma);
 % cnr = (max(signal) - min(signal))./mean(sigma);
-disp(['  CNR        : ',round2str(cnr,1)]);
+disp(['  CNR        : ',round2str(cnr,2),' +/- ',num2str(std(cnr),3)]);
+
+% disp(snr);
