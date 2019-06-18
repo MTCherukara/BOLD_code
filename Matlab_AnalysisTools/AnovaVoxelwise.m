@@ -1,4 +1,4 @@
-% voxelwise_anova.m
+% AnovaVoxelwise.m
 %
 % calculates variation between fabber data-sets, on a voxel-wise basis using
 % ANOVA. Derived from FabberAverages.m
@@ -20,18 +20,19 @@ clear;
 % close all;
 setFigureDefaults;
 
-set0 = 1;
+set0 = 2;
 
 %% User Selected Parameters
-vname = 'R2p';              % variable name
-setname = 'VS';
-lbls = {'L Model','1C Model','2C Model'};
+vname = 'OEF';              % variable name
+setname = 'CSF';
+lbls = {'FP-2C','NF-2C','NF-3C','NF-T1','NF-T2','NF-BF','NF-FC'};
 
 % Pick FABBER datasets
-fsets = [855, 901, 915] + set0 - 1;
+% fsets = [836,806:5:835] + set0 - 1;
+fsets = [876,846:5:856,881,866:5:875] + set0 - 1;
 
 % Which pairs of FSETS do we want to compare?
-grps = {[1,2];[1,3]};
+grps =  {[1,2],[1,3],[1,4],[1,5],[1,6],[1,7]};
 
 
 %% Basics
@@ -74,7 +75,7 @@ switch setname
     case 'CSF'
         
         slicenum = 3:8;
-        maskname = 'mask_new_gm_50.nii.gz';
+        maskname = 'mask_new_gm_80.nii.gz';
         CC = strsplit(fabdir,'_s');     % need a 2-digit subject number
         subnum = CC{2}(1:2);
         maskdir = ['/Users/mattcher/Documents/DPhil/Data/subject_',subnum,'/'];

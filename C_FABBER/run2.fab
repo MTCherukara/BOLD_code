@@ -1,8 +1,8 @@
 # fabber run 2, CSF stuff
 
 # Input Data (subjects 3, 4, 6, 8, 9)
-data=../../Data/subject_09/ASE_NF_82_unrung.nii.gz
-mask=../../Data/subject_09/mask_FLAIR.nii.gz
+data=../../Data/subject_06/ASE_NF_82_unrung.nii.gz
+mask=../../Data/subject_06/mask_FLAIR.nii.gz
 
 # Run Options
 output=../../Data/Fabber_Results/
@@ -17,23 +17,23 @@ max-iterations=10
 allow-bad-voxels
 
 # Spatial VB Information (remove all of this if method!=spatialvb)
-param-spatial-priors=MMM
-#image-prior4=../../Data/subject_09/CSF_T1w.nii.gz
+param-spatial-priors=MMMI
+image-prior4=../../Data/subject_06/CSF_T2w.nii.gz
 
 # Inference Model 
 model=qboldR2p
 inferR2p
 inferDBV
 inferS0
-#inferlam
+inferlam
 #inferdF
 
 motional_narrowing
 include_intra
 
 precR2p=1e-4
-precDBV=1e-2
-#precCSF=1e-1
+precDBV=1e-1
+precCSF=1e1
 
 # Correction Parameters
 #SR=0.47

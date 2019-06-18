@@ -32,7 +32,7 @@ clear;
 vars = {'R2p','DBV','OEF'};
 
 % Choose Data set
-for setnum = 841:850
+for setnum = [876:880]
     
 vecRes = zeros(4*length(vars),1);
 
