@@ -20,19 +20,19 @@ clear;
 % close all;
 setFigureDefaults;
 
-set0 = 2;
+set0 = 4;
 
 %% User Selected Parameters
 vname = 'OEF';              % variable name
 setname = 'CSF';
-lbls = {'FP-2C','NF-2C','NF-3C','NF-T1','NF-T2','NF-BF','NF-FC'};
+lbls = {'FP-2C','NF-2C','NF-3C'};%,'NF-T1','NF-T2','NF-BF','NF-FC'};
 
 % Pick FABBER datasets
-% fsets = [836,806:5:835] + set0 - 1;
-fsets = [876,846:5:856,881,866:5:875] + set0 - 1;
+fsets = [801,806:5:815] + set0 - 1;
+% fsets = [876,846:5:875] + set0 - 1;
 
 % Which pairs of FSETS do we want to compare?
-grps =  {[1,2],[1,3],[1,4],[1,5],[1,6],[1,7]};
+grps =  {[1,2]};
 
 
 %% Basics
@@ -75,7 +75,7 @@ switch setname
     case 'CSF'
         
         slicenum = 3:8;
-        maskname = 'mask_new_gm_80.nii.gz';
+        maskname = 'mask_new_gm_99.nii.gz';
         CC = strsplit(fabdir,'_s');     % need a 2-digit subject number
         subnum = CC{2}(1:2);
         maskdir = ['/Users/mattcher/Documents/DPhil/Data/subject_',subnum,'/'];
@@ -122,6 +122,7 @@ end
         % down to the length of the largest set, and then deal with the extra
         % zeros later
 matData = zeros(5000,nsets);
+matStdv = zeros(5000,nsets);
 
 % pre-assign the max and min lengths, which will be replaced in the loop
 maxLength = 1; 
@@ -141,12 +142,17 @@ for ss = 1:nsets
     
     % Load the data
     volData = LoadSlice([fabdir,'mean_',vname,'.nii.gz'],slicenum);
+    
+    % Load standard deviation data
+    volStdv  = LoadSlice([fabdir,'std_',vname,'.nii.gz'],slicenum);
 
     % Apply mask
     volData = abs(volData(:).*mskData(:));
+    volStdv = volStdv(:).*mskData(:);
     
     % Remove bad values
     volData(volData == 0) = [];
+    volStdv(volStdv == 0) = [];
     
     % pull out the length of the data
     dataLength = length(volData);
@@ -157,6 +163,7 @@ for ss = 1:nsets
     
     % assign data into the pre-allocated array
     matData(1:dataLength,ss) = volData;
+    matStdv(1:dataLength,ss) = volStdv;
     
 end
 
@@ -168,14 +175,20 @@ thrsh = threshes(vname);
 
 % cut off excess zeros in the data array
 matData = matData(1:minLength,:);    
+matStdv = matStdv(1:minLength,:);
 
 % Now remove some bad values from the matrix
 matBad = (matData > thrsh) + ~isfinite(matData);
+matBad = matBad + (matStdv > 1e2*thrsh) + ~isfinite(matStdv);
 badrows = sum(matBad,2);
 matData(badrows > 0,:) = [];
+matStdv(badrows > 0,:) = [];
     
 % Average
-aData = mean(matData);
+aData = median(matData);
+% sData = std(matData);
+sData = (quantile(matData,0.75) - quantile(matData,0.25))./2;
+% sData = mean(matStdv);
 
 % ANOVA
 [~,~,daStats] = anova2(matData,1,'off');
@@ -189,6 +202,7 @@ pvls = MC_pvalues(daC,grps);
 
 if strcmp(vname,'DBV') || strcmp(vname,'OEF') || strcmp(vname,'VC') || strcmp(vname,'lambda')
         aData = aData.*100;
+        sData = sData.*100;
 end
     
 % Maximum y-axis value based on the variable:
@@ -199,6 +213,8 @@ yMax = containers.Map({'R2p', 'DBV' , 'OEF' , 'VC', 'DF', 'lambda'}, ...
 figure;
 hold on; box on;
 bar(1:nsets,aData,0.6);
+errorbar(1:nsets,aData,sData,'k.','LineWidth',2,'MarkerSize',1);
+
 
 % Set Axes
 axis([0.5,nsets+0.5,0,yMax(vname)]);
