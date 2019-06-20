@@ -49,6 +49,7 @@ protected:
     double prec_DBV;
     double prec_CSF;
     double prec_OEF;
+    double prec_DF;
 
     // Model parameters
     double SR;      // this is a scaling factor for R2', applied in the asymptotic model

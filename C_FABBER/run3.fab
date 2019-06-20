@@ -21,7 +21,8 @@ max-iterations=10
 
 # Inference Model 
 model=spinEcho
-infer_theta
+#infer_theta
+infer_r2
 
 # Scan Parameters (maybe I'll think of a better way of doing this...)
 TE1=0.066

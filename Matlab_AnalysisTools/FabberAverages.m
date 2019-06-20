@@ -29,10 +29,11 @@ clear;
 %% User To Select Fabber Data To Display
 
 % Choose Variables
-vars = {'R2p','DBV','OEF'};
+% vars = {'R2p','DBV','OEF'};
+vars = {'R2'};
 
 % Choose Data set
-for setnum = [801:815]
+for setnum = 791:795
     
 vecRes = zeros(4*length(vars),1);
 
@@ -81,7 +82,7 @@ switch setname
     case 'CSF'
         
         slicenum = 3:8;
-        maskname = 'mask_new_gm_99.nii.gz';
+        maskname = 'mask_new_gm_80.nii.gz';
         CC = strsplit(fabdir,'_s');     % need a 2-digit subject number
         subnum = CC{2}(1:2);
         maskdir = ['/Users/mattcher/Documents/DPhil/Data/subject_',subnum,'/'];
@@ -105,8 +106,8 @@ switch setname
 end
 
 % Threshold values
-threshes = containers.Map({'R2p', 'DBV', 'OEF', 'VC', 'DF', 'lambda', 'Ax' },...
-                          [ 30  ,  1   ,  1   ,  1  ,  15 ,   1     ,  30  ]);  
+threshes = containers.Map({'R2p', 'DBV', 'OEF', 'VC', 'DF', 'lambda', 'Ax' , 'R2'},...
+                          [ 30  ,  1   ,  1   ,  1  ,  15 ,   1     ,  30  ,  50 ]);  
 
 % Title
 % disp(['Data from Fabber Set ',num2str(setnum),'. ',setname, ' Subject ',num2str(subnum)]);

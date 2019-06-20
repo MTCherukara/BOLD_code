@@ -38,7 +38,7 @@ string SpinEchoFwdModel::GetDescription() const
 
 string SpinEchoFwdModel::ModelVersion() const
 {
-    return "1.2";
+    return "1.2 June 2019";
 } // ModelVersion
 
 
