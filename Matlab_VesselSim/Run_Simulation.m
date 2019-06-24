@@ -18,7 +18,7 @@
 % Created by NP Blockley, March 2016
 %
 %
-%       Copyright (C) University of Oxford, 2016-2018
+%       Copyright (C) University of Oxford, 2016-2019
 %
 %
 % CHANGELOG:
@@ -34,45 +34,55 @@
 %       save out the results.
 
 clear;
-tic;
 
-save_data = 1;  % set this to 1 to save storedPhase data out, or 0 not to
+radii = [38:44,46:50,22.5,60,90,51:59,61:89,91:100];
 
-% DBV Values for reference
-% 0.0100    0.0167    0.0233    0.0300    0.0367    0.0433    0.0500    0.0567    0.0633    0.0700
-
-% Fixed Parameters
-p.D     = 1e-9;     % m^2/s - Rate of diffusion
-p.B0    = 3;        % T     - Static magnetic field
-p.TE    = 60e-3;    % s     - Echo time
-p.dt    = 200e-6;   % s     - Time between steps (0.2ms) - leads to having 10 points per T
-p.Hct   = 0.40;     % -     - Fractional haematocrit
-p.N     = 10000;    % -     - Number of particles
-p.gamma = 2*pi*42.58e6;     % Gyromagnetic ratio
-p.deltaTE = 0.002;  % s     - step size (1ms) this should give more data
-p.deltaChi0 = 0.264e-6;     % Susceptibility difference
-p.universeScale = 45;      % Defines size of universe
-p.solidWalls = 0;
-
-% Sharan Radii
-%       2.8    7.5   15.0   22.5   45.0   90.0
-
-% Varied Parameters
-p.R = 1.*1e-6;               % m     - Vessel radius
-p.Y = 0.6;                  % -     - (1-OEF)
-p.V = 0.03;                 % -     - Volume
-p.vesselFraction = p.V;
-
-% Derived parameters
-
-[Phase,p] = vesselSim(p);
-
-toc;
-% save out data
-if save_data
-    dataname = ['newStoredPhase/VSdata_R_'  ,num2str(p.R(1)*1e6),...
-                                     '_OEF_',num2str(100*(1-p.Y)),...
-                                     '_DBV_',num2str(100*sum(p.V))];
+for rr = 1:length(radii)
+   
+    rad0 = radii(rr);
     
-    save(strcat(dataname,'.mat'),'Phase','p');
-end
+    disp(['Simulating Radius ',num2str(rad0),'um']);
+    
+    tic;
+
+    save_data = 1;  % set this to 1 to save storedPhase data out, or 0 not to
+
+    % DBV Values for reference
+    % 0.0100    0.0167    0.0233    0.0300    0.0367    0.0433    0.0500    0.0567    0.0633    0.0700
+
+    % Fixed Parameters
+    p.D     = 1e-9;     % m^2/s - Rate of diffusion
+    p.B0    = 3;        % T     - Static magnetic field
+    p.TE    = 120e-3;    % s     - Echo time
+    p.dt    = 200e-6;   % s     - Time between steps (0.2ms) - leads to having 10 points per T
+    p.Hct   = 0.40;     % -     - Fractional haematocrit
+    p.N     = 10000;    % -     - Number of particles
+    p.gamma = 2*pi*42.58e6;     % Gyromagnetic ratio
+    p.deltaTE = 0.001;  % s     - step size (1ms) this should give more data
+    p.deltaChi0 = 0.264e-6;     % Susceptibility difference
+    p.universeScale = 45;      % Defines size of universe
+    p.solidWalls = 0;
+
+    % Sharan Radii
+    %       2.8    7.5   15.0   22.5   45.0   90.0
+
+    % Varied Parameters
+    p.R = rad0.*1e-6;               % m     - Vessel radius
+    p.Y = 0.6;                  % -     - (1-OEF)
+    p.V = 0.03;                 % -     - Volume
+    p.vesselFraction = p.V;
+
+    % Derived parameters
+
+    [spp,p] = vesselSim(p);
+
+    toc;
+    % save out data
+    if save_data
+        datdir = 'D:\Matthew\1_DPhil\Data\vesselsim_data\simulated_data\';
+        dataname = [datdir,'FullData_R_'  ,num2str(p.R(1)*1e6)];
+
+        save(strcat(dataname,'.mat'),'spp','p');
+    end
+    
+end % for rr = 1:length(radii)

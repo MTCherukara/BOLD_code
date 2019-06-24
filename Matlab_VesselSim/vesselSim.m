@@ -8,7 +8,7 @@
 % Created by NP Blockley, March 2016
 %
 %
-%       Copyright (C) University of Oxford, 2016-2018
+%       Copyright (C) University of Oxford, 2016-2019
 %
 %
 % CHANGELOG:
