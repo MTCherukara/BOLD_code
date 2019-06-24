@@ -35,7 +35,7 @@
 
 clear;
 
-radii = [38:44,46:50,22.5,60,90,51:59,61:89,91:100];
+radii = [2.8,7.5];
 
 for rr = 1:length(radii)
    
@@ -79,7 +79,7 @@ for rr = 1:length(radii)
     toc;
     % save out data
     if save_data
-        datdir = 'D:\Matthew\1_DPhil\Data\vesselsim_data\simulated_data\';
+        datdir = '/Users/mattcher/OneDrive - Nexus365/DPhil/Data/vsdata/';
         dataname = [datdir,'FullData_R_'  ,num2str(p.R(1)*1e6)];
 
         save(strcat(dataname,'.mat'),'spp','p');

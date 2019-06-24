@@ -60,6 +60,7 @@ void R2primeFwdModel::Initialize(ArgsType &args)
 
     inc_intra = args.ReadBool("include_intra");
     inc_csf = args.ReadBool("include_csf");
+    ignore_T1 = args.ReadBool("ignore_T1");
 
     motion_narr = args.ReadBool("motional_narrowing");
 
@@ -541,8 +542,8 @@ void R2primeFwdModel::Evaluate(const ColumnVector &params, ColumnVector &result)
     }
 
     // calculate tc and threshold it if necessary
-    //tc = 1.7/dw;
-    tc = 0.010;
+    tc = 1.7/dw;
+    //tc = 0.010;
     /*
     if (tc > 0.03)
     {
@@ -557,47 +558,32 @@ void R2primeFwdModel::Evaluate(const ColumnVector &params, ColumnVector &result)
     R2b  = ( 4.5 + (16.4*Hct)) + ( ((165.2*Hct) + 55.7)*pow(OEF,2.0) );
     R2bp = (10.2 - ( 1.5*Hct)) + ( ((136.9*Hct) - 13.9)*pow(OEF,2.0) );
     
+    // simulated data doesn't have any T1 contrast
+    if (ignore_T1)
+    {
+        lam0 = lam;
+        CBV = DBV;
+    }
+    else
+    {
+        // here are some more constants we will need
+        double T1t = 1.20;
+        double T1e = 3.87;
+        double T1b = 1.58;
 
-    // here are some more constants we will need
-    double T1t = 1.20;
-    double T1e = 3.87;
-    double T1b = 1.58;
+        double nt = 0.723;
+        double ne = 1.000;
+        double nb = 0.775;
 
-    double nt = 0.723;
-    double ne = 1.000;
-    double nb = 0.775;
+        // calculate magnetizations
+        mt = 1.0 - ( ( 2 - exp(-(TR-TI)/T1t) ) * exp(-TI/T1t) );
+        mb = 1.0 - ( ( 2 - exp(-(TR-TI)/T1b) ) * exp(-TI/T1b) );
+        me = 1.0 - ( ( 2 - exp(-(TR-TI)/T1e) ) * exp(-TI/T1e) );
 
-    // we can do the magnetization stuff outside the loop, since they are not affected by tau
-
-    // calculate steady state magnetization values, for tissue, blood, and CSF
-    // CORRECT VERSION
-
-    mt = 1.0 - ( ( 2 - exp(-(TR-TI)/T1t) ) * exp(-TI/T1t) );
-    mb = 1.0 - ( ( 2 - exp(-(TR-TI)/T1b) ) * exp(-TI/T1b) );
-    me = 1.0 - ( ( 2 - exp(-(TR-TI)/T1e) ) * exp(-TI/T1e) );
-
-    // OLD VERSION (with no TAU dependence)
-    
-    /*
-    double TE = TEvals(1);
-    mt = exp(-TE*R2t) * ( 1 - ( 1 + (2*exp(TE/(2*T1t))) ) * ( 2 - exp(-(TR-TI)/T1t)) * exp(-TI/T1t) );
-    mb = exp(-TE*R2b) * ( 1 - ( 1 + (2*exp(TE/(2*T1b))) ) * ( 2 - exp(-(TR-TI)/T1b)) * exp(-TI/T1b) );
-    me = exp(-TE*R2e) * ( 1 - ( 1 + (2*exp(TE/(2*T1e))) ) * ( 2 - exp(-(TR-TI)/T1e)) * exp(-TI/T1e) );
-      */
-
-    /* OLD OLD VERSION
-    double TE = TEvals(1);
-    mt = exp(-(TE-tau)*R2t) * ( 1 - ( 1 + (2*exp((TE-tau)/(2*T1t))) ) 
-                                * ( 2 - exp(-(TR-TI)/T1t)) * exp(-TI/T1t)  );
-    mb = exp(-(TE-tau)*R2b) * ( 1 - ( 1 + (2*exp((TE-tau)/(2*T1b))) ) 
-                                * ( 2 - exp(-(TR-TI)/T1b)) * exp(-TI/T1b)  );
-    me = exp(-(TE-tau)*R2e) * ( 1 - ( 1 + (2*exp((TE-tau)/(2*T1e))) ) 
-                                * ( 2 - exp(-(TR-TI)/T1e)) * exp(-TI/T1e)  );
-    */
-
-    // calculate tissue compartment weightings
-    lam0 = (ne*me*lam) / ( (nt*mt*(1-lam)) + (ne*me*lam) );
-    CBV = nb*mb*(1-lam0)*DBV;
+        // calculate tissue compartment weightings
+        lam0 = (ne*me*lam) / ( (nt*mt*(1-lam)) + (ne*me*lam) );
+        CBV = nb*mb*(1-lam0)*DBV;
+    }
     
     // loop through taus
     result.ReSize(taus.Nrows());

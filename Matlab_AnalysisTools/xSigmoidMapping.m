@@ -10,39 +10,57 @@
 % Actively used as of 2019-04-16
 %
 % CHANGELOG:
+%
+% 2019-06-24 (MTC). This version is used for sets of 5 results, with DBV values
+%       of 1, 3, 5, 7, and 9% respectively. Added functionality for random-grid
+%       variant
 
 
 clear;
-close all;
+% close all;
 setFigureDefaults;
 
-plot_orig = 0;      % for plotting the tan shape
-plot_rand = 1;      % for random plots
+plot_orig = 1;      % for plotting the tan shape
+plot_rand = 0;      % for random plots
 
-% choose first dataset (assuming there are 5 after it)
-set1 = 521;
+% are we using a random grid of OEF and DBV values? If so, paramPairs = 1;
+paramPairs = 1;
+
+% % define the five datasets we want
+% set1 = 636;
+% sets = set1:set1+4;
 
 kappa = .47;
 
-% define the five datasets we want
-sets = set1:set1+4;
-% sets = [563,538];
+% define any number of datasets
+sets = 641;
 
 %% Find directories, and load ground truth data and stuff
 % Data directory
 resdir = '/Users/mattcher/Documents/DPhil/Data/Fabber_ModelFits/';
 
-% Ground truth
-% OEFvals = linspace(0.21,0.70,no);
-OEFvals = 0.01:0.01:1;
-DBVvals = 0.01:0.02:0.09;
-% DBVvals = [0.05,0.05];
+if paramPairs == 0
+    
+    % Ground truth
+    % OEFvals = linspace(0.21,0.70,no);
+    OEFvals = 0.01:0.01:1;
+    DBVvals = 0.01:0.02:0.09;
+    % DBVvals = 0:0.01:0.09;
+    % DBVvals = [0.05,0.05];
+
+else
+    
+    load(['../Matlab_VesselSim/Sim_OEF_DBV_pairs_',num2str(paramPairs),'.mat']);
+    OEFvals = OEFvals(:);
+    DBVvals = DBVvals(:);
+end
 
 no = length(OEFvals);
 nd = length(sets);
 mo = 0.8*max(OEFvals);
 
-% Pre-allocate
+
+% Pre-allocate (remove the nd dimension for the 5-DBV analysis)
 estR2p = zeros(length(sets),no);
 estDBV = zeros(length(sets),no);
 estOEF = zeros(length(sets),no);
@@ -58,18 +76,29 @@ for ss = 1:length(sets)
     % Load the data
     volR = LoadSlice([fabdir,'mean_R2p.nii.gz'],1);
     volV = LoadSlice([fabdir,'mean_DBV.nii.gz'],1);
+    
+    if paramPairs == 0
 
-    % Average
-    vecR = mean(volR,1);
-    vecV = mean(volV,1);
+        % Average
+        vecR = mean(volR,1);
+        vecV = mean(volV,1);
+       
+    else
         
+        % Vectorize
+        vecR = volR(:);
+        vecV = volV(:);
+        
+    end
+    
     % Calculate Ratio
     vecOEF = vecR./vecV;
     
     % Store Results
-    estR2p(ss,:) = vecR(1:no);
-    estDBV(ss,:) = vecV(1:no);
-    estOEF(ss,:) = vecOEF(1:no);
+    estR2p(ss,:) = vecR;
+    estDBV(ss,:) = vecV;
+    estOEF(ss,:) = vecOEF;
+        
    
 end % for setnum = ....
    
@@ -84,14 +113,20 @@ if plot_orig
 
     figure; box on; hold on; axis square; grid on;
     for ff = 1:length(sets)   
-        scatter(estOEF(ff,:),100*OEFvals,[],'filled');
+%         scatter(estOEF(ff,:),100*OEFvals,[],'filled');
+        scatter(100*OEFvals,estOEF(ff,:),[],'filled');
     %     plot(estOEF(ff,:),yy(ff,:),'--','Color',defColour(ff));
     end
+    
+    % unity line
+    plot([0,100],[0,100],'k-','LineWidth',1);
 
-    legend('DBV = 1%','DBV = 3%','DBV = 5%','DBV = 7%','DBV = 9%','Location','NorthWest')
-    xlabel('Ratio R2'' / DBV');
-    ylabel('Simulated OEF (%)');
+%     legend('DBV = 1%','DBV = 3%','DBV = 5%','DBV = 7%','DBV = 9%','Location','SouthEast')
+%     ylabel('Ratio R2'' / DBV');
+    xlabel('Simulated OEF (%)');
+    ylabel('Estimated OEF (%)');
     ylim([0,100*max(OEFvals)]);
+    xlim([0,100*max(OEFvals)]);
 end
 
 

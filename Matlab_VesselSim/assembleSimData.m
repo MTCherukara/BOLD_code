@@ -14,15 +14,19 @@ clear;
 simdir = '../../Data/vesselsim_data/';
 
 % Which distribution we want - 'sharan' or 'frechet'
-distname = 'lauwers';
+distname = 'sharan';
 
 % Options
 plot_figure = 0;
 
+% Do we want to use pre-defined random OEF-DBV pairs? If so, pick 1-5
+paramPairs = 1;
+
 % Fixed Parameters
-TE  = 0.084;
-tau = (-16:8:64)./1000;    % For TE = 72ms or 108ms or 84 ms
-% tau = (-12:4:32)./1000;      % For TE = 36ms
+TE  = 0.112;
+% tau = (-16:8:64)./1000;    % For TE = 72ms or 108ms or 84 ms
+% tau = (-24:12:96)./1000;      % For TE = 36ms
+tau = (-8:4:32)./1000;
 
 % Vessel Distribution
 switch lower(distname)
@@ -50,11 +54,17 @@ switch lower(distname)
         disp('Invalid distribution');
 end
 
-% Array sizes
+% Array size
 nr = length(RR);    % number of different vessel radii
 nt = length(tau);   % number of tau values
-nd = 50;            % number of DBV values  
-no = 50;            % number of OEF values
+    
+if paramPairs == 0   
+    nd = 10;            % number of DBV values  
+    no = 100;            % number of OEF values 
+else
+    nd = 100;
+    no = 10;
+end
 
 % Preallocate arrays
 %       Dimensions: TIME, DBV, OEF, RADIUS
@@ -70,8 +80,23 @@ for i1 = 1:nr
     vrad = RR(i1);
     
     % Load data
-    load([simdir,'vs_arrays/vsArray',num2str(nd),'_',distname,...
-                 'ND_TE_',num2str(1000*TE),'_R_',num2str(vrad),'.mat']);
+    if paramPairs == 0
+
+        load([simdir,'vs_arrays/vsArray',num2str(nd),'_',distname,...
+                     '_TE_',num2str(1000*TE),...
+                     '_tau_',num2str(1000*max(tau)),...
+                     '_R_',num2str(vrad),'.mat']);
+                 
+    else
+        
+        load([simdir,'vs_arrays/vsArray_RND_',num2str(paramPairs),...
+                   '_',distname,...
+                   '_TE_',num2str(1000*TE),...
+                   '_tau_',num2str(1000*max(tau)),...
+                   '_R_',num2str(vrad),'.mat']);
+               
+    end
+
 %     load([simdir,'vs_arrays/vsArray',num2str(np),'_',distname,...
 %                  '_R_',num2str(vrad),'.mat']);
     % Fill matrix
@@ -99,7 +124,7 @@ for i1 = 1:no
         sigASEev = squeeze(S0_ev(:,i2,i1,:));
         sigASEiv = squeeze(S0_iv(:,i2,i1,:));
         
-        vFrac = 0.793.*DBVvals(i2).*VF;
+        vFrac = 0.793.*DBVvals(i2,i1).*VF;
         
         % Stot dimensions:  TIME
 %         Stot = (1-sum(vFrac)).*prod(sigASEev,2)+sum(bsxfun(@times,vFrac,sigASEiv),2);
@@ -116,8 +141,19 @@ end % OEF loop
 
 
 %% Save Data
-% sname = strcat(simdir,'vs_arrays/TE',num2str(1000*TE),'_vsData_',distname,'_R_',num2str(RR(1)),'.mat');
-sname = strcat(simdir,'vs_arrays/TE',num2str(1000*TE),'_vsData_',distname,'_ND_50.mat');
+
+if paramPairs == 0
+
+    % sname = strcat(simdir,'vs_arrays/TE',num2str(1000*TE),'_vsData_',distname,'_R_',num2str(RR(1)),'.mat');
+    sname = strcat(simdir,'vs_arrays/TE',num2str(1000*TE),...
+                                   '_tau_',num2str(1000*max(tau)),...
+                                   '_vsData_',distname,'_100.mat');
+else
+    sname = strcat(simdir,'vs_arrays/DataRND_',num2str(paramPairs),...
+                   '_TE_',num2str(1000*TE),...
+                   '_tau_',num2str(1000*max(tau)),...
+                   '_',distname,'_100.mat');
+end
 save(sname,'S0','S_ev','S_iv','tau','TE','OEFvals','DBVvals');
     
 

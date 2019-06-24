@@ -125,6 +125,7 @@ protected:
     bool motion_narr;
     bool inc_intra;
     bool inc_csf;
+    bool ignore_T1;
 
 private:
     static FactoryRegistration<FwdModelFactory, R2primeFwdModel> registration;
