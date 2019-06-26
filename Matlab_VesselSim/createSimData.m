@@ -13,7 +13,8 @@ t0 = tic; % main timer
 %% Initialization
 
 % Where the data is stored
-simdir = '../../Data/vesselsim_data/';
+% simdir = '../../Data/vesselsim_data/';
+simdir = 'D:\Matthew\1_DPhil\Data\vesselsim_data\';
 
 % Selet distribution 
 distname = 'frechet';
@@ -22,10 +23,10 @@ distname = 'frechet';
 paramPairs = 2;
 
 % Fixed Parameters
-TE  = 0.080;
-% tau = (-16:8:64)./1000;    % For TE = 72ms or 108ms or 84 ms
+TE  = 0.08;
+tau = (-16:8:64)./1000;    % For TE = 72ms or 108ms or 84 ms
 % tau = (-24:12:96)./1000;      % For TE = 36ms or 56 ms
-tau = (-8:4:32)./1000;
+% tau = (-8:4:32)./1000;
 
 % Vessel Distribution
 switch lower(distname)
