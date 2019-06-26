@@ -14,16 +14,16 @@ clear;
 simdir = '../../Data/vesselsim_data/';
 
 % Which distribution we want - 'sharan' or 'frechet'
-distname = 'sharan';
+distname = 'frechet';
 
 % Options
 plot_figure = 0;
 
 % Do we want to use pre-defined random OEF-DBV pairs? If so, pick 1-5
-paramPairs = 1;
+paramPairs = 2;
 
 % Fixed Parameters
-TE  = 0.112;
+TE  = 0.080;
 % tau = (-16:8:64)./1000;    % For TE = 72ms or 108ms or 84 ms
 % tau = (-24:12:96)./1000;      % For TE = 36ms
 tau = (-8:4:32)./1000;

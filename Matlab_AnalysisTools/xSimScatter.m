@@ -16,7 +16,7 @@
 %       data in upfront, in order to generate a mask of "bad values" to remove.
 
 clear;
-% close all;
+close all;
 setFigureDefaults;
 
 % clc;
@@ -25,20 +25,23 @@ setFigureDefaults;
 vars = {'OEF', 'DBV', 'R2p'};
 thrA = [  5.0,   2.0,  50  ];     % threshold of actual values
 thrS = [  5.0,   2.0,  50  ];     % threshold of standard deviations
+minG = [    0,  0.0,  0   ];     % minimum value ground truth 
 % vars = {'OEF'};
 
 kappa = 1;
 
 % dHb = 0.0361 * R2p;
 
+text_title = 'TE = 112 ms, max(\tau) = 96 ms';
+
 % choose dataset
-for setnum = 264:277
+for setnum = 646
     
 % Do we have STD data?
-do_std = 0;
+do_std = 1;
 
 % Do we want a figure?
-plot_fig = 0;
+plot_fig = 1;
 plot_grid = 0;
 
 
@@ -57,9 +60,13 @@ fabdir = strcat(resdir,fdname.name,'/');
 gnddir = '/Users/mattcher/Documents/DPhil/Data/qboldsim_data/';
 
 % Load ground truth data for both OEF and DBV
-volOEF = LoadSlice([gnddir,'True_Grid_50x50_OEF.nii.gz'],1);
-volDBV = LoadSlice([gnddir,'True_Grid_50x50_DBV.nii.gz'],1);
-volR2p = LoadSlice([gnddir,'True_Grid_50x50_R2p.nii.gz'],1);
+% volOEF = LoadSlice([gnddir,'True_Grid_50x50_OEF.nii.gz'],1);
+% volDBV = LoadSlice([gnddir,'True_Grid_50x50_DBV.nii.gz'],1);
+% volR2p = LoadSlice([gnddir,'True_Grid_50x50_R2p.nii.gz'],1);
+load(['../Matlab_VesselSim/Sim_OEF_DBV_pairs_1.mat']);
+volOEF = OEFvals(:)';
+volDBV = DBVvals(:)';
+volR2p = 355.*volOEF.*volDBV;
 
 % % we actually only want to go up to 10% DBV, not 15%, and we want to halve the
 % % number of OEF points we have
@@ -67,12 +74,13 @@ volR2p = LoadSlice([gnddir,'True_Grid_50x50_R2p.nii.gz'],1);
 % volDBV = volDBV(2:1:50,1:34);
 % volR2p = volR2p(2:1:50,1:34);
 
-volOEF = volOEF(:,35:50);
-volDBV = volDBV(:,35:50);
-volR2p = volR2p(:,35:50);
+% volOEF = volOEF(:,35:50);
+% volDBV = volDBV(:,35:50);
+% volR2p = volR2p(:,35:50);
 
 matGnd = [volOEF(:),volDBV(:),volR2p(:)];
 matScl = [volDBV(:),volOEF(:),volR2p(:)];
+Sclabels = {'DBV (%)','OEF (%)','dHb content (ml/100g)'};
 
 
 %% Loop through and load the actual data
@@ -94,7 +102,7 @@ for vv = 1:length(vars)
     % Load the data
     volData = LoadSlice([fabdir,'mean_',vname,'.nii.gz'],1);
 %     volData = volData(2:1:50,1:34);
-    volData = volData(:,35:50);
+%     volData = volData(:,35:50);
 
 %     if strcmp(vname,'DBV') || strcmp(vname,'OEF')
 %         resp(vv,1) = 100.*volData(20,10);
@@ -117,6 +125,9 @@ for vv = 1:length(vars)
     
     % apply threshold mask
     vecBad = vecBad + ~isfinite(matAll(:,vv)) + ( matAll(:,vv) > thrA(vv) );
+    
+    % mask out minimum values
+    vecBad = vecBad + (matGnd(:,vv) < minG(vv));
     
 %     if strcmp(vname,'DBV')
 %         vecBad = vecBad + (vecGnd > 0.1) + (vecGnd < 0.01);
@@ -174,16 +185,17 @@ for vv = 1:length(vars)
     if strcmp(vname,'DBV') || strcmp(vname,'OEF')
         vecData = vecData.*100;
         vecGnd = vecGnd.*100;
+        vecScl = vecScl.*100;
     elseif strcmp(vname,'R2p')
         % Converting R2' to dHb
-%         vecData = vecData.*0.0361*0.8;
-%         vecGnd = vecGnd.*0.0361;
-%         vecScl = vecScl.*0.0361;
+        vecData = vecData.*0.0361;
+        vecGnd = vecGnd.*0.0361;
+        vecScl = vecScl.*0.0361;
     end
     
     % Limits, for plotting
-    minV = vecGnd(1);
-    maxV = vecGnd(end);
+    minV = min(vecGnd);
+    maxV = max(vecGnd);
     
     % Colour the results based on the log of their standard deviation
     if do_std
@@ -214,6 +226,7 @@ for vv = 1:length(vars)
     
     if strcmp(vname,'R2p')
         vlabel = 'dHb content (ml/100g)';
+%         vlabel = vname;
     else
         vlabel = strcat(vname,' (%)');
     end
@@ -222,14 +235,23 @@ for vv = 1:length(vars)
     if plot_fig
         figure; hold on; box on; grid on; axis square;
         plot([0,maxV],[0,maxV],'-k');
-        colormap(parula);
         scatter(vecGnd,vecData,[],shades,'filled');
         xlabel(['True ',vlabel]);
         ylabel(['Estimated ',vlabel]);
-        axis([minV,maxV,minV,maxV]);    % always go from 0% to 100% in the figure
+        title(text_title);
         if strcmp(vname,'OEF')
-            axis([minV,maxV,0,100]);
+            axis([0,100,0,100]);
+            colormap(plasma);
+        elseif strcmp(vname,'DBV')
+            axis([0,10,0,10]);
+            colormap(parula);
+        else
+            axis([minV,maxV,minV,maxV]); 
+            colormap(viridis);
         end
+        cb = colorbar;
+        ylabel(cb,['True ',Sclabels{vv}]);
+        set(cb,'FontSize',20);
     end
     
     % Store the results
@@ -257,7 +279,7 @@ end % for vv = 1:length(vars)
 % disp(['(Excluded ',num2str(sum(vecThres)),' of 2500 data points)']);
 
 % Display the whole results row entry
-disp(num2str(vecRes(:)'));
+% disp(num2str(vecRes(:)'));
 
 if plot_grid
 

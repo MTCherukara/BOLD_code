@@ -12,7 +12,7 @@ clear;
 
 
 %% Specify what we want
-SNR = 500;
+SNR = inf;
 % tau = (-16:8:64)./1000;    % For TE = 72ms or 108ms or 84 ms
 % tau = [0,16:8:64]./1000;
 tau = (-8:4:32)./1000;
@@ -28,7 +28,7 @@ RR = 23;
 %% Load in the big grid
 % fulldata = load(['ASE_Data/ASE_Grid_2C_100x10_TE_84.mat']);
 % fulldata = load(['../../Data/vesselsim_data/vs_arrays/TE84_vsData_single_R_',num2str(RR),'.mat']);
-fulldata = load('../../Data/vesselsim_data/vs_arrays/DataRND_1_TE_112_tau_32_sharan_100.mat');
+fulldata = load('../../Data/vesselsim_data/vs_arrays/DataRND_1_TE_80_tau_32_sharan_100.mat');
 
 % Pull values
 DBVvals = fulldata.DBVvals;
@@ -68,8 +68,8 @@ gridSigma = repmat(mean(ase_model,4)./SNR,1,1,1,nt);
 gridNoise = gridSigma.*randn(size(ase_model));
 
 % Add noise
-ase_data = ase_model + gridNoise;
-% ase_data = ase_model;
+% ase_data = ase_model + gridNoise;
+ase_data = ase_model;
 
 % Normalize to spin echo
 ase_data = ase_data ./ repmat(ase_data(:,:,:,SEind),1,1,1,nt);

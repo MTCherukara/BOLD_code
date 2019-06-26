@@ -16,13 +16,13 @@ t0 = tic; % main timer
 simdir = '../../Data/vesselsim_data/';
 
 % Selet distribution 
-distname = 'sharan';
+distname = 'frechet';
 
 % Do we want to use pre-defined random OEF-DBV pairs? If so, pick 1-5
-paramPairs = 1;
+paramPairs = 2;
 
 % Fixed Parameters
-TE  = 0.112;
+TE  = 0.080;
 % tau = (-16:8:64)./1000;    % For TE = 72ms or 108ms or 84 ms
 % tau = (-24:12:96)./1000;      % For TE = 36ms or 56 ms
 tau = (-8:4:32)./1000;
@@ -117,8 +117,8 @@ for i1 = rstart:rend
     % Parallel Loop over OEF
     parfor i2 = 1:no
         
-        OEF = OEFvals(i2);
-        Y = 1-OEF;
+%         OEF = OEFvals(i2);
+%         Y = 1-OEF;
         
         Vvals = DBVvals;    % to avoid using DBVvals as a broadcast variable
         Ovals = OEFvals;
@@ -134,10 +134,10 @@ for i1 = rstart:rend
         % Loop over DBV
         for i3 = 1:nd
             
-            DBV = Vvals(i3);
+%             DBV = Vvals(i3);
             
-%             DBV = Vvals(i3,i2);
-%             OEF = Ovals(i3,i2);
+            DBV = Vvals(i3,i2);
+            OEF = Ovals(i3,i2);
             
             % Vessel fraction. The factor 0.793 should account for the relative
             % contribution of capillaries to total DBV

@@ -8,12 +8,12 @@
 clear;
 
 
-start_tau = -28;
-delta_tau = 4;
-end_tau = 64;
+start_tau = -24;
+delta_tau = 12;
+end_tau = 96;
 
 % manually specify input name
-nii_name = '/Users/mattcher/Documents/DPhil/Data/validation_sqbold/vs1/ASE_FLAIR_av_mc.nii.gz';
+% nii_name = '/Users/mattcher/Documents/DPhil/Data/validation_sqbold/vs1/ASE_FLAIR_av_mc.nii.gz';
 
 if ~exist('nii_name','var')
     [dfile,ddir] = uigetfile('*.nii.gz','Choose Data File');
