@@ -6,13 +6,13 @@ simdir = '../../Data/vesselsim_data/';
 tic;
 
 % Fixed Parameters
-TE  = 0.108;
-tau = (-28:4:64)./1000;    % For TE = 72ms or 108ms or 88 ms
+TE  = 0.060;
+tau = (-28:8:64)./1000;    % For TE = 72ms or 108ms or 88 ms
 % tau = (-12:4:32)./1000;      % For TE = 36ms or 56 ms
 
 % Physiology
 OEF = 0.4;
-DBV = 0.05;
+DBV = 0.03;
 
 Rs=3:1:100;
 relVf=gevpdf(Rs,0.41,5.8,10.1);

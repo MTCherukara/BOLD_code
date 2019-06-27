@@ -32,16 +32,16 @@ kappa = 1;
 
 % dHb = 0.0361 * R2p;
 
-text_title = 'TE = 112 ms, max(\tau) = 96 ms';
+text_title = '';
 
 % choose dataset
-for setnum = 646
+for setnum = 681:683
     
 % Do we have STD data?
 do_std = 1;
 
 % Do we want a figure?
-plot_fig = 1;
+plot_fig = 0;
 plot_grid = 0;
 
 
@@ -63,7 +63,7 @@ gnddir = '/Users/mattcher/Documents/DPhil/Data/qboldsim_data/';
 % volOEF = LoadSlice([gnddir,'True_Grid_50x50_OEF.nii.gz'],1);
 % volDBV = LoadSlice([gnddir,'True_Grid_50x50_DBV.nii.gz'],1);
 % volR2p = LoadSlice([gnddir,'True_Grid_50x50_R2p.nii.gz'],1);
-load(['../Matlab_VesselSim/Sim_OEF_DBV_pairs_1.mat']);
+load(['../Matlab_VesselSim/Sim_OEF_DBV_pairs_2.mat']);
 volOEF = OEFvals(:)';
 volDBV = DBVvals(:)';
 volR2p = 355.*volOEF.*volDBV;
@@ -186,11 +186,11 @@ for vv = 1:length(vars)
         vecData = vecData.*100;
         vecGnd = vecGnd.*100;
         vecScl = vecScl.*100;
-    elseif strcmp(vname,'R2p')
-        % Converting R2' to dHb
-        vecData = vecData.*0.0361;
-        vecGnd = vecGnd.*0.0361;
-        vecScl = vecScl.*0.0361;
+%     elseif strcmp(vname,'R2p')
+%         % Converting R2' to dHb
+%         vecData = vecData.*0.0361;
+%         vecGnd = vecGnd.*0.0361;
+%         vecScl = vecScl.*0.0361;
     end
     
     % Limits, for plotting
@@ -279,7 +279,7 @@ end % for vv = 1:length(vars)
 % disp(['(Excluded ',num2str(sum(vecThres)),' of 2500 data points)']);
 
 % Display the whole results row entry
-% disp(num2str(vecRes(:)'));
+disp(num2str(vecRes(:)'));
 
 if plot_grid
 

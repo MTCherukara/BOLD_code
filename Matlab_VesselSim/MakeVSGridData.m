@@ -13,9 +13,9 @@ clear;
 
 %% Specify what we want
 SNR = inf;
-% tau = (-16:8:64)./1000;    % For TE = 72ms or 108ms or 84 ms
+tau = (-16:8:64)./1000;    % For TE = 72ms or 108ms or 84 ms
 % tau = [0,16:8:64]./1000;
-tau = (-8:4:32)./1000;
+% tau = (-8:4:32)./1000;
 % tau = (-24:12:96)./1000;
 
 % figure out SEind
@@ -28,7 +28,7 @@ RR = 23;
 %% Load in the big grid
 % fulldata = load(['ASE_Data/ASE_Grid_2C_100x10_TE_84.mat']);
 % fulldata = load(['../../Data/vesselsim_data/vs_arrays/TE84_vsData_single_R_',num2str(RR),'.mat']);
-fulldata = load('../../Data/vesselsim_data/vs_arrays/DataRND_1_TE_80_tau_32_sharan_100.mat');
+fulldata = load('../../Data/vesselsim_data/vs_arrays/DataRND_2_TE_80_tau_64_frechet_100.mat');
 
 % Pull values
 DBVvals = fulldata.DBVvals;
@@ -74,12 +74,16 @@ ase_data = ase_model;
 % Normalize to spin echo
 ase_data = ase_data ./ repmat(ase_data(:,:,:,SEind),1,1,1,nt);
 
+% remove one value
+ase_data(:,:,:,[8,10]) = [];
+
 
 %% Save out
 % dname = strcat('ASE_Grid_Single_50x50_TE_',num2str(1000*TE),'_R_',num2str(RR));
 % dname = strcat('ASE_Grid_ND_Lauwers_50x50_TE_',num2str(1000*TE));
 % dname = strcat('ASE_Grid_Sharan_100_TE_',num2str(1000*TE),'_tau_',num2str(1000*tau(end)),'_DBV_',num2str(Dind-1));
-dname = strcat('ASE_Grid_RND_Sharan_1000_TE_',num2str(1000*TE),'_tau_',num2str(1000*tau(end)));
+% dname = strcat('ASE_Grid_RND_Frechet_1000_TE_',num2str(1000*TE),'_tau_',num2str(1000*tau(end)));
+dname = strcat('ASE_Bootstrap_Frechet_1000_TE_',num2str(1000*TE),'_Long2');
 
 
 % save([dname,'.mat'],'ase_data','ase_model','tau','TE','OEFvals','DBVvals','params');

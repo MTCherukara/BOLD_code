@@ -8,7 +8,7 @@ NN = size(spp,2);
 % TE and tau stuff
 tt  = (p.deltaTE:p.deltaTE:p.TE*2)';
 % tau = (p.TE-(p.deltaTE*2):-p.deltaTE*2:-p.TE+(p.deltaTE*2))';
-tau = (-16:2:96)./1000;
+tau = (-16:1:64)./1000;
 
 TE=repmat(p.TE,size(tau));
 TEind = p.TE/p.deltaTE;
@@ -33,4 +33,4 @@ sigEV = abs(sum(exp(-1i.*Phase),2)./NN);
 shapeEV = -log(sigEV)./p.vesselFraction;
 sigEV2 = exp(-p.vesselFraction.*shapeEV);
 
-plot(1000*tau,sigEV2);
+plot(1000*tau,sigEV2,'-');

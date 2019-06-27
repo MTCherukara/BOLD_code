@@ -1,7 +1,7 @@
 # fabber run 14 - SDR simulation testing
 
 # Input Data
-data=../../Data/qboldsim_data/ASE_Grid_RND_Sharan_1000_TE_80_tau_64.nii.gz
+data=../../Data/qboldsim_data/ASE_Bootstrap_Frechet_1000_TE_80_Long2.nii.gz
 mask=../../Data/qboldsim_data/Grid_100x10_mask.nii.gz
 
 # Run Options
@@ -53,10 +53,8 @@ tau4=0.008
 tau5=0.016
 tau6=0.024
 tau7=0.032
-tau8=0.040
-tau9=0.048
-tau10=0.056
-tau11=0.064
+tau8=0.048
+tau9=0.064
 
 # 11 taus (max 32)
 #tau1=-0.008
