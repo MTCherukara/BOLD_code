@@ -13,20 +13,21 @@ t0 = tic; % main timer
 %% Initialization
 
 % Where the data is stored
-% simdir = '../../Data/vesselsim_data/';
-simdir = 'D:\Matthew\1_DPhil\Data\vesselsim_data\';
+% simdir = '../../Data/vesselsim_data/';                  % Mac
+simdir = 'D:\Matthew\1_DPhil\Data\vesselsim_data\';     % Windows
 
 % Selet distribution 
-distname = 'frechet';
+distname = 'lauwers';
 
 % Do we want to use pre-defined random OEF-DBV pairs? If so, pick 1-5
-paramPairs = 2;
+paramPairs = 3;
 
 % Fixed Parameters
-TE  = 0.08;
-tau = (-16:8:64)./1000;    % For TE = 72ms or 108ms or 84 ms
-% tau = (-24:12:96)./1000;      % For TE = 36ms or 56 ms
+TE  = 0.112;
+% tau = (-16:8:64)./1000;    % For TE = 72ms or 108ms or 84 ms
+% tau = (-24:12:96)./1000;      % For TE = 36ms
 % tau = (-8:4:32)./1000;
+tau = (-100:2:100)./1000;   
 
 % Vessel Distribution
 switch lower(distname)
