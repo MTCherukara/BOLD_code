@@ -1,4 +1,4 @@
-function TC_ideal = xOptimize_TC
+function xOptimize_TC
 
 % To optimize the value of Tc (the point of transition between the linear-
 % exponential and quadratic-exponential regimes in the asymptotic qBOLD model).
@@ -25,41 +25,41 @@ setFigureDefaults;
 params = genParams;
 
 % Scan
-params.TE   = 0.084;        % s         - echo time
+params.TE   = 0.048;        % s         - echo time
 params.TR   = 3;
 params.TI   = 0;
 params.contr = 'OEF';
 params.incT1 = 0;
 params.incT2 = 1;
-params.incIV = 1;
+params.incIV = 0;
 
 % Physiology
 params.lam0 = 0.0;         % no units  - ISF/CSF signal contribution
 params.zeta = 0.03;         % no units  - deoxygenated blood volume
 params.OEF  = 0.40;         % no units  - oxygen extraction fraction
 
-tau = (-16:1:64)/1000; % for testing
-
+tau = (-16:1:40)/1000; % for testing
+% tau = (-24:12:96)./1000;
 
 %% Calculate the Analytical tissue signal
 
 np = 50;
 
 % 50x50 narrower range
-OEFs = 0.21:0.01:0.70;
-DBVs = 0.003:0.003:0.15;
+OEFs = linspace(0.21,0.70,np);
+DBVs = linspace(0.002,0.10,np);
 TC_ideal = zeros(np,np);
 % DW_ideal = zeros(1,np^2);
 
 % Load data from an already-generated dataset
-simdir = '../../Data/vesselsim_data/';
-datname = 'TE84_vsData_sharan_50.mat';
+% simdir = '../../Data/vesselsim_data/';
+% datname = 'TE84_vsData_sharan_50.mat';
 
-datIn = load([simdir,'vs_arrays/',datname]);
+% datIn = load([simdir,'vs_arrays/',datname]);
 % datIn = load('ASE_Data/ASE_Grid_1C_50x50_Taus_11_SNR_500.mat');
 
 % find tau indices
-[~,Tind,~] = intersect(datIn.tau,tau);
+% [~,Tind,~] = intersect(datIn.tau,tau);
 SEind = 3;
 
 
@@ -70,16 +70,16 @@ for i2 = 1:length(DBVs)
         params.zeta = DBVs(i2);
 
         % Calculate analytical model
-%         params.model = 'Full';
-%         S_analytical = qASE_model(tau,params.TE,params);
-        S_analytical = squeeze(datIn.S0(i2,i1,Tind))';
+        params.model = 'Full';
+        S_analytical = qASE_model(tau,params.TE,params);
+%         S_analytical = squeeze(datIn.S0(i2,i1,Tind))';
 %         S_analytical = squeeze(datIn.ase_data(i1,i2,:,Tind))';
         
         % normalize to spin echo
         S_analytical = S_analytical./S_analytical(SEind);
 
         % Calculate asymptotic model
-%         params.model = 'Asymp';    
+        params.model = 'Asymp';    
 
         myfun = @(x) sum((S_analytical-calcTissueAsymp(tau,params.TE,params,x)).^2);
 
@@ -188,11 +188,11 @@ function ST = calcTissueAsymp(TAU,TE,PARAMS,TC)
             
         else
             % Long tau regime
-            ST(ii) = exp(DBV - (0.52.*R2p.*abs(TAU(ii))));
+            ST(ii) = exp(DBV - (R2p.*abs(TAU(ii))));
         end
     end
     
-%     ST = PARAMS.S0.*ST.*exp(-PARAMS.R2t.*TE);
+    ST = PARAMS.S0.*ST.*exp(-PARAMS.R2t.*TE);
     
     ST = ST./ST(3);
 end

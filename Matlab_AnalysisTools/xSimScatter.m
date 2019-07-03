@@ -38,12 +38,12 @@ text_title = '';
 do_std = 1;
 
 % Do we want a figure?
-plot_fig = 0;
+plot_fig = 1;
 plot_grid = 0;
-print_res = 1;
+print_res = 0;
 
 % choose dataset
-for setnum = 707
+for setnum = 703
 
     %% Find directories, and load ground truth data and stuff
     % Data directory
