@@ -64,7 +64,7 @@ SEind = 3; % hardcoded for now
 
 % Parameter Values
 p_names = {  'OEF' ; 'R2p'; 'zeta' ; 'R2t' ; 'lam0' ; 'dF'  };
-p_infer = [    0   ,   1  ,   1    ,   0   ,   0    ,   0   ];
+p_infer = [    0   ,   1  ,   1    ,   0   ,   1    ,   0   ];
 p_inits = [  0.500 ,  4.0 ,  0.100 ,  10.0 ,  0.10  ,   4   ];
 p_range = [  0.001 ,  0.0 ,  0.001 ,   5.0 ,  0.00  ,   0    ;...
              1.000 , 20.0 ,  0.500 ,  15.0 ,  1.00  ,  20   ];

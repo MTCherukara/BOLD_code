@@ -19,16 +19,16 @@ pnames = {'R2p';'DBV';'OEF'};
 nsub = 5;
 
 % Set number
-fset = 846;
+fset = 801;
 
 % Results directory
 resdir = '/Users/mattcher/Documents/DPhil/Data/Fabber_Results/';
 
 % Slices
-slicenum = 3:8;
+slicenum = 2:6;
 
 % Mask name
-maskname = 'mask_new_gm_80.nii.gz';
+maskname = 'mask_new_gm_95.nii.gz';
 
 
 %% PRE-ALLOCATE
@@ -60,7 +60,7 @@ for ss = 1:nsub
     nmsk = sum(volMask(:));
     
     % Pre-allocate
-    matSubData = zeros(3,nmsk);
+    matSubData = zeros(3,int64(nmsk));
     
     % Loop through Parameters
     for pp = 1:length(pnames)
@@ -87,6 +87,6 @@ end % for ss = 1:nsub
 
 
 %% SAVE OUT
-save(['Fabber_Data/AllSub_Data_',num2str(fset),'.mat'],'vecAllData');
+save(['Fabber_Data/AllSub_Data_5_',num2str(fset),'.mat'],'vecAllData');
     
     

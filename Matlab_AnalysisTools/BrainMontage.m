@@ -14,10 +14,10 @@
 %
 % CHANGELOG:
 
-% clear;
+clear;
 setFigureDefaults;
 
-slices = 1;
+slices = 2:6;
 
 % SQ-LS    SQ-VB   1C-VBS  1C-VBTC 1C-VBI  1C-VB-TCI  2C-VB   2C-VBI  2C-VB-TC  2C-VB-TCI
 % '101'  , '250' , '330' , '264' , '257' , '316'    , '201' , '236' , '281'   , '309' ;...   % subject vs1
@@ -44,7 +44,7 @@ if strfind(lower(niname),'dbv')
     threshold = 0.25;
     cmp = magma;
 elseif strfind(lower(niname),'r2p')
-    threshold = 40; % for in vivo, 10; for simulation, 40
+    threshold = 10; % for in vivo, 10; for simulation, 40
     cmp = viridis;
 elseif strfind(lower(niname),'oef')
     threshold = 0.6;
