@@ -19,17 +19,17 @@ pnames = {'R2p';'DBV';'OEF'};
 nsub = 5;
 
 % Set number
-fset = 801;
+fset = 831;
 
 % Results directory
 resdir = '/Users/mattcher/Documents/DPhil/Data/Fabber_Results/';
 
 % Slices
-slicenum = 2:6;
+slicenum = 2:8;
 
 % Mask name
-maskname = 'mask_new_gm_95.nii.gz';
-
+% maskname = 'mask_new_gm_95.nii.gz';
+maskname = 'mask_csf_gm_20.nii.gz';
 
 %% PRE-ALLOCATE
 
@@ -87,6 +87,6 @@ end % for ss = 1:nsub
 
 
 %% SAVE OUT
-save(['Fabber_Data/AllSub_Data_5_',num2str(fset),'.mat'],'vecAllData');
+save(['Fabber_Data/AllSub_Data_CSF_20_',num2str(fset),'.mat'],'vecAllData');
     
     

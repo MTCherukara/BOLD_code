@@ -23,16 +23,16 @@ setFigureDefaults;
 set0 = 4;
 
 %% User Selected Parameters
-vname = 'OEF';              % variable name
+vname = 'DBV';              % variable name
 setname = 'CSF';
-lbls = {'FP-2C','NF-2C','NF-3C'};%,'NF-T1','NF-T2','NF-BF','NF-FC'};
+lbls = {'FP-2C','NF-2C','NF-3C','NF-T1','NF-T2','NF-BF'};%,'NF-FC'};
 
 % Pick FABBER datasets
-fsets = [801,806:5:815] + set0 - 1;
+fsets = [801:5:830] + set0 - 1;
 % fsets = [876,846:5:875] + set0 - 1;
 
 % Which pairs of FSETS do we want to compare?
-grps =  {[1,2]};
+grps =  {[1,2];[1,3];[1,4];[1,5];[1,6]};
 
 
 %% Basics
@@ -75,7 +75,8 @@ switch setname
     case 'CSF'
         
         slicenum = 3:8;
-        maskname = 'mask_new_gm_99.nii.gz';
+        % maskname = 'mask_new_gm_99.nii.gz';
+        maskname = 'mask_csf_gm_20.nii.gz';
         CC = strsplit(fabdir,'_s');     % need a 2-digit subject number
         subnum = CC{2}(1:2);
         maskdir = ['/Users/mattcher/Documents/DPhil/Data/subject_',subnum,'/'];
