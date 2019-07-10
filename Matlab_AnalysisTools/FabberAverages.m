@@ -33,7 +33,7 @@ vars = {'R2p','DBV','OEF'};
 % vars = {'R2'};
 
 % Choose Data set
-for setnum = 831:835
+for setnum = [801:835]
     
 vecRes = zeros(4*length(vars),1);
 
@@ -82,7 +82,7 @@ switch setname
     case 'CSF'
         
         slicenum = 3:8;
-        maskname = 'mask_new_gm_60.nii.gz';
+        maskname = 'mask_csf_gm_20.nii.gz';
         CC = strsplit(fabdir,'_s');     % need a 2-digit subject number
         subnum = CC{2}(1:2);
         maskdir = ['/Users/mattcher/Documents/DPhil/Data/subject_',subnum,'/'];
@@ -201,9 +201,9 @@ for vv = 1:length(vars)
 end % for vv = length(vars)
 
 % display the results
-% disp(num2str(vecRes'));
+disp(num2str(vecRes'));
 % disp(['Percentage of voxels removed = ',num2str(100*nlost/ngm),'%']);
-disp(num2str(100*nlost/ngm));
+% disp(num2str(100*nlost/ngm));
 
 end % for setnum = ...
 

@@ -21,17 +21,30 @@ setFigureDefaults;
 tic;
 
 % Choose TE
-TE = 0.084;
+TE = 0.080;
+% taus = (-8:4:32)./1000;
+% taus = (-16:8:64)./1000;
+% taus = (-24:12:96)./1000;
+% taus = [-4:2:6, 32, 40, 48, 56, 64]./1000;
+taus = (-60:2:60)./1000;
 
 % Vessel Type
-vsd_name = 'sharan';
+vsd_name = 'lauwers';
 
 % Are we optimizing two parameters at once?
-optim2 = 0;
+optim2 = 1;
 
 % Load data
 %   Dimensions of S0:     DBV, OEF, TIME
-load(['../../Data/vesselsim_data/vs_arrays/TE',num2str(1000*TE),'_vsData_',vsd_name,'_100.mat']);
+fulldata = load(['../../Data/vesselsim_data/vs_arrays/DataRND_3_TE_',num2str(1000*TE),'_lauwers_100.mat']);
+
+% pull out the right tau value datapoints
+[~,Tind,~] = intersect(fulldata.tau,taus);
+
+tau = fulldata.tau(Tind);
+S0 = fulldata.S0(:,:,Tind);
+DBVvals = fulldata.DBVvals;
+OEFvals = fulldata.OEFvals;
 
 % declare global variables
 global S_dist param1 tau1
@@ -42,21 +55,21 @@ param1 = genParams('incIV',true,'incT2',true,...
                    'Model','Asymp','TE',TE,...
                    'beta',1.0);
                
-nDBV = length(DBVvals);
-nOEF = length(OEFvals);
+nDBV = size(DBVvals,1);
+nOEF = size(DBVvals,2);
 
 % pre-allocate estimate matrix
 % Dimensions:   OEF, DBV
 ests = zeros(nOEF,nDBV);
-est2 = zeros(nOEF,nDBV);
+est2 = ests;
 
 options = optimset('MaxFunEvals',400);
 
 % param1.SR = 0.8-(3*TE);
 % param1.alpha = 3.8;
 % param1.eta = 1.45;
-param1.SR = 0.47;
-param1.Voff = param1.SR;
+% param1.SR = 0.47;
+% param1.Voff = param1.SR;
 
 %% Do the thing
 
@@ -70,12 +83,12 @@ for i1 = 1:nOEF
         S_dist = squeeze(S0(i2,i1,:))';
         
         % assign parameter values
-        param1.zeta = DBVvals(i2);
-        param1.OEF  = OEFvals(i1);
+        param1.zeta = DBVvals(i2,i1);
+        param1.OEF  = OEFvals(i2,i1);
         
         % find the optimum R2' scaling factor
         if optim2
-            X1 = fminsearch(@optimPowerScale,[1,0],options);        
+            X1 = fminsearch(@optimPowerScale,[1,0.3],options);        
         else
             X1 = fminbnd(@optimScaling,0.0001,3);
         end
@@ -99,18 +112,18 @@ if optim2
     disp(['Mean B    :  ',round2str(mean(est2(:)),4)]);
 end
 
-% plot the results
-plotGrid(ests,100*DBVvals,100*OEFvals,...
-          'cmap',inferno,...
-          'cvals',[-2,2],...
-          'title','Optimized R2'' Scaling Factor');
-      
-if optim2
-    plotGrid(est2,100*DBVvals,100*OEFvals,...
-          'cmap',jet,...
-          'cvals',[-1,1],...
-          'title','Optimized R2'' Scaling Factor');
-end
+% % plot the results
+% plotGrid(ests,100*DBVvals,100*OEFvals,...
+%           'cmap',inferno,...
+%           'cvals',[-2,2],...
+%           'title','Optimized R2'' Scaling Factor');
+%       
+% if optim2
+%     plotGrid(est2,100*DBVvals,100*OEFvals,...
+%           'cmap',jet,...
+%           'cvals',[-1,1],...
+%           'title','Optimized R2'' Scaling Factor');
+% end
 
 % Key datapoints for comparing
 % OEF(52): 40 %    	OEF(88): 55 %       OEF(16): 25   %

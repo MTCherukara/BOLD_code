@@ -404,11 +404,12 @@ function ST = calcTissueAsymp(TAU,TE,PARAMS)
     V0 = PARAMS.Voff;
     eta = PARAMS.eta;
     R2p = PARAMS.R2p;
+    sge = PARAMS.sgeo;
     
     
     % define the regime boundary
     if PARAMS.tc_man
-        tc = PARAMS.tc_val;
+        tc = PARAMS.tc_val./dw;
     else
         tc = 1.7/dw;
     end
@@ -423,7 +424,7 @@ function ST = calcTissueAsymp(TAU,TE,PARAMS)
 
         if abs(TAU(ii)) < tc
             % short tau regime
-            ST(ii) = exp((Dprime*V0)-(0.3*(kappa*R2p.*TAU(ii)).^2)./(Dprime));
+            ST(ii) = exp((Dprime*V0)-(sge*(kappa*R2p.*TAU(ii)).^2)./(Dprime));
 %             ST(ii) = exp(-(0.3*(R2p.*TAU(ii)).^2)./(zeta));
 
 %             % alternative short tau regime
