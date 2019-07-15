@@ -4,7 +4,7 @@
 % R2' in the asmyptotic SDR qBOLD model. In this case, it applies kappa the
 % whole range of tau values, not just the long-tau regime.
 %
-% Actively used as of 2019-04-01
+% Actively used as of 2019-07-13
 %
 % MT Cherukara
 % 2018-10-24
@@ -21,22 +21,22 @@ setFigureDefaults;
 tic;
 
 % Choose TE
-TE = 0.080;
+TE = 0.048;
 % taus = (-8:4:32)./1000;
 % taus = (-16:8:64)./1000;
 % taus = (-24:12:96)./1000;
 % taus = [-4:2:6, 32, 40, 48, 56, 64]./1000;
-taus = (-60:2:60)./1000;
+taus = (-30:2:34)./1000;
 
 % Vessel Type
-vsd_name = 'lauwers';
+vsd_name = 'sharan';
 
 % Are we optimizing two parameters at once?
 optim2 = 1;
 
 % Load data
 %   Dimensions of S0:     DBV, OEF, TIME
-fulldata = load(['../../Data/vesselsim_data/vs_arrays/DataRND_3_TE_',num2str(1000*TE),'_lauwers_100.mat']);
+fulldata = load(['../../Data/vesselsim_data/vs_arrays/DataRND_5_TE_',num2str(1000*TE),'_tau_40_sharan_100.mat']);
 
 % pull out the right tau value datapoints
 [~,Tind,~] = intersect(fulldata.tau,taus);
@@ -62,6 +62,7 @@ nOEF = size(DBVvals,2);
 % Dimensions:   OEF, DBV
 ests = zeros(nOEF,nDBV);
 est2 = ests;
+est3 = ests;
 
 options = optimset('MaxFunEvals',400);
 
@@ -97,6 +98,7 @@ for i1 = 1:nOEF
         ests(i1,i2) = X1(1);
         if optim2
             est2(i1,i2) = X1(2);
+%             est3(i1,i2) = X1(3);
         end
         
     end % DBV Loop
@@ -110,6 +112,7 @@ disp('  Scaling Factor:');
 disp(['Mean A    :  ',round2str(mean(ests(:)),4)]);
 if optim2
     disp(['Mean B    :  ',round2str(mean(est2(:)),4)]);
+    disp(['Mean C    :  ',round2str(mean(est3(:)),4)]);
 end
 
 % % plot the results

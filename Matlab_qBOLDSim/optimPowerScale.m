@@ -8,6 +8,8 @@ function LL = optimPowerScale(xx)
     
     loc_param.SR  = xx(1);
     loc_param.sge = xx(2);
+%     loc_param.tc_val = xx(3);
+%     loc_param.tc_man = 1;
     
     S_model = qASE_model(tau1,param1.TE,loc_param);
     S_model = S_model./max(S_model);

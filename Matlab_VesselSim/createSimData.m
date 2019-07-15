@@ -13,14 +13,14 @@ t0 = tic; % main timer
 %% Initialization
 
 % Where the data is stored
-simdir = '../../Data/vesselsim_data/';                  % Mac
-% simdir = 'D:\Matthew\1_DPhil\Data\vesselsim_data\';     % Windows
+% simdir = '../../Data/vesselsim_data/';                  % Mac
+simdir = 'D:\Matthew\1_DPhil\Data\vesselsim_data\';     % Windows
 
 % Selet distribution 
 distname = 'sharan';
 
 % Do we want to use pre-defined random OEF-DBV pairs? If so, pick 1-5
-paramPairs = 4;
+paramPairs = 5;
 
 % Fixed Parameters
 TE  = 0.048;
