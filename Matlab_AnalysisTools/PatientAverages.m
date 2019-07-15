@@ -19,7 +19,7 @@ clear;
 p_id = '099';
 
 % choose session (as an integer)
-ses = 4;
+ses = 1;
 
 % choose variables
 vars = {'R2p','DBV','OEF'};
@@ -37,10 +37,12 @@ pdir = strcat('/Users/mattcher/Documents/BIDS_Data/qbold_stroke/sourcedata/sub-'
 sdir = strcat(pdir,'ses-00',num2str(ses),'/func-ase/');
 
 % Load session specific ROI
-volROI = LoadSlice([pdir,'ROI_final_s',num2str(ses),'.nii.gz'],slicenum);
+% volROI = LoadSlice([pdir,'ROI_final_s',num2str(ses),'.nii.gz'],slicenum);
+volROI = LoadSlice([sdir,'mask_finalROI.nii.gz'],slicenum);
+
 
 % Load session-specific contralateral GM ROI
-volCtr = LoadSlice([sdir,'mask_contra.nii.gz'],slicenum);
+volCtr = LoadSlice([sdir,'mask_contraROI.nii.gz'],slicenum);
 
 % Threshold values
 threshes = containers.Map({'R2p', 'DBV', 'OEF', 'R2'},...
