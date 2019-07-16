@@ -140,8 +140,8 @@ void R2primeFwdModel::Initialize(ArgsType &args)
     eta  = convertTo<double>(args.ReadWithDefault("eta","0.0"));
 
     // check for fixed DBV
-    fDBV = convertTo<double>(args.ReadWithDefault("fixDBV","0.036"));
-    fR2p = convertTo<double>(args.ReadWithDefault("fixR2p","2.6"));
+    fDBV = convertTo<double>(args.ReadWithDefault("fixDBV","0.03"));
+    fR2p = convertTo<double>(args.ReadWithDefault("fixR2p","4.0"));
 
 
     // add information to the log

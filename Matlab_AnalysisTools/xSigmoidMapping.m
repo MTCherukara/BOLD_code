@@ -33,7 +33,7 @@ paramPairs = 1;
 kappa = 1;
 
 % define any number of datasets
-sets = [641,653];
+sets = 641;
 
 %% Find directories, and load ground truth data and stuff
 % Data directory

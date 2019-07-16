@@ -33,7 +33,7 @@ vars = {'R2p','DBV','OEF'};
 % vars = {'R2'};
 
 % Choose Data set
-for setnum = [801:835]
+for setnum = [816:835]
     
 vecRes = zeros(4*length(vars),1);
 
@@ -109,6 +109,9 @@ end
 threshes = containers.Map({'R2p', 'DBV', 'OEF', 'VC', 'DF', 'lambda', 'Ax' , 'R2'},...
                           [ 30  ,  1   ,  1   ,  1  ,  15 ,   1     ,  30  ,  50 ]);  
 
+defaults = containers.Map({'R2p', 'DBV', 'OEF', 'VC', 'DF', 'lambda', 'Ax' , 'R2'},...
+                          [ 2.6 , 0.036, 0.4  , 0.01,  15 ,   1     ,  30  ,  50 ]);  
+                      
 % Title
 % disp(['Data from Fabber Set ',num2str(setnum),'. ',setname, ' Subject ',num2str(subnum)]);
 
@@ -128,6 +131,9 @@ for vv = 1:length(vars)
     
     % Pull out threshold value
     thrsh = threshes(vname); 
+    
+    % Pull out default value
+    dflt = defaults(vname);
         
     % Load the data
     volData = LoadSlice([fabdir,'mean_',vname,'.nii.gz'],slicenum);
@@ -141,8 +147,11 @@ for vv = 1:length(vars)
         stdData = (stdData(:).*mskData(:));
     end
     
+    % Find voxels that are different from the mode
+    volDiff = abs(volData - dflt);
+    
     % Create a mask of values to remove
-    badData = (volData <= 0) + ~isfinite(volData) + (volData > thrsh);
+    badData = (volData <= 0) + ~isfinite(volData) + (volData > thrsh) + (volDiff < 0.0001);
     if do_std
         badData = badData + ~isfinite(stdData) + (stdData > (thrsh/2)) + (stdData < (thrsh.*1e-3));
 %         badData = badData + ~isfinite(stdData) ;

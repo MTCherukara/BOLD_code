@@ -29,7 +29,7 @@ inferDBV
 #motional_narrowing
 
 precR2p=1e-4
-precDBV=1e-1
+precDBV=1e0
 #precOEF=1e0
 
 # Scan Parameters

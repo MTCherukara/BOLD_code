@@ -19,7 +19,7 @@ pnames = {'R2p';'DBV';'OEF'};
 nsub = 5;
 
 % Set number
-fset = 831;
+fset = 801;
 
 % Results directory
 resdir = '/Users/mattcher/Documents/DPhil/Data/Fabber_Results/';
@@ -32,6 +32,13 @@ slicenum = 2:8;
 maskname = 'mask_csf_gm_20.nii.gz';
 
 %% PRE-ALLOCATE
+
+% Threshold values
+threshes = containers.Map({'R2p', 'DBV', 'OEF', 'VC', 'DF', 'lambda', 'Ax' , 'R2'},...
+                          [ 30  ,  1   ,  1   ,  1  ,  15 ,   1     ,  30  ,  50 ]);  
+
+defaults = containers.Map({'R2p', 'DBV', 'OEF', 'VC', 'DF', 'lambda', 'Ax' , 'R2'},...
+                          [ 2.6 , 0.036, 0.4  , 0.01,  15 ,   1     ,  30  ,  50 ]);  
 
 % empty array
 vecAllData = [];
@@ -66,18 +73,28 @@ for ss = 1:nsub
     for pp = 1:length(pnames)
         
         vname = pnames{pp};
+        
+        % Pull out threshold and default values
+        thrsh = threshes(vname);
+        dflt = defaults(vname);
     
         % Load the data
         volRaw = LoadSlice([fabdir,'mean_',vname,'.nii.gz'],slicenum);
 
         % Apply mask
         volData = abs(volRaw(:).*volMask(:));
+        
+        % Calculate difference difference
+        volDiff = abs(volData - dflt);
+        
+        % Create vector of bad data, to remove
+        badData = (volData <= 0) + ~isfinite(volData) + (volData > thrsh) + (volDiff < 0.0001);
 
         % Remove bad values
-        volData(volData == 0) = [];
+        volData(badData > 0) = [];
 
         % Store out
-        matSubData(pp,:) = volData;
+        matSubData(pp,1:length(volData) ) = volData;
     end
     
     % Store out
@@ -85,8 +102,10 @@ for ss = 1:nsub
     
 end % for ss = 1:nsub
 
+% Cut any row with all zeros
+vecAllData(:,sum(vecAllData,1) == 0) = [];
 
 %% SAVE OUT
-save(['Fabber_Data/AllSub_Data_CSF_20_',num2str(fset),'.mat'],'vecAllData');
+% save(['Fabber_Data/AllSub_Data_CSF_20_',num2str(fset),'.mat'],'vecAllData');
     
     

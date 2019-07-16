@@ -16,7 +16,7 @@ TEind = p.TE/p.deltaTE;
 SEind = round((p.TE-tau)./(2.*p.deltaTE),0);
 
 % Pre-allocate
-Phase = zeros(length(tau),size(spp,2));
+Phase = zeros(length(tau),NN);
 
 % Pre-sum
 cumPhase = cumsum(spp,1);
