@@ -136,8 +136,7 @@ void R2primeFwdModel::Initialize(ArgsType &args)
 
     // read SR and beta
     SR   = convertTo<double>(args.ReadWithDefault("SR","1.0"));
-    Voff = convertTo<double>(args.ReadWithDefault("Voff","0.0"));
-    eta  = convertTo<double>(args.ReadWithDefault("eta","0.0"));
+    eta  = convertTo<double>(args.ReadWithDefault("eta","0.3"));
 
     // check for fixed DBV
     fDBV = convertTo<double>(args.ReadWithDefault("fixDBV","0.03"));
@@ -542,8 +541,8 @@ void R2primeFwdModel::Evaluate(const ColumnVector &params, ColumnVector &result)
     }
 
     // calculate tc and threshold it if necessary
-    tc = 1.7/dw;
-    //tc = 0.010;
+    tc = 1.5/dw;
+    //tc = 0.015;
     /*
     if (tc > 0.03)
     {
@@ -610,7 +609,7 @@ void R2primeFwdModel::Evaluate(const ColumnVector &params, ColumnVector &result)
         }
         else
         {
-            Ss = exp((Voff*DBV)-0.3*pow(SR*R2p*tau,2.0)/DBV);          // SDR model
+            Ss = exp((Voff*DBV)-eta*pow(SR*R2p*tau,2.0)/DBV);          // SDR model
             // Ss = exp(((eta*DBV)-(alpha*pow(R2p,2.0)))*pow(tau,2.0)); // new model
             // Ss = exp( -alpha*kk*SR*R2p*pow(tau,2.0) );                  // even newer model (12 APR)
             // Ss = exp( -alpha*(eta/(1.45-3.8*DBV))*SR*R2p*pow(tau,2.0) );                  // even newer model (12 APR)

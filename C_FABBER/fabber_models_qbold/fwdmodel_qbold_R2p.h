@@ -54,7 +54,7 @@ protected:
     // Model parameters
     double SR;      // this is a scaling factor for R2', applied in the asymptotic model
     double Voff;    // this defines an offset for the short-tau regime
-    double eta;     // this scales DBV' by R2'
+    double eta;     // the geometric constant (0.3) in the short tau regime
     double fDBV;    // fixed value of DBV or prior on DBV
     double fR2p;    // fixed value of R2', or prior on R2'
 

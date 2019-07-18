@@ -6,19 +6,26 @@ function LL = optimContent(Kappa)
     
     loc_param = param1;
     
-    % compute the true value of R2'
-    tR2p = (4/3)*pi*loc_param.gam*loc_param.B0*loc_param.dChi*loc_param.Hct*loc_param.OEF*loc_param.zeta;
+    loc_param.SR = Kappa;
     
-    % apply some scaling to it
-    sR2p = Kappa .* tR2p;
+    S_model = qASE_model(tau1,param1.TE,loc_param);
+    S_model = S_model./max(S_model);
     
-    % generate a (log) signal 
-    S_model = loc_param.zeta-sR2p.*tau1;
+    LL = log(sum((S_model - S_dist).^2));
     
-    % normalize the signals in some way?
-   
-       
-    % calculate likelihood
-    LL = log(sum((log(S_dist)-S_model).^2));
+%     % compute the true value of R2'
+%     tR2p = (4/3)*pi*loc_param.gam*loc_param.B0*loc_param.dChi*loc_param.Hct*loc_param.OEF*loc_param.zeta;
+%     
+%     % apply some scaling to it
+%     sR2p = Kappa .* tR2p;
+%     
+%     % generate a (log) signal 
+%     S_model = loc_param.zeta-sR2p.*tau1;
+%     
+%     % normalize the signals in some way?
+%    
+%        
+%     % calculate likelihood
+%     LL = log(sum((log(S_dist)-S_model).^2));
     
 end

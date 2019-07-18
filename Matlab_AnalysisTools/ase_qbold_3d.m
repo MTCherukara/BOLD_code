@@ -8,12 +8,15 @@
 clear;
 
 
-start_tau = -24;
-delta_tau = 12;
-end_tau = 96;
+start_tau = -8;
+delta_tau = 4;
+end_tau = 32;
 
 % manually specify input name
 % nii_name = '/Users/mattcher/Documents/DPhil/Data/validation_sqbold/vs1/ASE_FLAIR_av_mc.nii.gz';
+
+ddir = '/Users/mattcher/Documents/DPhil/Data/qboldsim_data/';
+nii_name = strcat(ddir,'ASE_Grid_RND_Sharan1_1000_TE_80_tau_32.nii.gz');
 
 if ~exist('nii_name','var')
     [dfile,ddir] = uigetfile('*.nii.gz','Choose Data File');

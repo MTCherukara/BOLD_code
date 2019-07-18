@@ -22,20 +22,21 @@ setFigureDefaults;
 % clc;
 
 % Choose variables
-vars = {'OEF', 'DBV', 'R2p'};
-thrA = [  5.0,   2.0,  50  ];     % threshold of actual values
+vars = {'OEF'};
+% vars = {'OEF', 'DBV', 'R2p'};
+thrA = [  1.0,   1.0,  30  ];     % threshold of actual values
 thrS = [ 10.0,   5.0, 100  ];     % threshold of standard deviations
 minG = [    0,  0.0,  0   ];     % minimum value ground truth 
 % vars = {'OEF'};
 
-kappa = 1;
+kappa = 0.66;
 
 % dHb = 0.0361 * R2p;
 
 text_title = '';
 
 % Do we have STD data?
-do_std = 1;
+do_std = 0;
 
 % Do we want a figure?
 plot_fig = 1;
@@ -43,8 +44,7 @@ plot_grid = 0;
 print_res = 0;
 
 % choose dataset
-for setnum = 703
-
+for setnum = 727
     %% Find directories, and load ground truth data and stuff
     % Data directory
     resdir = '/Users/mattcher/Documents/DPhil/Data/Fabber_ModelFits/';
@@ -65,7 +65,7 @@ for setnum = 703
     % volOEF = LoadSlice([gnddir,'True_Grid_50x50_OEF.nii.gz'],1);
     % volDBV = LoadSlice([gnddir,'True_Grid_50x50_DBV.nii.gz'],1);
     % volR2p = LoadSlice([gnddir,'True_Grid_50x50_R2p.nii.gz'],1);
-    load(['../Matlab_VesselSim/Sim_OEF_DBV_pairs_4.mat']);
+    load(['../Matlab_VesselSim/Sim_OEF_DBV_pairs_1.mat']);
     volOEF = OEFvals(:)';
     volDBV = DBVvals(:)';
     volR2p = 355.*volOEF.*volDBV;
@@ -114,9 +114,12 @@ for setnum = 703
 
         % take the absolute value and store it 
         matAll(:,vv) = (volData(:));
+        
+        volMode = mode(matAll(:,vv));
+        volDiff = abs(matAll(:,vv) - volMode);
 
         % apply threshold mask
-        vecBad = vecBad + ~isfinite(matAll(:,vv)) + ( matAll(:,vv) > thrA(vv) );
+        vecBad = vecBad + ~isfinite(matAll(:,vv)) + ( matAll(:,vv) > thrA(vv) ) + (volDiff < 0.00001);
 
         % mask out minimum values
         vecBad = vecBad + (matGnd(:,vv) < minG(vv));
@@ -234,9 +237,11 @@ for setnum = 703
             if strcmp(vname,'OEF')
                 axis([0,100,0,100]);
                 colormap(plasma);
+                caxis([0,10])
             elseif strcmp(vname,'DBV')
                 axis([0,10,0,10]);
                 colormap(parula);
+                caxis([0,100])
             else
                 axis([minV,maxV,minV,maxV]); 
                 colormap(viridis);

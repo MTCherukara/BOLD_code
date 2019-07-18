@@ -6,10 +6,12 @@
 % 16 July 2019
 
 clear;
+% close all;
+setFigureDefaults;
 
 % timings
 TE = 0.074;
-tau = (-28:4:68)./1000;
+tau = (-16:8:64)./1000;
 
 % Load the data
 load('newStoredPhase/VSdata_VesselDist_Average_Diff.mat');
