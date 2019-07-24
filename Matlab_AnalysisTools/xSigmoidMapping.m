@@ -20,8 +20,8 @@ clear;
 % close all;
 setFigureDefaults;
 
-plot_orig = 1;      % for plotting the tan shape
-plot_rand = 1;      % for random plots
+plot_orig = 0;      % for plotting the tan shape
+plot_rand = 0;      % for random plots
 
 % are we using a random grid of OEF and DBV values? If so, paramPairs = 1;
 paramPairs = 1;
@@ -33,7 +33,7 @@ paramPairs = 1;
 kappa = 1;
 
 % define any number of datasets
-sets = 641;
+sets = 708;
 
 %% Find directories, and load ground truth data and stuff
 % Data directory

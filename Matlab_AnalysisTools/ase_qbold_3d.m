@@ -8,20 +8,22 @@
 clear;
 
 
-start_tau = -8;
-delta_tau = 4;
-end_tau = 32;
+start_tau = -16;
+delta_tau = 8;
+end_tau = 64;
 
 % manually specify input name
-% nii_name = '/Users/mattcher/Documents/DPhil/Data/validation_sqbold/vs1/ASE_FLAIR_av_mc.nii.gz';
+% nii_name = '/Users/mattcher/Documents/DPhil/Data/validation_sqbold/vs7/ASE_FLAIR_av_mc.nii.gz';
 
 ddir = '/Users/mattcher/Documents/DPhil/Data/qboldsim_data/';
-nii_name = strcat(ddir,'ASE_Grid_RND_Sharan1_1000_TE_80_tau_32.nii.gz');
+nii_name = strcat(ddir,'ASE_Grid_RND_Frechet_1000_TE_80_tau_64.nii.gz');
 
 if ~exist('nii_name','var')
     [dfile,ddir] = uigetfile('*.nii.gz','Choose Data File');
     nii_name = strcat(ddir,dfile);
 end
+
+kappa = 0.64;
 
 tic; 
 %% Load dataset
@@ -31,7 +33,7 @@ tic;
 
 %% Fit R2'
 % Constants
-Hct = 0.4; % hct ratio in small vessels
+Hct = 0.34; % hct ratio in small vessels
 dChi0 = 0.264*10^-6; % ppm, sus difference between fully oxy & deoxy rbc's
 gamma = 2.675*10^4; % rads/(secs.Gauss) gyromagnetic ratio
 B0 = 3*10^4; %Gauss, Field strength
@@ -77,7 +79,7 @@ end
 
 % Calculate Physiological Parameters
 s0_id = find(tau == 0);
-r2p = -p(:,:,:,1); 
+r2p = -p(:,:,:,1)/kappa; 
 c = p(:,:,:,2);
 dbv = c - ln_Sase(:,:,:,s0_id);
 oef = r2p./(dbv.*gamma.*(4./3).*pi.*dChi0.*Hct.*B0);

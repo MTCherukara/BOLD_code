@@ -29,7 +29,7 @@ thrS = [ 10.0,   5.0, 100  ];     % threshold of standard deviations
 minG = [    0,  0.0,  0   ];     % minimum value ground truth 
 % vars = {'OEF'};
 
-kappa = 0.66;
+kappa = 1;
 
 % dHb = 0.0361 * R2p;
 
@@ -44,7 +44,7 @@ plot_grid = 0;
 print_res = 0;
 
 % choose dataset
-for setnum = 727
+for setnum = 731
     %% Find directories, and load ground truth data and stuff
     % Data directory
     resdir = '/Users/mattcher/Documents/DPhil/Data/Fabber_ModelFits/';
@@ -65,7 +65,7 @@ for setnum = 727
     % volOEF = LoadSlice([gnddir,'True_Grid_50x50_OEF.nii.gz'],1);
     % volDBV = LoadSlice([gnddir,'True_Grid_50x50_DBV.nii.gz'],1);
     % volR2p = LoadSlice([gnddir,'True_Grid_50x50_R2p.nii.gz'],1);
-    load(['../Matlab_VesselSim/Sim_OEF_DBV_pairs_1.mat']);
+    load(['../Matlab_VesselSim/Sim_OEF_DBV_pairs_2.mat']);
     volOEF = OEFvals(:)';
     volDBV = DBVvals(:)';
     volR2p = 355.*volOEF.*volDBV;
@@ -119,7 +119,8 @@ for setnum = 727
         volDiff = abs(matAll(:,vv) - volMode);
 
         % apply threshold mask
-        vecBad = vecBad + ~isfinite(matAll(:,vv)) + ( matAll(:,vv) > thrA(vv) ) + (volDiff < 0.00001);
+        vecBad = vecBad + ~isfinite(matAll(:,vv)) + ( matAll(:,vv) > thrA(vv) ) ...
+                        + (volDiff < 0.00001);
 
         % mask out minimum values
         vecBad = vecBad + (matGnd(:,vv) < minG(vv));
