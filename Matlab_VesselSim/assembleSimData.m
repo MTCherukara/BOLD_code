@@ -16,7 +16,7 @@ simdir = 'D:\Matthew\1_DPhil\Data\vesselsim_data\';     % Windows
 
 
 % Which distribution we want - 'sharan' or 'frechet'
-distname = 'sharan';
+distname = 'lauwers';
 
 % Options
 plot_figure = 0;
@@ -25,12 +25,11 @@ plot_figure = 0;
 paramPairs = 5;
 
 % Fixed Parameters
-TE  = 0.0480;
+TE  = 0.080;
 % tau = (-16:8:64)./1000;    % For TE = 72ms or 108ms or 84 ms
 % tau = (-24:12:96)./1000;      % For TE = 36ms
 % tau = (-8:4:32)./1000;
-tau = (-40:2:40)./1000;     
-
+tau = (-16:4:64)./1000;   
 
 % Vessel Distribution
 switch lower(distname)
