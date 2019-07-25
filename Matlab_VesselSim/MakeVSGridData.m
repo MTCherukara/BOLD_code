@@ -12,11 +12,11 @@ clear;
 
 
 %% Specify what we want
-SNR = inf;
+SNR = 500;
 % tau = (-16:8:64)./1000;    % For TE = 72ms or 108ms or 84 ms
-% tau = (-8:4:32)./1000;
+tau = (-8:4:32)./1000;
 % tau = (-24:12:96)./1000;
-tau = [-16, -12, -8, -4, 0, 4, 8, 12, 32, 48, 64]./1000;
+% tau = [-16, -12, -8, -4, 0, 4, 8, 12, 32, 48, 64]./1000;
 
 % figure out SEind
 SEind = find(tau == 0);
@@ -30,7 +30,7 @@ Rind = 11;
 %% Load in the big grid
 % fulldata = load(['ASE_Data/ASE_Grid_2C_100x10_TE_84.mat']);
 % fulldata = load(['../../Data/vesselsim_data/vs_arrays/TE84_vsData_single_R_',num2str(RR),'.mat']);
-fulldata = load('../../Data/vesselsim_data/vs_arrays/DataRND_4_TE_80_sharan_100.mat');
+fulldata = load('../../Data/vesselsim_data/vs_arrays/DataRND_2_TE_48_tau_32_frechet_100.mat');
 
 % Pull values
 DBVvals = fulldata.DBVvals;
@@ -70,8 +70,8 @@ gridSigma = repmat(mean(ase_model,4)./SNR,1,1,1,nt);
 gridNoise = gridSigma.*randn(size(ase_model));
 
 % Add noise
-% ase_data = ase_model + gridNoise;
-ase_data = ase_model;
+ase_data = ase_model + gridNoise;
+% ase_data = ase_model;
 
 % Normalize to spin echo
 ase_data = ase_data ./ repmat(ase_data(:,:,:,SEind),1,1,1,nt);
@@ -85,9 +85,9 @@ ase_data = ase_data ./ repmat(ase_data(:,:,:,SEind),1,1,1,nt);
 % dname = strcat('ASE_Grid_Single_50x50_TE_',num2str(1000*TE),'_R_',num2str(RR));
 % dname = strcat('ASE_Grid_ND_Lauwers_50x50_TE_',num2str(1000*TE));
 % dname = strcat('ASE_Grid_Sharan_100_TE_',num2str(1000*TE),'_tau_',num2str(1000*tau(end)),'_DBV_',num2str(Dind-1));
-% dname = strcat('ASE_Grid_RND_Sharan4_1000_TE_',num2str(1000*TE),'_tau_',num2str(1000*tau(end)));
+dname = strcat('ASE_Grid_RND_Frechet2_TE_',num2str(1000*TE),'_tau_',num2str(1000*tau(end)));
 % dname = strcat('ASE_Bootstrap_Sharan_1000_TE_',num2str(1000*TE),'_skip_',num2str(Rind));
-dname = strcat('ASE_Grid_RND_Sharan4_1000_TE_',num2str(1000*TE),'_set_7');
+% dname = strcat('ASE_Grid_RND_Sharan4_1000_TE_',num2str(1000*TE),'_set_7');
 
 
 % save([dname,'.mat'],'ase_data','ase_model','tau','TE','OEFvals','DBVvals','params');

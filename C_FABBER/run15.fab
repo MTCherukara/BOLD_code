@@ -1,7 +1,7 @@
 # fabber run 14 - SDR simulation testing
 
 # Input Data
-data=../../Data/qboldsim_data/ASE_Grid_RND_Sharan1_1000_TE_112_tau_96.nii.gz
+data=../../Data/qboldsim_data/ASE_Grid_RND_Frechet2_TE_112_tau_96.nii.gz
 mask=../../Data/qboldsim_data/Grid_100x10_mask.nii.gz
 
 # Run Options
@@ -30,15 +30,15 @@ include_intra
 ignore_T1
 
 # correction parameters
-SR=0.52
-eta=0.37
+#SR=0.43
+#eta=0.40
 
-precR2p=1e-4
+precR2p=1e-3
 precDBV=1e0
 #precOEF=1e2
 
 # Scan Parameters (maybe I'll think of a better way of doing this...)
-TE=0.080
+TE=0.112
 TR=3.000
 TI=0.0
 #TI=1.210

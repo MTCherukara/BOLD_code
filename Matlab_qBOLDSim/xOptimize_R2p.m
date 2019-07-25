@@ -27,7 +27,7 @@ TE = 0.112;
 % taus = (-24:12:96)./1000;
 % taus = [-4:2:6, 32, 40, 48, 56, 64]./1000;
 % taus = (-30:2:34)./1000;
-taus = (24:4:40)./1000;
+taus = (24:12:96)./1000;
 
 % Vessel Type
 vsd_name = 'frechet';
@@ -37,7 +37,7 @@ optim2 = 0;
 
 % Load data
 %   Dimensions of S0:     DBV, OEF, TIME
-fulldata = load(['../../Data/vesselsim_data/vs_arrays/DataRND_4_TE_',num2str(1000*TE),'_',vsd_name,'_100.mat']);
+fulldata = load(['../../Data/vesselsim_data/vs_arrays/DataRND_2_TE_',num2str(1000*TE),'_tau_96_',vsd_name,'_100.mat']);
 
 % pull out the right tau value datapoints
 [~,Tind,~] = intersect(fulldata.tau,taus);

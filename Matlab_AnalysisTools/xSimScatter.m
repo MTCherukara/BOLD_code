@@ -22,14 +22,14 @@ setFigureDefaults;
 % clc;
 
 % Choose variables
-vars = {'OEF'};
-% vars = {'OEF', 'DBV', 'R2p'};
-thrA = [  1.0,   1.0,  30  ];     % threshold of actual values
+% vars = {'OEF'};
+vars = {'OEF', 'DBV', 'R2p'};
+thrA = [  1.0,   1.0, 100  ];     % threshold of actual values
 thrS = [ 10.0,   5.0, 100  ];     % threshold of standard deviations
 minG = [    0,  0.0,  0   ];     % minimum value ground truth 
 % vars = {'OEF'};
 
-kappa = 1;
+kappa = 1.0;
 
 % dHb = 0.0361 * R2p;
 
@@ -44,7 +44,7 @@ plot_grid = 0;
 print_res = 0;
 
 % choose dataset
-for setnum = 731
+for setnum = 743
     %% Find directories, and load ground truth data and stuff
     % Data directory
     resdir = '/Users/mattcher/Documents/DPhil/Data/Fabber_ModelFits/';
@@ -182,11 +182,11 @@ for setnum = 731
             vecData = vecData.*100;
             vecGnd = vecGnd.*100;
             vecScl = vecScl.*100;
-    %     elseif strcmp(vname,'R2p')
-    %         % Converting R2' to dHb
-    %         vecData = vecData.*0.0361;
-    %         vecGnd = vecGnd.*0.0361;
-    %         vecScl = vecScl.*0.0361;
+        elseif strcmp(vname,'R2p')
+            % Converting R2' to dHb
+            vecData = vecData.*0.0361;
+            vecGnd = vecGnd.*0.0361;
+            vecScl = vecScl.*0.0361;
         end
 
         % Limits, for plotting

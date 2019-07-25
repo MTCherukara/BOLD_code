@@ -468,7 +468,7 @@ void R2primeFwdModel::Evaluate(const ColumnVector &params, ColumnVector &result)
     }
     else
     {
-        Hct = 0.34;
+        Hct = 0.40;
     }
     if (infer_R2e)
     {
@@ -541,7 +541,7 @@ void R2primeFwdModel::Evaluate(const ColumnVector &params, ColumnVector &result)
     }
 
     // calculate tc and threshold it if necessary
-    tc = 1.5/dw;
+    tc = 1.76/dw;
     //tc = 0.015;
     /*
     if (tc > 0.03)
