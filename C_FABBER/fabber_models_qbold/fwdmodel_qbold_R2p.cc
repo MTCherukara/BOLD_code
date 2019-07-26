@@ -138,10 +138,6 @@ void R2primeFwdModel::Initialize(ArgsType &args)
     SR   = convertTo<double>(args.ReadWithDefault("SR","1.0"));
     eta  = convertTo<double>(args.ReadWithDefault("eta","0.3"));
 
-    // check for fixed DBV
-    fDBV = convertTo<double>(args.ReadWithDefault("fixDBV","0.03"));
-    fR2p = convertTo<double>(args.ReadWithDefault("fixR2p","4.0"));
-
 
     // add information to the log
     LOG << "Inference using development model" << endl;
@@ -271,13 +267,13 @@ void R2primeFwdModel::HardcodedInitialDists(MVNDist &prior, MVNDist &posterior) 
     
     if (infer_R2p)
     {
-        prior.means(R2p_index()) = fR2p;
+        prior.means(R2p_index()) = 2.6;
         precisions(R2p_index(), R2p_index()) = prec_R2p;
     }
 
     if (infer_DBV)
     {
-        prior.means(DBV_index()) = fDBV; // 0.036
+        prior.means(DBV_index()) = 0.036; // 0.036
         precisions(DBV_index(), DBV_index()) = prec_DBV;
     }
 
@@ -326,19 +322,19 @@ void R2primeFwdModel::HardcodedInitialDists(MVNDist &prior, MVNDist &posterior) 
     if (infer_OEF)
     {
         posterior.means(OEF_index()) = 0.4;
-        precisions(OEF_index(), OEF_index()) = 1e-1; // 1e1
+        precisions(OEF_index(), OEF_index()) = prec_OEF; // 1e1
     }
     
     if (infer_R2p)
     {
-        posterior.means(R2p_index()) = fR2p;
-        precisions(R2p_index(), R2p_index()) = 1e-3;
+        posterior.means(R2p_index()) = 2.6;
+        precisions(R2p_index(), R2p_index()) = prec_R2p;
     }
 
     if (infer_DBV)
     {
-        posterior.means(DBV_index()) = fDBV;
-        precisions(DBV_index(), DBV_index()) = 1e0; 
+        posterior.means(DBV_index()) = 0.036;
+        precisions(DBV_index(), DBV_index()) = prec_DBV; 
     }
 
     if (infer_R2t)
@@ -368,13 +364,13 @@ void R2primeFwdModel::HardcodedInitialDists(MVNDist &prior, MVNDist &posterior) 
     if (infer_dF)
     {
         posterior.means(dF_index()) = 5.0;
-        precisions(dF_index(), dF_index()) = 1e-2; // 1e-2
+        precisions(dF_index(), dF_index()) = prec_DF; // 1e-2
     }
 
     if (infer_lam)
     {
         posterior.means(lam_index()) = 0.1;
-        precisions(lam_index(), lam_index()) = 1e-1; // 1e1
+        precisions(lam_index(), lam_index()) = prec_CSF; // 1e1
     } 
 
     
@@ -444,7 +440,7 @@ void R2primeFwdModel::Evaluate(const ColumnVector &params, ColumnVector &result)
     }
     else
     {
-        DBV = fDBV;
+        DBV = 0.026;
     }
     if (infer_R2t)
     {
@@ -468,7 +464,7 @@ void R2primeFwdModel::Evaluate(const ColumnVector &params, ColumnVector &result)
     }
     else
     {
-        Hct = 0.40;
+        Hct = 0.340;
     }
     if (infer_R2e)
     {
@@ -505,16 +501,12 @@ void R2primeFwdModel::Evaluate(const ColumnVector &params, ColumnVector &result)
     else if (infer_R2p)
     {
         R2p = (paramcpy(R2p_index()));
-        if (R2p < 0.01)
+        /*if (R2p < 0.01)
         {
             R2p = 0.01;
-        }
+        }  */
 
         OEF = R2p/(887.4082*DBV*Hct);
-        /*if (OEF < 0.01)
-        {
-            OEF = 0.01;
-        }*/
         dw = 887.4082*Hct*OEF;
 
         // SRb = 6.263*(1-exp(-3.477*OEF));
@@ -536,13 +528,13 @@ void R2primeFwdModel::Evaluate(const ColumnVector &params, ColumnVector &result)
     }
     else
     {
-        OEF = 0.3;
-        R2p = 2.5;
+        OEF = 0.4;
+        R2p = 4.0;
     }
 
     // calculate tc and threshold it if necessary
-    tc = 1.76/dw;
-    //tc = 0.015;
+    tc = 1.7/dw;
+    //tc = 0.010;
     /*
     if (tc > 0.03)
     {
@@ -596,23 +588,14 @@ void R2primeFwdModel::Evaluate(const ColumnVector &params, ColumnVector &result)
         if (tau < -tc)
         {
             Ss = exp(DBV + (SR*R2p*tau));          // SDR model
-            // Ss = exp(SR*(DBV + R2p*tau));       // new model
-            // Ss = exp(SR*R2p*((1/kk) + tau));    // even newer model (12 APR)
-            // Ss = exp(SR*R2p*(((1.45-3.8*DBV)/eta) + tau));    // even newer model (12 APR)
         }
         else if (tau > tc)
         {
             Ss = exp(DBV - (SR*R2p*tau));          // SDR model
-            // Ss = exp(SR*(DBV - R2p*tau));       // new model
-            // Ss = exp(SR*R2p*((1/kk) - tau));    // even newer model (12 APR)
-            // Ss = exp(SR*R2p*(((1.45-3.8*DBV)/eta) - tau));    // even newer model (12 APR)
         }
         else
         {
             Ss = exp((Voff*DBV)-eta*pow(SR*R2p*tau,2.0)/DBV);          // SDR model
-            // Ss = exp(((eta*DBV)-(alpha*pow(R2p,2.0)))*pow(tau,2.0)); // new model
-            // Ss = exp( -alpha*kk*SR*R2p*pow(tau,2.0) );                  // even newer model (12 APR)
-            // Ss = exp( -alpha*(eta/(1.45-3.8*DBV))*SR*R2p*pow(tau,2.0) );                  // even newer model (12 APR)
         }
 
         // add T2 effect to tissue compartment

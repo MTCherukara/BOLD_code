@@ -20,20 +20,20 @@ clear;
 % close all;
 setFigureDefaults;
 
-plot_orig = 0;      % for plotting the tan shape
-plot_rand = 0;      % for random plots
+plot_orig = 1;      % for plotting the tan shape
+plot_rand = 1;      % for random plots
 
 % are we using a random grid of OEF and DBV values? If so, paramPairs = 1;
-paramPairs = 1;
+paramPairs = 2;
 
 % % define the five datasets we want
 % set1 = 636;
 % sets = set1:set1+4;
 
-kappa = 1;
+kappa = 0.57;
 
 % define any number of datasets
-sets = 708;
+sets = 746;
 
 %% Find directories, and load ground truth data and stuff
 % Data directory
@@ -196,30 +196,30 @@ if plot_rand
 
     %% Plotting corrected OEF estimates
 
-%     % % L model
-%     % modOEF = 0.106.*tan(0.0138*estR2p./estDBV);
-% 
-%     % 2C model
-% %     modOEF = 0.212.*tan(0.0125*estR2p./estDBV);
-%     
-%     % Kappa 2C
+    % % L model
+    % modOEF = 0.106.*tan(0.0138*estR2p./estDBV);
+
+    % 2C model
+%     modOEF = 0.212.*tan(0.0125*estR2p./estDBV);
+    
+    % Kappa 2C
 %     modOEF = 0.145.*tan(0.00477*estR2p./estDBV);
-% 
-% 
-%     figure; box on; hold on; axis square; grid on;
-%     for ff = 1:nd
-%         scatter(trueOEF(ff,:),modOEF(ff,:),[],'filled');
-%     end
-% 
-%     % plot unity line
-%     plot([0,mo],[0,mo],'k-','LineWidth',1);
-% 
-%     legend('DBV = 1%','DBV = 3%','DBV = 5%','DBV = 7%','DBV = 9%','Location','NorthWest')
-%     xlabel('True OEF (%)');
-%     ylabel('Estimated OEF (%)');
-%     axis([0,mo,0,mo]);
-% 
-%     yticks([0:0.2:0.8])
-%     yticklabels({'0','20','40','60','80'})
-%     xticklabels({'0','20','40','60','80'})
+    modOEF = 0.151.*tan((0.00215*estOEF)-0.0017) + 0.462;
+
+    figure; box on; hold on; axis square; grid on;
+    for ff = 1:nd
+        scatter(OEFvals,modOEF(ff,:),[],'filled');
+    end
+
+    % plot unity line
+    plot([0,mo],[0,mo],'k-','LineWidth',1);
+
+    legend('DBV = 1%','DBV = 3%','DBV = 5%','DBV = 7%','DBV = 9%','Location','NorthWest')
+    xlabel('True OEF (%)');
+    ylabel('Estimated OEF (%)');
+    axis([0,mo,0,mo]);
+
+    yticks([0:0.2:0.8])
+    yticklabels({'0','20','40','60','80'})
+    xticklabels({'0','20','40','60','80'})
 end

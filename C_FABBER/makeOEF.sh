@@ -7,8 +7,8 @@
 # Matthew Cherukara, 3 October 2017
 
 # directory of results
-#rdir=~/Documents/DPhil/Data/Fabber_Results
-rdir=~/Documents/DPhil/Data/Fabber_ModelFits
+rdir=~/Documents/DPhil/Data/Fabber_Results
+#rdir=~/Documents/DPhil/Data/Fabber_ModelFits
 
 # find the name of the directory that has the specified number, if no input is specified, use the
 # default-created directory "+" 
@@ -27,8 +27,8 @@ if [[ -d "${rdir}/${dname}" ]] ; then
     #                   then threshold all values below 0.01 to 0.01 (avoids singular problems)
     #                   then multiply by 301.74 (when Hct=0.34) or 354.99 (Hct=0.40), and save
     #fslmaths ${rdir}/${dname}/mean_DBV.nii.gz -mul 301.74 temp_DBV.nii.gz
-    #fslmaths ${rdir}/${dname}/mean_DBV.nii.gz -abs -sub 1 -uthr 0 -add 0.99 -thr 0 -add 0.01 -mul 301.74 temp_DBV.nii.gz
-    fslmaths ${rdir}/${dname}/mean_DBV.nii.gz -abs -sub 1 -uthr 0 -add 0.999 -thr 0 -add 0.001 -mul 354.99 temp_DBV.nii.gz
+    fslmaths ${rdir}/${dname}/mean_DBV.nii.gz -abs -sub 1 -uthr 0 -add 0.99 -thr 0 -add 0.01 -mul 301.74 temp_DBV.nii.gz
+    #fslmaths ${rdir}/${dname}/mean_DBV.nii.gz -abs -sub 1 -uthr 0 -add 0.999 -thr 0 -add 0.001 -mul 354.99 temp_DBV.nii.gz
 
     # for the R2p file, first take the absolute value
     #                   then divide by the temporary DBV file, and save to OEF

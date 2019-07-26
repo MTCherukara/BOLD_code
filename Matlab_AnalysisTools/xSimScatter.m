@@ -29,7 +29,7 @@ thrS = [ 10.0,   5.0, 100  ];     % threshold of standard deviations
 minG = [    0,  0.0,  0   ];     % minimum value ground truth 
 % vars = {'OEF'};
 
-kappa = 1.0;
+kappa = 0.43;
 
 % dHb = 0.0361 * R2p;
 
@@ -41,10 +41,10 @@ do_std = 0;
 % Do we want a figure?
 plot_fig = 1;
 plot_grid = 0;
-print_res = 0;
+print_res = 1;
 
 % choose dataset
-for setnum = 743
+for setnum = 752
     %% Find directories, and load ground truth data and stuff
     % Data directory
     resdir = '/Users/mattcher/Documents/DPhil/Data/Fabber_ModelFits/';
@@ -56,8 +56,6 @@ for setnum = 743
     % disp(' ');
     % disp(['Opening dataset ',fdname.name,':']);
 
-
-
     % Ground truth data is stored here
     gnddir = '/Users/mattcher/Documents/DPhil/Data/qboldsim_data/';
 
@@ -65,7 +63,7 @@ for setnum = 743
     % volOEF = LoadSlice([gnddir,'True_Grid_50x50_OEF.nii.gz'],1);
     % volDBV = LoadSlice([gnddir,'True_Grid_50x50_DBV.nii.gz'],1);
     % volR2p = LoadSlice([gnddir,'True_Grid_50x50_R2p.nii.gz'],1);
-    load(['../Matlab_VesselSim/Sim_OEF_DBV_pairs_2.mat']);
+    load(['../Matlab_VesselSim/Sim_OEF_DBV_pairs_5.mat']);
     volOEF = OEFvals(:)';
     volDBV = DBVvals(:)';
     volR2p = 355.*volOEF.*volDBV;

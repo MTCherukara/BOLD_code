@@ -1,7 +1,7 @@
 # fabber run 14 - SDR simulation testing
 
 # Input Data
-data=../../Data/qboldsim_data/ASE_Grid_RND_Frechet2_TE_112_tau_96.nii.gz
+data=../../Data/qboldsim_data/ASE_Grid_RND_Lauwers5_TE_80_tau_64.nii.gz
 mask=../../Data/qboldsim_data/Grid_100x10_mask.nii.gz
 
 # Run Options
@@ -30,15 +30,15 @@ include_intra
 ignore_T1
 
 # correction parameters
-#SR=0.43
-#eta=0.40
+SR=0.43
+eta=0.40
 
 precR2p=1e-3
 precDBV=1e0
 #precOEF=1e2
 
 # Scan Parameters (maybe I'll think of a better way of doing this...)
-TE=0.112
+TE=0.080
 TR=3.000
 TI=0.0
 #TI=1.210
@@ -70,30 +70,30 @@ TI=0.0
 #tau11=0.032
 
 # set with 11 taus (max 64)
-#tau1=-0.016
-#tau2=-0.008
-#tau3=0.0
-#tau4=0.008
-#tau5=0.016
-#tau6=0.024
-#tau7=0.032
-#tau8=0.040
-#tau9=0.048
-#tau10=0.056
-#tau11=0.064
+tau1=-0.016
+tau2=-0.008
+tau3=0.0
+tau4=0.008
+tau5=0.016
+tau6=0.024
+tau7=0.032
+tau8=0.040
+tau9=0.048
+tau10=0.056
+tau11=0.064
 
 # 11 taus (max 96)
-tau1=-0.024
-tau2=-0.012
-tau3=0.0
-tau4=0.012
-tau5=0.024
-tau6=0.036
-tau7=0.048
-tau8=0.060
-tau9=0.072
-tau10=0.084
-tau11=0.096
+#tau1=-0.024
+#tau2=-0.012
+#tau3=0.0
+#tau4=0.012
+#tau5=0.024
+#tau6=0.036
+#tau7=0.048
+#tau8=0.060
+#tau9=0.072
+#tau10=0.084
+#tau11=0.096
 
 # set with 7 taus (longer 0:10:60)
 #tau1=0.0
