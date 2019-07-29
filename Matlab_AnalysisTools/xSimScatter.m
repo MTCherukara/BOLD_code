@@ -109,6 +109,7 @@ for setnum = 752
         end
 
         vecGnd = matGnd(:,vv);
+        vecScl = matScl(:,vv);
 
         % take the absolute value and store it 
         matAll(:,vv) = (volData(:));
@@ -123,9 +124,13 @@ for setnum = 752
         % mask out minimum values
         vecBad = vecBad + (matGnd(:,vv) < minG(vv));
 
-    %     if strcmp(vname,'DBV')
-    %         vecBad = vecBad + (vecGnd > 0.1) + (vecGnd < 0.01);
-    %     end
+%         if strcmp(vname,'DBV')
+%             vecBad = vecBad + (vecGnd > 0.1) + (vecGnd < 0.01);
+%         end
+    
+%         if strcmp(vname,'OEF')
+%             vecBad = vecBad + (vecScl > 0.095) + (vecScl < 0.005);
+%         end
 
         % load and store standard deviation data
         if do_std
@@ -186,6 +191,24 @@ for setnum = 752
             vecGnd = vecGnd.*0.0361;
             vecScl = vecScl.*0.0361;
         end
+        
+        if strcmp(vname,'OEF')
+            
+            newBad = vecData > 24;
+            vecData(newBad > 0.5) = [];
+            vecGnd(newBad > 0.5) = [];
+            vecScl(newBad > 0.5) = [];
+            
+            vecO = kappa*matAll(:,1)./(3.55*matAll(:,2));
+            vecData = 3.76.*tan(0.063.*vecData) + 20.2;
+            
+            newBad = (vecData > 100) + (vecData < 0);
+            vecData(newBad > 0.5) = [];
+            vecGnd(newBad > 0.5) = [];
+            vecScl(newBad > 0.5) = [];
+            
+        end
+            
 
         % Limits, for plotting
         minV = min(vecGnd);

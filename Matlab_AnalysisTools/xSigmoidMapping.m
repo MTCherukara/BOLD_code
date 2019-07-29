@@ -11,29 +11,32 @@
 %
 % CHANGELOG:
 %
+% 2019-07-29 (MTC). Sorted things out so that we could just do single set of
+%       random-grid OEF and DBV values
+%
 % 2019-06-24 (MTC). This version is used for sets of 5 results, with DBV values
 %       of 1, 3, 5, 7, and 9% respectively. Added functionality for random-grid
 %       variant
 
 
 clear;
-% close all;
+close all;
 setFigureDefaults;
 
-plot_orig = 1;      % for plotting the tan shape
+plot_orig = 0;      % for plotting the tan shape
 plot_rand = 1;      % for random plots
 
 % are we using a random grid of OEF and DBV values? If so, paramPairs = 1;
-paramPairs = 2;
+paramPairs = 5;
 
 % % define the five datasets we want
 % set1 = 636;
 % sets = set1:set1+4;
 
-kappa = 0.57;
+kappa = 0.43;
 
 % define any number of datasets
-sets = 746;
+sets = 752;
 
 %% Find directories, and load ground truth data and stuff
 % Data directory
@@ -77,6 +80,7 @@ for ss = 1:length(sets)
     % Load the data
     volR = LoadSlice([fabdir,'mean_R2p.nii.gz'],1);
     volV = LoadSlice([fabdir,'mean_DBV.nii.gz'],1);
+    volO = LoadSlice([fabdir,'mean_OEF.nii.gz'],1);
     
     if paramPairs == 0
 
@@ -89,11 +93,12 @@ for ss = 1:length(sets)
         % Vectorize
         vecR = volR(:);
         vecV = volV(:);
+%         vecOEF = volO(:);
         
     end
     
     % Calculate Ratio
-    vecOEF = vecR./vecV;
+    vecOEF = kappa.*vecR./(3.55.*vecV);
     
     % Store Results
     estR2p(ss,:) = vecR;
@@ -131,70 +136,78 @@ if plot_orig
 end
 
 
+%% Plot rands
+
 
 if plot_rand
     %% Plotting R2' esimates only
-%     trueOEF = repmat(OEFvals,nd,1);
-%     trueDBV = repmat(DBVvals',1,no);
-
-%     evns = 1:1:no;
-
-    trueR2p = 355.*OEFvals.*DBVvals;
-    mR = 35;
-%     trueR2p = 355.*trueOEF.*trueDBV;
-%     mR = 0.6*max(trueR2p(:));
-
-    figure; box on; hold on; axis square; grid on;
-    for ff = 1:length(sets)
-        scatter(trueR2p,estR2p(ff,:),[],'filled');
-    end
-
-    % plot unity line
-    plot([0,mR],[0,mR],'k-','LineWidth',1);
-
-    % legend('DBV = 1%','DBV = 3%','DBV = 5%','DBV = 7%','DBV = 9%','Location','NorthWest')
-    xlabel('True R2''');
-    ylabel('Estimated R2''');
-    axis([0,mR,0,mR]);
-    
-    
-    %% Plot DBV estimates
-    mD = 0.1;
-    
-    figure; box on; hold on; axis square; grid on;
-    for ff = 1:length(sets)
-        scatter(DBVvals,estDBV(ff,:),[],'filled');
-    end
-
-    % plot unity line
-    plot([0,mD],[0,mD],'k-','LineWidth',1);
-
-    % legend('DBV = 1%','DBV = 3%','DBV = 5%','DBV = 7%','DBV = 9%','Location','NorthWest')
-    xlabel('True DBV (%)');
-    ylabel('Estimated DBV (%)');
-    axis([0,mD,0,mD]);
-    
-    
-    %% Plotting original OEF estimates
+% %     trueOEF = repmat(OEFvals,nd,1);
+% %     trueDBV = repmat(DBVvals',1,no);
+% 
+% %     evns = 1:1:no;
+% 
+%     trueR2p = 355.*OEFvals.*DBVvals;
+%     mR = 35;
+% %     trueR2p = 355.*trueOEF.*trueDBV;
+% %     mR = 0.6*max(trueR2p(:));
 % 
 %     figure; box on; hold on; axis square; grid on;
-%     for ff = 1:nd
-%         scatter(trueOEF(ff,:),kappa*estOEF(ff,:)./355,[],'filled');
+%     for ff = 1:length(sets)
+%         scatter(trueR2p,estR2p(ff,:),[],'filled');
 %     end
 % 
 %     % plot unity line
-%     plot([0,mo],[0,mo],'k-','LineWidth',1);
+%     plot([0,mR],[0,mR],'k-','LineWidth',1);
 % 
+%     % legend('DBV = 1%','DBV = 3%','DBV = 5%','DBV = 7%','DBV = 9%','Location','NorthWest')
+%     xlabel('True R2''');
+%     ylabel('Estimated R2''');
+%     axis([0,mR,0,mR]);
+    
+    
+    %% Plot DBV estimates
+%     mD = 0.1;
+%     
+%     figure; box on; hold on; axis square; grid on;
+%     for ff = 1:length(sets)
+%         scatter(DBVvals,estDBV(ff,:),[],'filled');
+%     end
+% 
+%     % plot unity line
+%     plot([0,mD],[0,mD],'k-','LineWidth',1);
+% 
+%     % legend('DBV = 1%','DBV = 3%','DBV = 5%','DBV = 7%','DBV = 9%','Location','NorthWest')
+%     xlabel('True DBV (%)');
+%     ylabel('Estimated DBV (%)');
+%     axis([0,mD,0,mD]);
+    
+    
+    %% Plotting original OEF estimates
+
+    figure; box on; hold on; axis square; grid on;
+    for ff = 1:nd
+%         scatter(trueOEF(ff,:),kappa*estOEF(ff,:)./355,[],'filled');
+        scatter(100*OEFvals,estOEF(ff,:),[],'filled');
+    end
+
+    % plot unity line
+    plot([0,mo],[0,mo],'k-','LineWidth',1);
+
 %     legend('DBV = 1%','DBV = 3%','DBV = 5%','DBV = 7%','DBV = 9%','Location','NorthWest')
-%     xlabel('True OEF (%)');
-%     ylabel('Estimated OEF (%)');
-%     axis([0,mo,0,mo]);
-% 
+    xlabel('True OEF (%)');
+    ylabel('Estimated OEF (%)');
+    axis([0,mo,0,mo]);
+
+    yticks([0:20:100]);
+    xticks([0:20:100]);
 %     yticks([0:0.2:0.8])
 %     yticklabels({'0','20','40','60','80'})
 %     xticklabels({'0','20','40','60','80'})
 
     %% Plotting corrected OEF estimates
+    
+    % pull out true OEFs
+    truOEF = 100*OEFvals;
 
     % % L model
     % modOEF = 0.106.*tan(0.0138*estR2p./estDBV);
@@ -204,22 +217,39 @@ if plot_rand
     
     % Kappa 2C
 %     modOEF = 0.145.*tan(0.00477*estR2p./estDBV);
-    modOEF = 0.151.*tan((0.00215*estOEF)-0.0017) + 0.462;
+%     modOEF = 15.1.*tan((0.215*estOEF)-0.17) + 46.2;
+
+    % Sharan
+%     modOEF = 31.0.*tan(0.131*estOEF) + 32.9;
+    
+    % Frechet
+%     modOEF = 30.*tan(0.111*estOEF) + 45.7;
+
+    % Lauwers
+    modOEF = 12.9.*tan(0.186*estOEF) + 22.0;
+    
+    badVec = (modOEF > 100) + (modOEF < 0) + (estOEF > 25);
+    
+    modOEF(badVec > 0.5) = [];
+    truOEF(badVec > 0.5) = [];
 
     figure; box on; hold on; axis square; grid on;
-    for ff = 1:nd
-        scatter(OEFvals,modOEF(ff,:),[],'filled');
-    end
+    scatter(truOEF,modOEF,[],'filled');
+%     for ff = 1:nd
+%         scatter(100*OEFvals,modOEF(ff,:),[],'filled');
+%     end
+%     legend('DBV = 1%','DBV = 3%','DBV = 5%','DBV = 7%','DBV = 9%','Location','NorthWest')
 
     % plot unity line
     plot([0,mo],[0,mo],'k-','LineWidth',1);
 
-    legend('DBV = 1%','DBV = 3%','DBV = 5%','DBV = 7%','DBV = 9%','Location','NorthWest')
     xlabel('True OEF (%)');
     ylabel('Estimated OEF (%)');
-    axis([0,mo,0,mo]);
+%     axis([0,mo,0,mo]);
 
-    yticks([0:0.2:0.8])
-    yticklabels({'0','20','40','60','80'})
-    xticklabels({'0','20','40','60','80'})
+    yticks([0:20:100]);
+    xticks([0:20:100]);
+%     yticks([0:0.2:0.8])
+%     yticklabels({'0','20','40','60','80'})
+%     xticklabels({'0','20','40','60','80'})
 end
