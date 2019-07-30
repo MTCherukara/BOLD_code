@@ -24,7 +24,7 @@ setFigureDefaults;
 % Choose variables
 % vars = {'OEF'};
 vars = {'OEF', 'DBV', 'R2p'};
-thrA = [  1.0,   1.0, 100  ];     % threshold of actual values
+thrA = [  1.0,   1  , 100  ];     % threshold of actual values
 thrS = [ 10.0,   5.0, 100  ];     % threshold of standard deviations
 minG = [    0,  0.0,  0   ];     % minimum value ground truth 
 % vars = {'OEF'};
@@ -194,7 +194,7 @@ for setnum = 752
         
         if strcmp(vname,'OEF')
             
-            newBad = vecData > 24;
+            newBad = vecData > 22;
             vecData(newBad > 0.5) = [];
             vecGnd(newBad > 0.5) = [];
             vecScl(newBad > 0.5) = [];
@@ -235,6 +235,14 @@ for setnum = 752
         RMSE(vv) = mean(abs(vecGnd - vecData));
     %     RELE(vv) = std(abs(vecGnd - vecData));
         RELE(vv) = 100*mean(abs(vecGnd - vecData)./abs(vecGnd));
+        
+        if strcmp(vname,'R2p')
+            err_R2p = abs(diffs);
+        elseif strcmp(vname,'DBV')
+            err_DBV = abs(diffs);
+        elseif strcmp(vname,'OEF')
+            err_OEF = abs(diffs);
+        end
 
         if do_std
             wdiff = diffs.*nm_std;

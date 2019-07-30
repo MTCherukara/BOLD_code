@@ -33,20 +33,22 @@ vars = {'R2p','DBV','OEF'};
 % vars = {'R2'};
 
 % Choose datasets
-sets = 1022:1028;
+sets = 331:335;
 
 % Which set of subjects is this from?
-setname = 'VS';          % 'VS', 'genF', 'genNF', 'CSF', or 'AMICI'
+setname = 'genF';          % 'VS', 'genF', 'genNF', 'CSF', or 'AMICI'
 
 % Options
 do_FE = 0;      % do Free energy?
 do_std = 0;     % do standard deviations
+kappa = 0.43;
+do_tan = 1;
 
 
 %% Initial stuff
 % Threshold values
 threshes = containers.Map({'R2p', 'DBV', 'OEF', 'VC', 'DF', 'lambda', 'Ax' , 'R2'},...
-                          [ 30  ,  0.5 ,  1   ,  1  ,  15 ,   1     ,  30  ,  50 ]);  
+                          [ 30  ,  0.2 ,  2   ,  1  ,  15 ,   1     ,  30  ,  50 ]);  
 
 defaults = containers.Map({'R2p', 'DBV', 'OEF', 'VC', 'DF', 'lambda', 'Ax' , 'R2'},...
                           [ 2.6 , 0.036,  1   , 0.01,  15 ,   1     ,  30  ,  50 ]);  
@@ -100,7 +102,7 @@ for setnum = sets
         case 'genF'
 
             slicenum = 1:6;     % new AMICI protocol FLAIR
-            maskname = 'mask_gm_80_FLAIR_80.nii.gz';
+            maskname = 'mask_gm_96_FLAIR.nii.gz';
             CC = strsplit(fabdir,'_s');     % need a 2-digit subject number
             subnum = CC{2}(1:2);
             maskdir = ['/Users/mattcher/Documents/DPhil/Data/subject_',subnum,'/'];
@@ -175,6 +177,16 @@ for setnum = sets
                 stdData = stdData.*100;
             end
         end
+        
+        % scale OEF by kappa
+        if strcmp(vname,'OEF') && (do_tan == 1)
+            volData = 11.7.*tan(0.151.*kappa.*volData) + 31.2;
+            
+            newBad = (volData > 100) + (volData < 0);
+            volData(newBad > 0.5) = [];
+            
+           
+        end
 
         % calculate IQR
         qnt = quantile(volData,[0.75,0.25]);
@@ -208,6 +220,7 @@ for setnum = sets
         else
             vecRes((4*vv)) = std(volData);
         end
+        vecRes((4*vv)-2) = 100*(ngm - length(volData))./ngm;
 
 
 

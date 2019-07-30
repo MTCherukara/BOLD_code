@@ -464,7 +464,7 @@ void R2primeFwdModel::Evaluate(const ColumnVector &params, ColumnVector &result)
     }
     else
     {
-        Hct = 0.340;
+        Hct = 0.40;
     }
     if (infer_R2e)
     {
@@ -595,7 +595,7 @@ void R2primeFwdModel::Evaluate(const ColumnVector &params, ColumnVector &result)
         }
         else
         {
-            Ss = exp((Voff*DBV)-eta*pow(SR*R2p*tau,2.0)/DBV);          // SDR model
+            Ss = exp(-eta*pow(SR*R2p*tau,2.0)/DBV);          // SDR model
         }
 
         // add T2 effect to tissue compartment

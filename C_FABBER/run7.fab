@@ -10,13 +10,13 @@ save-model-fit
 print-free-energy
 
 # Method Information
-method=spatialvb
+method=vb
 noise=white
 max-iterations=10
 allow-bad-voxels
 
 # Spatial VB Information (remove all of this if method!=spatialvb)
-param-spatial-priors=MMM
+#param-spatial-priors=MMM
 #image-prior4=../../Data/subject_04/CSF_T2w.nii.gz
 
 # Inference Model 
