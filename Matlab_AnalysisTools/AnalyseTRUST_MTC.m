@@ -98,7 +98,7 @@ vecTRUST = vecTRUST./max(vecTRUST);
 
 % Fit an exponential function
 coeff_TRUST = fit(TEs', vecTRUST, 'exp1');
-R2_TRUST    = -coeff_TRUST.b;
+R2_TRUST    = 0.62-coeff_TRUST.b;
 
 % Print results
 disp(['TRUST T2 of blood: ',num2str(1000/R2_TRUST),' ms']);
@@ -106,13 +106,13 @@ disp(['TRUST T2 of blood: ',num2str(1000/R2_TRUST),' ms']);
 Hct = 0.40;
 
 % % Calculate OEF (old formula)
-OEF = sqrt((R2_TRUST - 11.06)/121.78);
+% OEF = sqrt((R2_TRUST - 11.06)/121.78);
 
 % % Calculate OEF Lu, 2012 formula, from O'Brien:
-% A = 247.4*Hct*(1-Hct);
-% B = (3.4*(Hct^2)) - (Hct/2);
-% C = -13.5 + (80.2*Hct) - (75.9*(Hct^2));
-% OEF = -B + sqrt((B^2) - (4*A*(C-R2_TRUST))) ./ (2*A);
+A = 247.4*Hct*(1-Hct);
+B = 3.4*(Hct.^2) - (Hct/2);
+C = -13.5 + (80.2*Hct) - (75.9*(Hct^2));
+OEF = (-B + sqrt((B^2) - (4*A*(C-R2_TRUST)))) ./ (2*A);
 
 
 disp(['TRUST OEF: ',num2str(100*OEF,3),' %']);

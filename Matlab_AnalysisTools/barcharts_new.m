@@ -31,10 +31,10 @@ legtext = {'uncorr.'            , ...       %  1 - Uncorrected
 
 
 % Choose which columns to plot
-dpts = [1,5,6];
+dpts = [1,8,9,10];
 
 % Pick pairwise comparisons from DPTS values
-grps = {[1,2],[1,3]};
+grps = {[1,2],[1,3],[1,4],[2,3],[2,4],[3,4]};
 
 % Decide on additional plots
 plot_FE = 0;    % Free Energy (Median)

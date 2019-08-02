@@ -17,7 +17,7 @@
 clear;
 setFigureDefaults;
 
-slices = 2:6;
+% slices = 2:6;
 
 % SQ-LS    SQ-VB   1C-VBS  1C-VBTC 1C-VBI  1C-VB-TCI  2C-VB   2C-VBI  2C-VB-TC  2C-VB-TCI
 % '101'  , '250' , '330' , '264' , '257' , '316'    , '201' , '236' , '281'   , '309' ;...   % subject vs1
@@ -34,7 +34,7 @@ end
 % Check whether slices have been specified, if not, default to 3:10
 if ~exist('slices','var')
 %     slices = 3:10;       % VS
-%     slices = 3:14;       % CSF
+%     slices = 3:14;       % CSF5
     slices = 2:6;       % s11 FLAIR
 end
 ns = length(slices); % number of slices
@@ -44,10 +44,10 @@ if strfind(lower(niname),'dbv')
     threshold = 0.25;
     cmp = magma;
 elseif strfind(lower(niname),'r2p')
-    threshold = 10; % for in vivo, 10; for simulation, 40
+    threshold = 15; % for in vivo, 10; for simulation, 40
     cmp = viridis;
 elseif strfind(lower(niname),'oef')
-    threshold = 0.6;
+    threshold = 1;
     cmp = parula;
 elseif strfind(lower(niname),'df')
     threshold = 15;
@@ -63,12 +63,17 @@ end
 
 % Take absolute value of DBV data
 % if strfind(lower(niname),'dbv')
-    voldata = abs(inputdata);
+    volData = abs(inputdata);
 % end
 
+% % Tan correction bit
+% volZeros = volData == 0;
+% volData = 0.117.*tan(100.*0.151.*0.57.*volData) + 0.312;
+% volData(volZeros) = 0;
+
 % Threshold
-voldata(voldata < 0) = 0;
-voldata(voldata > threshold) = threshold;
+volData(volData < 0) = 0;
+volData(volData > threshold) = threshold;
 
 
 % % TEMP - multiply by the grey matter mask
@@ -86,30 +91,29 @@ if length(slices) == 1
     sh_bot = 0;
 else
     sh_sds = 15;        % sides
-    sh_top = 5;         % top and bottom
+    sh_top = 10;         % top and bottom
     sh_bot = 5;
 end
 
 
-voldata = voldata(1+sh_sds:end-sh_sds,1+sh_bot:end-sh_top,:);
+volData = volData(1+sh_sds:end-sh_sds,1+sh_bot:end-sh_top,:);
 
 % work out the new sizes
-sv = size(voldata);
+sv = size(volData);
 
 
 %% DEFINE MONTAGE MATRIX
 
+% for 4 or fewer slices, use a single row
+if ns < 5
+    nrows = 1;
+    ncols = ns;
+    
 % for even slices, create a 2xN grid
-if mod(ns,2) == 0
+elseif mod(ns,2) == 0
     nrows = 2;
     ncols = ns/2;
 
-% for 4 or fewer slices, use a single row
-elseif ns < 5
-    nrows = 1;
-    ncols = ns;
-
-    
 % for odd multiples of 3, create a 3xN grid
 elseif mod(ns,3) == 0
     nrows = 3;
@@ -137,7 +141,7 @@ pos_c = 1;
 for ii = slices
     
     % Fill the slice in the montage_image
-    montage_image(pos_c:pos_c+sv(2)-1,pos_r:pos_r+sv(1)-1) = (squeeze(voldata(:,:,ii,1))');
+    montage_image(pos_c:pos_c+sv(2)-1,pos_r:pos_r+sv(1)-1) = (squeeze(volData(:,:,ii,1))');
     
     % Move on to the next starting point
     pos_r = pos_r + sv(1);

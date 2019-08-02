@@ -25,6 +25,7 @@
     
 clear; 
 % clc;
+close all;
 
 %% User To Select Fabber Data To Display
 
@@ -33,28 +34,34 @@ vars = {'R2p','DBV','OEF'};
 % vars = {'R2'};
 
 % Choose datasets
-sets = 331:335;
+sets = 922:928;
 
 % Which set of subjects is this from?
-setname = 'genF';          % 'VS', 'genF', 'genNF', 'CSF', or 'AMICI'
+setname = 'VS';          % 'VS', 'genF', 'genNF', 'CSF', or 'AMICI'
 
 % Options
 do_FE = 0;      % do Free energy?
 do_std = 0;     % do standard deviations
-kappa = 0.43;
-do_tan = 1;
+kappa = 1;
+do_tan = 0;
+plot_hists = 0;
 
 
 %% Initial stuff
 % Threshold values
 threshes = containers.Map({'R2p', 'DBV', 'OEF', 'VC', 'DF', 'lambda', 'Ax' , 'R2'},...
-                          [ 30  ,  0.2 ,  2   ,  1  ,  15 ,   1     ,  30  ,  50 ]);  
+                          [ 20  ,  0.5   ,  2   ,  1  ,  15 ,   1     ,  30  ,  50 ]);  
 
 defaults = containers.Map({'R2p', 'DBV', 'OEF', 'VC', 'DF', 'lambda', 'Ax' , 'R2'},...
                           [ 2.6 , 0.036,  1   , 0.01,  15 ,   1     ,  30  ,  50 ]);  
 
 % Results directory
 resdir = '/Users/mattcher/Documents/DPhil/Data/Fabber_Results/';
+
+% Pre-allocate large arrays
+vecOEF = [];
+vecR2p = [];
+vecDBV = [];
 
 
 %% Loop through datasets
@@ -185,7 +192,16 @@ for setnum = sets
             newBad = (volData > 100) + (volData < 0);
             volData(newBad > 0.5) = [];
             
-           
+        end
+        
+        % temporarily save out some results
+        if strcmp(vname,'OEF')
+            volData(volData < 2.4) = [];
+            vecOEF = [vecOEF; volData];
+        elseif strcmp(vname,'R2p')
+            vecR2p = [vecR2p; volData];
+        elseif strcmp(vname,'DBV')
+            vecDBV = [vecDBV; volData];
         end
 
         % calculate IQR
@@ -220,7 +236,7 @@ for setnum = sets
         else
             vecRes((4*vv)) = std(volData);
         end
-        vecRes((4*vv)-2) = 100*(ngm - length(volData))./ngm;
+%         vecRes((4*vv)-2) = 100*(ngm - length(volData))./ngm;
 
 
 
@@ -232,6 +248,49 @@ for setnum = sets
     % disp(num2str(100*nlost/ngm));
 
 end % for setnum = ...
+
+%% Histograms
+
+if plot_hists
+    
+    nb = 25;       % number of histogram bins
+    
+    % Plot R2p
+    figure;
+    histogram(vecR2p,nb);
+    xlabel('R2'' (s^-^1)');
+    xlim([0,threshes('R2p')]);
+    axis square;
+    ylabel('Voxels');
+    title('All Subjects, 2C Model');
+%     yticks([]);
+    
+    % Plot DBV
+    figure;
+    histogram(vecDBV,nb);
+    xlabel('^ DBV (%)^ ');
+    xlim([0,100*threshes('DBV')]);
+    ylabel('Voxels');
+    axis square;
+    title('All Subjects, 2C Model');
+%     yticks([]);
+    
+    % Plot OEF
+    vecOEF(vecOEF > 100) = [];
+    vecOEF(vecOEF < 1) = [];
+    figure;
+    histogram(vecOEF,nb);
+    xlabel('^ OEF (%)^ ');
+    xlim([0,100]);
+    axis square;
+    ylabel('Voxels');
+    title('All Subjects, 2C Model');
+%     yticks([]);
+    
+end % if plot_hists
+
+
+
 
 %% Free Energy and Residuals
 
@@ -291,3 +350,4 @@ if do_FE
         disp(['Median Free Energy : ',num2str(-median(FData),4)]);
     end
 end
+
