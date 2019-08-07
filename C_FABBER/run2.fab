@@ -1,8 +1,8 @@
 # fabber run 2, CSF stuff
 
 # Input Data (subjects 3, 4, 6, 8, 9)
-data=../../Data/subject_15/ASE_96_FLAIR_unrung.nii.gz
-mask=../../Data/subject_15/mask_96_FLAIR.nii.gz
+data=../../Data/subject_16/ASE_FLAIR_TE_66_tau32_unrung.nii.gz
+mask=../../Data/subject_16/mask_96_FLAIR.nii.gz
 
 # Run Options
 output=../../Data/Fabber_Results/
@@ -37,22 +37,60 @@ precDBV=1e0
 #precDF=1e0
 
 # Correction Parameters
-SR=0.43
-eta=0.4
+SR=0.48
+eta=0.38
 
 # Scan Parameters (maybe I'll think of a better way of doing this...)
-TE=0.084
+TE=0.066
 TR=3.000
 TI=1.210
 
-tau1=-0.016
-tau2=-0.008
-tau3=0.0
-tau4=0.008
+# TE=84, tau=32 (or TE=112)
+#tau1=-0.008
+#tau2=-0.004
+#tau3=0.0
+#tau4=0.004
+#tau5=0.008
+#tau6=0.012
+#tau7=0.016
+#tau8=0.020
+#tau9=0.024
+#tau10=0.028
+#tau11=0.032
+
+# TE=66, tau=32
+tau1=0.0
+tau2=0.004
+tau3=0.008
+tau4=0.012
 tau5=0.016
-tau6=0.024
-tau7=0.032
-tau8=0.040
-tau9=0.048
-tau10=0.056
-tau11=0.064
+tau6=0.020
+tau7=0.024
+tau8=0.028
+tau9=0.032
+
+# TE=84, tau=64
+#tau1=-0.016
+#tau2=-0.008
+#tau3=0.0
+#tau4=0.008
+#tau5=0.016
+#tau6=0.024
+#tau7=0.032
+#tau8=0.040
+#tau9=0.048
+#tau10=0.056
+#tau11=0.064
+
+# TE=112, tau=96
+#tau1=-0.024
+#tau2=-0.012
+#tau3=0.0
+#tau4=0.012
+#tau5=0.024
+#tau6=0.036
+#tau7=0.048
+#tau8=0.060
+#tau9=0.072
+#tau10=0.084
+#tau11=0.096

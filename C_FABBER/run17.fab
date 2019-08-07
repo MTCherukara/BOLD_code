@@ -1,0 +1,42 @@
+# fabber run 17 - TRUST
+
+# Input Data
+data=../../Data/subject_16/TRUST_diff.nii.gz
+mask=../../Data/subject_16/mask_trust.nii.gz
+
+# Run Options
+output=../../Data/Fabber_Results/
+save-residuals
+save-model-fit
+print-free-energy
+
+# Method Information
+method=vb
+noise=white
+max-iterations=10
+allow-bad-voxels
+
+# Spatial VB Information (remove this if method!=spatialvb)
+#param-spatial-priors=NNN
+
+# Inference Model 
+model=trust
+inferS0
+inferOEF
+inferHct
+
+# Scan Parameters (maybe I'll think of a better way of doing this...)
+
+# 12 TEs (two repeats)
+TE1=0.0
+TE2=0.040
+TE3=0.080
+TE4=0.120
+TE5=0.160
+TE6=0.200
+TE7=0.0
+TE8=0.040
+TE9=0.080
+TE10=0.120
+TE11=0.160
+TE12=0.200

@@ -34,10 +34,10 @@ vars = {'R2p','DBV','OEF'};
 % vars = {'R2'};
 
 % Choose datasets
-sets = 922:928;
+sets = 374:379;
 
 % Which set of subjects is this from?
-setname = 'VS';          % 'VS', 'genF', 'genNF', 'CSF', or 'AMICI'
+setname = 'genF';          % 'VS', 'genF', 'genNF', 'CSF', 'TRUST', or 'AMICI'
 
 % Options
 do_FE = 0;      % do Free energy?
@@ -50,7 +50,7 @@ plot_hists = 0;
 %% Initial stuff
 % Threshold values
 threshes = containers.Map({'R2p', 'DBV', 'OEF', 'VC', 'DF', 'lambda', 'Ax' , 'R2'},...
-                          [ 20  ,  0.5   ,  2   ,  1  ,  15 ,   1     ,  30  ,  50 ]);  
+                          [ 30  ,  0.5  ,  2   ,  1  ,  15 ,   1     ,  30  ,  50 ]);  
 
 defaults = containers.Map({'R2p', 'DBV', 'OEF', 'VC', 'DF', 'lambda', 'Ax' , 'R2'},...
                           [ 2.6 , 0.036,  1   , 0.01,  15 ,   1     ,  30  ,  50 ]);  
@@ -113,6 +113,14 @@ for setnum = sets
             CC = strsplit(fabdir,'_s');     % need a 2-digit subject number
             subnum = CC{2}(1:2);
             maskdir = ['/Users/mattcher/Documents/DPhil/Data/subject_',subnum,'/'];
+            
+        case 'TRUST'
+
+            slicenum = 1;     % TRUST data
+            maskname = 'mask_trust.nii.gz';
+            CC = strsplit(fabdir,'_s');     % need a 2-digit subject number
+            subnum = CC{2}(1:2);
+            maskdir = ['/Users/mattcher/Documents/DPhil/Data/subject_',subnum,'/'];
 
         otherwise 
 
@@ -123,7 +131,6 @@ for setnum = sets
             maskdir = ['/Users/mattcher/Documents/DPhil/Data/subject_',subnum,'/'];
 
     end
-
 
     % Title
     % disp(['Data from Fabber Set ',num2str(setnum),'. ',setname, ' Subject ',num2str(subnum)]);
@@ -166,7 +173,7 @@ for setnum = sets
         % Create a mask of values to remove
         badData = (volData <= 0) + ~isfinite(volData) + (volData > thrsh) + (volDiff < 0.0001);
         if do_std
-            badData = badData + ~isfinite(stdData) + (stdData > (thrsh/2)) + (stdData < (thrsh.*1e-3));
+            badData = badData + ~isfinite(stdData) + (stdData > (thrsh/2)) + (stdData < (thrsh.*1e-6));
     %         badData = badData + ~isfinite(stdData) ;
         end
 
@@ -187,7 +194,7 @@ for setnum = sets
         
         % scale OEF by kappa
         if strcmp(vname,'OEF') && (do_tan == 1)
-            volData = 11.7.*tan(0.151.*kappa.*volData) + 31.2;
+            volData = 12.5.*tan(0.144.*kappa.*volData) + 40.4;
             
             newBad = (volData > 100) + (volData < 0);
             volData(newBad > 0.5) = [];

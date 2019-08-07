@@ -1,7 +1,7 @@
 # fabber run 14 - SDR simulation testing
 
 # Input Data
-data=../../Data/qboldsim_data/ASE_Grid_RND_Lauwers5_TE_80_tau_64.nii.gz
+data=../../Data/qboldsim_data/ASE_Grid_RND_Lauwers8_TE_80_tau_64.nii.gz
 mask=../../Data/qboldsim_data/Grid_100x10_mask.nii.gz
 
 # Run Options
@@ -30,8 +30,8 @@ include_intra
 ignore_T1
 
 # correction parameters
-SR=0.43
-eta=0.40
+SR=0.64
+eta=0.36
 
 precR2p=1e-3
 precDBV=1e0

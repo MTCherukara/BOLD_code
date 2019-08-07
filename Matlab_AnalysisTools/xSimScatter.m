@@ -16,7 +16,7 @@
 %       data in upfront, in order to generate a mask of "bad values" to remove.
 
 clear;
-close all;
+% close all;
 setFigureDefaults;
 
 % clc;
@@ -29,7 +29,7 @@ thrS = [ 10.0,   5.0, 100  ];     % threshold of standard deviations
 minG = [    0,  0.0,  0   ];     % minimum value ground truth 
 % vars = {'OEF'};
 
-kappa = 0.43;
+kappa = 1;
 
 % dHb = 0.0361 * R2p;
 
@@ -41,10 +41,10 @@ do_std = 0;
 % Do we want a figure?
 plot_fig = 1;
 plot_grid = 0;
-print_res = 1;
+print_res = 0;
 
 % choose dataset
-for setnum = 752
+for setnum = 723
     %% Find directories, and load ground truth data and stuff
     % Data directory
     resdir = '/Users/mattcher/Documents/DPhil/Data/Fabber_ModelFits/';
@@ -63,7 +63,7 @@ for setnum = 752
     % volOEF = LoadSlice([gnddir,'True_Grid_50x50_OEF.nii.gz'],1);
     % volDBV = LoadSlice([gnddir,'True_Grid_50x50_DBV.nii.gz'],1);
     % volR2p = LoadSlice([gnddir,'True_Grid_50x50_R2p.nii.gz'],1);
-    load(['../Matlab_VesselSim/Sim_OEF_DBV_pairs_5.mat']);
+    load(['../Matlab_VesselSim/Sim_OEF_DBV_pairs_1.mat']);
     volOEF = OEFvals(:)';
     volDBV = DBVvals(:)';
     volR2p = 355.*volOEF.*volDBV;
@@ -194,18 +194,18 @@ for setnum = 752
         
         if strcmp(vname,'OEF')
             
-            newBad = vecData > 22;
-            vecData(newBad > 0.5) = [];
-            vecGnd(newBad > 0.5) = [];
-            vecScl(newBad > 0.5) = [];
-            
-            vecO = kappa*matAll(:,1)./(3.55*matAll(:,2));
-            vecData = 3.76.*tan(0.063.*vecData) + 20.2;
-            
-            newBad = (vecData > 100) + (vecData < 0);
-            vecData(newBad > 0.5) = [];
-            vecGnd(newBad > 0.5) = [];
-            vecScl(newBad > 0.5) = [];
+%             newBad = vecData > 22;
+%             vecData(newBad > 0.5) = [];
+%             vecGnd(newBad > 0.5) = [];
+%             vecScl(newBad > 0.5) = [];
+%             
+%             vecO = kappa*matAll(:,1)./(3.55*matAll(:,2));
+%             vecData = 3.76.*tan(0.063.*vecData) + 20.2;
+%             
+%             newBad = (vecData > 100) + (vecData < 0);
+%             vecData(newBad > 0.5) = [];
+%             vecGnd(newBad > 0.5) = [];
+%             vecScl(newBad > 0.5) = [];
             
         end
             
