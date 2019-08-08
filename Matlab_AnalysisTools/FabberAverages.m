@@ -34,10 +34,16 @@ vars = {'R2p','DBV','OEF'};
 % vars = {'R2'};
 
 % Choose datasets
-sets = 374:379;
+sets = 234:238;
 
 % Which set of subjects is this from?
-setname = 'genF';          % 'VS', 'genF', 'genNF', 'CSF', 'TRUST', or 'AMICI'
+setname = 'AMICI';          % 'VS', 'genF', 'genNF', 'CSF', 'TRUST', or 'AMICI'
+
+if strcmp(setname,'AMICI')
+    roinames = {'initROI','finalROI','growth','contraGM'};
+else
+    roinames = {'gm_50'};
+end
 
 % Options
 do_FE = 0;      % do Free energy?
@@ -67,193 +73,199 @@ vecDBV = [];
 %% Loop through datasets
 for setnum = sets
     
-    % Pre-allocate results array
-    vecRes = zeros(4*length(vars),1);
-
-    %% Initial Stuff
-
-    % Figure out the results directory we want to load from
-    fdname = dir([resdir,'fabber_',num2str(setnum),'_*']);
-    fabdir = strcat(resdir,fdname.name,'/');
-
-    % Figure out subject and mask number, and such
-    switch setname
-
-        case 'VS'
-
-            slicenum = 4:9;
-            maskname = 'mask_gm.nii.gz';
-            CC = strsplit(fabdir,'_vs');    % need a 1-digit subject number
-            subnum = CC{2}(1);
-            maskdir = ['/Users/mattcher/Documents/DPhil/Data/validation_sqbold/vs',subnum,'/'];
-
-        case 'AMICI'
-
-            slicenum = 3:8;
-            maskname = 'mask_GM.nii.gz';
-            CC = strsplit(fabdir,'_p');     % need a 3-digit subject number
-            subnum = CC{2}(1:3);            
-            C2 = strsplit(CC{2},'ses');     % also need a Session Number (1,5)
-            sesnum = C2{2}(1);
-            maskdir = ['/Users/mattcher/Documents/BIDS_Data/qbold_stroke/sourcedata/sub-',...
-                       subnum,'/ses-00',sesnum,'/func-ase/'];
-
-        case 'CSF'
-
-            slicenum = 3:8;
-            maskname = 'mask_csf_gm_20.nii.gz';
-            CC = strsplit(fabdir,'_s');     % need a 2-digit subject number
-            subnum = CC{2}(1:2);
-            maskdir = ['/Users/mattcher/Documents/DPhil/Data/subject_',subnum,'/'];
-
-        case 'genF'
-
-            slicenum = 1:6;     % new AMICI protocol FLAIR
-            maskname = 'mask_gm_96_FLAIR.nii.gz';
-            CC = strsplit(fabdir,'_s');     % need a 2-digit subject number
-            subnum = CC{2}(1:2);
-            maskdir = ['/Users/mattcher/Documents/DPhil/Data/subject_',subnum,'/'];
+    for ss = 1:length(roinames);
+        
+        roiname = roinames{ss};
+        
+        % Pre-allocate results array
+        vecRes = zeros(4*length(vars),1);
+        
+        %% Initial Stuff
+        
+        % Figure out the results directory we want to load from
+        fdname = dir([resdir,'fabber_',num2str(setnum),'_*']);
+        fabdir = strcat(resdir,fdname.name,'/');
+        
+        % Figure out subject and mask number, and such
+        switch setname
             
-        case 'TRUST'
-
-            slicenum = 1;     % TRUST data
-            maskname = 'mask_trust.nii.gz';
-            CC = strsplit(fabdir,'_s');     % need a 2-digit subject number
-            subnum = CC{2}(1:2);
-            maskdir = ['/Users/mattcher/Documents/DPhil/Data/subject_',subnum,'/'];
-
-        otherwise 
-
-            slicenum = 5:10;    % new AMICI protocol nonFLAIR
-            maskname = 'mask_gm_80_nonFLAIR.nii.gz';
-            CC = strsplit(fabdir,'_s');     % need a 2-digit subject number
-            subnum = CC{2}(1:2);
-            maskdir = ['/Users/mattcher/Documents/DPhil/Data/subject_',subnum,'/'];
-
-    end
-
-    % Title
-    % disp(['Data from Fabber Set ',num2str(setnum),'. ',setname, ' Subject ',num2str(subnum)]);
-
-    % Load mask data
-    mskData = LoadSlice([maskdir,maskname],slicenum);
-
-    % count the number of GM voxels
-    ngm = sum(mskData(:) >= 0.5);
-
-
-    %% Loop Through Variables, Displaying Averages:
-
-    for vv = 1:length(vars)
-
-        % Identify Variable
-        vname = vars{vv};
-
-        % Pull out threshold value
-        thrsh = threshes(vname); 
-
-        % Pull out default value
-        dflt = defaults(vname);
-
-        % Load the data
-        volData = LoadSlice([fabdir,'mean_',vname,'.nii.gz'],slicenum);
-
-        % Apply Mask and Threshold (ABSOLUTE VALUE)
-        volData = abs(volData(:).*mskData(:));
-
-        % Load Standard Deviation data
-        if do_std
-            stdData = LoadSlice([fabdir,'std_' ,vname,'.nii.gz'],slicenum);
-            stdData = (stdData(:).*mskData(:));
+            case 'VS'
+                
+                slicenum = 4:9;
+                maskname = 'mask_gm.nii.gz';
+                CC = strsplit(fabdir,'_vs');    % need a 1-digit subject number
+                subnum = CC{2}(1);
+                maskdir = ['/Users/mattcher/Documents/DPhil/Data/validation_sqbold/vs',subnum,'/'];
+                
+            case 'AMICI'
+                
+                slicenum = 1:8;
+                maskname = strcat('mask_',roiname,'.nii.gz');
+                CC = strsplit(fabdir,'_p');     % need a 3-digit subject number
+                subnum = CC{2}(1:3);
+                C2 = strsplit(CC{2},'ses');     % also need a Session Number (1,5)
+                sesnum = C2{2}(1);
+                maskdir = ['/Users/mattcher/Documents/BIDS_Data/qbold_stroke/sourcedata/sub-',...
+                    subnum,'/ses-00',sesnum,'/func-ase/'];
+                
+            case 'CSF'
+                
+                slicenum = 3:8;
+                maskname = 'mask_csf_gm_20.nii.gz';
+                CC = strsplit(fabdir,'_s');     % need a 2-digit subject number
+                subnum = CC{2}(1:2);
+                maskdir = ['/Users/mattcher/Documents/DPhil/Data/subject_',subnum,'/'];
+                
+            case 'genF'
+                
+                slicenum = 1:6;     % new AMICI protocol FLAIR
+                maskname = 'mask_gm_96_FLAIR.nii.gz';
+                CC = strsplit(fabdir,'_s');     % need a 2-digit subject number
+                subnum = CC{2}(1:2);
+                maskdir = ['/Users/mattcher/Documents/DPhil/Data/subject_',subnum,'/'];
+                
+            case 'TRUST'
+                
+                slicenum = 1;     % TRUST data
+                maskname = 'mask_trust.nii.gz';
+                CC = strsplit(fabdir,'_s');     % need a 2-digit subject number
+                subnum = CC{2}(1:2);
+                maskdir = ['/Users/mattcher/Documents/DPhil/Data/subject_',subnum,'/'];
+                
+            otherwise
+                
+                slicenum = 5:10;    % new AMICI protocol nonFLAIR
+                maskname = 'mask_gm_80_nonFLAIR.nii.gz';
+                CC = strsplit(fabdir,'_s');     % need a 2-digit subject number
+                subnum = CC{2}(1:2);
+                maskdir = ['/Users/mattcher/Documents/DPhil/Data/subject_',subnum,'/'];
+                
         end
-
-        % Find voxels that are different from the mode
-        volDiff = abs(volData - dflt);
-
-        % Create a mask of values to remove
-        badData = (volData <= 0) + ~isfinite(volData) + (volData > thrsh) + (volDiff < 0.0001);
-        if do_std
-            badData = badData + ~isfinite(stdData) + (stdData > (thrsh/2)) + (stdData < (thrsh.*1e-6));
-    %         badData = badData + ~isfinite(stdData) ;
-        end
-
-        % Remove bad values
-        volData(badData ~= 0) = [];
-        if do_std
-            stdData(badData ~= 0) = [];
-        end
-
-
-        % convert certain params to percentages
-        if strcmp(vname,'DBV') || strcmp(vname,'OEF') || strcmp(vname,'VC') || strcmp(vname,'lambda')
-            volData = volData.*100;
+        
+        % Title
+        % disp(['Data from Fabber Set ',num2str(setnum),'. ',setname, ' Subject ',num2str(subnum)]);
+        
+        % Load mask data
+        mskData = LoadSlice([maskdir,maskname],slicenum);
+        
+        % count the number of GM voxels
+        ngm = sum(mskData(:) >= 0.5);
+        
+        
+        %% Loop Through Variables, Displaying Averages:
+        
+        for vv = 1:length(vars)
+            
+            % Identify Variable
+            vname = vars{vv};
+            
+            % Pull out threshold value
+            thrsh = threshes(vname);
+            
+            % Pull out default value
+            dflt = defaults(vname);
+            
+            % Load the data
+            volData = LoadSlice([fabdir,'mean_',vname,'.nii.gz'],slicenum);
+            
+            % Apply Mask and Threshold (ABSOLUTE VALUE)
+            volData = abs(volData(:).*mskData(:));
+            
+            % Load Standard Deviation data
             if do_std
-                stdData = stdData.*100;
+                stdData = LoadSlice([fabdir,'std_' ,vname,'.nii.gz'],slicenum);
+                stdData = (stdData(:).*mskData(:));
             end
-        end
-        
-        % scale OEF by kappa
-        if strcmp(vname,'OEF') && (do_tan == 1)
-            volData = 12.5.*tan(0.144.*kappa.*volData) + 40.4;
             
-            newBad = (volData > 100) + (volData < 0);
-            volData(newBad > 0.5) = [];
+            % Find voxels that are different from the mode
+            volDiff = abs(volData - dflt);
             
-        end
+            % Create a mask of values to remove
+            badData = (volData <= 0) + ~isfinite(volData) + (volData > thrsh) + (volDiff < 0.0001);
+            if do_std
+                badData = badData + ~isfinite(stdData) + (stdData > (thrsh/2)) + (stdData < (thrsh.*1e-6));
+                %         badData = badData + ~isfinite(stdData) ;
+            end
+            
+            % Remove bad values
+            volData(badData ~= 0) = [];
+            if do_std
+                stdData(badData ~= 0) = [];
+            end
+            
+            
+            % convert certain params to percentages
+            if strcmp(vname,'DBV') || strcmp(vname,'OEF') || strcmp(vname,'VC') || strcmp(vname,'lambda')
+                volData = volData.*100;
+                if do_std
+                    stdData = stdData.*100;
+                end
+            end
+            
+            % scale OEF by kappa
+            if strcmp(vname,'OEF') && (do_tan == 1)
+                volData = 12.5.*tan(0.144.*kappa.*volData) + 40.4;
+                
+                newBad = (volData > 100) + (volData < 0);
+                volData(newBad > 0.5) = [];
+                
+            end
+            
+            % temporarily save out some results
+            if strcmp(vname,'OEF')
+                volData(volData < 2.4) = [];
+                vecOEF = [vecOEF; volData];
+            elseif strcmp(vname,'R2p')
+                vecR2p = [vecR2p; volData];
+            elseif strcmp(vname,'DBV')
+                vecDBV = [vecDBV; volData];
+            end
+            
+            % calculate IQR
+            qnt = quantile(volData,[0.75,0.25]);
+            iqr = qnt(1) - qnt(2) ./ 2;
+            
+            % calculate and display the number of voxels we had to threshold out
+            nkept = length(volData);
+            nlost = ngm - nkept;
+            
+            %     disp('  ');
+            %     disp(vname);
+            %     disp(['  Kept ',num2str(nkept),' of ',num2str(ngm),' voxels (',round2str(100*nkept/ngm,1),'%)']);
+            %     disp(['  Lost ',num2str(nlost),' of ',num2str(ngm),' voxels (',round2str(100*nlost/ngm,1),'%)']);
+            
+            % Display results
+            %     disp('   ');
+            %     disp(['Median ',vname,': ',num2str(median(volData),4)]);
+            %     disp(['   IQR ',vname,': ',num2str(iqr,4)]);
+            
+            %     disp('   ');
+            %     disp(['Mean ',vname,'   : ',num2str(mean(volData),4)]);
+            %     if do_std
+            %         disp(['    Std ',vname,': ',num2str(mean(stdData),4)]);
+            %     else
+            %         disp(['    Std ',vname,': ',num2str(std(volData),4)]);
+            %     end
+            
+            vecRes((4*vv)-1) = mean(volData);
+            if do_std
+                vecRes((4*vv)) = mean(stdData);
+            else
+                vecRes((4*vv)) = std(volData);
+            end
+            %         vecRes((4*vv)-2) = 100*(ngm - length(volData))./ngm;
+            
+            
+            
+        end % for vv = length(vars)
         
-        % temporarily save out some results
-        if strcmp(vname,'OEF')
-            volData(volData < 2.4) = [];
-            vecOEF = [vecOEF; volData];
-        elseif strcmp(vname,'R2p')
-            vecR2p = [vecR2p; volData];
-        elseif strcmp(vname,'DBV')
-            vecDBV = [vecDBV; volData];
-        end
-
-        % calculate IQR
-        qnt = quantile(volData,[0.75,0.25]);
-        iqr = qnt(1) - qnt(2) ./ 2;
-
-        % calculate and display the number of voxels we had to threshold out
-        nkept = length(volData);
-        nlost = ngm - nkept;
-
-    %     disp('  ');
-    %     disp(vname);
-    %     disp(['  Kept ',num2str(nkept),' of ',num2str(ngm),' voxels (',round2str(100*nkept/ngm,1),'%)']);
-    %     disp(['  Lost ',num2str(nlost),' of ',num2str(ngm),' voxels (',round2str(100*nlost/ngm,1),'%)']);
-
-        % Display results
-    %     disp('   ');
-    %     disp(['Median ',vname,': ',num2str(median(volData),4)]);
-    %     disp(['   IQR ',vname,': ',num2str(iqr,4)]);
-
-    %     disp('   ');
-    %     disp(['Mean ',vname,'   : ',num2str(mean(volData),4)]);
-    %     if do_std
-    %         disp(['    Std ',vname,': ',num2str(mean(stdData),4)]);
-    %     else
-    %         disp(['    Std ',vname,': ',num2str(std(volData),4)]);
-    %     end
-
-        vecRes((4*vv)-1) = mean(volData);
-        if do_std
-            vecRes((4*vv)) = mean(stdData);
-        else
-            vecRes((4*vv)) = std(volData);
-        end
-%         vecRes((4*vv)-2) = 100*(ngm - length(volData))./ngm;
-
-
-
-    end % for vv = length(vars)
-
-    % display the results
-    disp(num2str(vecRes'));
-    % disp(['Percentage of voxels removed = ',num2str(100*nlost/ngm),'%']);
-    % disp(num2str(100*nlost/ngm));
-
+        % display the results
+        disp(num2str(vecRes'));
+        % disp(['Percentage of voxels removed = ',num2str(100*nlost/ngm),'%']);
+        % disp(num2str(100*nlost/ngm));
+        
+    end % for ss = 1:3
+    
 end % for setnum = ...
 
 %% Histograms

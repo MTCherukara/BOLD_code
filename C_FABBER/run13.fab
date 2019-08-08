@@ -11,7 +11,7 @@ save-model-fit
 #print-free-energy
 
 # Method Information
-method=spatialvb
+method=vb
 noise=white
 max-iterations=10
 allow-bad-voxels
@@ -25,12 +25,16 @@ inferS0
 inferR2p
 inferDBV
 
-#include_intra
-#motional_narrowing
+include_intra
+motional_narrowing
 
 precR2p=1e-4
 precDBV=1e0
 #precOEF=1e0
+
+# Correction Parameters
+SR=0.64
+eta=0.36
 
 # Scan Parameters
 TE=0.082
