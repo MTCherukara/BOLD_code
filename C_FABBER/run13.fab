@@ -1,8 +1,8 @@
 # fabber run 13 - AMICI stroke data (BIDS format)
 
 # Input Data
-data=/Users/mattcher/Documents/BIDS_Data/qbold_stroke/sourcedata/sub-183/ses-004/func-ase/ASE_FLAIR_av.nii.gz
-mask=/Users/mattcher/Documents/BIDS_Data/qbold_stroke/sourcedata/sub-183/ses-004/func-ase/mask_FLAIR.nii.gz
+data=/Users/mattcher/Documents/BIDS_Data/qbold_stroke/sourcedata/sub-104/ses-003/func-ase/ASE_FLAIR_av.nii.gz
+mask=/Users/mattcher/Documents/BIDS_Data/qbold_stroke/sourcedata/sub-104/ses-003/func-ase/mask_FLAIR.nii.gz
 
 # Run Options
 output=../../Data/Fabber_Results/
@@ -42,26 +42,26 @@ TR=3.000
 TI=1.210
 
 # 11 taus version (subjects up to 109)
-#tau1=-0.016
-#tau2=-0.008
-#tau3=0.000
-#tau4=0.008
-#tau5=0.016
-#tau6=0.024
-#tau7=0.032
-#tau8=0.040
-#tau9=0.048
-#tau10=0.056
-#tau11=0.064
+tau1=-0.016
+tau2=-0.008
+tau3=0.000
+tau4=0.008
+tau5=0.016
+tau6=0.024
+tau7=0.032
+tau8=0.040
+tau9=0.048
+tau10=0.056
+tau11=0.064
 
 # 10 taus version (subjects 180 onwards)
-tau1=-0.008
-tau2=0.0
-tau3=0.008
-tau4=0.016
-tau5=0.024
-tau6=0.032
-tau7=0.040
-tau8=0.048
-tau9=0.056
-tau10=0.064
+#tau1=-0.008
+#tau2=0.0
+#tau3=0.008
+#tau4=0.016
+#tau5=0.024
+#tau6=0.032
+#tau7=0.040
+#tau8=0.048
+#tau9=0.056
+#tau10=0.064

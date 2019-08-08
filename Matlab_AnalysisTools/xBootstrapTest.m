@@ -6,7 +6,7 @@
 % 27 June 2019
 
 clear;
-close all;
+% close all;
 
 setFigureDefaults;
 
@@ -32,7 +32,8 @@ setFigureDefaults;
 % ErrOEF = [  52.1200   53.8700   56.1700   53.8500   52.7000   56.5900   53.1700   53.2300   54.7800   53.8200   53.5300 ];
 % ErrDBV = [ 121.8400  128.5200  166.3300  128.5800  124.2400  149.2800  124.9400  129.8600  145.4000  126.4400  112.7700 ];
 % ErrR2p = [  22.4800   23.2400   19.6200   24.0000   22.6500   31.4600   24.0500   25.3800   29.4400   24.8700   27.4900 ];
-
+% 
+% ErrDBV = ErrDBV./2;
 
 %% Data (TE = 80 ms) - Sharan
 % taus = -8:4:32;
@@ -70,7 +71,7 @@ taus = 1:length(CorrOEF);
 % xticks(taus);
 % xlabel('Spin Echo Displacement \tau (ms)');
 % ylabel('True-Estimated Correlation');
-% legend('R2p','DBV','OEF');
+% legend('R2''','DBV','OEF');
 % 
 % 
 % % Plot Error (Relative)
@@ -83,7 +84,7 @@ taus = 1:length(CorrOEF);
 % xticks(taus);
 % xlabel('Spin Echo Displacement \tau (ms)');
 % ylabel('Relative Error (%)');
-% legend('R2p','DBV','OEF');
+% legend('R2''','DBV','OEF');
 
 
 %% Bar Plots
