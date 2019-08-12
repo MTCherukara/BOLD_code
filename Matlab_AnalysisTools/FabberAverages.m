@@ -34,7 +34,7 @@ vars = {'R2p','DBV','OEF'};
 % vars = {'R2'};
 
 % Choose datasets
-sets = 247:250;
+sets = 239;
 
 % Which set of subjects is this from?
 setname = 'AMICI';          % 'VS', 'genF', 'genNF', 'CSF', 'TRUST', or 'AMICI'
@@ -56,7 +56,7 @@ plot_hists = 0;
 %% Initial stuff
 % Threshold values
 threshes = containers.Map({'R2p', 'DBV', 'OEF', 'VC', 'DF', 'lambda', 'Ax' , 'R2'},...
-                          [ 30  ,  0.5  ,  2   ,  1  ,  15 ,   1     ,  30  ,  50 ]);  
+                          [ 30  ,  1  ,  2   ,  1  ,  15 ,   1     ,  30  ,  50 ]);  
 
 defaults = containers.Map({'R2p', 'DBV', 'OEF', 'VC', 'DF', 'lambda', 'Ax' , 'R2'},...
                           [ 2.6 , 0.036,  1   , 0.01,  15 ,   1     ,  30  ,  50 ]);  

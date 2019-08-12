@@ -13,13 +13,13 @@ setFigureDefaults;
 %% Plotting Information
 
 % choose patient number
-pat_id = '104';
+pat_id = '183';
 
 % choose which dimension to reduce (1 = pick a session, 2 = pick a correction)
-dimred = 1;
+dimred = 2;
 
 % choose Session (1 = ses-001, 2 = ses-004) or a Correction
-sesnum = 1;
+sesnum = 4;
 
 % choose which masks we want
 msks = [1,3,4];
@@ -90,7 +90,7 @@ xticks(bpos);
 xticklabels(mlbls);
 % ylim([0,36]);
 if dimred == 1
-    legend('uncorr.','\kappa corr.','\kappa\eta corr.','Location','SouthEast');
+    legend('uncorr.','\kappa corr.','\kappa\eta corr.','linear','Location','SouthEast');
 else
     legend('Presentation','1 Week','Location','South');
 end

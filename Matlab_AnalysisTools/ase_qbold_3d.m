@@ -8,12 +8,15 @@
 clear;
 
 
-start_tau = -28;
-delta_tau = 4;
+start_tau = -8;
+delta_tau = 8;
 end_tau = 64;
 
-% manually specify input name
-nii_name = '/Users/mattcher/Documents/DPhil/Data/validation_sqbold/vs7/ASE_FLAIR_av_mc.nii.gz';
+% % manually specify input name
+% nii_name = '/Users/mattcher/Documents/DPhil/Data/validation_sqbold/vs7/ASE_FLAIR_av_mc.nii.gz';
+
+% Patient data
+nii_name = '/Users/mattcher/Documents/BIDS_Data/qbold_stroke/sourcedata/sub-182/ses-001/func-ase/ASE_FLAIR_av.nii.gz';
 
 % ddir = '/Users/mattcher/Documents/DPhil/Data/qboldsim_data/';
 % nii_name = strcat(ddir,'ASE_Grid_RND_Frechet2_TE_48_tau_',num2str(end_tau),'.nii.gz');
@@ -33,7 +36,7 @@ tic;
 
 %% Fit R2'
 % Constants
-Hct = 0.34; % hct ratio in small vessels
+Hct = 0.40; % hct ratio in small vessels
 dChi0 = 0.264*10^-6; % ppm, sus difference between fully oxy & deoxy rbc's
 gamma = 2.675*10^4; % rads/(secs.Gauss) gyromagnetic ratio
 B0 = 3*10^4; %Gauss, Field strength
