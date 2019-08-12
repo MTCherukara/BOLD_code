@@ -54,7 +54,7 @@ params = genParams;
 
 % Assign specific parameters
 
-params.B0 = 1.5;
+params.B0 = 3;
 
 % Scan
 params.TE   = 0.084;        % s         - echo time

@@ -17,7 +17,8 @@ setFigureDefaults;
 lbls = {'TE=66, \tau=32','TE=80, \tau=32','TE=80, \tau=64','TE=112, \tau=32','TE=112, \tau=96'};
 
 % Choose which columns to plot
-dpts = [1,6,7];
+dpts = [1,5,6,7];
+bnames = {'uncorr.','\kappa (Sh)','\kappa (Jo)','\kappa (La)','\kappa,\eta (Sh)','\kappa,\eta (Jo)','\kappa,\eta (La)'};
 
 %% Data
 
@@ -28,11 +29,11 @@ dpts = [1,6,7];
 %       66-32     84-32     84-64     112-32    112-96
 R2p = [ 2.0610    2.8800    2.6810    2.0260    2.9820      % Unc
         2.6210    3.9760    3.9390    2.8120    4.3670      % Kappa S
-        2.2560    3.4600    3.3590    2.4260    3.8290      % K/E S
-        2.4720    4.1560    4.0810    3.8180    5.5900      % Kappa J
-        3.0270    4.5610    4.4710    3.4600    5.1920      % K/E J
-        2.6570    4.0880    3.9940    3.1630    4.8340      % Kappa L
-        3.6890    5.1580    5.5800    4.4510    6.6030      % K/E L
+        2.2560    3.4600    3.3590    2.4260    3.8290      % Kappa J
+        2.4720    4.1560    4.0810    3.8180    5.5900      % Kappa L
+        3.0270    4.5610    4.4710    3.4600    5.1920      % K/E S
+        2.6570    4.0880    3.9940    3.1630    4.8340      % K/E L
+        3.6890    5.1580    5.5800    4.4510    6.6030      % K/E J
         ];
 
 %       66-32     84-32     84-64     112-32    112-96
@@ -79,8 +80,8 @@ box on;
 axis([0.5,5.5,0,10.8]);
 ylabel('DBV (%)');
 xticklabels(lbls);
-legend('uncorr.','\kappa corr.','\kappa,\eta corr.','Location','NorthWest');
-title('GM Mean DBV Estimates (La)')
+legend(bnames(dpts),'Location','NorthWest');
+title('GM Mean DBV Estimates')
 xtickangle(315);
 
 
@@ -91,6 +92,6 @@ box on;
 axis([0.5,5.5,0,52]);
 ylabel('OEF (%)');
 xticklabels(lbls);
-legend('uncorr.','\kappa corr.','\kappa,\eta corr.','Location','NorthWest');
-title('GM Mean OEF Estimates (La)')
+legend(bnames(dpts),'Location','NorthWest');
+title('GM Mean OEF Estimates')
 xtickangle(315);
