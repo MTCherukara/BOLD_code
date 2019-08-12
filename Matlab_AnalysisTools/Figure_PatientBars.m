@@ -13,13 +13,13 @@ setFigureDefaults;
 %% Plotting Information
 
 % choose patient number
-pat_id = '183';
+pat_id = '104';
 
 % choose which dimension to reduce (1 = pick a session, 2 = pick a correction)
 dimred = 2;
 
 % choose Session (1 = ses-001, 2 = ses-004) or a Correction
-sesnum = 4;
+sesnum = 1;
 
 % choose which masks we want
 msks = [1,3,4];
@@ -46,6 +46,9 @@ else
     sesDBV = squeeze(matDBV(:,:,sesnum));
     sesOEF = squeeze(matOEF(:,:,sesnum));
 end
+
+% normalize to contralateral
+sesOEF = 100*sesOEF./repmat(sesOEF(3,1),3,2);
 
 
 %% Bar Chart Plotting
@@ -88,7 +91,7 @@ bar(bpos,sesOEF);
 box on;
 xticks(bpos);
 xticklabels(mlbls);
-% ylim([0,36]);
+ylim([40,160]);
 if dimred == 1
     legend('uncorr.','\kappa corr.','\kappa\eta corr.','linear','Location','SouthEast');
 else
