@@ -1,8 +1,8 @@
 # fabber run 13 - AMICI stroke data (BIDS format)
 
 # Input Data
-data=/Users/mattcher/Documents/BIDS_Data/qbold_stroke/sourcedata/sub-104/ses-003/func-ase/ASE_FLAIR_av.nii.gz
-mask=/Users/mattcher/Documents/BIDS_Data/qbold_stroke/sourcedata/sub-104/ses-003/func-ase/mask_FLAIR.nii.gz
+data=/Users/mattcher/Documents/BIDS_Data/qbold_stroke/sourcedata/sub-104/ses-001/func-ase/ASE_FLAIR_av.nii.gz
+mask=/Users/mattcher/Documents/BIDS_Data/qbold_stroke/sourcedata/sub-104/ses-001/func-ase/mask_FLAIR.nii.gz
 
 # Run Options
 output=../../Data/Fabber_Results/
@@ -11,13 +11,13 @@ save-model-fit
 #print-free-energy
 
 # Method Information
-method=vb
+method=spatialvb
 noise=white
 max-iterations=10
 allow-bad-voxels
 
 # Spatial VB Information (remove all of this if method!=spatialvb)
-param-spatial-priors=NNN
+param-spatial-priors=MNM
 
 # Inference Model 
 model=qboldR2p
@@ -29,7 +29,7 @@ include_intra
 motional_narrowing
 
 precR2p=1e-4
-precDBV=1e0
+precDBV=1e-2
 #precOEF=1e0
 
 # Correction Parameters

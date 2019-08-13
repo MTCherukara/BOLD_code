@@ -14,7 +14,7 @@
 %
 % CHANGELOG:
 
-clear;
+% clear;
 setFigureDefaults;
 
 % slices = 2:6;
@@ -35,7 +35,7 @@ end
 if ~exist('slices','var')
 %     slices = 3:10;       % VS
 %     slices = 3:14;       % CSF5
-    slices = 2:6;       % s11 FLAIR
+    slices = 3:8;       % s11 FLAIR
 end
 ns = length(slices); % number of slices
 
@@ -92,7 +92,7 @@ if length(slices) == 1
 else
     sh_sds = 15;        % sides
     sh_top = 10;         % top and bottom
-    sh_bot = 5;
+    sh_bot = 0;
 end
 
 

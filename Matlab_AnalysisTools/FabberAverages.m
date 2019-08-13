@@ -34,7 +34,7 @@ vars = {'R2p','DBV','OEF'};
 % vars = {'R2'};
 
 % Choose datasets
-sets = 239;
+sets = 265:270;
 
 % Which set of subjects is this from?
 setname = 'AMICI';          % 'VS', 'genF', 'genNF', 'CSF', 'TRUST', or 'AMICI'
@@ -73,7 +73,7 @@ vecDBV = [];
 %% Loop through datasets
 for setnum = sets
     
-    for ss = 1:length(roinames);
+    for ss = 1:length(roinames)
         
         roiname = roinames{ss};
         

@@ -13,7 +13,7 @@ setFigureDefaults;
 %% Plotting Information
 
 % choose patient number
-pat_id = '104';
+pat_id = '100';
 
 % choose which dimension to reduce (1 = pick a session, 2 = pick a correction)
 dimred = 2;
@@ -100,5 +100,4 @@ end
 ylabel('OEF (%)');
 title('Mean OEF Estimates');
 xtickangle(330);
-
-
+axis square;
