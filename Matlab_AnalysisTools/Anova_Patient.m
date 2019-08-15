@@ -14,7 +14,7 @@ setFigureDefaults;
 %% OPTIONS
 
 % Choose FABBER dataset
-setnum = 270;
+setnum = 225;
 tstr = 'Patient 5 \kappa,\eta-Corrected';
 
 % Choose variable 
@@ -52,7 +52,7 @@ maskdir = ['/Users/mattcher/Documents/BIDS_Data/qbold_stroke/sourcedata/sub-',..
 % Load three masks
 mskInit = LoadSlice([maskdir,'mask_initROI.nii.gz'],slicenum);
 mskGrow = LoadSlice([maskdir,'mask_growth.nii.gz'],slicenum);
-mskCont = LoadSlice([maskdir,'mask_contraGM.nii.gz'],slicenum);
+mskCont = LoadSlice([maskdir,'mask_finalROI.nii.gz'],slicenum);
 
 % Load the data
 volData = LoadSlice([fabdir,'mean_',vname,'.nii.gz'],slicenum);

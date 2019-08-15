@@ -34,10 +34,10 @@ vars = {'R2p','DBV','OEF'};
 % vars = {'R2'};
 
 % Choose datasets
-sets = 265:270;
+sets = 391;
 
 % Which set of subjects is this from?
-setname = 'AMICI';          % 'VS', 'genF', 'genNF', 'CSF', 'TRUST', or 'AMICI'
+setname = 'genF';          % 'VS', 'genF', 'genNF', 'CSF', 'TRUST', or 'AMICI'
 
 if strcmp(setname,'AMICI')
     roinames = {'initROI','finalROI','growth','contraGM'};
@@ -119,7 +119,7 @@ for setnum = sets
             case 'genF'
                 
                 slicenum = 1:6;     % new AMICI protocol FLAIR
-                maskname = 'mask_gm_96_FLAIR.nii.gz';
+                maskname = 'mask_gm_96_FLAIR_3.nii.gz';
                 CC = strsplit(fabdir,'_s');     % need a 2-digit subject number
                 subnum = CC{2}(1:2);
                 maskdir = ['/Users/mattcher/Documents/DPhil/Data/subject_',subnum,'/'];
