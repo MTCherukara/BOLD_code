@@ -7,9 +7,9 @@ clear;
 close all;
 
 % Manual selection of subject
-subnum = 3;
+subnum = 9;
 ddir = strcat('/Users/mattcher/Documents/DPhil/Data/subject_0',num2str(subnum),'/');
-dfile = 'ASE_NF_82_unrung.nii.gz';
+dfile = 'ASE_FLAIR_82_unrung.nii.gz';
 
 % % have the user the data file, then load it
 % disp('Choose data file:');
@@ -77,6 +77,13 @@ for ii = 1:dims(4)
     
     % print out result
 %     disp(['  SNR of Volume ',num2str(ii),' of ',num2str(dims(4)),': ',round2str(snr(ii),2)]);
+
+    if ii == 3
+        data_SE = bdata;
+    elseif ii == dims(4)
+        data_LT = bdata;
+    end
+
 end
 
 disp(['Average SNR  : ',round2str(mean(snr),2),' +/- ',num2str(std(snr),3)]);
@@ -84,8 +91,10 @@ disp(['Average SNR  : ',round2str(mean(snr),2),' +/- ',num2str(std(snr),3)]);
 % disp(['  SNR (end)  : ',round2str(snr(end),1)]);
 
 % Calculate CNR
+contr = (data_SE - data_LT)./mean(sigma);
+
 cnr = (signal(3) - signal(end))./mean(sigma);
 % cnr = (max(signal) - min(signal))./mean(sigma);
-disp(['  CNR        : ',round2str(cnr,2),' +/- ',num2str(std(cnr),3)]);
+disp(['  CNR        : ',round2str(mean(contr),2),' +/- ',num2str(std(contr)/2,2)]);
 
 % disp(snr);

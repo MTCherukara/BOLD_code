@@ -14,8 +14,10 @@ setFigureDefaults;
 %% OPTIONS
 
 % Choose FABBER dataset
-setnum = 225;
-tstr = 'Patient 5 \kappa,\eta-Corrected';
+setnum = 277;
+% tstr = 'Patient 2 Uncorrected';
+tstr = 'Patient 6 \kappa,\eta-Corrected';
+
 
 % Choose variable 
 vname = 'OEF';
@@ -27,7 +29,7 @@ threshes = containers.Map({'R2p', 'DBV', 'OEF', 'VC', 'DF', 'lambda', 'Ax' , 'R2
 % Define which groups (of masks) we want to compare
 grps = {[1,2],[2,3],[1,3]};
 
-oneset = 1;
+oneset = 0;
 
 
 %% LOAD DATA
@@ -50,9 +52,9 @@ maskdir = ['/Users/mattcher/Documents/BIDS_Data/qbold_stroke/sourcedata/sub-',..
     subnum,'/ses-00',sesnum,'/func-ase/'];
 
 % Load three masks
-mskInit = LoadSlice([maskdir,'mask_initROI.nii.gz'],slicenum);
+mskInit = LoadSlice([maskdir,'mask_coreROI.nii.gz'],slicenum);
 mskGrow = LoadSlice([maskdir,'mask_growth.nii.gz'],slicenum);
-mskCont = LoadSlice([maskdir,'mask_finalROI.nii.gz'],slicenum);
+mskCont = LoadSlice([maskdir,'mask_contraGM.nii.gz'],slicenum);
 
 % Load the data
 volData = LoadSlice([fabdir,'mean_',vname,'.nii.gz'],slicenum);

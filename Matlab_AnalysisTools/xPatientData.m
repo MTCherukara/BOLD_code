@@ -40,7 +40,7 @@ end
 
 %% Line Graph comparing OEF values
 msks = [1,3,4];
-corr = 2;
+corr = 1;
 mnames = mask_labels(msks);
 nm = length(msks);
 

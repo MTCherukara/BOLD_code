@@ -34,13 +34,12 @@ vars = {'R2p','DBV','OEF'};
 % vars = {'R2'};
 
 % Choose datasets
-sets = 391;
-
+sets = 277;
 % Which set of subjects is this from?
-setname = 'genF';          % 'VS', 'genF', 'genNF', 'CSF', 'TRUST', or 'AMICI'
+setname = 'AMICI';          % 'VS', 'genF', 'genNF', 'CSF', 'TRUST', or 'AMICI'
 
 if strcmp(setname,'AMICI')
-    roinames = {'initROI','finalROI','growth','contraGM'};
+    roinames = {'coreROI','growth','contraGM'};
 else
     roinames = {'gm_50'};
 end
@@ -56,7 +55,7 @@ plot_hists = 0;
 %% Initial stuff
 % Threshold values
 threshes = containers.Map({'R2p', 'DBV', 'OEF', 'VC', 'DF', 'lambda', 'Ax' , 'R2'},...
-                          [ 30  ,  1  ,  2   ,  1  ,  15 ,   1     ,  30  ,  50 ]);  
+                          [ 15  ,  0.5  ,  2   ,  1  ,  15 ,   1     ,  30  ,  50 ]);  
 
 defaults = containers.Map({'R2p', 'DBV', 'OEF', 'VC', 'DF', 'lambda', 'Ax' , 'R2'},...
                           [ 2.6 , 0.036,  1   , 0.01,  15 ,   1     ,  30  ,  50 ]);  
@@ -203,11 +202,17 @@ for setnum = sets
             end
             
             % scale OEF by kappa
-            if strcmp(vname,'OEF') && (do_tan == 1)
-                volData = 12.5.*tan(0.144.*kappa.*volData) + 40.4;
-                
-                newBad = (volData > 100) + (volData < 0);
-                volData(newBad > 0.5) = [];
+            if strcmp(vname,'OEF') 
+                if (do_tan == 1)
+      
+                    volData = 12.5.*tan(0.144.*kappa.*volData) + 40.4;
+
+                    newBad = (volData > 100) + (volData < 0);
+                    volData(newBad > 0.5) = [];
+                    
+                else
+                    volData = kappa.*volData;
+                end
                 
             end
             
