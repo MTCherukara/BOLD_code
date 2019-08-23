@@ -7,14 +7,14 @@
 % 9 August 2019
 
 clear;
-% close all;
+close all;
 setFigureDefaults;
 
 
 %% OPTIONS
 
 % Choose FABBER dataset
-setnum = 277;
+setnum = 281;
 % tstr = 'Patient 2 Uncorrected';
 tstr = 'Patient 6 \kappa,\eta-Corrected';
 
@@ -108,7 +108,7 @@ if oneset
     ylabel('OEF (%)');
     xticks(1:3);
     xticklabels(mask_labels);
-    ylim([0,60]);
+%     ylim([0,60]);
     title(tstr);
 
 
@@ -142,7 +142,7 @@ else
         subnum,'/ses-00',sesnum,'/func-ase/'];
 
     % Load three masks
-    mskInit = LoadSlice([maskdir,'mask_initROI.nii.gz'],slicenum);
+    mskInit = LoadSlice([maskdir,'mask_coreROI.nii.gz'],slicenum);
     mskGrow = LoadSlice([maskdir,'mask_growth.nii.gz'],slicenum);
     mskCont = LoadSlice([maskdir,'mask_contraGM.nii.gz'],slicenum);
 

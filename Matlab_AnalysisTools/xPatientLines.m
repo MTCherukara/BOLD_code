@@ -9,7 +9,7 @@ clear;
 % close all;
 setFigureDefaults;
 
-corr = 0;
+corr = 1;
 
 %% DATA
        
@@ -41,6 +41,18 @@ if corr == 0
                26.1300   27.0800   23.0400
                30.2000   23.2000   20.6400 
                34.0700   34.1400   25.6000 ];
+           
+    %          Core      Growth    Contra
+    folOEF = [ 51.5800   39.3400   23.9400
+               19.1600   30.2600   26.6500
+               20.3400   25.9300   29.5100
+               15.6900   31.0200   28.6200
+               22.2700   20.5200   25.3500
+               36.1300   20.6100   24.8600 ];
+    
+    %          Core      Growth    Contra
+    
+    %          Core      Growth    Contra
 
        
 else
@@ -71,44 +83,58 @@ else
                37.9400   39.5200   29.4000
                46.3900   29.8900   25.6000 
                46.6100   47.7200   35.0200 ];
-
+           
+    %          Core      Growth    Contra
+    folOEF = [ 50.2700   63.1200   33.0500
+               27.2300   35.8500   35.7900
+               45.1500   37.9400   42.2600
+               29.2900   43.3200   35.7200
+               33.6100   29.7100   31.7700
+               61.3100   38.3500   32.4700 ];
+    
+    %          Core      Growth    Contra
+    
+    %          Core      Growth    Contra
+    
+    
 end
 
 
 %% Line Graph comparing OEF values
-mnames = {'Core','Growth','Contralateral'};
-nm = 3;
 
-% matOEF = 100*matOEF./repmat(matOEF(:,3),1,3);
-
-% Plot
-figure; hold on;
-plot(1:nm,matOEF(1:6,:),'o-','MarkerSize',10);
-grid on; box on;
-
-xticks(1:nm);
-xticklabels(mnames);
-xlim([0.6,nm+0.4]);
-ylabel('OEF (%)');
-ylim([10,80]);
-title(tltx);
-
-
-% ANOVA
-grps = {[1,2],[2,3],[1,3]};
-[~,~,stat_OEF] = anova2(matOEF([1,4,5,6,7],:),1,'off');
-c_O = multcompare(stat_OEF,'display','off');
-p_O = MC_pvalues(c_O,grps);
-
-
-% % Significance
-HO = sigstar(grps,p_O,1);
-set(HO,'Color','k')
-set(HO(:,2),'FontSize',18);
-
-
-axis square;
-legend('Patient 1','Patient 2','Patient 3','Patient 4','Patient 5','Patient 6','Location','EastOutside')
+% mnames = {'Core','Growth','Contralateral'};
+% nm = 3;
+% 
+% % matOEF = 100*matOEF./repmat(matOEF(:,3),1,3);
+% 
+% % Plot
+% figure; hold on;
+% plot(1:nm,matOEF(1:6,:),'o-','MarkerSize',10);
+% grid on; box on;
+% 
+% xticks(1:nm);
+% xticklabels(mnames);
+% xlim([0.6,nm+0.4]);
+% ylabel('OEF (%)');
+% ylim([10,80]);
+% title(tltx);
+% 
+% 
+% % ANOVA
+% grps = {[1,2],[2,3],[1,3]};
+% [~,~,stat_OEF] = anova2(matOEF([1,4,5,6,7],:),1,'off');
+% c_O = multcompare(stat_OEF,'display','off');
+% p_O = MC_pvalues(c_O,grps);
+% 
+% 
+% % % Significance
+% HO = sigstar(grps,p_O,1);
+% set(HO,'Color','k')
+% set(HO(:,2),'FontSize',18);
+% 
+% 
+% axis square;
+% legend('Patient 1','Patient 2','Patient 3','Patient 4','Patient 5','Patient 6','Location','EastOutside')
 
 
 %% The same line graph, but normalized to the Contralateral value
@@ -126,3 +152,83 @@ legend('Patient 1','Patient 2','Patient 3','Patient 4','Patient 5','Patient 6','
 % ylabel('Relative OEF (%)');
 % ylim([95,165]);
 % axis square;
+
+%% Compare Follow-up OEF data
+
+matOEF = matOEF(1:6,:);
+
+stepOEF(:,:,1) = matOEF;
+stepOEF(:,:,2) = folOEF;
+
+% % Normalize to Contralateral
+% % stepOEF = stepOEF./repmat(stepOEF(:,3,:),1,3,1);
+% 
+% % Plot core
+% figure; hold on;
+% plot(1:2,squeeze(stepOEF(:,1,:)),'o-','MarkerSize',10);
+% grid on; box on;
+% 
+% xticks(1:2);
+% xticklabels({'Presentation','Follow-up'});
+% xlim([0.7,2.3]);
+% ylabel('Relative OEF');
+% % ylim([0.5,2.5]);
+% ylim([0,70]);
+% title(['Core ',tltx]);
+% 
+% axis square;
+% legend('Patient 1','Patient 2','Patient 3','Patient 4','Patient 5','Patient 6','Location','EastOutside')
+% 
+% 
+% % Plot growth
+% figure; hold on;
+% plot(1:2,squeeze(stepOEF(:,3,:)),'o-','MarkerSize',10);
+% grid on; box on;
+% 
+% xticks(1:2);
+% xticklabels({'Presentation','Follow-up'});
+% xlim([0.7,2.3]);
+% ylabel('Relative OEF');
+% % ylim([0.5,2.5]);
+% ylim([0,70]);
+% title(['Growth ',tltx]);
+% 
+% axis square;
+% legend('Patient 1','Patient 2','Patient 3','Patient 4','Patient 5','Patient 6','Location','EastOutside')
+
+
+%% Bar Chart
+
+sbs = [1,2,4,5,6];
+
+matOEF = matOEF(sbs,:);
+folOEF = folOEF(sbs,:);
+
+% normalize to contralateral
+matOEF = matOEF./repmat(matOEF(:,3),1,3);
+folOEF = folOEF./repmat(folOEF(:,3),1,3);
+
+boxOEF = [matOEF(:,1), folOEF(:,1), matOEF(:,2), folOEF(:,2)];
+
+% average
+avs = [mean(matOEF); mean(folOEF)]';
+err = [std(matOEF); std(folOEF)]';
+
+% Plot
+figure; hold on;
+% boxplot(boxOEF);
+bar(avs(1:2,:));
+box on;
+xticks(1:2);
+xlim([0.5,2.5]);
+% xticklabels({'Core (P)','Core (F)','Growth (P)','Growth (F)'});
+xticklabels({'Core','Growth'});
+ylabel('Relative OEF');
+% ylim([0,55]);
+legend('Presentation','Follow-up')
+axis square;
+
+% grps = {[1,2],[3,4]};
+% [~,~,stat_OEF] = anova2(boxOEF,1,'off');
+% c_O = multcompare(stat_OEF,'display','off');
+% p_O = MC_pvalues(c_O,grps);

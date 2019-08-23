@@ -34,7 +34,7 @@ vars = {'R2p','DBV','OEF'};
 % vars = {'R2'};
 
 % Choose datasets
-sets = 277;
+sets = [246,280,234,236,238,282];
 % Which set of subjects is this from?
 setname = 'AMICI';          % 'VS', 'genF', 'genNF', 'CSF', 'TRUST', or 'AMICI'
 
